@@ -35,8 +35,9 @@ export const FOGLI_CHAT = {
   'chat-app2': ['app-virtual'],
   // le piastrelle delle app nuove (26.10): il profilo, l'account e le app veloci (conversioni, calcolatrice da geometra,
   // il compilatore C, la cucina del Mincio). Queste e gli avatar NON sono di gpt-image-2: sono a pixel, di
-  // retro-diffusion/rd-plus, una per una (tools/pzkko/pixel.mjs, che ha i prompt; fogli-chat.js non le rifà)
-  'chat-app3': ['app-profilo', 'app-account', 'app-conversioni', 'app-calcolatrice', 'app-compilatore', 'app-cucina', 'app-rapina', 'app-lavatrice', 'app-decifratore'],
+  // retro-diffusion/rd-plus, una per una (tools/pzkko/pixel.mjs, che ha i prompt; fogli-chat.js non le rifà). Il 29.10 il
+  // pzkstore, il negozio delle app da comprare (telefono/app/pzkstore.js)
+  'chat-app3': ['app-profilo', 'app-account', 'app-conversioni', 'app-calcolatrice', 'app-compilatore', 'app-cucina', 'app-rapina', 'app-lavatrice', 'app-decifratore', 'app-pzkstore'],
   // la roba degli uffici (26.10): quello che passa sul nastro dello spazzino (testi.js, UFFICIO)
   'chat-ufficio': ['cartaccia', 'lattina-vuota', 'graffette', 'tazza', 'mouse', 'cuffie', 'orologio', 'chiavetta', 'wallet-pzk'],
   // la cucina del Mincio (26.10, telefono/app/cucina.js): gli ingredienti, gli attrezzi e i piatti che non c'erano

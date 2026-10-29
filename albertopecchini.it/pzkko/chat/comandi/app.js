@@ -1,5 +1,6 @@
 // I comandi delle app del telefono, giocabili anche dalla chat: telefono, shop, virtual, sfide, missioni, quest, quiz.
 // (La logica sta in sfide.js, missioni.js, quiz.js, mercato.js; l'interfaccia grande è nelle app di telefono/app/.)
+import * as pzk from '../../games/pzk.js'
 import * as zaino from '../zaino.js'
 import * as sfide from '../sfide.js'
 import * as missioni from '../missioni.js'
@@ -68,23 +69,63 @@ function schedaMissione(ctx, id, esito = null) {
     azioni: v.scelte.map((s) => [s.ok ? `quest ${id} ${s.i + 1}` : `quest ${id} ${s.i + 1}`, `${s.eti}${s.costo ? ` (${s.costo})` : ''}${s.azzardo ? ` ${s.azzardo} %` : ''}${s.ok ? '' : ` — ${s.motivo}`}`, s.ok ? '' : 'spento']) })
 }
 
-// le app che si installano dalla chat (26.10): ognuna compare nel cercapersone una volta installata
-export const INSTALLABILI = {
-  decifratore: { prezzo: 1500, icona: 'app-decifratore', cosa: 'apre i wallet pzk e le chiavette usb che lo spazzino trova nei cestini, con tre giochini di decodifica. I soldi che escono sono puliti: erano destinati a sparire.' },
+// ── le app da comprare (26.10 dalla chat, «installa decifratore»; dal 29.10 il pzkstore del cercapersone,
+// telefono/app/pzkstore.js, che ha il catalogo e gli acquisti): «installa <app>» compra dallo stesso pzkstore, allo stesso
+// prezzo e con le stesse regole (il conto, i soldi puliti, niente in galera); «pzkstore» lo apre; «lavatrice» (anche «lava»)
+// apre la lavatrice, e a chi non ce l'ha spiega tutta la strada: il pzkstore, il prezzo, la commissione, come si lava ──
+const store = () => import('../../telefono/app/pzkstore.js')
+const nomeApp = (x) => x.nome.toLowerCase()
+const fatta = (x) => (x.f ? 'installata' : 'installato')
+/** «lav» → la lavatrice: per id o per l'inizio del nome (almeno tre lettere). */
+const trova = (s, arg) => (arg ? s.CATALOGO.find((x) => x.id === arg || (arg.length >= 3 && x.id.startsWith(arg))) : null)
+/** Il catalogo del pzkstore in chat, coi tasti per comprare quello che manca. */
+function elenco(ctx, s, nota = '') {
+  const manca = s.CATALOGO.filter((x) => !zaino.installata(x.id))
+  return ctx.dì({
+    colore: 'blu', t: ':app-pzkstore: il pzkstore', d: `${nota}le app che il cercapersone non ha di serie. Si comprano una volta coi $pzk <b>puliti</b> (gli sporchi non valgono) e compaiono nella home del cercapersone, nella pagina dei soldi. Qui con <code>installa lavatrice</code>, o nell’app <b>pzkstore</b> del cercapersone, con tutte le schede.`,
+    html: `<table>${s.CATALOGO.map((x) => `<tr><td>:${x.icona}:</td><td><b>${nomeApp(x)}</b>${zaino.installata(x.id) ? ` ✓ ${fatta(x)}` : ''}<br><small>${x.breve}</small></td><td>${x.prezzo ? ctx.pzkHtml(x.prezzo) : 'gratis'}</td></tr>`).join('')}</table>`,
+    azioni: [['pzkstore', ':app-pzkstore: apri il pzkstore', 'oro'], ...manca.map((x) => [`installa ${x.id}`, `:${x.icona}: compra ${nomeApp(x)} (${ctx.fmt(x.prezzo)})`])],
+    pie: pzk.conto() ? `hai ${ctx.fmt(pzk.puliti())} $pzk puliti${pzk.sporchi() > 0 ? ` e ${ctx.fmt(pzk.sporchi())} sporchi` : ''}` : 'senza conto non si compra: crealo nel cercapersone (app account)',
+  })
 }
 export const APP = [
   {
-    nomi: ['installa', 'install', 'scarica'], cat: 'app', icona: 'app-decifratore', breve: 'installa un’app nel cercapersone: «installa decifratore»', uso: 'installa <app>', senzaEventi: true,
+    nomi: ['installa', 'install', 'scarica'], cat: 'app', icona: 'app-pzkstore', breve: 'compra un’app del pzkstore e la installa nel cercapersone: «installa lavatrice», «installa decifratore»', uso: 'installa <app>', senzaEventi: true,
     async fai(ctx) {
-      const id = ctx.args[0]?.toLowerCase()
-      const x = INSTALLABILI[id]
-      if (!x) return ctx.dì({ colore: 'blu', t: ':telefono: le app da installare', html: `<table>${Object.entries(INSTALLABILI).map(([k, v]) => `<tr><td>:${v.icona}:</td><td><b>${k}</b>${zaino.installata(k) ? ' ✓' : ''}<br><small>${v.cosa}</small></td><td>${ctx.pzkHtml(v.prezzo)}</td></tr>`).join('')}</table>`, pie: 'scrivi «installa decifratore»' }) && false
-      if (zaino.installata(id)) return ctx.dì({ colore: 'grigio', d: `il ${id} c’è già: è nel cercapersone.` }) && false
-      if (!ctx.spendi(x.prezzo)) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `costa ${ctx.pzkHtml(x.prezzo)} puliti: ${ctx.pzk.perche() || `ne hai ${ctx.fmt(ctx.pzk.puliti())}`}.` }) && false
+      const s = await store(), x = trova(s, ctx.args[0]?.toLowerCase())
+      if (!x) return elenco(ctx, s, ctx.args[0] ? `nel pzkstore non c’è «${esc(ctx.args[0])}». ` : '') && false
+      const apri = [`pzkstore ${x.id}`, `:${x.icona}: apri ${nomeApp(x)}`, 'oro']
+      if (zaino.installata(x.id)) return ctx.dì({ colore: 'grigio', d: `${nomeApp(x)} ce l’hai già: è nel cercapersone, nella home (pagina dei soldi).`, azioni: [apri] }) && false
+      const r = s.compra(x.id)
+      if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', t: `:${x.icona}: ${nomeApp(x)}: ${ctx.fmt(x.prezzo)} $pzk puliti`, d: `${esc(r.errore)}.`, azioni: pzk.conto() ? [['pzkstore ' + x.id, ':app-pzkstore: la scheda nel pzkstore']] : [['telefono', ':app-account: crea il conto (cercapersone)', 'oro']] }) && false
       await ctx.pensa(900)
-      zaino.installa(id)
-      return ctx.dì({ colore: 'verde', av: 'bot-occhiolino', t: `:${x.icona}: ${id} installato`, d: `${x.cosa}
-Lo trovi nel cercapersone, fra le app.`, pie: `-${ctx.fmt(x.prezzo)} $pzk` })
+      return ctx.dì({ colore: 'verde', av: 'bot-occhiolino', t: `:${x.icona}: ${nomeApp(x)} ${fatta(x)}`, d: `${x.breve} Adesso:\n${x.come.slice(1).map((t, i) => `${i + 1}. ${t}`).join('\n')}`, azioni: [apri], pie: x.prezzo ? `−${ctx.fmt(x.prezzo)} $pzk puliti, alla cassa di pzk` : 'gratis' })
+    },
+  },
+  {
+    nomi: ['pzkstore', 'appstore', 'app-store'], cat: 'app', icona: 'app-pzkstore', breve: 'il pzkstore: le app da comprare per il cercapersone (la lavatrice, il decifratore)', uso: 'pzkstore [app]', senzaEventi: true,
+    async fai(ctx) {
+      const s = await store(), x = trova(s, ctx.args[0]?.toLowerCase())
+      // con un'app: quella, se ce l'hai; se no la sua scheda nel pzkstore
+      if (x && zaino.installata(x.id)) return ctx.apriApp(x.id)
+      ctx.apriApp('pzkstore', x ? { app: x.id } : {})
+    },
+  },
+  {
+    nomi: ['lavatrice', 'lava', 'ricicla'], cat: 'app', icona: 'app-lavatrice', breve: 'la lavatrice dei soldi sporchi: si compra nel pzkstore, poi lava fino a 50.000 in 10 minuti', uso: 'lavatrice', senzaEventi: true,
+    async fai(ctx) {
+      if (zaino.installata('lavatrice')) return ctx.apriApp('lavatrice')
+      const x = (await store()).PER_ID.lavatrice, sp = pzk.sporchi()
+      return ctx.dì({
+        colore: 'ambra', av: 'bot-pensa', t: ':app-lavatrice: la lavatrice non ce l’hai',
+        d: `i soldi sporchi (il bottino delle <b>rapine</b>) si vedono nel saldo ma con pzk non si spendono: o aspetti 96 giorni che si puliscano da soli, o li lavi nella <b>lavatrice</b>. Si fa così:
+1. apri il <b>pzkstore</b> del cercapersone (o scrivi <code>installa lavatrice</code>) e compri la lavatrice, una volta sola: <b>${ctx.fmt(x.prezzo)} $pzk puliti</b>;
+2. la apri dalla home del cercapersone, nella pagina dei soldi;
+3. scegli quanti sporchi lavare, fino a 50.000, e paghi <b>2.000 puliti</b> di commissione;
+4. dopo dieci minuti sono puliti.`,
+        azioni: [['installa lavatrice', `:app-lavatrice: compra la lavatrice (${ctx.fmt(x.prezzo)})`, 'oro'], ['pzkstore lavatrice', ':app-pzkstore: la scheda nel pzkstore']],
+        pie: pzk.conto() ? `hai ${ctx.fmt(sp)} $pzk sporchi e ${ctx.fmt(pzk.puliti())} puliti` : 'serve il conto: i soldi sporchi stanno lì',
+      }) && false
     },
   },
   {

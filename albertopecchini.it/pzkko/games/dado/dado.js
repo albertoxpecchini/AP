@@ -163,7 +163,7 @@ function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
   if (!el.saldo) return
-  if (!contando) el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
+  if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
   const p = puntato()
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta'
@@ -596,6 +596,12 @@ async function fermata(dadi) {
   segnaVinte(dadi)
   const giocate = stato.giro ?? new Map()
   const conto = esito(giocate, dadi, R())
+  // (29.10 notte, Alberto: «ho vinto un botto, ho visto saldo 8000 e rotti e poi ctrl f5 sono spariti»): i soldi passano
+  // SUBITO, appena la campana dice com'è andata (un lotto, games/pzk.js, che parte in quell'istante); prima passavano solo
+  // dopo tutte le fiches che volano, e ricaricando a metà la vincita si perdeva. Le fiches e il saldo che conta sono da
+  // vedere: il tavolo mostra il saldo di prima (mostrato) finché non arrivano
+  mostrato = pzk.saldo()
+  pzk.regola(GIOCO, conto.puntato, conto.torna)
   voce(giocate.size ? (conto.netto > 0 ? `${nome}: vinci ${fmt(conto.netto)} $pzk` : conto.torna ? `${nome}: ti tornano ${fmt(conto.torna)} $pzk` : `${nome}: il banco si prende tutto`) : nome)
   await attendi(700)
 
@@ -652,10 +658,12 @@ async function fermata(dadi) {
         })
       }
     })
-    contaSaldo(pzk.saldo(), pzk.saldo() + conto.torna)
+    contaSaldo(mostrato, mostrato + conto.torna)
+    mostrato = null // (durante il conteggio il saldo lo scrive contaSaldo; poi quello vero)
     await Promise.all(ritorni)
   }
-  pzk.regola(GIOCO, conto.puntato, conto.torna)
+  mostrato = null
+  aggiornaBanco()
   if (giocate.size) stato.ultime = giocate
   stato.giocate = new Map()
   stato.mosse = []
@@ -667,7 +675,7 @@ async function fermata(dadi) {
   if (pzk.aSecco()) voce(`${nome}. hai finito i $pzk: ricarica`)
 }
 
-let contando = false
+let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches tornano (i soldi sono già passati)
 function contaSaldo(da, a) {
   const durata = RIDOTTO.matches ? 0 : 900
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }

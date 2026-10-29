@@ -6,30 +6,46 @@
 //   zero, il gioco ne dà altri 1.000. Niente EUR€, niente borsa: 1.000 standard sono 1.000 standard.
 // - IL CONTO: chi entra nel wallet (un nome e un PIN di quattro cifre, api/wallet.mjs) ha i suoi soldi salvati sul
 //   server e soggetti alla borsa (api/borsa.mjs): può parcheggiarli in EUR€ (l'euroshit, l'euro finto del wallet) e
-//   riportarli in $pzk al cambio del momento. I giochi girano qui, nel browser, quindi il saldo si salva da qui (salva,
-//   un po' dopo ogni cambio e quando la pagina si nasconde); il cambio e il conto si sincronizzano all'ingresso, quando
-//   il wallet si apre e comunque dopo mezz'ora (il server non converte col cambio di più di mezz'ora fa). Il token
-//   e l'ultimo stato stanno in localStorage (pzkko-wallet): la pagina riparte con quelli, e intanto chiede al server.
+//   riportarli in $pzk al cambio del momento. Il token e il conto com'è sul server stanno in localStorage (pzkko-wallet).
+//
+// I LOTTI (29.10 notte, Alberto: «ho giocato i dadi, ho vinto un botto, ho visto saldo 8000 e rotti e poi ctrl f5 sono
+// spariti … quando vinco anche dopo 1 millesimo le cose si salvino subito … se entro con 2 telefoni e stesso account assieme
+// devo vedere le cose sincronizzati al millisecondo»). Fino al 29.10 il browser mandava il saldo intero, un po' dopo ogni
+// cambio: quello che non era ancora partito spariva ricaricando, e due dispositivi si cancellavano a vicenda. Adesso:
+// - il saldo vero è quello del server (W.conto.pzk); quello che si vede è il saldo del server PIÙ le variazioni di qui che
+//   il server non ha ancora contato, più i premi che il server sta per dare (attesa);
+// - ogni variazione (un giro finito, una morte) è un LOTTO numerato, { n, d, persi, v }: quanto cambia il saldo e da dove
+//   (le voci: il gioco col puntato e il tornato, i soldi nuovi del lavoro, la cassa); finisce SUBITO in localStorage (la
+//   coda di questa pagina, pzkko-coda:<conto>:<pagina>) e parte SUBITO per il server (se una richiesta è in volo, appena
+//   torna). Ogni pagina aperta è un dispositivo: una pagina ricaricata trova la coda di quella di prima, la conta nel saldo
+//   e la rimanda; il server non applica mai due volte lo stesso lotto (api/wallet.mjs, «I LOTTI NUMERATI»), lo controlla
+//   prima (le voci devono fare esattamente la variazione, un gioco non rende più di 50 volte, niente salti impossibili) e
+//   risponde col saldo vero. Le code di tutte le schede dello stesso browser si sommano subito (l'evento storage);
+//   gli altri dispositivi lo sanno dal canale (games/live.js), che porta il saldo nuovo del server (dalCanale).
+// - il conto ha una versione (conto.agg, l'ora del server, sempre crescente): una risposta o un avviso più vecchi di quello
+//   che si sa già non cambiano niente.
 //
 // Ogni gioco sposta i $pzk dal saldo al suo tavolo quando punta (punta), li riprende se toglie la fiche (ritira) e, a giro
-// finito, chiude il conto (regola): quello che era sul tavolo è giocato, torna quello che si è vinto. Si salva il saldo
-// più quello che c'è sui tavoli: se la pagina si chiude a metà giro, alla volta dopo le puntate tornano nel saldo.
+// finito, chiude il conto (regola): quello che era sul tavolo è giocato, torna quello che si è vinto. Le puntate non sono
+// lotti: per il server il saldo le contiene ancora, e se la pagina si chiude a metà giro, alla volta dopo tornano nel saldo.
 // I conti vanno a mezzi $pzk (il blackjack paga 3 a 2: 5 → 7,5); gli EUR€ a centesimi.
 //
 // L'ECONOMIA (26.10, api/_economia.mjs): ogni regola dice dove vanno i soldi. Di base è un conto con la CASSA DI PZK (le
 // puntate perse, gli acquisti; le vincite e la roba venduta escono da lì): regola(gioco, giocato, torna). I soldi nuovi
 // (il lavoro, le quest, i premi, la miniera) sono CONIO: regola(…, 'conio'); quelli persi morendo cadono per terra:
-// perdi(n). Il browser tiene il conto (W.flussi) e lo manda col saldo a lotti numerati (W.fn); il server fa i conti
-// dell'offerta. Col conto ci sono anche i SOLDI SPORCHI (il bottino delle rapine: si vedono nel saldo ma con pzk non si
-// spendono, quindi punta accetta solo i puliti) e la GALERA (non si punta).
+// perdi(n). Le voci dei lotti lo dicono al server, che fa i conti dell'offerta e il libro di ognuno (le classifiche). Col
+// conto ci sono anche i SOLDI SPORCHI (il bottino delle rapine: si vedono nel saldo ma con pzk non si spendono, quindi punta
+// accetta solo i puliti) e la GALERA (non si punta).
 
 const API = '/api/wallet/' // con la barra finale: il sito ha trailingSlash, e senza ogni POST passava da un redirect 308 che alcuni browser fanno confermare (« reinviare i dati del modulo? »)
 const CHIAVE_SESSIONE = 'pzkko-pzk-sessione'
 const CHIAVE_CONTO = 'pzkko-wallet'
 const CHIAVE_TROVATE = 'pzkko-pzk-trovate'
+const CODA = 'pzkko-coda:' // + <conto>:<pagina>
 export const INIZIALE = 1000
 export const VALE_CAMBIO = 30 * 60 * 1000
 export const BANCONOTE = { b500: 500, b100: 100, b25: 25, b10: 10 }
+const GIOCHI = ['roulette', 'blackjack', 'mine', 'dado', 'moneta', 'virtual'] // i giochi grandi (come GIOCHI_SOLDI di api/wallet.mjs)
 
 const mezzi = (n) => Math.round(n * 2) / 2
 const cent = (n) => Math.round(n * 100) / 100
@@ -54,11 +70,10 @@ const leggiJSON = (dep, k) => { try { return JSON.parse(dep.getItem(k) || 'null'
 const scriviJSON = (dep, k, v) => { try { v === null ? dep.removeItem(k) : dep.setItem(k, JSON.stringify(v)) } catch {} }
 
 // ── lo stato ──
-let W = leggiConto() // il conto: { token, conto, tasso, t, nuovo?, flussi, fn } o null
-const flussi = () => { if (!W) return null; W.flussi ??= { casa: 0, persi: 0 }; W.fn ??= (W.conto.fn ?? 0) + 1; return W.flussi }
-let liberi = W ? Math.max(0, mezzi(W.conto.pzk)) : leggiSessione()
+let W = leggiConto() // il conto: { token, conto (com'è sul server), tasso, t } o null
+let liberi = 0
 let online = null // null = non si sa ancora, false = il server dice offline
-let inCorso = null // la richiesta di salvataggio in volo
+let attesa = 0 // i $pzk che il server sta per dare (il sussidio, una banconota, il regalo di instagram): si vedono subito
 
 function leggiSessione() {
   const s = leggiJSON(sessionStorage, CHIAVE_SESSIONE)
@@ -69,10 +84,65 @@ function leggiConto() {
   return w && typeof w.token === 'string' && w.conto && Number.isFinite(w.conto.pzk) ? w : null
 }
 function avvisa() { for (const f of ascolti) f(liberi); for (const f of osservatori) f() }
-function scrivi() {
-  const tutto = mezzi(liberi + sulTavoli())
-  if (W) { W.conto.pzk = tutto; scriviJSON(localStorage, CHIAVE_CONTO, W); salvaPoi() } else scriviJSON(sessionStorage, CHIAVE_SESSIONE, { saldo: tutto })
+
+// ── le code dei lotti (vedi in cima). code: chiave di localStorage → { chi, n, lotti, vivo } ──
+const nuovoId = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }
+const DISP = nuovoId() // questa pagina
+const chi = () => (W ? W.token.split('.')[0] : null) // il conto (la prima parte del token)
+const chiaveMia = () => `${CODA}${chi()}:${DISP}`
+const dispDi = (k) => k.slice(k.lastIndexOf(':') + 1)
+function leggiCode() {
+  const out = {}
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (!k?.startsWith(CODA)) continue
+      const q = leggiJSON(localStorage, k)
+      if (q && Array.isArray(q.lotti)) out[k] = q
+    }
+  } catch {}
+  return out
+}
+let code = leggiCode()
+/** Le code di questo conto (di questa pagina, delle altre schede, delle pagine di prima). */
+const mie = () => Object.entries(code).filter(([k, q]) => q.chi === chi() && k.startsWith(`${CODA}${chi()}:`))
+const inCoda = () => mie().reduce((s, [, q]) => s + q.lotti.reduce((a, l) => a + (Number(l.d) || 0), 0), 0)
+/** Di nessuno: la pagina che la teneva è stata chiusa (vivo 0) o non si fa viva da mezzo minuto. */
+const orfana = (k, q) => dispDi(k) !== DISP && (q.vivo === 0 || Date.now() - q.vivo > 30_000)
+const daMandare = () => mie().filter(([, q]) => q.lotti.length).map(([k, q]) => ({ disp: dispDi(k), lotti: q.lotti }))
+
+/** Il saldo che si vede: quello del server, più i lotti in viaggio, più i premi in arrivo, meno quello che c'è sui tavoli. */
+function ricalcola() {
+  if (W) liberi = Math.max(0, mezzi(W.conto.pzk + inCoda() + attesa - sulTavoli()))
   avvisa()
+}
+function scrivi() {
+  if (W) return ricalcola()
+  scriviJSON(sessionStorage, CHIAVE_SESSIONE, { saldo: mezzi(liberi + sulTavoli()) })
+  avvisa()
+}
+/** Un lotto nuovo di questa pagina: in coda (in localStorage, subito) e via al server. */
+function aggiungi(parte) {
+  const k = chiaveMia(), q = (code[k] ??= { chi: chi(), n: 0, lotti: [], vivo: Date.now() })
+  q.n += 1
+  q.lotti.push({ n: q.n, ...parte })
+  q.vivo = Date.now()
+  scriviJSON(localStorage, k, q)
+  manda()
+}
+/** Il server ha visto fino al lotto visti[pagina]: si tolgono dalle code. Le code di questa pagina e quelle di nessuno si
+ *  riscrivono (o si cancellano, vuote); quelle delle altre schede vive le riscrive chi le tiene. */
+function pota(visti = {}) {
+  for (const [k, q] of mie()) {
+    const v = visti[dispDi(k)] ?? 0, prima = q.lotti.length
+    q.lotti = q.lotti.filter((l) => l.n > v)
+    if (q.lotti.length === prima) continue
+    const mia = dispDi(k) === DISP
+    if (!mia && !orfana(k, q)) continue
+    if (!q.lotti.length && !mia) { delete code[k]; scriviJSON(localStorage, k, null) }
+    else if (!q.lotti.length) scriviJSON(localStorage, k, null) // (la mia, vuota: in memoria resta il numero)
+    else scriviJSON(localStorage, k, q)
+  }
 }
 
 /** I $pzk liberi (quelli non puntati). */
@@ -103,15 +173,19 @@ export function ritira(gioco, n) {
   liberi += n
   scrivi()
 }
+const nomeVoce = (g) => String(g).toLowerCase().replace(/[^a-z0-9-]/g, '-').slice(0, 24) || 'altro'
 /** Fine di un giro (o di una parte): `giocato` lascia il tavolo, `torna` va nel saldo. `tipo`: 'casa' (di base: un conto
- *  con la cassa di pzk, che incassa il giocato e paga il tornato), 'conio' (soldi nuovi: il tornato nasce dal nulla). */
+ *  con la cassa di pzk, che incassa il giocato e paga il tornato), 'conio' (soldi nuovi: il tornato nasce dal nulla).
+ *  Col conto è un lotto, che parte subito. */
 export function regola(gioco, giocato, torna, tipo = 'casa') {
   if (stantii.has(gioco)) { stantii.delete(gioco); return } // la puntata era di un altro portafoglio (vedi altroProprietario): niente da pagare qui
+  // (lascia il tavolo quello che c'era davvero: chi regola senza aver puntato non paga, come prima dei lotti)
+  const g = Math.min(mezzi(giocato), sulTavolo(gioco)), t = mezzi(torna)
   tavoli.set(gioco, Math.max(0, sulTavolo(gioco) - mezzi(giocato)))
-  liberi += mezzi(torna)
-  const F = flussi()
-  if (F && tipo === 'casa') F.casa = mezzi(F.casa + mezzi(giocato) - mezzi(torna))
-  else if (F && tipo === 'conio' && giocato) F.casa = mezzi(F.casa + mezzi(giocato)) // (quello che si era puntato va comunque alla cassa)
+  if (W) {
+    const nome = nomeVoce(gioco), voce = tipo === 'conio' ? [`c:${nome}`, [g, t]] : GIOCHI.includes(gioco) || gioco.startsWith('chat-') ? [`g:${nome}`, [g, t, 1, t > g ? 1 : 0, Math.max(0, t - g)]] : [`k:${nome}`, [g, t]]
+    if (g || t) aggiungi({ d: mezzi(t - g), persi: 0, v: { [voce[0]]: voce[1] } })
+  } else liberi += t
   scrivi()
   // le statistiche del profilo (26.10): i giochi grandi le segnano nello zaino (chat/zaino.js, giro: gli altri li ignora)
   if (!gioco.startsWith('chat')) import('../chat/zaino.js').then((z) => z.giro?.(gioco, mezzi(giocato), mezzi(torna))).catch(() => {})
@@ -121,9 +195,8 @@ export const aSecco = () => liberi < 1 && sulTavoli() === 0
 export function perdi(n) {
   n = mezzi(Math.min(n, liberi))
   if (!(n > 0)) return 0
-  liberi -= n
-  const F = flussi()
-  if (F) F.persi = mezzi(F.persi + n)
+  if (W) aggiungi({ d: -n, persi: n, v: {} })
+  else liberi -= n
   scrivi()
   return n
 }
@@ -136,9 +209,16 @@ export const galera = () => (W?.conto.galera > Date.now() ? W.conto.galera : 0)
 export const inGalera = () => galera() > 0
 export const lavaggio = () => W?.conto.lavaggio ?? null
 /** Perché una puntata non passa (i giochi lo dicono con la loro voce): la galera, i soldi sporchi, o non bastano. */
-export const nonBasta = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}` : sporchi() > 0 ? `puoi puntare solo i soldi puliti: ne hai ${fmt(puliti())} (gli altri ${fmt(sporchi())} sono sporchi: lavatrice)` : liberi >= 1 ? `non ti bastano: hai ${fmt(liberi)} $pzk` : 'hai finito i $pzk')
+export const nonBasta = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}` : sporchi() > 0 ? `puoi puntare solo i soldi puliti: ne hai ${fmt(puliti())} (gli altri ${fmt(sporchi())} sono sporchi: si lavano nella lavatrice, che si compra nel pzkstore del cercapersone)` : liberi >= 1 ? `non ti bastano: hai ${fmt(liberi)} $pzk` : 'hai finito i $pzk')
 const oraDi = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
 
+/** Un premio che dà il server (il sussidio, una banconota, il regalo di instagram): si vede subito (attesa), e quando il
+ *  server risponde vale il suo conto (che lo contiene, o no se ha detto di no). */
+function promessa(n, body) {
+  attesa = mezzi(attesa + n)
+  ricalcola()
+  return chiama(body).then((d) => { attesa = mezzi(attesa - n); if (d.conto) accogli(d); else ricalcola(); return d })
+}
 /**
  * A secco (meno di 1 $pzk libero e niente sui tavoli): nella sessione altri INIZIALE, subito. Col conto: se ci sono
  * EUR€ si apre il wallet per convertirli (false: niente $pzk nuovi); se no il sussidio, 1.000 $pzk una volta al giorno
@@ -150,24 +230,35 @@ export function ricarica() {
   if (W.conto.eur >= 0.01) { apriWallet('converti'); return false }
   if (W.conto.sussidio) return false
   W.conto.sussidio = true
-  liberi += INIZIALE
-  scrivi()
-  chiama({ a: 'sussidio' }).then((r) => { if (!r.ok && r.conto) { W.conto = r.conto; liberi = Math.max(0, mezzi(r.conto.pzk - sulTavoli())); scriviJSON(localStorage, CHIAVE_CONTO, W); avvisa() } })
+  promessa(INIZIALE, { a: 'sussidio' })
   return true
 }
 /** Perché ricarica() ha detto di no (per la voce del gioco). */
-export const perche = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}: si esce prima con la cauzione (app rapina)` : W && sporchi() > 0 && puliti() < 1 ? 'hai solo soldi sporchi: con pzk non si spendono. lavali nella lavatrice (app del cercapersone)' : !W ? '' : W.conto.eur >= 0.01 ? `hai ${fmtEur(W.conto.eur)} EUR€ nel wallet: convertili in $pzk per giocare` : 'il sussidio è uno al giorno: torna domani, o fatti mandare $pzk da un amico')
+export const perche = () => (inGalera() ? `sei in galera fino alle ${oraDi(galera())}: si esce prima con la cauzione (app rapina)` : W && sporchi() > 0 && puliti() < 1 ? 'hai solo soldi sporchi: con pzk non si spendono. si lavano nella lavatrice, che si compra nel pzkstore del cercapersone (5.000 puliti, una volta; poi 2.000 a lavaggio): i puliti vengono dal lavoro, dalle quest, dalle sfide. o aspetti 96 giorni, e si puliscono da soli' : !W ? '' : W.conto.eur >= 0.01 ? `hai ${fmtEur(W.conto.eur)} EUR€ nel wallet: convertili in $pzk per giocare` : 'il sussidio è uno al giorno: torna domani, o fatti mandare $pzk da un amico')
 
 /** fn(saldo) a ogni cambio, anche quando il saldo cambia in un'altra scheda. Restituisce la funzione per smettere. */
 export function ascolta(fn) { ascolti.add(fn); return () => ascolti.delete(fn) }
 /** fn() a ogni cambio di qualunque cosa (saldo, conto, EUR€, cambio): per il wallet. */
 export function osserva(fn) { osservatori.add(fn); return () => osservatori.delete(fn) }
 
+// le altre schede: il conto (entrare, uscire, la versione nuova del server) e le loro code (si sommano subito)
 addEventListener('storage', (e) => {
+  if (e.key === null) { code = leggiCode(); return ricalcola() } // (localStorage svuotato)
+  if (e.key?.startsWith(CODA)) {
+    const q = leggiJSON(localStorage, e.key)
+    // (senza i lotti che il server ha già contato: chi la riscrive può non averlo ancora saputo, e si conterebbero due volte)
+    if (q && Array.isArray(q.lotti)) { const v = W?.conto.disp?.[dispDi(e.key)] ?? 0; q.lotti = q.lotti.filter((l) => l.n > v); code[e.key] = q }
+    else if (dispDi(e.key) !== DISP) delete code[e.key]
+    return ricalcola()
+  }
   if (e.key !== CHIAVE_CONTO) return
   const w = leggiConto()
-  if (!!w !== !!W || (w && W && w.token !== W.token)) { altroProprietario(); W = w; liberi = w ? Math.max(0, mezzi(w.conto.pzk)) : leggiSessione(); avvisa(); avvisaCambioConto(); return }
-  if (w && W) { W = w; liberi = Math.max(0, mezzi(w.conto.pzk - sulTavoli())); avvisa() }
+  if (!!w !== !!W || (w && W && w.token !== W.token)) {
+    altroProprietario(); W = w; attesa = 0
+    if (!W) liberi = leggiSessione()
+    ricalcola(); avvisaCambioConto(); return
+  }
+  if (w && W && (w.conto.agg ?? 0) >= (W.conto.agg ?? 0)) { W = { ...W, ...w }; pota(W.conto.disp); ricalcola() }
 })
 
 /** Le fiches (le stesse foto in tutti i giochi: art/fiches/f<valore>.webp) e un importo in fiches, dalle più grandi. */
@@ -193,8 +284,9 @@ export function fmtCorto(n) {
 }
 
 // ── il conto ─────────────────────────────────────────────────────────────────
-/** Il conto, come lo vede il wallet ({ nome, ind, pzk, eur, ig, trovati, invii, mosse… }), o null (la sessione). */
-export const conto = () => W?.conto ?? null
+/** Il conto, come lo vede il wallet ({ nome, ind, pzk, eur, ig, trovati, invii, mosse… }), o null (la sessione). Il saldo
+ *  (pzk) è quello che si vede: il server più i lotti in viaggio. */
+export const conto = () => (W ? { ...W.conto, pzk: mezzi(liberi + sulTavoli()) } : null)
 export const token = () => W?.token ?? null
 export const euro = () => W?.conto.eur ?? 0
 /** Il cambio (1 $pzk in EUR€) di quando ci si è sincronizzati, e quando; scaduto() dopo mezz'ora. */
@@ -202,57 +294,65 @@ export const tasso = () => W?.tasso ?? 1
 export const sincronizzato = () => W?.t ?? 0
 export const scaduto = () => !!W && Date.now() - W.t > VALE_CAMBIO
 export const serverOnline = () => online
+/** Le code ancora in viaggio (per la regia e le prove): quanti lotti e quanti $pzk. */
+export const inViaggio = () => ({ lotti: mie().reduce((s, [, q]) => s + q.lotti.length, 0), pzk: mezzi(inCoda()) })
 
 async function chiama(body, { keepalive = false } = {}) {
-  // i flussi partono col saldo (un lotto: n); quando il server dice di averlo contato (conto.fn) si tolgono
-  const F = body.pzk !== undefined ? flussi() : null, lotto = F && { n: W.fn, casa: F.casa, persi: F.persi }
-  if (lotto) body = { ...body, flussi: lotto }
+  // col conto partono sempre le code (anche vuote): il server non riceve mai più il saldo intero, se non dal browser di prima
+  const dati = W ? { token: W.token, disp: DISP, code: daMandare(), ...body } : body
   try {
-    // lg: il giorno della lumachina che il saldo di qui contiene già (api/wallet.mjs: se una risposta s'è persa, il server
-    // aggiunge le giornate che il browser non ha visto)
-    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(W && { token: W.token, lg: W.conto.lumaca?.g ?? null, ...(Number.isInteger(W.conto.es) && { es: W.conto.es }) }), ...body }), keepalive })
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dati), keepalive })
     const d = await r.json().catch(() => ({ ok: false, errore: 'il server non risponde' }))
     online = !d.offline
-    if (lotto && W && d.conto?.fn >= lotto.n) { const G = flussi(); G.casa = mezzi(G.casa - lotto.casa); G.persi = mezzi(G.persi - lotto.persi); W.fn = d.conto.fn + 1 }
-    else if (lotto && W && d.avviso) { W.flussi = { casa: 0, persi: 0 } } // il server ha tenuto il suo saldo: i flussi di qui non valgono più
-    if (d.esci && W) { esci(false) }
+    if (d.scartati?.length) console.warn('wallet: lotti scartati dal server', d.scartati, d.avviso)
+    if (d.esci && W) esci(false)
     return d
   } catch { return { ok: false, errore: 'niente rete: riprova' } }
 }
-// la risposta del server con dentro il conto: diventa lo stato (il saldo libero segue, i tavoli restano). Se intanto qui
-// si è giocato (tienipzk), resta il saldo di qui più quello che la lumachina ha appena spostato sul server (d.lumaca.delta)
-function accogli(d, { tienipzk = false } = {}) {
+/** La risposta del server con dentro il conto: diventa lo stato, se non è più vecchia di quella che si ha. */
+function accogli(d) {
   if (!d?.conto || !W) return
-  // es: i soldi arrivati da fuori (un invio ricevuto, un'operazione della banca) che il saldo di qui non contiene ancora
-  const pzkLocale = W.conto.pzk, esPrima = W.conto.es
-  const fuori = Number.isInteger(esPrima) ? (d.conto.esterni ?? []).filter((v) => v.s > esPrima).reduce((a, v) => a + v.n, 0) : 0
-  const lumaca = (Number(d.lumaca?.delta) || 0) + fuori
-  W.conto = d.conto
   if (Number.isFinite(d.tasso)) W.tasso = d.tasso
   if (Number.isFinite(d.t)) W.t = d.t
-  if (tienipzk && !d.avviso) { W.conto.pzk = Math.max(0, mezzi(pzkLocale + lumaca)); if (lumaca) liberi = Math.max(0, mezzi(liberi + lumaca)) }
-  else liberi = Math.max(0, mezzi(W.conto.pzk - sulTavoli()))
+  if ((d.conto.agg ?? 0) >= (W.conto.agg ?? 0)) { W.conto = d.conto; pota(d.conto.disp) }
   scriviJSON(localStorage, CHIAVE_CONTO, W)
-  avvisa()
+  ricalcola()
 }
-// il saldo al server: un po' dopo l'ultimo cambio, e subito (keepalive) quando la pagina si nasconde
-let attesa = 0, sporco = false
-// (quasi subito: 250 ms, perché le puntate di fila siano una richiesta sola; gli altri dispositivi lo sanno da games/live.js)
-function salvaPoi() { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 250) }
-async function salva(keepalive = false) {
-  if (!W || !sporco) return
-  sporco = false
-  const mandato = W.conto.pzk
-  inCorso = chiama({ a: 'salva', pzk: mandato }, { keepalive })
-  const d = await inCorso
-  inCorso = null
-  if (d.ok) accogli(d, { tienipzk: W?.conto.pzk !== mandato })
-  else if (d.conto) accogli(d)
-  // (non andato: troppe richieste, rete, server che non risponde: il saldo di qui non si butta via, si riprova fra 8 secondi)
-  else if (W && /calma|rete|risponde|riprova/.test(d.errore ?? '')) { sporco = true; clearTimeout(attesa); attesa = setTimeout(() => salva(), 8000) }
+/** Il canale (games/live.js) dice che il conto sul server è cambiato: il saldo, gli EUR€, i lotti visti, la versione. Si
+ *  prende subito se è più nuovo; → true se lo era (live.js poi chiede il resto, le mosse e tutto, con sincronizza). */
+export function dalCanale(s) {
+  if (!W || !s || !Number.isFinite(s.pzk) || !((s.agg ?? 0) > (W.conto.agg ?? 0))) return false
+  W.conto = { ...W.conto, pzk: s.pzk, eur: Number.isFinite(s.eur) ? s.eur : W.conto.eur, disp: s.disp ?? W.conto.disp, agg: s.agg }
+  pota(W.conto.disp)
+  scriviJSON(localStorage, CHIAVE_CONTO, W)
+  ricalcola()
+  return true
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(attesa); salva(true) } })
-addEventListener('pagehide', () => { clearTimeout(attesa); salva(true) })
+
+// le code al server: subito; se una richiesta è già in volo, appena torna (una sola alla volta, con dentro tutto quello che
+// c'è). Rete persa, server in pausa: si riprova fra 2 secondi, poi 4, 8… fino a 30, e intanto il saldo resta quello di qui
+let volo = null, ancora = false, riprova = 0, pausa = 2000
+function manda() {
+  if (!W) return
+  if (volo) { ancora = true; return }
+  if (!daMandare().length) return
+  clearTimeout(riprova)
+  const k = chiaveMia()
+  if (code[k]?.lotti.length) { code[k].vivo = Date.now(); scriviJSON(localStorage, k, code[k]) } // (viva: le altre schede non la prendono per di nessuno)
+  volo = chiama({ a: 'salva' }).then((d) => {
+    if (d.conto) { accogli(d); pausa = 2000 }
+    else if (W) { riprova = setTimeout(manda, pausa); pausa = Math.min(30_000, pausa * 2) }
+  }).finally(() => { volo = null; if (ancora) { ancora = false; manda() } })
+}
+// la pagina se ne va: la sua coda diventa di nessuno (la pagina dopo la prende subito) e parte quello che c'è (keepalive)
+addEventListener('pagehide', () => {
+  if (!W) return
+  const k = chiaveMia()
+  if (code[k]?.lotti.length) { code[k].vivo = 0; scriviJSON(localStorage, k, code[k]) }
+  if (daMandare().length) chiama({ a: 'salva' }, { keepalive: true })
+})
+addEventListener('pageshow', (e) => { const k = W && chiaveMia(); if (e.persisted && code[k]?.lotti.length) { code[k].vivo = Date.now(); scriviJSON(localStorage, k, code[k]) } })
+document.addEventListener('visibilitychange', () => { if (document.hidden) manda() })
 
 /** Entra con nome e PIN. → { ok, errore? } */
 export async function entra(nome, pin) {
@@ -269,37 +369,45 @@ export async function crea(nome, pin, key) {
 function prendi(d) {
   altroProprietario() // (quello che era sui tavoli era della sessione: non passa nel conto)
   W = { token: d.token, conto: d.conto, tasso: d.tasso, t: d.t }
-  liberi = Math.max(0, mezzi(d.conto.pzk))
+  attesa = 0
   scriviJSON(localStorage, CHIAVE_CONTO, W)
-  avvisa()
+  code = leggiCode() // (le code di questo conto rimaste da prima: si contano e si rimandano)
+  ricalcola()
   avvisaCambioConto()
+  manda()
 }
-/** Esci: si torna ai 1.000 della sessione (prima si salva quello che c'è). */
+/** Esci: si torna ai 1.000 della sessione (prima parte quello che c'è). */
 export async function esci(salvaPrima = true) {
   if (!W) return
-  if (salvaPrima) { clearTimeout(attesa); await salva() }
-  altroProprietario() // (le puntate del conto sono nel suo saldo, salvato qui sopra: i tavoli non seguono nella sessione)
+  if (salvaPrima && daMandare().length) { const d = await chiama({ a: 'salva' }); if (d.conto) accogli(d) }
+  if (!W) return
+  altroProprietario() // (le puntate del conto sono nel suo saldo sul server: i tavoli non seguono nella sessione)
+  const k = chiaveMia()
+  if (code[k]?.lotti.length) { code[k].vivo = 0; scriviJSON(localStorage, k, code[k]) } // (non partita: resta per quando si rientra)
   W = null
+  attesa = 0
   scriviJSON(localStorage, CHIAVE_CONTO, null)
   liberi = leggiSessione()
   avvisa()
   avvisaCambioConto()
 }
-/** Sincronizza col server: il conto com'è lì e il cambio di adesso (prima manda il saldo di qui). → { ok, errore? } */
+/** Sincronizza col server: il conto com'è lì e il cambio di adesso (partono anche le code). → { ok, errore? } */
 export async function sincronizza() {
   if (!W) return { ok: false, errore: 'non sei entrato' }
-  clearTimeout(attesa); sporco = false
-  const mandato = W.conto.pzk
-  const d = await chiama({ a: 'stato', pzk: mandato })
-  if (d.ok || d.conto) accogli(d, { tienipzk: d.ok && W?.conto.pzk !== mandato })
+  const d = await chiama({ a: 'stato' })
+  if (d.conto) accogli(d)
   return d
 }
-// le azioni che toccano il conto: il saldo di qui parte insieme, e il conto torna com'è sul server
+/** Il biglietto del canale diretto col server dei dati (games/live.js): { url, biglietto } o null. */
+export async function biglietto() {
+  if (!W) return null
+  const d = await chiama({ a: 'biglietto' })
+  return d.ok && d.url && d.biglietto ? { url: d.url, biglietto: d.biglietto } : null
+}
+// le azioni che toccano il conto: partono insieme alle code, e il conto torna com'è sul server
 async function azione(body) {
   if (!W) return { ok: false, errore: 'entra nel conto, prima (l’app account del cercapersone)' }
-  clearTimeout(attesa); sporco = false
-  if (inCorso) await inCorso
-  const d = await chiama({ ...body, pzk: W.conto.pzk })
+  const d = await chiama(body)
   if (d.conto) accogli(d)
   return d
 }
@@ -326,7 +434,7 @@ export async function colpo(op, codice = '') {
   if (!W) return { ok: false, errore: 'serve il conto (app account)' }
   if (op !== 'stato') return azione({ a: 'colpo', op, codice })
   const d = await chiama({ a: 'colpo', op, codice })
-  if (d.conto) accogli(d, { tienipzk: true }) // (il bottino o la multa arrivano come soldi da fuori)
+  if (d.conto) accogli(d) // (il bottino o la multa arrivano col saldo del server)
   return d
 }
 export const cambiaIndirizzo = (nuovo, key) => azione({ a: 'indirizzo', nuovo, ...(key && { key }) })
@@ -338,14 +446,13 @@ export async function chiE(ind) { try { return await (await fetch(`${API}?ind=${
 function trovateSessione() { const t = leggiJSON(sessionStorage, CHIAVE_TROVATE); return t && t.g === oggi() ? t.q : [] }
 /** Le banconote già raccolte oggi (['b500', …]). */
 export const trovate = () => (W ? W.conto.trovati ?? [] : trovateSessione())
-/** Raccoglie una banconota: i suoi $pzk arrivano subito (col conto, il server conferma). → true se era da raccogliere */
+/** Raccoglie una banconota: i suoi $pzk arrivano subito (col conto, li dà il server, che segna la banconota). → true se era da raccogliere */
 export function trova(quale) {
   const v = BANCONOTE[quale]
   if (!v || trovate().includes(quale)) return false
   if (W) {
     W.conto.trovati = [...trovate(), quale]
-    liberi += v; scrivi()
-    chiama({ a: 'trova', quale, pzk: W.conto.pzk }).then((d) => { if (d.conto) accogli(d, { tienipzk: d.ok }) })
+    promessa(v, { a: 'trova', quale })
   } else {
     scriviJSON(sessionStorage, CHIAVE_TROVATE, { g: oggi(), q: [...trovateSessione(), quale] })
     liberi += v; scrivi()
@@ -387,8 +494,7 @@ export function premioInstagram() {
   if (premioPreso()) return false
   if (W) {
     W.conto.ig = true
-    liberi += PREMIO_IG; scrivi()
-    chiama({ a: 'ig', pzk: W.conto.pzk }).then((d) => { if (d.conto) accogli(d, { tienipzk: d.ok }) })
+    promessa(PREMIO_IG, { a: 'ig' })
   } else {
     try { localStorage.setItem(CHIAVE_IG, new Date().toISOString()) } catch {}
     liberi += PREMIO_IG; scrivi()
@@ -426,5 +532,16 @@ export function linkInstagram({ classe = 'pzk-ig', fatto } = {}) {
   return a
 }
 
-// all'arrivo, col conto: si chiede al server com'è (e il cambio di adesso), senza fermare nessuno
-if (W) setTimeout(() => sincronizza(), 400)
+// ── all'arrivo ──
+// col conto: il saldo è quello del server più le code rimaste (anche quelle della pagina di prima, appena ricaricata), e
+// si chiede subito al server com'è adesso (partono anche le code). Il conto scritto dal codice di prima del 29.10 (senza
+// conto.agg) ha il saldo intero di qui, magari non ancora salvato: la prima volta parte così, alla vecchia, e il server lo
+// accetta se ha senso (come prima); da lì in poi solo lotti.
+if (W) {
+  ricalcola()
+  if (W.conto.agg === undefined) {
+    const vecchio = { a: 'stato', token: W.token, pzk: W.conto.pzk, lg: W.conto.lumaca?.g ?? null, ...(Number.isInteger(W.conto.es) && { es: W.conto.es }) }
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vecchio) })
+      .then((r) => r.json()).then((d) => { if (d.conto) { W.conto.agg = -1; accogli(d) } if (d.esci) esci(false) }).catch(() => {}).finally(() => sincronizza())
+  } else sincronizza()
+} else liberi = leggiSessione()

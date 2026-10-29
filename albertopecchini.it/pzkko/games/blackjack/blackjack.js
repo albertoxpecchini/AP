@@ -167,7 +167,7 @@ function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
   if (!el.saldo) return
-  if (!contando) el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
+  if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
   const p = pzk.sulTavolo(GIOCO)
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta'
@@ -725,6 +725,10 @@ const FA = {
     await attendi(350)
   },
   async laterali(e) {
+    // (29.10 notte) i soldi subito, come in esito; le fiches dopo, col saldo di prima fermo sul tavolo
+    mostrato = pzk.saldo()
+    pzk.regola(GIOCO, e.giocato, e.torna)
+    giroNetto += e.torna - e.giocato
     await atterrate()
     for (const k of ['pp', 't3']) {
       const l = e[k]
@@ -738,9 +742,8 @@ const FA = {
         svuota(key, centro(el.saldo))
       } else svuota(key, bancoFiches(), { scala: 0.7 })
     }
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
-    if (e.torna) contaSaldo(pzk.saldo() - e.torna, pzk.saldo())
+    if (e.torna) contaSaldo(mostrato, mostrato + e.torna)
+    mostrato = null
     stato.puntate[e.casella].pp = stato.puntate[e.casella].t3 = 0
     await attendi(e.torna ? 300 : 150)
   },
@@ -751,13 +754,15 @@ const FA = {
     await aggiungi(`ins${m.casella}`, pzk.inFiches(e.importo), centro(el.saldo))
   },
   async pari(e) {
+    mostrato = pzk.saldo() // (29.10 notte: i soldi subito, le fiches dopo)
+    pzk.regola(GIOCO, e.giocato, e.torna)
+    giroNetto += e.torna - e.giocato
     const m = mani.get(e.mano)
     timbro(m, 'alla pari', 'oro')
     await aggiungi(`m${m.id}`, pzk.inFiches(e.torna - e.giocato).slice(0, 14), bancoFiches(), { passo: 30 })
     await attendi(300)
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
-    contaSaldo(pzk.saldo() - e.torna, pzk.saldo())
+    contaSaldo(mostrato, mostrato + e.torna)
+    mostrato = null
     await svuota(`m${m.id}`, centro(el.saldo))
   },
   async sbircia(e) {
@@ -783,6 +788,9 @@ const FA = {
     await attendi(200)
   },
   async 'assicurazione chiusa'(e) {
+    mostrato = pzk.saldo() // (29.10 notte: i soldi subito, le fiches dopo)
+    pzk.regola(GIOCO, e.giocato, e.torna)
+    giroNetto += e.torna - e.giocato
     const m = mani.get(e.mano)
     const key = `ins${m.casella}`
     if (e.vinta) {
@@ -791,22 +799,21 @@ const FA = {
       await attendi(300)
       svuota(key, centro(el.saldo))
     } else svuota(key, bancoFiches(), { scala: 0.7 })
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
-    if (e.torna) contaSaldo(pzk.saldo() - e.torna, pzk.saldo())
+    if (e.torna) contaSaldo(mostrato, mostrato + e.torna)
+    mostrato = null
     await attendi(200)
   },
   async tocca(e) { await atterrate(); attiva(e.mano) },
   async stai(e) { const m = mani.get(e.mano); m.segno?.classList.remove('attiva') },
   async sballa(e) {
+    pzk.regola(GIOCO, e.giocato, 0) // (29.10 notte: i soldi subito)
+    giroNetto -= e.giocato
     await atterrate()
     const m = mani.get(e.mano)
     segnaPunti(m)
     timbro(m, 'sballa', 'rosso')
     voce(`${testoPunti(m.dati)}: sballa`)
     await attendi(250)
-    pzk.regola(GIOCO, e.giocato, 0)
-    giroNetto -= e.giocato
     await Promise.all([svuota(`m${m.id}`, bancoFiches(), { scala: 0.7 }), svuota(`r${m.id}`, bancoFiches(), { scala: 0.7 })])
     aggiornaBanco()
   },
@@ -846,13 +853,19 @@ const FA = {
     }
   },
   async esito(e) {
+    // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena il banco ha
+    // finito: prima passavano dopo le fiches che volano, e ricaricando a metà la vincita si perdeva. Il tavolo tiene il saldo
+    // di prima (mostrato) finché le fiches non arrivano
+    let netto = 0, torna = 0, giocato = 0
+    for (const x of e.mani) { giocato += x.giocato; torna += x.torna; netto += x.torna - x.giocato }
+    mostrato = pzk.saldo()
+    pzk.regola(GIOCO, giocato, torna)
     await atterrate()
     attiva(null)
     const b = e.banco
     voce(b.bj ? 'blackjack del banco' : b.sballa ? `il banco sballa con ${b.tot}` : `il banco fa ${b.tot}`)
     if (banco.carte.length) timbro(banco, b.bj ? 'blackjack' : b.sballa ? 'sballa' : String(b.tot), b.sballa ? 'rosso' : '')
     await attendi(500)
-    let netto = 0, torna = 0, giocato = 0
     // le perse al banco, poi le vinte pagate accanto e tutto al giocatore
     const perse = e.mani.filter((x) => x.torna === 0)
     await Promise.all(perse.map((x, k) => { timbro(mani.get(x.mano), 'perde', 'grigio'); return Promise.all([svuota(`m${x.mano}`, bancoFiches(), { dopo: k * 80, scala: 0.7 }), svuota(`r${x.mano}`, bancoFiches(), { dopo: k * 80 + 40, scala: 0.7 })]) }))
@@ -867,9 +880,8 @@ const FA = {
       else timbro(m, 'perde', 'grigio') // obo: tornano solo raddoppi e divisioni
     }))
     if (vinte.length) await attendi(500)
-    for (const x of e.mani) { giocato += x.giocato; torna += x.torna; netto += x.torna - x.giocato }
-    pzk.regola(GIOCO, giocato, torna)
-    if (torna) contaSaldo(pzk.saldo() - torna, pzk.saldo())
+    if (torna) contaSaldo(mostrato, mostrato + torna)
+    mostrato = null
     await Promise.all(vinte.map((x, k) => Promise.all([svuota(`m${x.mano}`, centro(el.saldo), { dopo: k * 60 }), svuota(`r${x.mano}`, centro(el.saldo), { dopo: k * 60 + 30 })])))
     const tutto = giroNetto + netto
     voce(`${b.bj ? 'blackjack del banco' : b.sballa ? `il banco sballa (${b.tot})` : `il banco fa ${b.tot}`} · ${tutto > 0 ? `vinci ${fmt(tutto)} $pzk` : tutto < 0 ? `perdi ${fmt(-tutto)} $pzk` : 'pari'}`)
@@ -937,7 +949,7 @@ async function fineGiro() {
   el.dai.focus({ preventScroll: true })
 }
 
-let contando = false
+let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches arrivano (i soldi sono già passati)
 function contaSaldo(da, a) {
   const durata = RIDOTTO.matches ? 0 : 800
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }

@@ -3,7 +3,8 @@
 // «roulette 50 rosso»; anche «pzk pesca» e «/pesca» vanno bene) e lui risponde con una scheda, come un bot di Discord
 // (è fatto sul modello di Dank Memer, tutto in italiano e con le cose di Mantova). I soldi sono i $pzk di games/pzk.js,
 // gli stessi dei giochi e del wallet; il resto (xp, livello, mestiere, oggetti, attese) è lo zaino (zaino.js).
-// I comandi stanno in comandi/ (una famiglia per file); le icone sono le nostre (icone.js, art/chat-*), mai emoji.
+// I comandi stanno in comandi/ (una famiglia per file); le icone sono le nostre (icone.js, art/chat-*), mai emoji. Mentre si
+// scrive, il menù sopra la riga suggerisce i comandi e i loro argomenti (predittivo.js, 29.10).
 //
 // prepara(tasto): accende il cercapersone («1 msg» quando c'è un premio pronto). apri(comando): apre la chat e, se c'è,
 // scrive il comando. Un comando riceve un «ctx» con tutto quello che serve per parlare e aspettare risposte: dì(scheda),
@@ -17,6 +18,7 @@ import { eventoCasuale, salutoIniziale } from './comandi/eventi.js'
 import { NEGOZIO as NEGOZIO_OGGETTI, PER_ID } from './testi.js'
 import { prezzoDi } from './mercato.js'
 import * as led from './led.js'
+import { collega as collegaPredittivo } from './predittivo.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const mezzi = (n) => Math.round(n * 2) / 2
@@ -27,7 +29,7 @@ export const eurHtml = (n) => `<span class="eur">EUR€ ${pzk.fmtEur(n)}</span>`
 // il vetro rotto del cercapersone scassato, nel tasto piccolo: la versione ridotta col massimo (tools/pzkko/crepe-piccole.mjs),
 // perché ridotta con la media ai 74 px dell'lcd sparirebbe. Lo schermo grande (telefono.js) usa crepe.webp
 const CREPE = '/art/chat-pager-crepe/crepe-piccola.webp'
-let tasto = null, dlg = null, lista = null, input = null, sugg = null, saldoEl = null, giuEl = null, rapidiEl = null
+let tasto = null, dlg = null, lista = null, input = null, pred = null, saldoEl = null, giuEl = null, rapidiEl = null
 let nuovi = 0, ultimoGiorno = '', incollata = true, rapidiFrecce = () => {}
 let aspettaTesto = null // { risolvi, nascosto } quando un minigioco aspetta che si scriva qualcosa
 const storia = [] // i comandi scritti, per le frecce
@@ -75,7 +77,7 @@ export function monta(host) {
         <button class="c-fr dx" type="button" aria-label="scorri i tasti a destra" hidden>›</button>
       </div>
       <form class="c-riga" autocomplete="off">
-        <ul class="c-sugg" role="listbox" hidden></ul>
+        <div class="c-pred" hidden><ul class="c-sugg" id="c-sugg" role="listbox" aria-label="comandi suggeriti"></ul><p class="c-pred-tasti" aria-hidden="true">tab completa · frecce su e giù · esc chiude</p></div>
         <span class="c-prompt" aria-hidden="true">›</span>
         <input type="text" name="c" placeholder="scrivi un comando: aiuto" aria-label="il comando" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" maxlength="120">
         <button class="c-b c-invia" type="submit">invia</button>
@@ -84,7 +86,6 @@ export function monta(host) {
   host.appendChild(dlg)
   lista = dlg.querySelector('.c-lista')
   input = dlg.querySelector('input')
-  sugg = dlg.querySelector('.c-sugg')
   saldoEl = dlg.querySelector('.c-saldo')
   giuEl = dlg.querySelector('.c-giu')
   rapidiEl = dlg.querySelector('.c-rapidi')
@@ -114,10 +115,10 @@ export function monta(host) {
   zaino.ascolta(disegnaRapidi)
   dlg.querySelector('.c-indietro').addEventListener('click', () => import('../telefono/telefono.js').then((t) => t.indietro({ daFreccia: true }))) // come il tasto verde: una mossa indietro
   dlg.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); invia() })
-  input.addEventListener('input', suggerisci)
+  // il testo predittivo (29.10): sopra la riga i comandi che vanno bene con quello che scrivi, poi i loro argomenti (predittivo.js);
+  // non mentre un minigioco aspetta una risposta, e da scassato solo quello che passa. Non copre più di metà dei messaggi
+  pred = collegaPredittivo(input, dlg.querySelector('.c-pred'), { spento: () => !!aspettaTesto, passa: passaPredittivo, durata, spazio: () => lista.clientHeight + rapidiEl.parentElement.offsetHeight })
   input.addEventListener('keydown', tasti)
-  input.addEventListener('blur', () => setTimeout(() => { sugg.hidden = true }, 150))
-  sugg.addEventListener('mousedown', (e) => { const li = e.target.closest('li'); if (li) { e.preventDefault(); input.value = li.dataset.nome + ' '; sugg.hidden = true; input.focus() } })
   aggiornaSaldo()
   return dlg
 }
@@ -495,6 +496,8 @@ const prezzoPager = () => prezzoDi(PER_ID.pager)
 const AZIONI_SCASSATO = [['lavora', ':rider: lavora', 'oro'], ['compra cercapersone', ':pager: compra il nuovo']]
 /** Da scassato passano solo «lavora» (con lista, come, licenziati) e «compra cercapersone». */
 const passaDaRotto = (c, testo) => c?.nomi[0] === 'lavora' || (c?.nomi[0] === 'compra' && RICOMPRA.test(testo.trim()))
+/** Per il testo predittivo: da scassato si suggerisce solo quello che passa (`testo` null: il comando, prima degli argomenti). */
+const passaPredittivo = (c, testo) => !zaino.pagerRotto() || (testo == null ? AZIONI_SCASSATO.some(([r]) => PER_NOME.get(analizza(r).nome) === c) : passaDaRotto(c, testo))
 function soloScassato() {
   scheda({ colore: 'rosso', av: 'bot-triste', t: ':pager: cercapersone scassato', d: `col vetro rotto funzionano solo due cose: <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, azioni: AZIONI_SCASSATO })
 }
@@ -503,7 +506,7 @@ function invia() {
   const riga = input.value.trim()
   if (!riga) return
   input.value = ''
-  sugg.hidden = true
+  pred.chiudi()
   if (aspettaTesto) { utente(riga); aspettaTesto.risolvi(riga); return }
   storia.push(riga); if (storia.length > 50) storia.shift(); iStoria = storia.length
   esegui(riga)
@@ -576,34 +579,13 @@ function clicLista(e) {
   if (!b || b.disabled) return
   const cmd = b.dataset.cmd
   if (aspettaTesto) { input.focus(); return }
-  if (b.classList.contains('cmd') && /[<[]/.test(cmd)) { input.value = cmd.replace(/\s*[<[].*$/, ' '); input.focus(); return } // ha parti da riempire
+  if (b.classList.contains('cmd') && /[<[]/.test(cmd)) { input.value = cmd.replace(/\s*[<[].*$/, ' '); input.focus(); pred.apri(); return } // ha parti da riempire (e il menù le suggerisce)
   esegui(cmd)
 }
 
-// ── i suggerimenti e le frecce ──
-function suggerisci() {
-  const v = input.value.trimStart().replace(/^\/+/, '').replace(/^pzk\s+/i, '')
-  if (!v || v.includes(' ') || aspettaTesto) { sugg.hidden = true; return }
-  const q = v.toLowerCase()
-  const trovati = COMANDI.filter((c) => !c.nascosto && c.nomi.some((n) => n.startsWith(q))).slice(0, 8)
-  if (!trovati.length) { sugg.hidden = true; return }
-  sugg.innerHTML = trovati.map((c, i) => `<li role="option" data-nome="${c.nomi.find((n) => n.startsWith(q)) ?? c.nomi[0]}"${i === 0 ? ' class="scelta"' : ''}>${c.icona ? icona(c.icona) : ''}<b>${c.nomi.find((n) => n.startsWith(q)) ?? c.nomi[0]}</b><span>${c.breve}</span></li>`).join('')
-  sugg.hidden = false
-}
+// ── le frecce: col menù aperto lo scorrono (predittivo.js), se no ripescano gli ultimi comandi scritti ──
 function tasti(e) {
-  if (!sugg.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-    e.preventDefault()
-    const li = [...sugg.children], i = li.findIndex((l) => l.classList.contains('scelta'))
-    li[i]?.classList.remove('scelta')
-    li[(i + (e.key === 'ArrowDown' ? 1 : li.length - 1)) % li.length].classList.add('scelta')
-    return
-  }
-  if (!sugg.hidden && (e.key === 'Tab' || (e.key === 'Enter' && !input.value.includes(' ')))) {
-    const li = sugg.querySelector('.scelta')
-    if (li) { e.preventDefault(); input.value = li.dataset.nome + (e.key === 'Tab' ? ' ' : ''); sugg.hidden = true; if (e.key === 'Enter') invia() }
-    return
-  }
-  if (e.key === 'Escape' && !sugg.hidden) { e.preventDefault(); e.stopPropagation(); sugg.hidden = true; return }
+  if (pred.tasto(e)) return
   if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !aspettaTesto && storia.length) {
     e.preventDefault()
     iStoria = Math.max(0, Math.min(storia.length, iStoria + (e.key === 'ArrowUp' ? -1 : 1)))

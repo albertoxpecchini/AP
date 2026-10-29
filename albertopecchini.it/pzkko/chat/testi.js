@@ -156,7 +156,8 @@ export const MESTIERI = [
   { id: 'contrabbandiere', nome: 'contrabbandiere di tortelli', liv: 12, paga: 2200, frase: 'porti tortelli di zucca oltre il confine con Cremona', gioco: 'memoria', rischio: 0.22, galera: 6, multa: 2500 },
 ]
 // ── la roba degli uffici (26.10): quello che passa sul nastro dello spazzino. peso = quanto spesso passa; la chiavetta e il
-// wallet pzk non si vendono: si decifrano (l'app decifratore, da installare dalla chat) ──
+// wallet pzk non si vendono: si decifrano (l'app decifratore: dal 29.10 si compra nel pzkstore del cercapersone, o in chat
+// «installa decifratore») ──
 export const UFFICIO = [
   { id: 'cartaccia', nome: 'una cartaccia', peso: 30, vale: 1, schifo: true },
   { id: 'lattina-vuota', nome: 'una lattina vuota', peso: 22, vale: 2, schifo: true },
@@ -165,8 +166,8 @@ export const UFFICIO = [
   { id: 'mouse', nome: 'un mouse senza filo', peso: 9, vale: 45 },
   { id: 'cuffie', nome: 'delle cuffie col microfono', peso: 6, vale: 90 },
   { id: 'orologio', nome: 'un orologio da polso', peso: 3, vale: 260, raro: true },
-  { id: 'chiavetta', nome: 'una chiavetta usb', peso: 5, vale: 0, sospetto: true, cosa: 'dentro c’è un wallet pzk cifrato: si apre con l’app decifratore (in chat: «installa decifratore»).' },
-  { id: 'wallet-pzk', nome: 'un wallet pzk cifrato', peso: 4, vale: 0, sospetto: true, cosa: 'qualcuno l’ha perso: si apre con l’app decifratore (in chat: «installa decifratore»).' },
+  { id: 'chiavetta', nome: 'una chiavetta usb', peso: 5, vale: 0, sospetto: true, cosa: 'dentro c’è un wallet pzk cifrato: si apre con l’app decifratore, che si compra nel pzkstore del cercapersone (1.500 $pzk puliti; in chat: «installa decifratore»).' },
+  { id: 'wallet-pzk', nome: 'un wallet pzk cifrato', peso: 4, vale: 0, sospetto: true, cosa: 'qualcuno l’ha perso: si apre con l’app decifratore, che si compra nel pzkstore del cercapersone (1.500 $pzk puliti; in chat: «installa decifratore»).' },
 ]
 
 // ── il negozio: prezzo in $pzk, cosa fa ──

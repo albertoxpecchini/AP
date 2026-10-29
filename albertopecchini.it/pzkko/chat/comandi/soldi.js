@@ -1,5 +1,6 @@
 // I soldi: aiuto, saldo, profilo, attese, i premi giornalieri, l'elemosina, la classifica, manda.
 import * as zaino from '../zaino.js'
+import { conti } from '../../games/libro.mjs'
 import { PERSONAGGI, nomeDi } from '../testi.js'
 
 const ORA = 3600_000, GIORNO = 24 * ORA
@@ -31,7 +32,7 @@ export const SOLDI = [
       if (quale) {
         const c = ctx.perNome.get(quale)
         if (!c) return ctx.dì({ colore: 'rosso', d: `«${quale}» non è un comando. Scrivi <code>aiuto</code> e basta.` })
-        return ctx.dì({ colore: 'blu', t: `${c.icona ? `:${c.icona}: ` : ''}${c.nomi[0]}`, d: c.spiega ?? c.breve, campi: [['come si scrive', `<code>${c.uso ?? c.nomi[0]}</code>`], ...(c.nomi.length > 1 ? [['anche', c.nomi.slice(1).map((n) => `<code>${n}</code>`).join(' ')]] : []), ...(c.attesa ? [['attesa', ctx.durata(c.attesa * 1000)]] : [])] })
+        return ctx.dì({ colore: 'blu', t: `${c.icona ? `:${c.icona}: ` : ''}${c.nomi[0]}`, d: c.spiega ?? c.breve, campi: [['come si scrive', `<code>${String(c.uso ?? c.nomi[0]).replace(/[&<>]/g, (x) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[x])}</code>`], /* (29.10 notte: «<mestiere>», «<app>» senza escape diventavano tag finti e sparivano) */ ...(c.nomi.length > 1 ? [['anche', c.nomi.slice(1).map((n) => `<code>${n}</code>`).join(' ')]] : []), ...(c.attesa ? [['attesa', ctx.durata(c.attesa * 1000)]] : [])] })
       }
       ctx.dì({ colore: 'blu', t: 'i comandi', d: 'Scrivi un comando e basta (anche <code>pzk pesca</code> o <code>/pesca</code>). <code>aiuto pesca</code> spiega un comando. Le frecce in su ripetono gli ultimi.',
         campi: ctx.categorie.map(([id, nome, ico]) => [`${ico} ${nome}`, ctx.comandi.filter((c) => c.cat === id && !c.nascosto).map((c) => `<code>${c.nomi[0]}</code>`).join(' '), true])})
@@ -51,7 +52,7 @@ export const SOLDI = [
       const l = zaino.livello(), xp = zaino.xp(), prossimo = zaino.xpPer(l + 1), m = zaino.mestiere()
       const s = (k) => zaino.stat(k)
       ctx.dì({ colore: 'blu', t: `:livello: ${ctx.pzk.conto() ? ctx.nome() + ', ' : ''}livello ${l}`, d: `${xp} xp, al livello ${l + 1} ne mancano ${prossimo - xp}.`,
-        campi: [['mestiere', m ? `:${m}: ${nomeDi(m)} (${zaino.stato().turni} turni)` : 'disoccupato («lavora lista»)'], ['guadagnati', ctx.pzkHtml(s('guadagnati'))], ['vinti ai giochi', ctx.pzkHtml(s('vinti'))], ['persi ai giochi', `<span class="meno">${ctx.fmt(s('persi'))} $pzk</span>`], ['pescati', s('pescati')], ['cacciati', s('cacciati')], ['scavati', s('scavati')], ['morti', `:teschio: ${s('morti')}`], ['comandi', s('comandi')]] })
+        campi: [['mestiere', m ? `:${m}: ${nomeDi(m)} (${zaino.stato().turni} turni)` : 'disoccupato («lavora lista»)'], ...(() => { const k = conti(ctx.pzk.conto()?.libro); return [['guadagnati in tutto', ctx.pzkHtml(k.guadagnati)], [k.giochi < 0 ? 'persi ai giochi' : 'vinti ai giochi', k.giochi < 0 ? `<span class="meno">${ctx.fmt(-k.giochi)} $pzk</span>` : ctx.pzkHtml(k.giochi)], ['lavoro e premi', ctx.pzkHtml(k.lavoro)]] })(), /* (29.10 notte: dal libro dei conti del server, games/libro.mjs, come le classifiche) */ ['pescati', s('pescati')], ['cacciati', s('cacciati')], ['scavati', s('scavati')], ['morti', `:teschio: ${s('morti')}`], ['comandi', s('comandi')]] })
     },
   },
   {

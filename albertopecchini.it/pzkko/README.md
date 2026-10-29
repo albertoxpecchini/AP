@@ -1860,8 +1860,8 @@ sono nuovi». Le regole sono quelle di una moneta vera (e su un punto correggono
 
 **I soldi sporchi**: il bottino delle rapine. Si sommano al saldo ma **con pzk non si spendono** (né giochi, né shop, né
 app: `pzk.punta` accetta solo i puliti), non si mandano, non si cambiano in EUR€. Si puliscono da soli dopo 96 giorni o
-nella **lavatrice** (l'app `telefono/app/lavatrice.js`, azione `lava`): fino a 50.000 in 10 minuti, 2.000 $pzk puliti di
-commissione alla cassa, una alla volta. Nella bio (il profilo, l'account, la scheda dell'app giocatori) puliti e sporchi
+nella **lavatrice** (l'app `telefono/app/lavatrice.js`, azione `lava`), che dal 29.10 si compra nel **pzkstore** (5.000
+$pzk puliti, una volta): fino a 50.000 in 10 minuti, 2.000 $pzk puliti di commissione alla cassa, una alla volta. Nella bio (il profilo, l'account, la scheda dell'app giocatori) puliti e sporchi
 si vedono separati.
 
 **La rapina** (`telefono/app/rapina.js`, azione `colpo`): contro la cassa, almeno in due e al più in quattro. Chi organizza
@@ -1882,10 +1882,56 @@ in tasca, e poi il resto lo si guarda passare; il rischio cresce del 15 % per og
 corriere di notte, il biscazziere, il contrabbandiere di tortelli. Ai mestieri onesti si sono aggiunti imbianchino,
 pizzaiolo, meccanico, bagnino del Mincio.
 
-**Il decifratore** (`telefono/app/decifratore.js`, azione `decifra`): si installa dalla chat («installa decifratore»,
-1.500 puliti: `chat/comandi/app.js`) e solo allora compare nel cercapersone. Apre i wallet pzk e le chiavette che lo
-spazzino trova (`testi.js`, UFFICIO) con tre giochini facili (il cifrario di Cesare, il binario, la sequenza, la parola
-allo specchio; due errori perdonati); i $pzk escono dal fondo dei portafogli smarriti, tre al giorno.
+**Il decifratore** (`telefono/app/decifratore.js`, azione `decifra`): si compra nel pzkstore (1.500 puliti) o in chat
+(«installa decifratore», che passa dallo stesso pzkstore), e solo allora compare nel cercapersone. Apre i wallet pzk e le
+chiavette che lo spazzino trova (`testi.js`, UFFICIO) con tre giochini facili (il cifrario di Cesare, il binario, la
+sequenza, la parola allo specchio; due errori perdonati); i $pzk escono dal fondo dei portafogli smarriti, tre al giorno.
+
+**Il pzkstore** (29.10, Alberto: «migliora app lavatrice e poi mettila in questo nuovo programma chiamato pzkstore dove si
+possono scaricare app nuove e a pagamento»; `telefono/app/pzkstore.js`): il negozio delle app del cercapersone. Le app di
+serie sono già nella home; nel pzkstore ci sono quelle da comprare (`CATALOGO`): la **lavatrice** (5.000 $pzk puliti) e il
+**decifratore** (1.500). La vetrina ha l'icona, due righe, il prezzo o «installata»; la scheda dice tutto (cosa fa, quanto
+costa adesso e a ogni uso, come si usa passo per passo, cosa serve, la versione e le novità) e ha «compra e scarica»
+(«scarica» per quelle gratis). Si paga come nello shop, coi $pzk **puliti** alla cassa di pzk (`pzk.punta` + `pzk.regola`,
+quindi un lotto `k:pzkstore` e una spesa nel libro dei conti): gli sporchi non valgono, in galera non si compra, senza conto
+nemmeno. L'app comprata si installa nello zaino (vale su tutti i dispositivi del conto) e compare nella home, nella pagina
+dei soldi; aperta senza averla (un link, il tasto della rapina, l'ultima app aperta) porta alla sua scheda nel pzkstore
+(`vai` in telefono.js, le app con `store: true`). Si toglie dalla scheda, **senza rimborso** (i soldi sono già della cassa,
+come per tutto quello che si compra: per riaverla si ricompra), e la lavatrice non si toglie mentre gira. «Aggiornabile»
+non c'è: le app sono moduli del sito e arrivano nuove a tutti, la scheda dice la versione. Il pallino sull'icona: le app
+che ti servirebbero e non hai (soldi sporchi senza lavatrice, wallet cifrati senza decifratore). L'icona
+(`art/chat-app3/app-pzkstore.webp`, rd-plus, `tools/pzkko/pixel.mjs`) è la freccia verde che scende nella vaschetta, sul
+rosso (gialla stava accanto alle sfide, gialle anche loro). In chat: `installa lavatrice`, `installa decifratore` (anche
+`scarica`) comprano dallo stesso pzkstore, allo stesso prezzo e con le stesse regole; `installa` da solo fa l'elenco coi
+tasti; `pzkstore [app]` lo apre (sull'app se ce l'hai, se no sulla sua scheda); `lavatrice` (anche `lava`) apre la
+lavatrice e a chi non ce l'ha spiega tutta la strada. Anche i giochi, a chi ha solo soldi sporchi, dicono la strada intera
+(`pzk.perche`, `pzk.nonBasta`). Il server non controlla che la lavatrice sia stata comprata prima di lavare: gli acquisti
+stanno nello zaino, come quelli dello shop.
+
+**Le app installate** (`chat/zaino.js`, `Z.app`): per ogni app il momento dell'ultima decisione, positivo installata e
+negativo tolta; fra due dispositivi vince la più recente, a pari momento installata (`chat/zaino-unisci.mjs`: prima si
+prendeva il massimo, e un'app tolta tornava dall'altro dispositivo). **La lavatrice di prima**: fino al 29.10 era nella home
+di tutti; se la tiene, regalata, chi quando arriva il pzkstore ha soldi sporchi, un lavaggio in corso o l'ha già usata (una
+commissione o un lavaggio fra le ultime mosse del conto), gli altri la comprano. La decisione (`lavatrice()` in
+telefono.js) si scrive una volta nello zaino al momento fisso `zaino.REGALO` (il 29.10.2026 a mezzanotte: comprarla o
+toglierla dopo vince sempre), e solo quando è arrivato lo zaino del server: se un altro dispositivo ha già deciso, vale
+quella.
+
+**Il prezzo della lavatrice**: 5.000 puliti, una volta. Un terzo del bottino più grosso a testa (15.000), due lavaggi e
+mezzo di commissione, più della cauzione e del decifratore: è lei che rende spendibile il bottino senza aspettare 96
+giorni. Con un colpo buono si ripaga al primo lavaggio; con la cassa piccola (a 21.000 $pzk un colpo in due dà circa 530 a
+testa) conviene aspettare i 96 giorni, ed è una scelta.
+
+**La lavatrice rifatta** (29.10, Alberto: «migliora app lavatrice»): a sinistra la macchina, ferma (il cestello che girava
+non c'è più: niente si muove da solo), col display che dice pronta, il conto alla rovescia, fine, ferma (in galera) o
+vuota; a destra i tre numeri (gli sporchi e quando i primi si puliscono da soli, i puliti, la commissione), quanto lavare
+(di serie il massimo, perché la commissione è fissa; il cursore per lavarne meno, «al massimo» per tornarci) col tasto
+subito sotto, e come sarai dopo: sporchi e puliti adesso e fra dieci minuti, quanto pesa la commissione in percentuale,
+quanti lavaggi servono ancora sopra i 50.000, l'avviso se si lava meno della commissione. Mentre gira: quanti, l'ora in cui
+sono pronti, il conto alla rovescia e la barra (una volta al secondo); finito, «ritira» (se no si puliscono la prossima
+volta che il conto parla col server). Sotto, la storia (rapine, commissioni, lavaggi, puliti dal tempo, fra le ultime mosse
+del conto) e le regole. In galera il tasto è spento e lo dice; quello che gira finisce lo stesso. Sul cellulare dritto
+tutto in colonna.
 
 ## I $pzk (games/pzk.js)
 
@@ -1895,15 +1941,61 @@ Un portafoglio solo per tutti i giochi e per il wallet. Dal 22.10 notte due modi
   (`sessionStorage`, `pzkko-pzk-sessione`) e non cambiano mai; a secco (meno di 1 libero e
   niente sui tavoli) il gioco ne dà altri 1.000. Niente EUR€, niente borsa.
 - **il conto**: chi entra nel wallet ha i suoi $pzk salvati sul server (`api/wallet.mjs`) e
-  soggetti alla borsa. I giochi girano nel browser, quindi il saldo lo manda il browser (`salva`,
-  un secondo dopo ogni cambio e subito quando la pagina si nasconde); il token e l'ultimo stato
-  stanno in `localStorage` (`pzkko-wallet`) e la pagina riparte con quelli mentre chiede al server.
+  soggetti alla borsa. Il token e il conto com'è sul server stanno in `localStorage`
+  (`pzkko-wallet`) e la pagina riparte con quelli mentre chiede al server.
   A secco: se ci sono EUR€ si apre il wallet per convertirli, se no il **sussidio**, 1.000 $pzk una
   volta al giorno (`perche()` dice al gioco cosa dire).
 
-Ogni gioco sposta i $pzk dal saldo al suo tavolo quando punta e li regola a fine giro; si salva il
-saldo più quello che c'è sui tavoli, così se la pagina si chiude a metà giro le puntate tornano. Le
-fiches (1, 5, 25, 100, 500) sono le stesse foto in tutti i giochi. Sotto il saldo di ogni gioco, col
+Ogni gioco sposta i $pzk dal saldo al suo tavolo quando punta e li regola a fine giro; le puntate
+per il server sono ancora nel saldo, così se la pagina si chiude a metà giro tornano. Le
+fiches (1, 5, 25, 100, 500) sono le stesse foto in tutti i giochi.
+
+**I lotti numerati** (29.10 notte; Alberto: «ho giocato i dadi, ho vinto un botto, ho visto saldo 8000 e rotti e poi
+ctrl f5 sono spariti … quando vinco anche dopo 1 millesimo le cose si salvino subito … se entro con 2 telefoni e stesso
+account assieme devo vedere le cose sincronizzati al millisecondo … tu creami la struttura super solida»). Fino al 29.10 il
+browser mandava al server il **saldo intero**, un po' dopo ogni cambio: due difetti. La vincita dei dadi passava al saldo
+solo dopo le fiches che volano (due o tre secondi), e ricaricando in mezzo spariva; e due dispositivi si cancellavano a
+vicenda, perché chi salvava per ultimo rimetteva il suo saldo (il canale sempre aperto, apposta, non sincronizzava il
+saldo). Adesso:
+- **ogni variazione è un lotto** (`games/pzk.js`, `aggiungi`): un giro finito (`regola`), una morte (`perdi`) diventano
+  `{ n, d, persi, v }`, quanto cambia il saldo e da dove (le **voci**: `g:dado` col puntato, il tornato, la mano, se vinta e
+  il colpo; `c:chat` i soldi nuovi del lavoro, della miniera, delle quest; `k:chat` la cassa fuori dai giochi, comprare e
+  vendere). Il lotto finisce **subito in `localStorage`** (la coda della pagina, `pzkko-coda:<conto>:<pagina>`) e **parte
+  subito** (se una richiesta è in volo, appena torna: una alla volta, con dentro tutto quello che c'è; rete persa: si
+  riprova a 2, 4, 8… 30 secondi). Ogni pagina aperta è un **dispositivo**; una pagina ricaricata trova la coda di quella
+  di prima, la conta subito nel saldo e la rimanda;
+- **il server li controlla uno per uno e li applica una volta sola** (`api/wallet.mjs`, «I LOTTI NUMERATI», `lotti`): le
+  voci devono fare esattamente la variazione, un gioco non rende più di 50 volte il puntato, il saldo non sale più di quello
+  che si può vincere in quel tempo (20.000 più 1.200 al secondo), i nomi delle voci sono quelli giusti; un lotto che non va
+  si **scarta** senza toccare il saldo. L'ultimo lotto visto di ogni dispositivo sta nel conto (`c.disp`, per tre giorni):
+  un lotto già visto non si riapplica, quindi il browser può rimandarlo finché non ha la risposta (una risposta persa, un
+  Ctrl+F5) senza che conti due volte;
+- **il saldo che si vede** è quello del server più i lotti ancora in viaggio, più i premi che il server sta per dare
+  (il sussidio, una banconota, instagram: `promessa`, si vedono subito e li conferma il server). Le schede dello stesso
+  browser si sommano le code fra loro (l'evento `storage`); gli altri dispositivi lo sanno dal **canale diretto** (sotto);
+- **la versione del conto** (`conto.agg`, l'ora del server, sempre crescente): una risposta o un avviso più vecchi di quello
+  che si sa non cambiano niente;
+- **i giochi pagano subito**: dadi, roulette, mine, moneta e blackjack chiamano `regola` appena il giro ha un esito (la
+  campana ferma, la pallina ferma, l'incasso, la moneta caduta, il banco che ha finito), e le fiches che volano e il saldo
+  che conta sono solo da vedere: il tavolo tiene fermo il saldo di prima (`mostrato`) finché non arrivano;
+- il primo salvataggio di un browser col conto scritto dal codice di prima (senza `agg`) parte alla vecchia, col saldo
+  intero, così chi aveva un saldo non ancora salvato non lo perde; i browser col codice di prima vanno ancora (il server
+  accetta tutti e due).
+
+Le prove: `node tools/pzkko/prova-lotti.mjs` (il wallet vero con l'archivio in memoria: la vincita mandata due volte, due
+dispositivi insieme, i lotti truccati, il libro dei conti, il browser di prima).
+
+**Il libro dei conti e le classifiche** (29.10 notte; Alberto: «non posso avere 5.5k in vinti ai giochi e 2.0k guadagnati
+in tutto, deve avere senso … rifai sistema classifiche mio e degli altri»). Prima i numeri li contava il browser nello
+zaino: «vinti ai giochi» erano le sole mani vinte (le perse a parte) e «guadagnati» il solo lavoro, quindi i vinti
+potevano superare i guadagnati in tutto, e si potevano falsare. Adesso li tiene il server, nel **libro** di ogni conto
+(`c.libro`, scritto dalle voci dei lotti e dalle mosse del server: i premi, la lumachina, le multe, la lavatrice, le
+rapine, gli invii, i cambi), e li legge **un modulo solo**, `games/libro.mjs`, per il server (le classifiche,
+`api/_giocatori.mjs`) e per il browser (il profilo, il comando «profilo» della chat): **vinti ai giochi** = tornato −
+puntato (il netto; sotto zero sono «persi ai giochi»); **lavoro e premi** = i soldi nuovi; **guadagnati in tutto** =
+giochi + lavoro e premi + vendite − spese ± lumachina − morti + rapine (gli invii e i cambi in EUR€ no: spostano i soldi,
+non li fanno). Le vincite di almeno 1.500 in un giro fanno notizia dal server (`notizieVincite`). Gli altri numeri del
+profilo (pescati, quiz, comandi…) restano quelli dello zaino. Sotto il saldo di ogni gioco, col
 conto, la riga `rigaEuro()`: «hai anche EUR€ 12,50 nel wallet: convertili in $pzk» apre il cambio.
 
 **Il regalo di Instagram**: «seguimi su instagram: +1000 $pzk», nei giochi e nel wallet. Il link apre
@@ -2072,10 +2164,14 @@ la finestra e i tasti diventano una barra in basso.
   computer è in carica). Dove il browser non dice la batteria (Safari, Firefox) resta quella del gioco, come nel wallet.
 - **La home a pagine** (29.10, Alberto: «fai nella home spazio per icone 3x3 poi deve scorrere quindi fai vedere come
   l'iphone dei puntini sotto in mezzo»): a sinistra l'ora e i widget, a destra le app **nove per pagina**, divise per
-  genere (`PAGINE` in telefono.js: tu e il gioco, i soldi, gli attrezzi); le pagine si scorrono di lato col dito (gli
-  agganci si fermano sempre su una pagina intera), la rotella, il mouse trascinato o le frecce, e i **puntini** sotto in
-  mezzo, che si possono premere, dicono dove sei. Più furba: un puntino **cerchiato di rosso** vuol dire che in quella
-  pagina c'è un'app col pallino; la pagina si ricorda (riaprendo si torna lì); un'app si carica appena il mouse ci passa
+  genere (`PAGINE` in telefono.js: tu e il gioco, cioè chat, profilo, shop, pzkstore, sfide, quiz, quest, giocatori,
+  zaino; i soldi, cioè account, miniera, foto, virtual, banca, rapina e le app comprate nel pzkstore; gli attrezzi; dal
+  29.10 notte l'account sta accanto alla banca, per far posto al pzkstore accanto allo shop); le pagine si scorrono di lato
+  col dito (gli agganci si fermano sempre su una pagina intera), la rotella, il mouse trascinato o le frecce, e i
+  **puntini** sotto in mezzo, che si possono premere, dicono dove sei: il puntino **cerchiato di rosso** è la pagina dove
+  sei (29.10 notte, Alberto: «devono essere circondati da quel cerchietto rosso che indica in che pagina sono e non solo
+  home»), un puntino **rosso pieno** vuol dire che in quella pagina c'è un'app col pallino; la pagina si ricorda (riaprendo
+  si torna lì); un'app si carica appena il mouse ci passa
   sopra o il dito la tocca, così al clic è pronta; i pallini di tutte le app si chiedono insieme, una volta sola per la
   home e il led. Sul cellulare in verticale le pagine stanno sotto i widget.
 
@@ -2094,6 +2190,7 @@ la finestra e i tasti diventano una barra in basso.
   (`art/chat-app2/app-virtual.webp`) per ora è disegnata a mano in SVG da `tools/pzkko/virtual/icona.mjs` (il pallone
   davanti alla porta col fischietto, sul verde): da rigenerare con gpt-image-2 come le altre, `node tools/pzkko/immagini.mjs
   genera chat-app2` (il prompt è nel foglio `chat-app2` di `tools/pzkko/fogli-chat.js`). **Banca**: apre il wallet.
+  **pzkstore**: le app da comprare (la lavatrice, il decifratore; vedi «L'economia»).
 
 **La miniera** (23.10; app `telefono/app/miniera.js`, regole `chat/miniera.js`, catalogo `chat/miniera-dati.mjs`, disegni
 `chat/miniera-pixel.js`): si minano $pzk col PC, ma prima bisogna comprare i pezzi e farsi la postazione. Dodici posti
@@ -2134,6 +2231,26 @@ volta; i pulsanti e i timer dei minigiochi partono a scrittura finita). Le sched
 nel testo si tocca, sotto possono esserci tasti di seguito, i propri messaggi hanno il ↻ per rifarli; orari e giorni, il
 tasto ↓ coi nuovi. Sopra la riga, i **tasti rapidi**: le ultime 8 scelte (salvate nello zaino), con le freccette per
 scorrerle. Niente emoji di sistema: solo le nostre icone (`chat/icone.js`, `art/chat-*`, `tools/pzkko/fogli-chat.js`).
+
+**Il testo predittivo** (29.10, `chat/predittivo.js`; Alberto: «nei comandi quando scrivo lavora deve esserci quasi un testo
+predittivo con i comandi disponibili così da poter finire col mouse oppure premendo tab e scorrendo con le freccie»): mentre
+si scrive, sopra la riga si apre un menù coi comandi che vanno bene. Prima quelli il cui nome comincia così, poi gli alias
+(con l'etichetta: `work` = lavora), poi quelli che contengono le lettere; a parità prima i tasti rapidi, poi l'ordine
+dell'`aiuto`. Ogni voce ha l'icona, la riga `breve` del comando e, se è in attesa, «fra 3 min». Dopo lo spazio, gli
+argomenti che il comando conosce già, solo da liste che ci sono: le parole dell'`uso` (`lavora` lista / come / licenziati,
+`sfide riscuoti`, `moneta … testa|croce`, `roulette … rosso|nero|…|dozzina 1-3`), i mestieri di `testi.js` dopo `lavora
+come` (spenti quelli di un livello che non hai), le app del pzkstore per `installa` e `pzkstore`, il negozio per `compra`,
+lo zaino per `vendi` e `usa`, le casse per `apri`, i reparti per `negozio`, gli argomenti del quiz, le metriche per
+`classifica` e `rivale`, le puntate del sic bo (dalla `breve` di `dado`), i comandi per `aiuto`. I tasti: ↑↓ scorrono; Tab
+completa con la voce evidenziata (se è l'unica, o è già scritta tutta, aggiunge lo spazio e passa agli argomenti), Tab di
+nuovo e Maiusc+Tab passano alla voce dopo e a quella prima, come nei terminali; Invio fa quello che c'è scritto se è un
+comando intero (`saldo`), se no la voce evidenziata (`pe` → pesca, come prima; e quella scelta con le frecce; `come`,
+`dozzina` invece aprono il seguito); Esc chiude. Col mouse o col dito si tocca una voce: entra nella riga con lo spazio e la
+tastiera del telefono resta su. La voce scelta è in negativo, verde pieno come il cursore di un menù a cristalli liquidi; il
+menù copre al più metà dei messaggi (cinque voci e mezza sul telefono, tre e mezza sul cercapersone orizzontale) e non ha
+animazioni. È una listbox legata alla riga (combobox, `aria-activedescendant`). Sta zitto durante i minigiochi che
+aspettano una risposta, e da scassato propone solo `lavora` e `compra cercapersone`. Le liste si leggono con `import * as`:
+se una cambia forma resta vuota, la chat no.
 
 **I comandi** (`aiuto` li elenca e ogni nome si tocca; `aiuto pesca` ne spiega uno):
 
@@ -2211,7 +2328,23 @@ nella pagina che dorme sotto la cornice della musica. **Limiti**: il saldo si av
 decide il browser che gioca, e il server lo accetta se plausibile: sincronizzare per una differenza farebbe sovrascrivere a chi
 sta fermo quello che ha appena giocato l'altro): si sincronizza solo se sono arrivati soldi da fuori (un invio, la banca).
 **Costo**: ogni controllo sono due richieste `head` a Blob ogni 3 secondi per istanza accesa, fino a che c'è qualcuno
-connesso: con più giocatori insieme è il consumo da guardare nella dashboard di Vercel.
+connesso: con più giocatori insieme è il consumo da guardare nella dashboard di Vercel. (Fu proprio questo consumo a far
+bloccare Blob la notte del 28.10.)
+
+**Il canale diretto** (29.10 notte; Alberto: «se entro con 2 telefoni e stesso account assieme devo vedere le cose
+sincronizzati al millisecondo … stai usando il mio pc»). Adesso il canale va dritto al **server dei dati sul pc di Alberto**
+(`C:\pzkko-server`, `GET /v1/live`, Server-Sent Events): è lui che scrive i conti e gli zaini, e **nell'istante in cui li
+scrive** manda a chi ascolta un conto il suo riassunto (`{ k: 'conto', pzk, eur, disp, agg }`: il saldo, gli EUR€, l'ultimo
+lotto visto di ogni dispositivo, la versione) e `{ k: 'zaino', t }`. Il browser (`games/live.js`) lo dà a `pzk.dalCanale`,
+che prende il saldo nuovo **subito** (più nuovo per `agg`; i lotti di qui ancora in viaggio restano sopra, quelli già visti
+si tolgono) e fra 300 ms chiede il resto del conto (`sincronizza`: le mosse, i soldi sporchi, la galera). Provato con due
+browser sullo stesso conto: il telefono vede la vincita del pc **19 ms** dopo. Per aprirlo serve un **biglietto** del conto
+(`api/wallet.mjs`, azione `biglietto`: `<conto>.<scadenza>.<firma>`, firmato col segreto del server, `PZKKO_SERVER_SECRET`;
+dieci minuti per aprire); il server lo chiude dopo mezz'ora e il browser ne chiede un altro. Il server: solo lettura, solo il
+proprio conto, solo dalle pagine di pzkko (`Origin`: pzkko.it, le anteprime, localhost), al più 300 connessioni e 8 per
+conto, un battito ogni 20 secondi; il biglietto non finisce mai nel registro. Se il canale diretto non c'è (il pc spento, il
+tunnel giù) o cade tre volte di fila senza aprirsi, per due minuti si usa quello di prima (`/api/live/`). Il saldo adesso si
+sincronizza anche da solo: con i lotti nessuno sovrascrive più quello che ha giocato l'altro.
 
 Il modulo si carica da solo appena la pagina è tranquilla e al clic; `#chat` apre direttamente la chat, l'evento
 `pzkko-chat` (con `detail.comando`) la apre scrivendo un comando. Gli strumenti che fotografano la pagina non vedono il tasto

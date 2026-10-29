@@ -41,6 +41,7 @@
 // finché la radice è albertopecchini.it, la pubblica albertopecchini.it/api/wallet.js, che la riesporta.
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { archivio, aggiorna, corpo, giornoDi, ipDi, json, limite } from './_archivio.mjs'
+import { serverOpzioni } from './_server.mjs'
 import { borsa, tassoA, attuale } from './_borsa.mjs'
 import { PATH, vuoto, offerta } from './_conti.mjs'
 import { PATH_GIOCATORI, vuotoG, aggiornaGiocatore, notizia } from './_giocatori.mjs'
@@ -114,16 +115,31 @@ const vista = (c, now) => ({
   // l'economia: i soldi sporchi e quando si puliscono, il lavaggio, la galera, l'ultimo lotto di flussi contato, l'ultimo colpo
   sporchi: sporchi(c), puliti: puliti(c), pulizia: c.sporchi?.length ? c.sporchi[0].t + PULIZIA : null, lavaggio: c.lavaggio ?? null,
   galera: c.galera > now ? c.galera : null, fn: c.fn ?? 0, colpo: c.ultimoColpo ?? 0, decifrati: c.decifrati?.g === oggi() ? c.decifrati.n : 0,
+  // (29.10 notte) la versione del conto, l'ultimo lotto visto di ogni dispositivo, il libro dei conti (vedi «I LOTTI NUMERATI»)
+  agg: c.agg ?? c.creato, disp: Object.fromEntries(Object.entries(c.disp ?? {}).map(([k, v]) => [k, v.n])), libro: c.libro ?? {},
 })
-const mossa = (c, m) => { (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40) }
+// ogni mossa del server finisce anche nel libro dei conti, e cambia la versione del conto
+const LIBRO = { lumaca: (c, m) => libro(c, 'lum', m.verso === 'meno' ? -m.n : m.n), inviato: (c, m) => libro(c, 'inv', m.n, 1), ricevuto: (c, m) => libro(c, 'inv', m.n, 0),
+  'in-eur': (c, m) => libro(c, 'cam', m.n, 0), 'in-pzk': (c, m) => libro(c, 'cam', m.n, 1), rapina: (c, m) => libro(c, 'rap', m.n),
+  arresto: (c, m) => libro(c, 'spe', m.n), cauzione: (c, m) => libro(c, 'spe', m.n), lavatrice: (c, m) => libro(c, 'spe', m.n),
+  instagram: (c, m) => libro(c, 'pre', m.n), trovato: (c, m) => libro(c, 'pre', m.n), sussidio: (c, m) => libro(c, 'pre', m.n), decifrato: (c, m) => libro(c, 'pre', m.n), premio: (c, m) => libro(c, 'pre', m.n) }
+const mossa = (c, m) => {
+  (c.mosse ??= []).push(m); if (c.mosse.length > 40) c.mosse.splice(0, c.mosse.length - 40)
+  if (Number.isFinite(m.n)) LIBRO[m.tipo]?.(c, m)
+  tocca(c, m.t ?? Date.now())
+}
 
 // la lumachina vive i giorni che le mancano fino a oggi (chat/lumaca.mjs): una mossa per ogni giornata che sposta $pzk.
 // → { delta, nuove } o null
-const vive = (c, now, db) => vivi(c, oggi(), (v) => {
-  if (!v.n) return
-  mossa(c, { t: now, tipo: 'lumaca', n: Math.abs(v.n), verso: v.n < 0 ? 'meno' : 'piu', pct: v.pct, g: v.g, ev: v.ev })
-  if (db) { if (v.n > 0) conia(db, v.n, now); else allaCassa(db, -v.n, now) } // i miracoli coniano, le spese vanno alla cassa
-})
+const vive = (c, now, db) => {
+  const r = vivi(c, oggi(), (v) => {
+    if (!v.n) return
+    mossa(c, { t: now, tipo: 'lumaca', n: Math.abs(v.n), verso: v.n < 0 ? 'meno' : 'piu', pct: v.pct, g: v.g, ev: v.ev })
+    if (db) { if (v.n > 0) conia(db, v.n, now); else allaCassa(db, -v.n, now) } // i miracoli coniano, le spese vanno alla cassa
+  })
+  if (r) tocca(c, now) // (anche una giornata senza soldi cambia la lumachina, che il browser mostra)
+  return r
+}
 // le catastrofi e i miracoli appena vissuti diventano notizie della banca (se il database dei giocatori non va, pazienza)
 async function notizieLumaca(c, lu, now) {
   const gravi = (lu?.nuove ?? []).filter((v) => Math.abs(v.pct) >= 25)
@@ -144,7 +160,7 @@ const lgDi = (x) => (x === null || (typeof x === 'string' && /^\d{4}-\d\d-\d\d$/
 // numero (c.es, il contatore, e c.esterni, gli ultimi 30 { s, n }); il browser manda `es`, l'ultimo che conosce, e quelli
 // dopo si aggiungono al saldo che manda (undefined: un browser di prima, niente da aggiungere)
 const esDi = (x) => (Number.isInteger(x) && x >= 0 ? x : undefined)
-const esterno = (c, n) => { c.es = (c.es ?? 0) + 1; (c.esterni ??= []).push({ s: c.es, n }); if (c.esterni.length > 30) c.esterni.splice(0, c.esterni.length - 30) }
+const esterno = (c, n) => { c.es = (c.es ?? 0) + 1; (c.esterni ??= []).push({ s: c.es, n }); if (c.esterni.length > 30) c.esterni.splice(0, c.esterni.length - 30); tocca(c, Date.now()) }
 // i flussi del browser (games/pzk.js): quanto è andato alla cassa (perso al gioco, speso; negativo: vinto, venduto) e quanto
 // è caduto per terra (le morti), in un lotto numerato (n: un lotto già contato, per una risposta persa, non si conta due
 // volte). Il resto della differenza di saldo è conio: soldi nuovi (il lavoro, le quest, i premi)
@@ -177,9 +193,110 @@ function accogli(c, pzk, now, lg, es, db = null, fl = null) {
   if (!illimitato(c) && pzk - c.pzk > 20000 + 1200 * secondi) return 'il saldo non torna: ricarico quello salvato'
   const delta = pzk - c.pzk
   c.pzk = pzk; c.salvato = now
+  if (delta) tocca(c, now)
   if (db && !eBanca(c)) contabilizza(db, c, delta, fl, now)
   return null
 }
+
+// ── I LOTTI NUMERATI (29.10 notte, Alberto: «ho giocato i dadi, ho vinto un botto, ho visto saldo 8000 e rotti e poi ctrl f5
+// sono spariti … quando vinco anche dopo 1 millesimo le cose si salvino subito … se entro con 2 telefoni e stesso account
+// assieme devo vedere le cose sincronizzati al millisecondo»). Fino a qui il browser mandava il SALDO INTERO (accogli, qui
+// sopra, che resta per i browser col codice di prima): una vincita non ancora mandata spariva ricaricando, e due dispositivi
+// si cancellavano a vicenda, perché l'ultimo che salvava rimetteva il suo saldo. Ora il browser (games/pzk.js) manda i LOTTI:
+// le variazioni del saldo, numerate per dispositivo (una scheda del browser), una volta sola ciascuna e mai il saldo:
+//   { n, d, persi, v: { 'g:dado': [puntato, tornato, mani, vinte, migliore], 'c:chat': [giocato, torna], 'k:chat': […] } }
+// d è quanto cambia il saldo; v dice da dove (g: un gioco, c: soldi nuovi, il lavoro, i premi, la miniera; k: la cassa fuori
+// dai giochi, comprare e vendere); persi, quello che è caduto per terra morendo. Il server li controlla UNO PER UNO prima di
+// toccare il saldo (la somma delle voci deve fare esattamente d; un gioco non rende più di MAX_PAGA volte il puntato; il saldo
+// non sale più di quello che si può vincere in quel tempo) e li applica al SUO saldo, che è quello vero: chi è già stato
+// visto (c.disp[dispositivo].n) non si riapplica, così il browser li rimanda finché non ha la risposta (una pagina
+// ricaricata, una rete persa) e non contano mai due volte; uno scartato non si applica e il browser lo butta. Due
+// dispositivi non si pestano più: ognuno porta le sue variazioni, e il saldo di tutti e due è quello del server più le
+// proprie ancora in viaggio.
+// Le voci tengono anche IL LIBRO DEI CONTI di ognuno (c.libro), da cui escono le classifiche (_giocatori.mjs): prima le
+// contava il browser nello zaino, e «vinti ai giochi» (le sole mani vinte) poteva superare «guadagnati in tutto» (che i
+// giochi non li contava). Ogni cambio di un conto ne alza c.agg (l'ora del server, sempre crescente): chi riceve due
+// versioni dello stesso conto (la risposta, l'avviso del canale) tiene la più nuova.
+export const GIOCHI_SOLDI = ['roulette', 'blackjack', 'mine', 'dado', 'moneta', 'virtual'] // i giochi grandi (più i chat-…)
+const MAX_PAGA = 50 // nessun gioco rende più di 50 volte il puntato in un giro (la roulette 36, il blackjack 2,5)
+const MAX_DISP = 60, VITA_DISP = 3 * 24 * 3600_000 // i dispositivi ricordati per conto: al più 60, dimenticati dopo tre giorni
+const DISP = /^[A-Za-z0-9_-]{8,32}$/
+const VOCE = /^[gck]:[a-z0-9-]{1,24}$/
+/** Il conto è cambiato: c.agg cresce sempre, anche due volte nello stesso millisecondo. */
+const tocca = (c, now) => { c.agg = Math.max(now, (c.agg ?? 0) + 1) }
+/** Il libro dei conti: aggiunge n alla voce k (lav, spe, ven, lum, mor, rap, pre; inv e cam sono coppie). */
+function libro(c, k, n, i = null) {
+  const L = (c.libro ??= {})
+  if (i === null) L[k] = mezzi((L[k] ?? 0) + n)
+  else { const a = (L[k] ??= [0, 0]); a[i] = mezzi(a[i] + n) }
+}
+/** Le code di lotti della richiesta (una per dispositivo: body.code = [{ disp, lotti }]; ogni pagina è un dispositivo, e una
+ *  pagina ricaricata rimanda anche la coda di quella di prima). → { avviso, scartati: [disp:n…], applicati } */
+function lotti(c, body, now, db) {
+  const gruppi = Array.isArray(body.code) ? body.code.slice(0, 20) : [{ disp: body.disp, lotti: body.lotti }]
+  const D = (c.disp ??= {}), scartati = [], perche = [], grosse = []
+  let applicati = 0, budget = illimitato(c) ? Infinity : 20000 + 1200 * Math.max(0, (now - (c.salvato ?? c.creato)) / 1000)
+  for (const gruppo of gruppi) {
+    const disp = typeof gruppo?.disp === 'string' && DISP.test(gruppo.disp) ? gruppo.disp : null
+    if (!disp || !Array.isArray(gruppo.lotti)) continue
+    for (const l of gruppo.lotti.slice(0, 200).sort((a, b) => (a?.n ?? 0) - (b?.n ?? 0))) {
+      const n = l?.n
+      if (!Number.isInteger(n) || n <= (D[disp]?.n ?? 0)) continue // già visto: una risposta persa, si rimanda
+      const no = (motivo) => { scartati.push(`${disp}:${n}`); perche.push(motivo); D[disp] = { n, t: now } }
+      // la forma: numeri finiti, voci coi nomi giusti, al più 40
+      const d = Number(l.d), persi = Number(l.persi ?? 0), voci = l.v && typeof l.v === 'object' && !Array.isArray(l.v) ? Object.entries(l.v) : []
+      if (!Number.isFinite(d) || Math.abs(d) > 1e8 || !Number.isFinite(persi) || persi < 0 || persi > 1e8 || voci.length > 40) { no('lotto strano'); continue }
+      let somma = -persi, casa = 0, conio = 0, ok = true, grossa = 0
+      for (const [k, a] of voci) {
+        if (!VOCE.test(k) || !Array.isArray(a) || a.length > 5 || !a.every((x) => Number.isFinite(x) && x >= 0 && x <= 1e8)) { ok = false; break }
+        const [giocato, torna] = a
+        if (k[0] === 'g' && torna > giocato * MAX_PAGA + 0.5) { ok = false; break } // un gioco che rende troppo
+        somma += torna - giocato
+        if (k[0] === 'c') { conio += torna; casa += giocato } else casa += giocato - torna
+        if (k[0] === 'g') grossa = Math.max(grossa, torna - giocato)
+      }
+      if (!ok) { no('voci strane'); continue }
+      if (Math.abs(somma - d) > 0.75) { no('i conti del lotto non tornano'); continue } // le voci devono fare esattamente d (a mezzi $pzk)
+      if (d > budget) { no('troppi $pzk in troppo poco tempo'); continue }
+      budget -= Math.max(0, d)
+      // va: il saldo, l'economia (la cassa, i portafogli smarriti, il conio) e il libro
+      c.pzk = Math.max(0, mezzi(c.pzk + d))
+      if (db && !eBanca(c)) { allaCassa(db, casa, now); perdi(db, persi, now); conia(db, conio, now) }
+      for (const [k, a] of voci) {
+        const [giocato, torna, mani = 0, vinte = 0, migliore = 0] = a, nome = k.slice(2)
+        if (k[0] === 'g') {
+          const g = ((c.libro ??= {}).g ??= {})[nome] ?? [0, 0, 0, 0, 0]
+          c.libro.g[nome] = [g[0] + Math.round(mani), g[1] + Math.round(vinte), mezzi(g[2] + giocato), mezzi(g[3] + torna), Math.max(g[4], mezzi(migliore))]
+        } else if (k[0] === 'c') { libro(c, 'lav', torna); if (giocato) libro(c, 'spe', giocato) }
+        else { libro(c, 'spe', giocato); libro(c, 'ven', torna) }
+      }
+      if (persi) libro(c, 'mor', persi)
+      if (grossa >= 1500) grosse.push(mezzi(grossa)) // (una vincita grossa fa notizia: notizieVincite)
+      D[disp] = { n, t: now }
+      c.salvato = now
+      applicati++
+    }
+  }
+  // si ricordano i dispositivi degli ultimi tre giorni, al più MAX_DISP (una coda si rimanda in pochi secondi: un dispositivo
+  // dimenticato non ha più niente in viaggio)
+  if (applicati || scartati.length) {
+    for (const [k, v] of Object.entries(D)) if (now - v.t > VITA_DISP) delete D[k]
+    const tutti = Object.entries(D)
+    if (tutti.length > MAX_DISP) for (const [k] of tutti.sort((a, b) => a[1].t - b[1].t).slice(0, tutti.length - MAX_DISP)) delete D[k]
+    tocca(c, now)
+  }
+  return { avviso: scartati.length ? `${perche[0]}: ricarico il saldo della banca` : null, scartati, applicati, grosse }
+}
+/** Le vincite grosse (≥ 1.500 in un giro) diventano notizie della banca (se il database dei giocatori non va, pazienza). */
+async function notizieVincite(c, grosse, now) {
+  if (!grosse?.length) return
+  try {
+    const dbG = await archivio(PATH_GIOCATORI, vuotoG)
+    if (dbG) await aggiorna(dbG, (g) => { for (const n of grosse) notizia(g, c, 'vincita', n, now) })
+  } catch (e) { console.warn('notizie vincite:', e.message) }
+}
+/** Il codice di adesso manda sempre `code` (anche vuoto): mai il saldo intero. */
+const conLotti = (body) => Array.isArray(body?.code) || (Array.isArray(body?.lotti) && typeof body.disp === 'string')
 
 // lo zaino della chat: la forma che accetta (numeri finiti, oggetti piccoli, al più MAX_ZAINO byte)
 const PATH_CHAT = process.env.CHAT_BLOB_PATH || 'pzkko/chat.json', MAX_ZAINO = 12 * 1024
@@ -303,6 +420,18 @@ export default async function handler(req, res) {
     // ── da qui in poi serve il token ──
     const id = leggiToken(body.token, now)
     if (!id) return json(res, 401, { ok: false, errore: 'entra di nuovo', esci: true })
+
+    // ── il biglietto del canale diretto (29.10 notte): il browser si collega al server dei dati sul pc di Alberto
+    // (C:\pzkko-server, /v1/live), che gli dice nell'istante stesso in cui il suo conto o il suo zaino cambiano (games/live.js).
+    // Il biglietto dice di chi è il conto ed è firmato col segreto del server (PZKKO_SERVER_SECRET): vale dieci minuti per
+    // aprire il canale, e il browser ne chiede uno nuovo quando si riapre ──
+    if (a === 'biglietto') {
+      const srv = serverOpzioni()
+      if (!srv) return json(res, 503, { ok: false, offline: true, errore: 'il canale diretto non c’è' })
+      const scade = (now + 10 * MINUTO).toString(36)
+      const firma = createHmac('sha256', srv.segreto).update(`pzk-live\n${id}\n${scade}`).digest('base64url')
+      return json(res, 200, { ok: true, url: srv.url, biglietto: `${id}.${scade}.${firma}` })
+    }
     const b = await borsa(now)
     const tasso = b ? attuale(b) : 1
     const risposta = (c, extra = {}) => ({ ok: true, conto: vista(c, now), tasso, t: now, ...extra })
@@ -339,35 +468,43 @@ export default async function handler(req, res) {
       const r = await aggiorna(store, (db) => {
         const c = db.conti.find((x) => x.id === id)
         if (!c) return { errore: 'conto sparito', esci: true }
-        const prima = c.pzk, avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi)), lu = vive(c, now, db)
-        const tempo = matura(c, now, (m) => mossa(c, m)) // i sporchi che si puliscono, il lavaggio finito, la galera scontata
+        const prima = c.agg
+        // i lotti (il codice di adesso) o il saldo intero (i browser col codice di prima)
+        const L = conLotti(body) ? lotti(c, body, now, db) : { avviso: accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi)), scartati: [] }
+        const lu = vive(c, now, db)
+        matura(c, now, (m) => mossa(c, m)) // i sporchi che si puliscono, il lavaggio finito, la galera scontata
         distruggi(db, now)
-        if (c.pzk === prima && !lu && !tempo && !avviso) return { invariato: true, c, avviso }
-        return { c, avviso, lu }
+        if (c.agg === prima && !L.avviso) return { invariato: true, c }
+        return { c, avviso: L.avviso, scartati: L.scartati, grosse: L.grosse, lu }
       })
       if (r.errore) return json(res, 401, { ok: false, errore: r.errore, esci: r.esci })
-      await notizieLumaca(r.c, r.lu, now)
-      return json(res, 200, risposta(r.c, { ...(r.avviso && { avviso: r.avviso }), ...(r.lu && { lumaca: r.lu }) }))
+      await Promise.all([notizieLumaca(r.c, r.lu, now), notizieVincite(r.c, r.grosse, now)])
+      return json(res, 200, risposta(r.c, { ...(r.avviso && { avviso: r.avviso }), ...(r.scartati?.length && { scartati: r.scartati }), ...(r.lu && { lumaca: r.lu }) }))
     }
 
     // le altre azioni cambiano il conto: prima il saldo del browser, poi la lumachina, poi la mossa. Se l'azione dice di no
     // ma la lumachina ha appena vissuto, si salva lo stesso (il no diventa un «rifiuto»): la giornata non va persa, se no il
     // browser la vedrebbe e il server no, e la richiesta dopo la vivrebbe due volte
+    // (coi lotti, il codice di adesso: i lotti si applicano sempre, anche se l'azione poi dice di no, e quelli scartati non
+    // fermano l'azione; si salva lo stesso, e il no diventa un «rifiuto», come per la lumachina)
     const azione = (fai) => aggiorna(store, (db) => {
       const c = db.conti.find((x) => x.id === id)
       if (!c) return { errore: 'conto sparito', esci: true }
-      const avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi))
-      if (avviso) return { errore: avviso, c }
+      let L = { scartati: [], applicati: 0 }
+      if (conLotti(body)) L = lotti(c, body, now, db)
+      else { const avviso = accogli(c, body.pzk, now, lgDi(body.lg), esDi(body.es), db, flussiDi(body.flussi)); if (avviso) return { errore: avviso, c } }
       const lu = vive(c, now, db)
       matura(c, now, (m) => mossa(c, m))
       const esito = fai(c, db) ?? {}
-      if (esito.errore && lu) return { c, lu, rifiuto: esito.errore }
-      return { c, lu, ...esito }
+      const altro = { scartati: L.scartati, grosse: L.grosse, ...(L.avviso && { avviso: L.avviso }) }
+      if (esito.errore && (lu || L.applicati || L.scartati.length)) return { c, lu, rifiuto: esito.errore, ...altro }
+      return { c, lu, ...esito, ...altro }
     })
     const manda = async (r, extra = {}) => {
-      await notizieLumaca(r.c, r.lu, now)
-      const errore = r.errore ?? r.rifiuto, lumaca = r.lu ? { lumaca: r.lu } : {}
-      return errore ? json(res, r.esci ? 401 : 409, { ok: false, errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }), ...lumaca }) : json(res, 200, risposta(r.c, { ...extra, ...lumaca }))
+      await Promise.all([notizieLumaca(r.c, r.lu, now), notizieVincite(r.c, r.grosse, now)])
+      const errore = r.errore ?? r.rifiuto, lumaca = r.lu ? { lumaca: r.lu } : {}, lotto = { ...(r.scartati?.length && { scartati: r.scartati }), ...(r.avviso && { avviso: r.avviso }) }
+      // (`fatto`, com'è andata, lo leggono il browser e la chat: dal 27.10, perso con l'annullamento dei premi e rimesso il 29.10)
+      return errore ? json(res, r.esci ? 401 : 409, { ok: false, errore, esci: r.esci, ...(r.c && { conto: vista(r.c, now), tasso, t: now }), ...lumaca, ...lotto }) : json(res, 200, risposta(r.c, { ...extra, ...(r.fatto && { fatto: r.fatto }), ...lumaca, ...lotto }))
     }
 
     if (a === 'converti') {

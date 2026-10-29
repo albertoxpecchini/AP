@@ -19,7 +19,7 @@
 // - LA HOME A PAGINE (29.10, Alberto: «spazio per icone 3x3 poi deve scorrere … come l'iphone dei puntini sotto in mezzo»): a
 //   sinistra l'ora e i widget, a destra le app nove per pagina, divise per genere (PAGINE); si scorrono di lato col dito, la
 //   rotella, il mouse trascinato o le frecce, e i puntini sotto in mezzo dicono quante pagine ci sono e dove sei (si possono
-//   premere). Un puntino cerchiato di rosso: in quella pagina c'è un'app col pallino.
+//   premere). Il puntino cerchiato di rosso è la pagina dove sei; un puntino rosso pieno: lì c'è un'app col pallino.
 // Sul cellulare niente cornice: lo schermo prende tutta la finestra e i due tasti diventano una barra in basso.
 // Ogni app è un modulo di telefono/app/ che si carica la prima volta che la apri e poi resta montata (la chat non perde i
 // messaggi quando torni alla home). (Il nome «telefono» è rimasto dalla prima versione, che era un telefono.)
@@ -63,6 +63,8 @@ export const APP = [
   // l'account (26.10): il conto, il cambio, gli invii e il resto, che prima stavano nelle pagine del wallet
   { id: 'account', nome: 'account', icona: 'app-account', carica: () => import('./app/account.js') },
   { id: 'negozio', nome: 'shop', icona: 'app-shop', carica: () => import('./app/negozio.js') },
+  // il pzkstore (29.10): le app da comprare (la lavatrice, il decifratore). Il pallino: quelle che ti servirebbero e non hai
+  { id: 'pzkstore', nome: 'pzkstore', icona: 'app-pzkstore', carica: () => import('./app/pzkstore.js'), badge: () => (pzk.conto() ? import('./app/pzkstore.js').then((m) => m.daComprare()) : 0) },
   { id: 'sfide', nome: 'sfide', icona: 'app-sfide', carica: () => import('./app/sfide.js'), badge: () => import('../chat/sfide.js').then((m) => m.daRiscuotere()) },
   { id: 'quiz', nome: 'quiz', icona: 'app-quiz', carica: () => import('./app/quiz.js') },
   { id: 'missioni', nome: 'quest', icona: 'app-quest', carica: () => import('./app/missioni.js'), badge: () => import('../chat/missioni.js').then((m) => m.pronte()) },
@@ -76,10 +78,11 @@ export const APP = [
   { id: 'virtual', nome: 'virtual', icona: 'app-virtual', carica: () => import('./app/virtual.js'), badge: () => import('../games/virtual/schedina.js').then((m) => { m.avvia(); return m.daVedere().length + m.aperteInChiusura() }) },
   { id: 'banca', nome: 'banca', icona: 'app-banca', azione: () => pzk.apriWallet() },
   // l'economia (26.10, api/_economia.mjs): il colpo alla cassa di pzk, la lavatrice dei soldi sporchi, il decifratore dei wallet
-  // trovati dallo spazzino (solo se installato dalla chat: «installa decifratore»). Il pallino della rapina: la galera
+  // trovati dallo spazzino. Il pallino della rapina: la galera. Dal 29.10 la lavatrice e il decifratore si comprano nel
+  // pzkstore (store: true): ci sono solo se installati (se), e aperti senza averli portano alla loro scheda (vai)
   { id: 'rapina', nome: 'rapina', icona: 'app-rapina', carica: () => import('./app/rapina.js'), badge: () => (pzk.inGalera() ? 1 : 0) },
-  { id: 'lavatrice', nome: 'lavatrice', icona: 'app-lavatrice', carica: () => import('./app/lavatrice.js'), badge: () => (pzk.lavaggio()?.fino <= Date.now() ? 1 : 0) },
-  { id: 'decifratore', nome: 'decifra', icona: 'app-decifratore', carica: () => import('./app/decifratore.js'), se: () => zaino.installata('decifratore'), badge: () => (zaino.installata('decifratore') ? zaino.quanti('wallet-pzk') + zaino.quanti('chiavetta') : 0) },
+  { id: 'lavatrice', nome: 'lavatrice', icona: 'app-lavatrice', carica: () => import('./app/lavatrice.js'), store: true, se: () => lavatrice(), badge: () => (lavatrice() && pzk.lavaggio()?.fino <= Date.now() ? 1 : 0) },
+  { id: 'decifratore', nome: 'decifra', icona: 'app-decifratore', carica: () => import('./app/decifratore.js'), store: true, se: () => zaino.installata('decifratore'), badge: () => (zaino.installata('decifratore') ? zaino.quanti('wallet-pzk') + zaino.quanti('chiavetta') : 0) },
   // le app veloci (26.10): le conversioni fra basi, la calcolatrice da geometra, il compilatore C, la cucina del Mincio
   { id: 'conversioni', nome: 'bin·hex', icona: 'app-conversioni', carica: () => import('./app/conversioni.js') },
   { id: 'calcolatrice', nome: 'calcoli', icona: 'app-calcolatrice', carica: () => import('./app/calcolatrice.js') },
@@ -88,12 +91,34 @@ export const APP = [
 ]
 
 // le pagine della home (29.10): nove app per pagina (3 × 3), divise per genere; un genere con più di nove app va a capo in
-// una pagina sua, e un'app nuova che non sta in nessuna lista finisce nell'ultima
+// una pagina sua, e un'app nuova che non sta in nessuna lista finisce nell'ultima. Il pzkstore (29.10 sera) sta nella prima,
+// accanto allo shop; per fargli posto l'account è passato nella pagina dei soldi, accanto alla banca (il conto, il cambio,
+// gli invii), dove arrivano anche le app comprate nel pzkstore
 const PAGINE = [
-  ['chat', 'profilo', 'account', 'negozio', 'sfide', 'quiz', 'missioni', 'giocatori', 'zaino'], // tu e il gioco
-  ['miniera', 'foto', 'virtual', 'banca', 'rapina', 'lavatrice', 'decifratore'], // i soldi
+  ['chat', 'profilo', 'negozio', 'pzkstore', 'sfide', 'quiz', 'missioni', 'giocatori', 'zaino'], // tu e il gioco
+  ['account', 'miniera', 'foto', 'virtual', 'banca', 'rapina', 'lavatrice', 'decifratore'], // i soldi
   ['conversioni', 'calcolatrice', 'compilatore', 'cucina'], // gli attrezzi
 ]
+
+// LA LAVATRICE DI PRIMA (29.10): fino al pzkstore era nella home di tutti. Se la tiene, regalata, chi quando arriva il
+// pzkstore ha soldi sporchi, un lavaggio in corso o l'ha già usata (una commissione o un lavaggio fra le ultime mosse del
+// conto); agli altri si compra. La decisione si scrive una volta nello zaino (installata o tolta al momento fisso
+// zaino.REGALO, così comprarla o toglierla dopo vince sempre), ma solo dopo che è arrivato lo zaino del server: se un altro
+// dispositivo ha già deciso, vale quella. Intanto la si vede se si avrà.
+let decidendo = null
+function lavatrice() {
+  if (zaino.installata('lavatrice')) return true
+  if (zaino.decisa('lavatrice') || !pzk.conto()) return false
+  decidendo ??= zaino.allineato().then((pronto) => {
+    decidendo = null
+    const c = pzk.conto()
+    if (!pronto || !c || zaino.decisa('lavatrice')) return
+    const usata = (c.mosse ?? []).some((m) => m.tipo === 'lavatrice' || m.tipo === 'lavati')
+    if (pzk.sporchi() > 0 || pzk.lavaggio() || usata) zaino.installa('lavatrice', zaino.REGALO)
+    else zaino.disinstalla('lavatrice', zaino.REGALO)
+  })
+  return pzk.sporchi() > 0 || !!pzk.lavaggio()
+}
 const PER_PAGINA = 9
 
 let dlg = null, corpo = null, schermo = null, palco = null, vista = null, homeEl = null, tostoEl = null, statoEl = null, ledEl = null, porta = null
@@ -409,7 +434,7 @@ async function aggiornaBadge() {
     tot += n
     for (const el of homeEl.querySelectorAll(`[data-app="${id}"] .t-badge`)) { el.hidden = !n; el.textContent = n > 9 ? '9+' : n }
   }
-  // i puntini delle pagine con un pallino sono cerchiati di rosso: si sa dove andare senza sfogliarle tutte
+  // i puntini delle pagine con un pallino sono rossi pieni: si sa dove andare senza sfogliarle tutte
   homeEl.querySelectorAll('.t-pagina').forEach((p, i) => {
     const c = [...p.querySelectorAll('[data-app]')].some((b) => conti.get(b.dataset.app))
     homeEl.querySelector(`.t-punto[data-pagina="${i}"]`)?.classList.toggle('avviso', c)
@@ -664,6 +689,7 @@ export async function apri(app = null, opz = {}) {
   // volta (Alberto, 23.10: «memorizza sempre le azioni»; da scassato solo la chat), se no la home. Senza sigla: suona
   // l'accensione
   const ultima = ricordo('cercapersone', { app: null }).app
+  lavatrice() // (chi l'aveva di serie: si decide subito, anche se si apre dritto su un'app e la home non si disegna)
   const a = app ?? (ultima && APP.some((x) => x.id === ultima) && (!zaino.pagerRotto() || ultima === 'chat') ? ultima : null)
   await ingrandisci(async () => { if (a) await vai(a, { ...opz, muto: true }); else home({ subito: true, muto: true }) })
   if (mio !== giro) return // chiuso mentre si accendeva
@@ -738,8 +764,11 @@ export function indietro({ daFreccia = false } = {}) {
 export async function vai(id, opz = {}) {
   let rimandata = false
   if (dentro && !pzk.conto() && id !== 'account') { daFare = { id, opz }; id = 'account'; opz = { scheda: 'conto' }; rimandata = true }
-  const a = APP.find((x) => x.id === id)
+  let a = APP.find((x) => x.id === id)
   if (!a) return
+  // un'app del pzkstore che non hai (29.10: un link, il tasto della rapina, l'ultima app aperta prima di toglierla): si apre
+  // la sua scheda nel pzkstore, col prezzo e il tasto per comprarla
+  if (a.store && a.se && !a.se() && !rimandata) { opz = { ...opz, app: id }; id = 'pzkstore'; a = APP.find((x) => x.id === id) }
   // scassato (dopo una morte) si apre solo la chat: lì si lavora e si ricompra il cercapersone nuovo
   if (zaino.pagerRotto() && id !== 'chat') { toast('è <b>scassato</b>: funziona solo la chat, per <b>lavorare</b> e <b>comprare il nuovo</b>', { icona: 'pager' }); return }
   if (a.azione) { a.azione(); return }

@@ -1412,6 +1412,10 @@
   "app-rapina": {
    "w": 204,
    "h": 204
+  },
+  "app-pzkstore": {
+   "w": 204,
+   "h": 204
   }
  },
  "chat-avatar": {

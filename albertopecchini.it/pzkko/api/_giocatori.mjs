@@ -12,6 +12,7 @@
 // (Comincia per _ : Vercel non ne fa una funzione.)
 
 import { sporchi } from './_economia.mjs'
+import { conti as contiDel } from '../games/libro.mjs'
 
 export const PATH_GIOCATORI = process.env.GIOCATORI_BLOB_PATH || 'pzkko/giocatori.json'
 export const vuotoG = () => ({ v: 1, g: {}, notizie: [] })
@@ -83,8 +84,7 @@ export function aggiornaGiocatore(db, c, z, now) {
   if (prima) {
     if (livelloDi(nuova.xp) > livelloDi(prima.xp) && livelloDi(nuova.xp) >= 3) nota('livello', livelloDi(nuova.xp))
     for (const r of nuova.rari) if (!prima.rari?.includes(r)) nota('leggenda', r)
-    const vinto = nuova.s.vinti - prima.s.vinti
-    if (vinto >= 1500) nota('vincita', vinto)
+    // (le vincite grosse dal 29.10 notte le dice il server dei soldi, dai lotti: api/wallet.mjs, notizieVincite)
     if (nuova.mest && nuova.mest !== prima.mest) nota('mestiere', nuova.mest)
     if (nuova.s.sfideFatte > prima.s.sfideFatte && nuova.s.sfideFatte % 10 === 0) nota('sfide', nuova.s.sfideFatte)
     if (nuova.s.missioniFatte > prima.s.missioniFatte) nota('missione', nuova.s.missioniFatte)
@@ -125,6 +125,14 @@ export function unisci(db, conti) {
     const g = db.g[c.id]
     const r = { id: c.id, ind: c.ind, nome: c.nome, creato: c.creato, pzk: c.pzk ?? 0, eur: c.eur ?? 0, xp: 0, mest: null, turni: 0, s: statDi(null), serie: 0, ogg: 0, rari: [], ult: c.salvato ?? c.creato, ...(g ?? {}), ...{ pzk: c.pzk ?? 0, eur: c.eur ?? 0, nome: c.nome, ind: c.ind } }
     r.s = { ...statDi(null), ...r.s }
+    // (29.10 notte) i soldi vengono dal libro dei conti del server (games/libro.mjs), non più dallo zaino del browser: vinti e
+    // persi ai giochi sono il netto, guadagnati è in tutto (giochi compresi); i giochi grandi, mano per mano, pure
+    const k = contiDel(c.libro)
+    r.s.vinti = Math.max(0, Math.round(k.giochi))
+    r.s.persi = Math.max(0, Math.round(-k.giochi))
+    r.s.guadagnati = Math.round(k.guadagnati)
+    r.cn = { giochi: k.giochi, lavoro: k.lavoro, spese: k.spese, vendite: k.vendite, lumaca: k.lumaca, morti: k.morti, rapine: k.rapine, guadagnati: k.guadagnati, puntato: k.puntato, tornato: k.tornato }
+    r.gi = Object.fromEntries(GIOCHI.filter((x) => c.libro?.g?.[x]).map((x) => [x, c.libro.g[x]]))
     r.sp = sporchi(c) // (26.10) i soldi sporchi e la galera si vedono nel profilo, come la fedina
     r.gal = c.galera > Date.now() ? c.galera : null
     r.liv = livelloDi(r.xp)
@@ -163,7 +171,7 @@ export function profilo(righe, r) {
   }
   return {
     ...pubblica(r), creato: r.creato, ult: r.ult, xp: r.xp, turni: r.turni, pzk: Math.round(r.pzk * 2) / 2, ogg: r.ogg, serie: r.serie, rari: r.rari, s: r.s,
-    xpProssimo: 60 * r.liv ** 2, giocatori: righe.length, posizioni, pr: r.pr ?? null, gi: r.gi ?? {}, sp: r.sp ?? 0, gal: r.gal ?? null,
+    xpProssimo: 60 * r.liv ** 2, giocatori: righe.length, posizioni, pr: r.pr ?? null, gi: r.gi ?? {}, sp: r.sp ?? 0, gal: r.gal ?? null, cn: r.cn ?? null,
   }
 }
 

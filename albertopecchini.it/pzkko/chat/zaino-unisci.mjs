@@ -2,11 +2,16 @@
 // sincronizzati»). Lo zaino si salva intero, da più dispositivi; prima vinceva quello col `t` più recente, e un telefono
 // rimasto indietro (lo zaino del server si chiedeva solo entrando nel conto, non aprendo la pagina), alla prima mossa
 // cancellava i progressi fatti sul pc. Ora si uniscono: quello che cresce soltanto (l'esperienza, le statistiche, i giri
-// ai giochi, i leggendari presi, le app installate, le side quest finite, il record del quiz, la serie più avanti) prende
-// il meglio dei due; il resto (gli oggetti, le attese, gli effetti, il mestiere, le sfide del giorno…) viene da `base`,
-// quello che vince: chi scrive avendo visto l'ultimo salvato. Lo usano chat/zaino.js nel browser e api/wallet.mjs.
+// ai giochi, i leggendari presi, le side quest finite, il record del quiz, la serie più avanti) prende il meglio dei due;
+// il resto (gli oggetti, le attese, gli effetti, il mestiere, le sfide del giorno…) viene da `base`, quello che vince: chi
+// scrive avendo visto l'ultimo salvato. Le app installate (29.10, il pzkstore: si comprano e si tolgono) hanno per ognuna
+// il momento dell'ultima decisione, positivo installata e negativo tolta: vince la più recente, a pari momento installata
+// (prima crescevano soltanto, e un'app tolta su un dispositivo tornava dall'altro). Lo usano chat/zaino.js nel browser e
+// api/wallet.mjs.
 
 const max = (a, b) => Math.max(Number(a) || 0, Number(b) || 0)
+// (un'app: +t installata, −t tolta al momento t; vince il momento più recente, a pari momento installata)
+const ultima = (a, b) => { const x = Number(a) || 0, y = Number(b) || 0; return Math.abs(y) > Math.abs(x) || (Math.abs(y) === Math.abs(x) && y > x) ? y : x }
 // (chiavi come __proto__ non entrano: il corpo di una richiesta lo scrive chi vuole)
 const perChiave = (a, b, f) => {
   const o = {}
@@ -25,7 +30,7 @@ export function unisci(base, altro) {
   z.stat = perChiave(base.stat, altro.stat, max)
   if (base.giochi || altro.giochi) z.giochi = perChiave(base.giochi, altro.giochi, (x, y) => (Array.isArray(x) && Array.isArray(y) ? Array.from({ length: Math.max(x.length, y.length) }, (_, i) => max(x[i], y[i])) : x))
   if (base.rari || altro.rari) z.rari = [...new Set([...(base.rari ?? []), ...(altro.rari ?? [])])]
-  if (base.app || altro.app) z.app = perChiave(base.app, altro.app, max)
+  if (base.app || altro.app) z.app = perChiave(base.app, altro.app, ultima)
   if (base.serie || altro.serie) z.serie = perChiave(base.serie, altro.serie, (x, y) => ((y?.ultimo ?? 0) > (x?.ultimo ?? 0) ? y : x))
   if (base.quest || altro.quest) {
     const fatte = perChiave(base.quest?.fatte, altro.quest?.fatte, max)

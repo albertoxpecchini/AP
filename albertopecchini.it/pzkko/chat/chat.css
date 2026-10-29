@@ -121,13 +121,32 @@
 .c-riga input{flex:1;min-width:0;padding:6px 8px;border:0;border-radius:4px;background:rgba(70,255,125,.06);color:#eaf5e4;font:400 16px/1.2 var(--mono);caret-color:var(--led)}
 .c-riga input::placeholder{color:#5f6b5c}
 .c-riga .c-invia{flex:none;padding:7px 12px 8px}
-.c-sugg{position:absolute;left:10px;right:10px;bottom:100%;margin:0 0 4px;padding:4px 0;list-style:none;border-radius:6px;background:#161c17;box-shadow:0 -4px 14px rgba(0,0,0,.6),inset 0 0 0 1px rgba(70,255,125,.25);max-height:220px;overflow:auto;z-index:4}
-.c-sugg[hidden]{display:none}
-.c-sugg li{display:flex;gap:10px;align-items:baseline;padding:5px 12px;cursor:pointer;font-size:14px}
-.c-sugg li b{font-family:var(--mono);color:var(--led)}
-.c-sugg li span{color:#8b9385;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.c-sugg li.scelta,.c-sugg li:hover{background:rgba(70,255,125,.12)}
-.c-sugg li .emo{height:1.2em}
+/* il testo predittivo (29.10, predittivo.js): mentre scrivi, sopra la riga, i comandi che vanno bene con quello che hai
+   scritto, e dopo lo spazio i loro argomenti. Un pannello dello schermo: vetro scuro, bordo nero e filo di fosforo; la voce
+   evidenziata è in negativo (verde pieno, scritta scura) come il cursore di un menù a cristalli liquidi, la parte scritta è
+   bianca. Una riga per voce: icona, nome, l'alias se l'hai scritto così, cosa fa (tagliata), l'attesa in ambra. Sta sopra i
+   tasti rapidi e il «giù», e copre il meno possibile: alto al più cinque voci e mezza (predittivo.js lo stringe ancora se
+   sopra c'è poco). Niente animazioni. Le parole dei tasti in fondo solo dove c'è una tastiera vera */
+.c-pred{position:absolute;left:8px;right:8px;bottom:100%;z-index:6;margin-bottom:4px;border:2px solid #000;border-radius:6px;background:#0a120c;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(70,255,125,.32),0 3px 0 #000,0 -6px 18px rgba(0,0,0,.6)}
+.c-pred[hidden]{display:none}
+.c-sugg{position:relative;margin:0;padding:3px 0;list-style:none;max-height:165px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.35) transparent}
+.c-sugg li{display:flex;align-items:center;gap:8px;min-height:30px;padding:3px 10px;cursor:pointer;font:400 14px/1.15 var(--mono);color:#cfe8cc;white-space:nowrap}
+.chat .c-sugg .emo{flex:none;width:20px;height:20px;margin:0;object-fit:contain;vertical-align:middle}
+.c-sugg li>b{flex:none;color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.45)}
+.c-sugg mark{background:none;color:#fff}
+.c-sugg li>small{flex:none;padding:2px 5px 3px;border:1px solid rgba(124,138,120,.55);border-radius:3px;font:400 11px/1 var(--mono);color:#9aa795}
+.c-sugg li>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font:400 12px/1.2 var(--mono);color:#8b9385}
+.c-sugg li>em{flex:none;margin-left:auto;font:400 11px/1 var(--mono);font-style:normal;color:var(--ambra)}
+.c-sugg li.spento{opacity:.5}
+@media (hover:hover){.c-sugg li:hover{background:rgba(70,255,125,.1)}}
+.c-sugg li.scelta{background:var(--led);opacity:1}
+.c-sugg li.scelta>b,.c-sugg li.scelta mark,.c-sugg li.scelta>small,.c-sugg li.scelta>span,.c-sugg li.scelta>em{color:#062a12;text-shadow:none}
+.c-sugg li.scelta>small{border-color:rgba(6,42,18,.5)}
+.c-sugg li.scelta mark{text-decoration:underline;text-underline-offset:2px}
+.c-sugg li.scelta.spento>b{color:#2f5a3a}
+.c-pred-tasti{margin:0;padding:4px 10px 5px;border-top:1px dashed rgba(70,255,125,.2);font:400 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#6c7a68}
+@media (hover:none),(pointer:coarse){.c-pred-tasti{display:none}}
 
 /* ── i tasti rapidi: le ultime scelte, una fila che scorre di lato sopra la riga dove si scrive ── */
 .c-rapidi-box{position:relative;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.3)}

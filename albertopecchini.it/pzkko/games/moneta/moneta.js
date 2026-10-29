@@ -475,6 +475,11 @@ async function fermata(l) {
   const g = stato.giro ?? { testa: 0, croce: 0 }
   const vinta = g[l], persa = g[altro(l)]
   const tot = vinta + persa
+  // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena la moneta cade:
+  // la vincita pagata e rimessa sul tavolo per «lascia o raddoppia» (il saldo non cambia: passa dal saldo al tavolo), o la
+  // puntata alla cassa. Le fiches che volano dopo sono da vedere
+  if (vinta) { pzk.regola(GIOCO, tot, 2 * vinta); pzk.punta(GIOCO, 2 * vinta) }
+  else if (tot) pzk.regola(GIOCO, tot, 0)
   voce(!tot ? l : vinta ? `${l}: vinci ${fmt(vinta)} $pzk` : stato.raddoppi ? `${l}: il raddoppio è andato` : `${l}: il banco si prende tutto`)
   await attendi(650)
 
@@ -508,9 +513,7 @@ async function fermata(l) {
       accanto.appendChild(img)
       return vola(v, banco, nelCampo({ x: c.x + 30, y: c.y + 3 - Math.min(j, 13) * ALTO }), { durata: 460, alto: 26, dopo: j * 45 }).then(() => { img.style.visibility = '' })
     }))
-    // i conti: la vincita è pagata, e tutto resta sul tavolo per «lascia o raddoppia»
-    pzk.regola(GIOCO, tot, 2 * vinta)
-    pzk.punta(GIOCO, 2 * vinta)
+    // (i conti sono già fatti, appena caduta la moneta: tutto resta sul tavolo per «lascia o raddoppia»)
     stato.giocate[l] = 2 * vinta
     await attendi(450)
     const n0 = p.el.children.length
@@ -529,7 +532,6 @@ async function fermata(l) {
     voce(`${l}! sul tavolo ${fmt(2 * vinta)} $pzk: lascia o raddoppia?`)
     return
   }
-  pzk.regola(GIOCO, tot, 0)
   fine()
   if (pzk.aSecco()) voce(`${l}. hai finito i $pzk: ricarica`)
 }

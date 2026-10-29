@@ -10,6 +10,7 @@
 import * as zaino from '../../chat/zaino.js'
 import * as db from '../../chat/db.js'
 import * as pzk from '../../games/pzk.js'
+import { conti } from '../../games/libro.mjs'
 import { nomeDi } from '../../chat/testi.js'
 import { icona, esiste } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
@@ -79,15 +80,17 @@ function cartellino() {
 const dati = (titolo, ic, celle) => `<section class="t-pf-sez"><h4>${icona(ic)}${titolo}</h4><div class="t-pf-dati">${celle.map(([v, t]) => `<div><b>${v}</b><small>${t}</small></div>`).join('')}</div></section>`
 
 function numeri() {
-  const s = zaino.stat, g = zaino.giochi(), z = zaino.stato()
-  const mani = Object.values(g).reduce((t, x) => t + x[0], 0), vinte = Object.values(g).reduce((t, x) => t + x[1], 0)
-  const netto = s('vinti') - s('persi'), m = zaino.mestiere(), q = zaino.quizStato(), ogg = zaino.oggetti().reduce((t, [, k]) => t + k, 0)
+  // (29.10 notte) i soldi e i giochi vengono dal libro dei conti del server (games/libro.mjs), gli stessi numeri delle
+  // classifiche: prima lo zaino ne teneva altri, e i vinti ai giochi potevano superare i guadagnati in tutto
+  const s = zaino.stat, k = conti(pzk.conto()?.libro), g = k.perGioco, z = zaino.stato()
+  const mani = k.mani, vinte = k.vinte
+  const netto = k.giochi, m = zaino.mestiere(), q = zaino.quizStato(), ogg = zaino.oggetti().reduce((t, [, k]) => t + k, 0)
   const righe = Object.entries(GIOCHI).map(([id, [nome, ic]]) => {
     const [ma, vi, pu, to, mi] = g[id] ?? [0, 0, 0, 0, 0]
     return `<tr${ma ? '' : ' class="mai"'}><th>${icona(ic)}${nome}</th><td>${n(ma)}</td><td>${pct(vi, ma)}</td><td>${p(pu)}</td><td class="${to - pu < 0 ? 'meno' : to - pu > 0 ? 'piu' : ''}">${to - pu > 0 ? '+' : ''}${pzk.fmtCorto(to - pu)}</td><td>${mi > 0 ? p(mi) : '—'}</td></tr>`
   }).join('')
   return `${cartellino()}
-    ${dati('soldi', 'pzk', [[p(pzk.puliti()), '$pzk puliti'], [pzk.sporchi() ? `<span class="sporco">${pzk.fmtCorto(pzk.sporchi())}</span>` : '—', 'sporchi (rapine)'], [pzk.euro() >= 0.01 ? `<span class="eur">${pzk.fmtEur(pzk.euro())}</span>` : '—', 'EUR€'], [p(s('guadagnati')), 'guadagnati'], [p(s('vinti')), 'vinti ai giochi'], [`<span class="meno">${pzk.fmtCorto(s('persi'))}</span>`, 'persi ai giochi'], [`<span class="${netto < 0 ? 'meno' : 'piu'}">${netto > 0 ? '+' : ''}${pzk.fmtCorto(netto)}</span>`, 'netto dei giochi']])}
+    ${dati('soldi', 'pzk', [[p(pzk.puliti()), '$pzk puliti'], [pzk.sporchi() ? `<span class="sporco">${pzk.fmtCorto(pzk.sporchi())}</span>` : '—', 'sporchi (rapine)'], [pzk.euro() >= 0.01 ? `<span class="eur">${pzk.fmtEur(pzk.euro())}</span>` : '—', 'EUR€'], [`<span class="${k.guadagnati < 0 ? 'meno' : 'piu'}">${k.guadagnati > 0 ? '+' : ''}${pzk.fmtCorto(k.guadagnati)}</span>`, 'guadagnati in tutto'], [`<span class="${netto < 0 ? 'meno' : 'piu'}">${netto > 0 ? '+' : ''}${pzk.fmtCorto(netto)}</span>`, netto < 0 ? 'persi ai giochi' : 'vinti ai giochi'], [p(k.lavoro), 'lavoro e premi'], [`<span class="meno">${pzk.fmtCorto(k.spese)}</span>`, 'spesi']])}
     <section class="t-pf-sez"><h4>${icona('dado')}i giochi grandi <span>${n(mani)} mani · ${pct(vinte, mani)} vinte</span></h4>
       <div class="t-pf-tab"><table><thead><tr><th></th><th>mani</th><th>vinte</th><th>puntato</th><th>netto</th><th>colpo</th></tr></thead><tbody>${righe}</tbody></table></div>
     </section>

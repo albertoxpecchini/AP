@@ -9,6 +9,7 @@
 // pzk.apriWallet('entra' | 'converti' | 'invia' | 'altro') apre il cercapersone qui, sulla scheda giusta.
 
 import * as pzk from '../../games/pzk.js'
+import * as zaino from '../../chat/zaino.js' // (29.10: se c'è la lavatrice, che dal pzkstore si compra)
 import { icona } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
@@ -37,7 +38,7 @@ function conto(c) {
         <div class="t-ac-azioni"><button class="c-b" type="submit">${crea ? 'crea il conto' : 'entra'}</button></div></form>`
   }
   return `<div class="t-ac-chi">${icona('app-account')}<div><b>${esc(c.nome)}</b><small>${esc(c.ind)} · nato il ${data(c.creato)}</small></div></div>
-    <div class="t-ca-griglia"><div class="t-ca-r"><span>$pzk puliti</span><b class="pzk">${fmt(c.puliti ?? c.pzk)}</b></div>${c.sporchi ? `<div class="t-ca-r sporchi"><span>sporchi (rapine)</span><b>${fmt(c.sporchi)}</b><small>lavali nella lavatrice</small></div>` : ''}<div class="t-ca-r"><span>EUR€</span><b class="eur">${fmtEur(c.eur)}</b></div>
+    <div class="t-ca-griglia"><div class="t-ca-r"><span>$pzk puliti</span><b class="pzk">${fmt(c.puliti ?? c.pzk)}</b></div>${c.sporchi ? `<div class="t-ca-r sporchi"><span>sporchi (rapine)</span><b>${fmt(c.sporchi)}</b><small>${zaino.installata('lavatrice') ? 'lavali nella lavatrice (home, pagina dei soldi)' : 'si lavano nella lavatrice: si compra nel pzkstore, 5.000 puliti'}</small></div>` : ''}<div class="t-ca-r"><span>EUR€</span><b class="eur">${fmtEur(c.eur)}</b></div>
       <div class="t-ca-r"><span>cambio delle ${new Date(pzk.sincronizzato()).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })}</span><b>1 $pzk = ${pzk.tasso().toFixed(4)} €</b></div>
       <div class="t-ca-r"><span>invii</span><b>${c.invii ? 'aperti' : `dal ${data(c.inviiDa, true)}`}</b></div></div>
     <div class="t-ac-azioni"><button class="c-b" type="button" data-fai="sincronizza">sincronizza</button><button class="c-b nero" type="button" data-fai="esci">esci</button></div>

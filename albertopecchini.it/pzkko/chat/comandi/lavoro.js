@@ -4,7 +4,8 @@
 // I MESTIERI RISCHIOSI (26.10: rischio, galera, multa in testi.js): pagano tanto, ma a ogni turno si può essere presi. Prima
 // di ogni turno il bot lo dice (la probabilità, le ore, la multa) e si può lasciar stare; presi = niente paga, la roba
 // sequestrata, la galera e la multa (pzk.arresto: sul conto, che serve). Lo spazzino gioca al nastro (minigiochi.js) e il
-// suo rischio cresce del 15 % per ogni chiavetta o wallet che si tiene; quelli si aprono col decifratore («installa decifratore»).
+// suo rischio cresce del 15 % per ogni chiavetta o wallet che si tiene; quelli si aprono col decifratore
+// (dal 29.10 si compra nel pzkstore del cercapersone, 1.500 puliti; o «installa decifratore», che passa dallo stesso pzkstore).
 import * as zaino from '../zaino.js'
 import { MESTIERI } from '../testi.js'
 import { MINIGIOCHI } from '../minigiochi.js'
@@ -77,7 +78,7 @@ Ti hanno preso${tenuti.length ? ' con la roba in tasca (sequestrata)' : ''}: <b>
         return false
       }
       for (const id of tenuti) zaino.aggiungi(id)
-      if (scottano) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':chiavetta: roba che scotta', d: `hai ${scottano === 1 ? 'una cosa cifrata' : `${scottano} cose cifrate`} nello zaino. Si aprono con l’app <b>decifratore</b>: scrivi <code>installa decifratore</code>.` })
+      if (scottano) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':chiavetta: roba che scotta', d: `hai ${scottano === 1 ? 'una cosa cifrata' : `${scottano} cose cifrate`} nello zaino. Si aprono con l’app <b>decifratore</b>: ${zaino.installata('decifratore') ? 'ce l’hai, è nella home del cercapersone (pagina dei soldi).' : 'si compra nel <b>pzkstore</b> del cercapersone, una volta sola, 1.500 $pzk puliti (o scrivi <code>installa decifratore</code>), poi lo apri dalla home, pagina dei soldi.'}` })
       const turni = zaino.stato().turni
       const bonus = 1 + 0.05 * Math.min(10, turni - 1)
       const n = ctx.paga(r.ok ? Math.round(m.paga * bonus) : Math.round(m.paga * 0.1))

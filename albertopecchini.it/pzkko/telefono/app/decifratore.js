@@ -1,6 +1,6 @@
-// L'app Decifratore (26.10): si installa dalla chat («installa decifratore», chat/comandi/app.js) e apre i wallet pzk e le
-// chiavette usb che lo spazzino trova sul nastro (chat/minigiochi.js, nastro). Ogni pezzo vuole tre giochini di decodifica,
-// facili (PEGI 13): la parola spostata di una lettera (il cifrario di Cesare), il numero in binario, la sequenza da
+// L'app Decifratore (26.10): si compra nel pzkstore (dal 29.10, telefono/app/pzkstore.js: 1.500 $pzk puliti) o dalla chat
+// («installa decifratore», chat/comandi/app.js, che passa dallo stesso pzkstore) e apre i wallet pzk e le chiavette usb
+// che lo spazzino trova sul nastro (chat/minigiochi.js, nastro). Ogni pezzo vuole tre giochini di decodifica, facili (PEGI 13): la parola spostata di una lettera (il cifrario di Cesare), il numero in binario, la sequenza da
 // completare, la parola allo specchio. Due errori si perdonano, al terzo il wallet si blocca (resta nello zaino: si riprova).
 // Aperto, i $pzk escono dal fondo dei portafogli smarriti (api/wallet.mjs, decifra: tre al giorno): soldi puliti, perché
 // erano destinati a sparire. Il pezzo aperto lascia lo zaino.

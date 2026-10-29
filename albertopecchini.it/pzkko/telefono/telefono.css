@@ -144,9 +144,13 @@
 .t-pagina img{-webkit-user-drag:none;pointer-events:none}
 .t-puntini{flex:none;display:flex;justify-content:center;min-height:18px;padding-top:4px}
 .t-punto{display:grid;place-items:center;width:20px;height:18px;padding:0;border:0;background:none;cursor:pointer}
+/* (29.10 notte, Alberto: «i pallini delle pagine devono essere circondati da quel cerchietto rosso che indica in che pagina
+   sono e non solo home»): il cerchietto rosso è la pagina dove sei, in tutte; una pagina con un'app col pallino ha il
+   puntino rosso pieno */
 .t-punto::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(233,239,230,.32)}
-.t-punto.on::before{background:#f3f7f1;box-shadow:0 0 6px rgba(70,255,125,.55)}
-.t-punto.avviso::before{outline:2px solid var(--rosso);outline-offset:1px}
+.t-punto.avviso::before{background:var(--rosso)}
+.t-punto.on::before{background:#f3f7f1;outline:2px solid var(--rosso);outline-offset:2px;box-shadow:0 0 6px rgba(255,91,74,.5)}
+.t-punto.on.avviso::before{background:var(--rosso)}
 @media (hover:hover){.t-punto:not(.on):hover::before{background:rgba(233,239,230,.6)}}
 .t-ico{display:flex;flex-direction:column;align-items:center;gap:5px;padding:0;border:0;background:none;cursor:pointer}
 /* le piastrelle: gli adesivi disegnati da Replicate (art/chat-app/), un po' storti come quelli sul muro */
@@ -1248,3 +1252,71 @@
 .tel .sporco{color:#c79b4a}
 .t-pf-chi em.galera,.t-pf-chi em.sporco{margin-left:4px;background:#a50d25;color:#fff}.t-pf-chi em.sporco{background:#6b5121;color:#fff}
 .t-gi-galera{margin:2px 0;color:#ff6b5a;font:400 12px/1.3 var(--mono)}
+
+/* ── il pzkstore (29.10, app/pzkstore.js): il negozio delle app da comprare. La vetrina è una lista (l'icona, il nome e due
+   righe, il prezzo o «installata»); la scheda come quella dello shop, l'icona a sinistra sullo schermo largo ── */
+.t-ps-saldo{font:400 12px/1 var(--mono);color:#9fb29a;white-space:nowrap}.t-ps-saldo b{font:400 15px/1 var(--mono)}
+.t-ps-intro{margin:0 0 4px;font:400 13px/1.45 var(--mono);color:#cfdccb}.t-ps-intro b{color:#fff}
+.t-ps .t-sh-sez:first-of-type{margin-top:12px}
+.t-ps-lista{display:grid;gap:8px}
+.t-ps-app{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;background:linear-gradient(170deg,rgba(255,255,255,.08),rgba(255,255,255,.03));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);cursor:pointer}
+@media (hover:hover){.t-ps-app:hover{box-shadow:inset 0 0 0 1px rgba(70,255,125,.5)}}
+.t-ps-app.serve{box-shadow:inset 0 0 0 2px var(--ambra)}
+.t-ps-ico .emo{display:block;width:64px;height:64px;margin:0;object-fit:contain;image-rendering:pixelated}
+.t-ps-ico.grande .emo{width:132px;height:132px}
+.t-ps-txt h3{margin:0 0 3px;font:400 20px/1 var(--fa);color:#fff}
+.t-ps-txt p{margin:0;font:400 12.5px/1.35 var(--mono);color:#cfdccb}
+.t-ps-serve{display:block;margin-top:5px;font:400 11.5px/1.3 var(--mono);color:var(--ambra)}
+.t-ps-serve.grande{margin:0 0 10px;padding:8px 12px;border:2px solid #000;border-radius:6px;background:#3a2c10;font-size:13px}
+.t-ps-dx{display:grid;justify-items:end;gap:6px}
+.t-ps-dx .c-b{transform:none}
+.t-ps-stato{font:400 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--led)}
+.t-ps-gratis{color:var(--led)}
+.t-ps-eroe{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;margin-bottom:10px}
+.t-ps-chi .t-sh-nome{margin-bottom:4px}
+.t-ps-chi .t-sh-cta{margin:8px 0 4px}
+.t-ps-tua{display:flex;align-items:center;gap:6px;margin:4px 0;font:400 13px/1.3 var(--mono);color:var(--led)}.t-ps-tua b{color:#fff}
+.t-ps-tua .emo{width:18px;height:18px;margin:0}
+.t-ps-nota{margin:2px 0 0;font:400 11.5px/1.35 var(--mono);color:#9fb29a}
+.t-ps-desc p{margin:0 0 8px;font-size:14.5px;line-height:1.45;color:#d6e2d1}.t-ps-desc b{color:#fff}
+.t-ps-passi{margin:0;padding:0 0 0 22px;display:grid;gap:5px;font:400 13px/1.4 var(--mono);color:#cfdccb}.t-ps-passi b{color:#fff}
+.t-ps-passi li::marker{color:var(--led)}
+@container palco (max-aspect-ratio: 1/1){
+  .t-ps-app{grid-template-columns:52px minmax(0,1fr)}
+  .t-ps-ico .emo{width:52px;height:52px}
+  .t-ps-dx{grid-column:2;justify-items:start;grid-auto-flow:column;align-items:center}
+  .t-ps-eroe{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .t-ps-ico.grande .emo{width:110px;height:110px}
+  .t-ps-tua,.t-ps-chi .t-sh-prezzo{justify-content:center}
+}
+
+/* ── la lavatrice rifatta (29.10, app/lavatrice.js): a sinistra la macchina ferma (il cestello non gira più), a destra i
+   conti, quanto lavare e come sarai dopo, il lavaggio in corso con la barra, la storia; sul cellulare dritto in colonna ── */
+.t-lv-griglia{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;align-items:start}
+.t-lv-sx{position:sticky;top:0;display:grid;justify-items:center;gap:6px}
+.t-lv-sx .t-la-macchina{width:190px;margin:0}
+.t-lv-sx .t-la-oblo{width:140px;height:140px;border-width:10px}
+.t-lv-sx .t-la-cestello img{width:42px;margin:-13px 0 0 -21px;transform:rotate(var(--a)) translateY(-36px) rotate(calc(var(--a) * -1.5))}
+.t-lv-stato{margin:0;font:400 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#9fb29a}
+.t-lv-conti{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.t-lv-conti small{font:400 10.5px/1.2 var(--mono);color:#9fb29a}
+.t-lv-gira{display:grid;gap:6px;margin:12px 0 4px;padding:12px;border:2px solid #000;border-radius:8px;background:#141915;font:400 13px/1.3 var(--mono);color:#cfdccb}
+.t-lv-gira>b{font:400 18px/1.1 var(--mono);color:#fff}.t-lv-gira span b{color:#ffd400}
+.t-lv-gira.pronto{background:#17301c}
+.t-lv-barra{height:12px;border:2px solid #000;border-radius:6px;background:#0b0e0c;overflow:hidden}
+.t-lv-barra i{display:block;height:100%;background:var(--led)}
+.t-lv-azioni{align-items:center;margin:4px 0 8px}
+.t-lv-max{padding:0;border:0;background:none;color:var(--ambra);font:400 12px/1.3 var(--mono);text-decoration:underline;cursor:pointer}
+.t-lv-max-nota{display:block;flex:1 1 200px;font:400 11.5px/1.3 var(--mono);color:#9fb29a}
+.t-lv .t-sh-sez{margin:12px 0 4px}
+.t-lv .t-ac-fader{margin:2px 0}
+.t-lv-dopo{width:100%;margin:4px 0 2px;border-collapse:collapse;font:400 13px/1.3 var(--mono);color:#e9efe6}
+.t-lv-dopo th{padding:3px 6px;font-size:10px;color:#9fb29a;text-align:right;text-transform:uppercase}.t-lv-dopo th:first-child{text-align:left}
+.t-lv-dopo td{padding:4px 6px;border-top:1px solid rgba(255,255,255,.07);text-align:right}.t-lv-dopo td:first-child{text-align:left;color:#9fb29a}
+.t-lv-dopo td.piu{color:var(--led)}
+.t-lv .t-ac-fader input:disabled{opacity:.4}
+.t-lv .t-ac-mosse b small{font-size:10.5px;color:#9fb29a}
+@container palco (max-aspect-ratio: 1/1){
+  .t-lv-griglia{grid-template-columns:1fr}
+  .t-lv-sx{position:static}
+}

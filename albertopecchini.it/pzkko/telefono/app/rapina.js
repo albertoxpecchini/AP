@@ -5,8 +5,11 @@
 // non si spende (la lavatrice lo pulisce, o 96 giorni). Se va male: sei ore di galera e una multa (il 20 % dei puliti, al più
 // 5.000). Un colpo al giorno, col conto di almeno 48 ore. Mentre un colpo è aperto l'app chiede lo stato ogni tre secondi.
 // In galera l'app è la cella: quanto manca, e la cauzione (3.000 $pzk puliti) per uscire prima.
+// Dal 29.10 la lavatrice si compra nel pzkstore (telefono/app/pzkstore.js): il colpo riuscito e le regole spiegano tutta la
+// strada (il pzkstore, il prezzo, la commissione), e il tasto porta alla lavatrice se c'è, se no alla sua scheda nel pzkstore.
 
 import * as pzk from '../../games/pzk.js'
+import * as zaino from '../../chat/zaino.js'
 import { icona } from '../../chat/icone.js'
 import { tieni } from '../ricordi.js'
 
@@ -30,8 +33,8 @@ function disegna() {
     const e = k.esito ?? {}
     return telaio(`<div class="t-ra-esito ${e.ok ? 'ok' : 'no'}">${icona(e.ok ? 'sacco' : 'sirena')}<b>${e.ok ? 'colpo riuscito' : 'presi'}</b>
       <span>${e.ok ? `${p(e.quota)} a testa · ${p(e.bottino)} in tutto` : `${e.ore} ore di galera e la multa`}</span></div>
-      <p class="t-ac-nota">${e.ok ? 'sono <b>soldi sporchi</b>: si vedono nel saldo ma con pzk non si spendono (né giochi né shop), non si mandano. Lavali nella <b>lavatrice</b> (fino a 50.000 in 10 minuti, 2.000 puliti) o aspetta 96 giorni.' : 'la cassa di pzk ha chiamato i carabinieri. La prossima volta, più complici.'}</p>
-      <div class="t-ac-azioni">${e.ok ? '<button class="c-b" type="button" data-vai="lavatrice">alla lavatrice</button>' : ''}<button class="c-b nero" type="button" data-fai="nuovo">va bene</button></div>`)
+      <p class="t-ac-nota">${e.ok ? `sono <b>soldi sporchi</b>: si vedono nel saldo ma con pzk non si spendono (né giochi né shop), non si mandano. Si puliscono da soli dopo 96 giorni, o nella <b>lavatrice</b>: ${zaino.installata('lavatrice') ? 'ce l’hai, è nella home del cercapersone (pagina dei soldi)' : 'si compra nel <b>pzkstore</b> del cercapersone, una volta sola, 5.000 $pzk puliti'}; poi lavi fino a 50.000 in 10 minuti, e ogni lavaggio costa 2.000 puliti di commissione.` : 'la cassa di pzk ha chiamato i carabinieri. La prossima volta, più complici.'}</p>
+      <div class="t-ac-azioni">${e.ok ? `<button class="c-b" type="button" data-vai="lavatrice">${zaino.installata('lavatrice') ? 'alla lavatrice' : 'compra la lavatrice (pzkstore)'}</button>` : ''}<button class="c-b nero" type="button" data-fai="nuovo">va bene</button></div>`)
   }
   if (k?.stato === 'aperto' && k.io) {
     const n = k.membri.length
@@ -49,7 +52,7 @@ function disegna() {
     </div>
     <h4 class="t-sh-sez">come funziona</h4>
     <table class="t-ra-regole"><tr><th>banda</th><th>riuscita</th><th>bottino a testa</th></tr>${[2, 3, 4].map((n) => `<tr><td>${n}</td><td>${PROB[n]} %</td><td>${S.cassa != null ? p(Math.min((S.cassa * (0.03 + 0.01 * n)) / n, 15000)) : '…'}</td></tr>`).join('')}</table>
-    <p class="t-ac-nota">⚠ se va male: <b>6 ore di galera</b> e una multa (il 20 % dei soldi puliti, al più 5.000). Il bottino è sporco. Un colpo al giorno; il conto deve avere 48 ore.</p>`)
+    <p class="t-ac-nota">⚠ se va male: <b>6 ore di galera</b> e una multa (il 20 % dei soldi puliti, al più 5.000). Il bottino è sporco: per spenderlo si lava nella lavatrice, che si compra nel pzkstore del cercapersone (5.000 puliti, una volta; poi 2.000 a lavaggio), o si aspettano 96 giorni. Un colpo al giorno; il conto deve avere 48 ore.</p>`)
 }
 
 async function stato() {

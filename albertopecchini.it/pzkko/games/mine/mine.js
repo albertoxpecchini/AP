@@ -161,7 +161,7 @@ function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
   if (!el.saldo) return
-  if (!contando) el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
+  if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
   const p = pzk.sulTavolo(GIOCO)
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta', gioco = stato.fase === 'gioco', P = stato.partita
@@ -639,12 +639,16 @@ const FA = {
       await svuota('p', bancoFiches(), { scala: 0.7 })
     } else {
       const utile = e.torna - e.giocato
+      // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, all'incasso; le
+      // fiches che arrivano e il saldo che conta sono da vedere: il tavolo tiene il saldo di prima (mostrato) fino ad allora
+      mostrato = pzk.saldo()
+      pzk.regola(GIOCO, e.giocato, e.torna)
       voce(`${e.k === CASELLE - P.m ? 'tutte le gemme! ' : ''}incassi ${fmt(e.torna)} $pzk (${scriviMolt(e.centesimi)}${e.torna >= MASSIMO ? ', il massimo' : ''})`)
       timbro({ x: G.vinto.x, y: G.vinto.y - G.vinto.r - 8 }, `+${fmt(utile)}`, 'oro')
       if (utile > 0) await aggiungi('v', pzk.inFiches(utile).slice(0, 16), bancoFiches(), { passo: 34 })
       await attendi(450)
-      pzk.regola(GIOCO, e.giocato, e.torna)
-      contaSaldo(pzk.saldo() - e.torna, pzk.saldo())
+      contaSaldo(mostrato, mostrato + e.torna)
+      mostrato = null
       await Promise.all([svuota('p', centro(el.saldo)), svuota('v', centro(el.saldo), { dopo: 60 })])
     }
     stato.storia = [e.esito === 'mina' ? 0 : e.centesimi, ...stato.storia].slice(0, 12)
@@ -701,7 +705,7 @@ async function copiaProva() {
   try { await navigator.clipboard.writeText(righe.join('\n')); voce(P.finita ? 'copiati il seme, l’impronta e le mine del giro' : 'copiata l’impronta: il seme arriva a fine giro') } catch { voce(`impronta ${P.impronta}`) }
 }
 
-let contando = false
+let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches arrivano (i soldi sono già passati)
 function contaSaldo(da, a) {
   const durata = RIDOTTO.matches ? 0 : 800
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }

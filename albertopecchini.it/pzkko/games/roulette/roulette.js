@@ -147,7 +147,7 @@ function chiudi() {
 function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
-  el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
+  if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
   const p = puntato()
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta'
@@ -488,6 +488,11 @@ async function fermata(n) {
   segnaNumero(n)
   const giocate = stato.giro ?? new Map()
   const conto = esito(giocate, n)
+  // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena la pallina si
+  // ferma (un lotto, games/pzk.js, che parte in quell'istante); le fiches che volano e il saldo che conta sono da vedere: il
+  // tavolo mostra il saldo di prima (mostrato) finché non arrivano
+  mostrato = pzk.saldo()
+  pzk.regola(GIOCO, conto.puntato, conto.torna)
   voce(giocate.size ? (conto.netto > 0 ? `${n} ${col}: vinci ${fmt(conto.torna)} $pzk` : conto.torna ? `${n} ${col}: ti tornano ${fmt(conto.torna)} $pzk` : `${n} ${col}: il banco si prende tutto`) : `${n} ${col}`)
   await attendi(RIDOTTO.matches ? 0 : 700)
 
@@ -551,11 +556,12 @@ async function fermata(n) {
       }
       k++
     }
-    contaSaldo(pzk.saldo(), pzk.saldo() + conto.torna, RIDOTTO.matches ? 0 : 900)
+    contaSaldo(mostrato, mostrato + conto.torna, RIDOTTO.matches ? 0 : 900)
+    mostrato = null // (durante il conteggio il saldo lo scrive contaSaldo; poi quello vero)
     await Promise.all(ritorni)
     for (const id of conto.vinte) { const p = pile.get(id); p?.vincita?.el.remove(); p?.el.remove(); pile.delete(id) }
   }
-  pzk.regola(GIOCO, conto.puntato, conto.torna)
+  mostrato = null
   if (giocate.size) stato.ultime = giocate
   stato.giocate = new Map()
   stato.mosse = []
@@ -568,7 +574,7 @@ async function fermata(n) {
   if (pzk.aSecco()) voce(`${n} ${col}. hai finito i $pzk: ricarica`)
 }
 
-let contando = false
+let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches tornano (i soldi sono già passati)
 function contaSaldo(da, a, durata) {
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }
   contando = true
@@ -577,7 +583,7 @@ function contaSaldo(da, a, durata) {
     const u = Math.min(1, (t - t0) / durata), e = 1 - (1 - u) ** 3
     el.saldo.textContent = `$pzk ${fmt(Math.round((da + (a - da) * e) * 2) / 2)}`
     if (u < 1) requestAnimationFrame(passo)
-    else contando = false
+    else { contando = false; aggiornaBanco() }
   }
   requestAnimationFrame(passo)
 }

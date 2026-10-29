@@ -109,6 +109,11 @@ const ICONE = {
   'app-rapina': [APP, ...tile('dark purple tile; a small black cartoon eye mask with two eye holes')],
   'app-lavatrice': [APP, ...tile('teal tile; a front-loading washing machine with green banknotes spinning in the round window')],
   'app-decifratore': [APP, ...tile('black tile; a green open padlock over a glowing green circuit pattern')],
+  // (29.10) il pzkstore, il negozio delle app del cercapersone: il segno dello scaricare, la freccia verde nella vaschetta,
+  // sul rosso (giallo stava accanto alle sfide, gialle anche loro, nella prima pagina della home).
+  // Il sacchetto della spesa non andava: bianco, il fondo tolto dal modello si portava via anche il davanti (restava vuoto);
+  // rosso, la freccia spariva (e sembrava lo shop) o il sacchetto diventava un blocco dritto con dei pixel staccati
+  'app-pzkstore': [APP, ...tile('red tile; the download symbol: one thick bright green arrow pointing down onto a small open black tray')],
   imbianchino: [OGG, poco(`a house painter in white overalls and a paper hat holding a paint roller, the character is ${LUMACHINA}`)],
   pizzaiolo: [OGG, poco(`a pizza chef in a white hat holding a pizza on a wooden peel, the character is ${LUMACHINA}`)],
   meccanico: [OGG, poco(`a mechanic in blue overalls holding a big wrench, a smudge of oil, the character is ${LUMACHINA}`)],

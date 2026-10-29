@@ -212,9 +212,24 @@ export function salvaMiniera(m) { Z.miniera = m; scrivi() }
 // la cucina del Mincio (telefono/app/cucina.js): il giorno, le ricette pagate oggi, i piatti già dati oggi, i record
 export const cucinaStato = () => Z.cucina ?? { g: '', pagate: 0, piatti: [], record: {} }
 export function salvaCucina(c) { Z.cucina = c; scrivi() }
-// le app installate dalla chat (26.10: il decifratore, «installa decifratore»): compaiono nel cercapersone
-export const installata = (id) => !!Z.app?.[id]
-export function installa(id) { (Z.app ??= {})[id] = Date.now(); scrivi() }
+// ── le app installate (26.10 dalla chat: il decifratore, «installa decifratore»; dal 29.10 dal pzkstore,
+// telefono/app/pzkstore.js, dove si comprano e si tolgono): compaiono nel cercapersone. Z.app[id] è il momento dell'ultima
+// decisione: positivo installata, negativo tolta (−t). Fra due dispositivi vince la decisione più recente (zaino-unisci.mjs);
+// prima del pzkstore c'era solo il positivo, e un'app tolta tornava dall'altro dispositivo ──
+export const installata = (id) => (Number(Z.app?.[id]) || 0) > 0
+/** Da quando è installata (0: non lo è). */
+export const installataIl = (id) => Math.max(0, Number(Z.app?.[id]) || 0)
+/** Per quest'app si è già deciso qualcosa (installata o tolta)? */
+export const decisa = (id) => !!Number(Z.app?.[id])
+/** t: il momento della decisione (di serie adesso; un regalo usa un momento fisso, così ogni decisione dopo vince). */
+export function installa(id, t = Date.now()) { (Z.app ??= {})[id] = t; scrivi() }
+export function disinstalla(id, t = Date.now()) { (Z.app ??= {})[id] = -t; scrivi() }
+/** Il momento delle app regalate (il 29.10.2026, mezzanotte di Mantova): chi aveva la lavatrice di serie prima del pzkstore
+ *  (telefono.js). È fisso e viene prima di ogni acquisto: comprarla o toglierla dopo vince sempre. */
+export const REGALO = Date.UTC(2026, 9, 28, 23)
+/** Lo zaino del server è arrivato (col conto; `primo`), e almeno una volta il server l'ha visto: prima non si decide niente
+ *  che il server potrebbe già sapere (la lavatrice di chi l'aveva di serie, telefono.js). → Promise<boolean> */
+export const allineato = () => primo.then(() => visto > 0)
 /** Segna un oggetto leggendario preso (il database ne fa una notizia). */
 export function nota(id) { Z.rari = [...new Set([...(Z.rari ?? []), id])]; scrivi() }
 
