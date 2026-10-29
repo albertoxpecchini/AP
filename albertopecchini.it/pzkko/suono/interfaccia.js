@@ -16,14 +16,15 @@
 //   pagina in cui si è entrati resta, e la musica non si ferma; dentro la cornice le pagine non ne fanno partire un'altra.
 // Nella home (e nella storia e nella 404) c'è il motore della strada: si usa il suo contesto (window.pzkkoSuono.ctx) e si
 // tace se il nastro «suono» è spento. Nelle pagine senza la strada (gadget, oggetti, traguardi, info, le prove) un contesto
-// suo, che nasce al primo gesto, e si tace se nel browser i suoni sono stati spenti (pzkko-suono = no).
+// suo, che nasce al primo gesto, e suona solo se nel browser i suoni sono stati accesi (pzkko-suono = si: dal 29.10 di
+// partenza sono spenti, Alberto: «impostazioni predefinite audio off»; prima suonava se non erano stati spenti).
 
 import { avviaCornice, fuori, vai } from './cornice.js'
 export { vai }
 
 const AC = window.AudioContext ?? window.webkitAudioContext
 let proprio = null, out = null, outCtx = null, bus = null
-const spentoQui = () => { try { return localStorage.getItem('pzkko-suono') === 'no' } catch { return false } }
+const spentoQui = () => { try { return localStorage.getItem('pzkko-suono') !== 'si' } catch { return true } }
 
 /** Il contesto audio, o null se non si deve suonare. `gesto`: siamo dentro un clic (si può far nascere il contesto). */
 function contesto(gesto = false) {

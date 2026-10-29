@@ -30,23 +30,24 @@
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
 <link rel="stylesheet" href="/barra/barra.css"><!-- la barra in alto con le sezioni (barra/barra.js) -->
-<!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte sempre col
-     muro di sempre, in 2D, a mezzogiorno col sole, sul computer e sul telefono: il 3D, l'ora vera con la sera e la notte
-     e il meteo vero di Mantova si accendono apposta, in cima alla scheda «grafica» della regia.
+<!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte col muro di
+     sempre, in 2D, sul computer e sul telefono; dal 29.10 con l'ora vera (la sera e la notte di Mantova), il meteo vero e
+     senza suoni (Alberto: «impostazioni predefinite audio off»). Il 3D, sempre giorno e sempre sole si scelgono in cima alla
+     scheda «grafica» della regia; i suoni col nastro in basso a sinistra.
      La scena 3D (in fondo alla pagina): se partirà (scelta, WebGL2, niente ?muro), la pagina si nasconde subito sotto
      l'anteprima della strada, senza far vedere il muro per un attimo; se no non si chiede niente di suo -->
 <script>
 (() => {
   const q = new URLSearchParams(location.search)
-  // pzkko-3d = si: il 3D (?scena=1 lo accende e ?muro=1 lo spegne, per le prove: ?muro comanda); pzkko-ora = vera: l'ora
-  // di Mantova, con la sera e la notte (se no sempre mezzogiorno, index.html più sotto); pzkko-meteo = vero: il meteo di
-  // Mantova nella scena (se no sempre sole). tempo = il meteo con cui parte la scena (window.pzkkoRegia.meteo, meteo.js):
+  // pzkko-3d = si: il 3D (?scena=1 lo accende e ?muro=1 lo spegne, per le prove: ?muro comanda); pzkko-ora: l'ora
+  // di Mantova, con la sera e la notte (= giorno: sempre mezzogiorno, index.html più sotto); pzkko-meteo: il meteo di
+  // Mantova nella scena (= sole: sempre sole). Dal 29.10 di partenza l'ora e il meteo veri (prima mezzogiorno e sole). tempo = il meteo con cui parte la scena (window.pzkkoRegia.meteo, meteo.js):
   // 'sole', o null = quello vero, anche quando ?meteo= ne chiede uno per le prove
   const leggi = (k) => { try { return localStorage.getItem(k) } catch { return null } }
   const S = window.pzkkoScelte = {
     scena: q.get('muro') !== null ? false : q.has('scena') ? q.get('scena') !== '0' : leggi('pzkko-3d') === 'si',
-    ora: leggi('pzkko-ora') === 'vera' ? 'vera' : 'giorno',
-    meteo: leggi('pzkko-meteo') === 'vero' ? 'vero' : 'sole',
+    ora: leggi('pzkko-ora') === 'giorno' ? 'giorno' : 'vera',
+    meteo: leggi('pzkko-meteo') === 'sole' ? 'sole' : 'vero',
     get tempo() { return this.meteo === 'vero' || q.has('meteo') ? null : 'sole' },
   }
   if (!S.scena) return
@@ -819,7 +820,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:924;--y:1277;--w:90;--r:-8deg;--mx:310;--my:1558;--mw:70;--mr:-10deg;z-index:4">
       <!-- il wallet e il cercapersone, come nella home (26.10): pezzi vivi del muro (tools/pzkko/storia/disposizione.js) -->
       <button class="it pezzo vivo wallet-tasto" id="wallet-muro" type="button" style="--x:20;--y:0;--w:245;--r:-2deg;--mx:8;--my:0;--mw:182;--mr:-2deg;z-index:6" aria-label="wallet: i tuoi $pzk, il conto e la borsa"><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas><img class="attacco" src="/art/muro/viti.svg" alt="" width="792" height="214"></button>
-      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img src="/art/chat-pager-grande/pager-piccolo.webp" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" src="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
+      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img src="/art/chat-pager-grande/pager-piccolo.webp?v=2" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" src="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
     </div>
   </main>
   <div class="buio" aria-hidden="true"></div>
@@ -838,7 +839,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   <span class="mosca" data-f="posata" aria-hidden="true"><img class="m-posata" src="/art/mosche/mosca.webp" alt="" width="158" height="166" style="--ax:80;--ay:72"><img class="m-zampe" src="/art/mosche/mosca-zampe.webp" alt="" width="154" height="182" style="--ax:75;--ay:92"><img class="m-vola" src="/art/mosche/mosca-vola.webp" alt="" width="192" height="135" style="--ax:94;--ay:64"><img class="m-vola2" src="/art/mosche/mosca-vola2.webp" alt="" width="118" height="149" style="--ax:56;--ay:78"></span>
 </div>
 <!-- i suoni della strada (suono/): partono al primo tocco o tasto; questo li spegne e li riaccende -->
-<button class="suono" type="button" aria-pressed="true" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
+<button class="suono" type="button" aria-pressed="false" aria-label="i suoni della strada" title="i suoni della strada" hidden><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4.5 12.4h6.2l8-6.6.3 20.6-8.1-6.8H4.8z"/><path class="s-onde" d="M24.2 10.6c2.6 3 2.8 7.6.2 10.9M28.6 6.8c4.6 4.9 4.8 13.3.3 18.6"/><path class="s-muto" d="M24.5 11.2l8.6 9.4M33 11.4l-8.4 9"/></svg><span>suono</span></button>
 
 <script>
 (() => {
@@ -851,10 +852,10 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   // 45,156° N 10,791° E: nessuna chiamata in rete, vale per sempre. Il muro vive
   // a Mantova: la sera cala all'ora di lì, da qualunque posto si guardi.
   // Prove: ?ora=18:30 (ora di Mantova di oggi), ?veloce=60 (il tempo corre 60×), ?notte=1.
-  // Dal 23.10 di partenza è sempre giorno: l'orologio sta fermo a mezzogiorno di Mantova (niente buio, insegna, lampioni
-  // né auto coi fari, e nella scena 3D il sole di mezzogiorno). L'ora vera, con la sera e la notte, la sceglie chi guarda
-  // nella regia (window.pzkkoScelte.ora = 'vera', pzkko-ora nel browser); le prove (?ora, ?veloce, ?notte) la vogliono vera
-  // come prima.
+  // Dal 29.10 di partenza l'ora è quella vera, con la sera e la notte (Alberto); dal 23.10 al 29.10 era sempre giorno.
+  // Sempre giorno (l'orologio fermo a mezzogiorno di Mantova: niente buio, insegna, lampioni né auto coi fari, e nella
+  // scena 3D il sole di mezzogiorno) lo sceglie chi guarda nella regia (window.pzkkoScelte.ora = 'giorno', pzkko-ora nel
+  // browser); le prove (?ora, ?veloce, ?notte) la vogliono vera comunque.
   const LAT = 45.1564, LON = 10.7914, RAD = Math.PI / 180, MIN = 60000
   // Calcolo NOAA (il foglio del Global Monitoring Laboratory), al minuto: per il
   // giorno UTC dell'istante chiesto, prima stima a mezzogiorno e poi tre giri
@@ -887,7 +888,7 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
     const scarto = Date.now() - romaOra.getTime()
     return new Date(romaOra.getFullYear(), romaOra.getMonth(), romaOra.getDate(), h || 0, m || 0).getTime() + scarto
   }
-  const scelte = (window.pzkkoScelte ??= { scena: false, ora: 'giorno', meteo: 'sole', tempo: 'sole' })
+  const scelte = (window.pzkkoScelte ??= { scena: false, ora: 'vera', meteo: 'vero', tempo: null })
   const prova = !!q.get('ora') || q.has('veloce') || q.get('notte') !== null
   // sempre giorno: la scelta di partenza (le prove comandano solo all'apertura: scelto dalla regia, vale la scelta)
   let giorno = !prova && scelte.ora !== 'vera'
@@ -1330,16 +1331,16 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
   // ── I suoni della strada (suono/) ────────────────────────────────────────
   // Tutto sintetizzato dal vivo, niente file: la città, le campane, gli uccelli, l'insegna che ronza, le auto, il meteo
   // vero, la goccia, le mosche, il PC del negozio. Il browser lascia partire l'audio solo dopo un gesto: partono al primo
-  // tocco o tasto, sfumando (se chi guarda non li ha spenti: pzkko-suono = no nel browser); il nastro in basso a sinistra
-  // li spegne e li riaccende. Il motore (suono/suono.js) si scarica solo allora, e riceve il contesto già sbloccato qui,
+  // tocco o tasto, sfumando, ma solo se chi guarda li ha accesi (pzkko-suono = si nel browser: dal 29.10 di partenza sono
+  // spenti, Alberto: «impostazioni predefinite audio off»); il nastro in basso a sinistra li accende e li spegne. Il motore (suono/suono.js) si scarica solo allora, e riceve il contesto già sbloccato qui,
   // dentro il gesto (Safari lo vuole lì). window.pzkkoSuono: acceso, volume (la strada), musica, accendi(sì, ricorda) e prova(nome) per la
   // regia, evento(nome, dati) per la pagina e la scena, che aspetta in coda finché il motore non c'è. Gli strumenti che
   // fotografano la pagina (navigator.webdriver) il nastro non lo vedono, se non con ?suono
   {
     const AC = window.AudioContext ?? window.webkitAudioContext
     const tasto = document.querySelector('.suono'), coda = []
-    let vuole = true, ctx = null, motore = null, spegni = 0
-    try { vuole = localStorage.getItem('pzkko-suono') !== 'no' } catch {}
+    let vuole = false, ctx = null, motore = null, spegni = 0
+    try { vuole = localStorage.getItem('pzkko-suono') === 'si' } catch {}
     const S = window.pzkkoSuono = {
       acceso: false, volume: 0.2, musica: 0.3, coda, // (26.10: la strada al 20%, la musica di suono/musica.js al 30%)
       evento: (nome, dati = {}) => { if (coda.length < 24) coda.push([nome, dati, performance.now()]) },

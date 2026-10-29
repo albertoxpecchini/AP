@@ -49,7 +49,9 @@ const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const PIENO = matchMedia('(max-width:700px),(max-height:520px)') // il cellulare: schermo intero
 // il tasto sotto il wallet è LA STESSA FOTO rimpicciolita (pager-piccolo.webp), con l'lcd nelle stesse quote: così
 // l'apertura è un ingrandimento puro e non si vede mai il cambio da una foto all'altra
-const PAGER = { src: '/art/chat-pager-grande/pager-grande.webp', w: 1341, h: 774, lcd: [8.352, 24.677, 66.294, 56.202] }
+// (?v=2: le immagini di /art/ restano 30 giorni nei browser, e dopo il tasto indietro ricolorato del 29.10 Alberto apriva
+// il cercapersone e lo vedeva ancora verde: cambiando la foto si cambia il numero, qui e nel tasto di index.html e storia/)
+const PAGER = { src: '/art/chat-pager-grande/pager-grande.webp?v=2', w: 1341, h: 774, lcd: [8.352, 24.677, 66.294, 56.202] }
 const precarica = new Image()
 precarica.src = PAGER.src // la foto grande è già pronta quando si tocca il tasto
 

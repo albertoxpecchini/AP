@@ -234,13 +234,15 @@ chiuso a Bologna, con l'insegna «coin» sopra e i manifesti attaccati sotto).
 
 - **Come parte** (23.10, «per adesso avvialo sia da telefono che da pc in 2d con
   sempre luce sparata»): la home parte **sempre in 2D**, il muro di sempre, sul computer
-  e sul telefono, anche dove c'è WebGL2, **a mezzogiorno col sole**: niente buio, niente
-  insegna accesa, niente lampioni né auto coi fari, niente pioggia, neve, nebbia o nuvole.
+  e sul telefono, anche dove c'è WebGL2. Fino al 29.10 partiva anche **a mezzogiorno col
+  sole**; dal 29.10 (Alberto: «impostazioni predefinite audio off» e l'ora vera, il meteo
+  vero) parte **con l'ora vera** di Mantova (la sera, la notte, l'insegna, i lampioni),
+  **il meteo vero** e **senza suoni** (il nastro «suono» li accende, vedi «I suoni»).
   Il resto è una scelta di chi guarda, in cima alla scheda «grafica» della regia («come
   parte», vedi «La regia»), ricordata nel browser: **il 3D** (`localStorage` `pzkko-3d` =
-  `si`; si accende e si spegne ricaricando la pagina), **l'ora vera** di Mantova con la sera
-  e la notte (`pzkko-ora` = `vera`; se no `giorno`) e **il meteo vero** nella scena
-  (`pzkko-meteo` = `vero`; se no `sole`); l'ora e il meteo cambiano subito. Lo decide uno
+  `si`; si accende e si spegne ricaricando la pagina), **sempre giorno** (`pzkko-ora` =
+  `giorno`; se no `vera`) e **sempre sole** nella scena (`pzkko-meteo` = `sole`; se no
+  `vero`); l'ora e il meteo cambiano subito. Lo decide uno
   script nella testa di `index.html` (`window.pzkkoScelte`: `scena`, `ora`, `meteo`, e
   `tempo`, il meteo con cui parte la scena); `window.pzkkoPagina.scegli(k, v)` le cambia.
   La luce non è il gioco: le batterie del wallet e del cercapersone (in carica dalle 19 alle 7,
@@ -966,9 +968,9 @@ Gli strumenti che fotografano o registrano la scena (`foto.mjs`, `carico.mjs`,
   livelli dalla telecamera, e `mondo.js` le spegne il livello 1 mentre uno specchio
   disegna (prima le pozze ridisegnavano anche il chiusino, e le gocce della
   pioggia).
-- **Il meteo** (`meteo.js`, `api/meteo.mjs`): dal 23.10 di partenza è **sempre sole**
-  (`REGIA.meteo` = `'sole'`) e i dati non si chiedono nemmeno; scelto il meteo vero nella
-  regia (`pzkko-meteo` = `vero`, o il tempo «vero» della scheda meteo), è quello di Mantova, chiesto a
+- **Il meteo** (`meteo.js`, `api/meteo.mjs`): dal 23.10 al 29.10 di partenza era **sempre sole**
+  (`REGIA.meteo` = `'sole'`) e i dati non si chiedevano nemmeno; dal 29.10 di partenza è il meteo
+  vero (`pzkko-meteo` = `vero`, o il tempo «vero» della scheda meteo), quello di Mantova, chiesto a
   `/api/meteo` da quel momento e ogni dieci minuti (la funzione lo prende da Open-Meteo,
   gratuito e senza chiave, e lo tiene dieci minuti nella cache di Vercel: Open-Meteo
   riceve una richiesta ogni dieci minuti, non una per visita). Dal codice WMO: sole,
@@ -1593,8 +1595,8 @@ passare dall'una all'altra; l'ultima aperta resta nel browser):
   nel browser, tre righe di caselle: **3D** spento / acceso (`pzkko-3d`; la pagina si
   ricarica, al posto di «muro senza 3D» e «con il 3D» che c'erano nelle prove), **ora**
   sempre giorno / vera (con la notte) (`pzkko-ora`) e **meteo** sempre sole / vero
-  (`pzkko-meteo`), questi due subito, senza ricaricare. Di partenza: spento, sempre giorno,
-  sempre sole (vedi «Come parte» nella home). Misurate il 23.10: sul computer i nomi a x 840
+  (`pzkko-meteo`), questi due subito, senza ricaricare. Di partenza: spento, vera, vero (dal
+  29.10; prima sempre giorno e sempre sole: vedi «Come parte» nella home). Misurate il 23.10: sul computer i nomi a x 840
   e le caselle a 952 come tutti gli altri controlli della scheda, sul telefono 14 e 104,
   ogni gruppo centrato sulla sua riga, tutte le caselle su una riga sola. Le schede «ora e
   sera» e «meteo» dicono in cima come si parte e che lì si prova soltanto. Poi
@@ -1696,7 +1698,7 @@ muro, il colpetto sul panno dei giochi, un tic morbido altrove; i cursori ticche
 frusciano, e il loro link parte 120 ms dopo perché il fruscio si senta (`barra/barra.js`). I volantini no (li suona la
 strada), né quello che ha `data-suono-no`. Nella home, nella storia e nella 404 usa il contesto della strada
 (`window.pzkkoSuono.ctx`) e tace se il nastro «suono» è spento; nelle pagine senza la strada fa un contesto suo al primo
-clic e tace se nel browser i suoni sono spenti (`pzkko-suono = no`). Lo carica la barra (quindi c'è in ogni pagina) e il
+clic e suona solo se nel browser i suoni sono accesi (`pzkko-suono = si`: dal 29.10 di partenza sono spenti). Lo carica la barra (quindi c'è in ogni pagina) e il
 cercapersone.
 
 **La musica** (26.10, `suono/musica.js`; Alberto: «voglio le musichette… diverse, stile ocarina / animal crossing /
@@ -1732,16 +1734,19 @@ Web Audio (`voci.js`: oscillatori e rumori filtrati; le cose fatte di mille pezz
 pioggia sulla lamiera, i grilli, i tuoni e la carta, calcolate una volta in un tampone; le
 campane in un `OfflineAudioContext`), e si sente quello che c'è nella scena, da dove sta la
 telecamera, all'ora di Mantova. Sono 70 KB di codice (23 compressi), che si scaricano solo
-quando i suoni partono. Dal 23.10 seguono le scelte di «come parte» (la regia): di partenza
-è mezzogiorno, fermo (il giorno, gli uccelli, il traffico di mezzogiorno; niente campane,
-che suonano solo se il tempo passa da sé), e c'è il sole (l'asfalto asciutto: senza 3D il
-bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della scena).
+quando i suoni partono. Dal 23.10 seguono le scelte di «come parte» (la regia): con sempre
+giorno è mezzogiorno, fermo (il giorno, gli uccelli, il traffico di mezzogiorno; niente
+campane, che suonano solo se il tempo passa da sé), con sempre sole c'è il sole (l'asfalto
+asciutto: senza 3D il bagnato è 0,15, col meteo vero 0,4 come prima; nel 3D quello della
+scena); dal 29.10 di partenza l'ora e il meteo sono quelli veri.
 
-- **Come parte**: il browser lascia suonare una pagina solo dopo un gesto. Al primo tocco o
-  tasto (non lo scorrimento) i suoni partono sfumando, in tre secondi; il nastro «suono» in
-  basso a sinistra (carta gommata, a pennarello: barrato quando è spento, le onde respirano
-  quando suona) li spegne e li riaccende, e il browser se lo ricorda (`pzkko-suono` in
-  `localStorage`: chi li ha spenti non li sente più partire da soli). Il contesto audio nasce
+- **Come parte**: dal 29.10 **di partenza i suoni sono spenti** (Alberto: «impostazioni
+  predefinite audio off»): il nastro «suono» in basso a sinistra (carta gommata, a pennarello:
+  barrato quando è spento, le onde respirano quando suona) li accende e li spegne, e il browser
+  se lo ricorda (`pzkko-suono` in `localStorage`: `si` acceso, `no` spento, niente = spento).
+  Chi li ha accesi li sente partire da soli alle visite dopo: il browser lascia suonare una
+  pagina solo dopo un gesto, e al primo tocco o tasto (non lo scorrimento) partono sfumando,
+  in tre secondi. Fino al 29.10 partivano per tutti, tranne chi li aveva spenti. Il contesto audio nasce
   dentro il gesto (Safari lo vuole lì) e passa a `suono.js`; sull'iPhone è «ambient»: rispetta
   il tasto del silenzioso e non ferma la musica. Con la pagina nascosta tutto si ferma;
   mentre si gioca (i giochi sono finestre modali) la strada si abbassa.

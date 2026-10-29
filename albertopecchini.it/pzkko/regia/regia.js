@@ -3,7 +3,7 @@
 // - in cima a grafica (dal 23.10) «come parte»: le scelte di chi guarda, che restano nel browser (index.html,
 //   window.pzkkoScelte e pzkkoPagina.scegli): il 3D spento o acceso (pzkko-3d: ricarica la pagina), l'ora sempre a
 //   mezzogiorno o quella vera con la sera e la notte (pzkko-ora), il meteo sempre sole o quello vero (pzkko-meteo). Di
-//   partenza: 2D, giorno, sole;
+//   partenza: 2D, ora vera, meteo vero (dal 29.10; prima giorno e sole), e i suoni spenti (il nastro, pzkko-suono);
 // - grafica: la qualità della scena 3D (auto, bassa, media, alta, ultra), cambiata dal vivo senza ricaricare, e i suoi
 //   pezzi uno per uno (risoluzione, ombre, riflessi, bagliore, palazzi: «su misura»), i ritocchi, la vetrina, la luce
 //   del portachiavi per terra. La qualità e la luce restano nel browser (scena.js, portachiavi.js);
@@ -41,7 +41,7 @@ const PREDEFINITI = {
   bestie: { formiche: true, mosche: true, zanzare: true, blatte: true }, blatteDiGiorno: false, velocitaBestie: 1, goccia: 1,
   meteo: null, intensita: 0.6, bagnato: null, manto: null,
 }
-// il meteo di partenza: il sole, o quello vero se lo si è scelto (window.pzkkoScelte.tempo, nella testa di index.html)
+// il meteo di partenza: quello vero, o il sole se lo si è scelto (window.pzkkoScelte.tempo, nella testa di index.html)
 const tempo = () => (window.pzkkoScelte ? window.pzkkoScelte.tempo : null)
 const R = (window.pzkkoRegia ??= { ...structuredClone(PREDEFINITI), meteo: tempo() })
 const pagina = () => window.pzkkoPagina
@@ -199,8 +199,9 @@ const senza3d = () => [nota(pagina().scelte?.scena
   : 'il 3D è spento: questo è il muro di sempre, con l\'ora, la sera, le auto e i suoni. la qualità e i ritocchi della scena compaiono qui quando lo si accende.')]
 
 // ── come parte la pagina: le scelte di chi guarda, che restano nel browser (dal 23.10) ──
-// di partenza la pagina è il muro di sempre, in 2D, a mezzogiorno col sole; il 3D (pzkko-3d), l'ora vera con la sera e
-// la notte (pzkko-ora) e il meteo vero (pzkko-meteo) si accendono qui, apposta. pzkkoPagina.scegli (index.html) le
+// di partenza la pagina è il muro di sempre, in 2D, con l'ora vera (la sera e la notte) e il meteo vero (dal 29.10, Alberto;
+// prima a mezzogiorno col sole); il 3D (pzkko-3d), sempre giorno (pzkko-ora) e sempre sole (pzkko-meteo) si scelgono qui,
+// apposta. pzkkoPagina.scegli (index.html) le
 // ricorda e mette subito l'ora e il meteo; il 3D si accende e si spegne ricaricando la pagina (senza ?scena e ?muro)
 const comeParte = () => {
   const P = pagina(), C = () => P.scelte ?? {}

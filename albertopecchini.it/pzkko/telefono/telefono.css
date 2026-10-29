@@ -166,8 +166,10 @@
 .t-testata{flex:none;display:flex;align-items:center;gap:8px;padding:6px 14px 7px;border-bottom:1px solid rgba(70,255,125,.15);background:rgba(70,255,125,.04)}
 .t-testata h2{margin:0;font:400 22px/1 var(--fa);letter-spacing:.03em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .t-az{margin-left:auto;display:flex;gap:8px;align-items:center}
-.t-indietro{flex:none;width:30px;height:30px;padding:0 0 3px;border:2px solid #000;border-radius:6px;background:#1c241d;color:var(--led);font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 0 #000}
-@media (hover:hover){.t-indietro:hover{background:#26342a}}
+/* la freccia indietro delle app (e della chat, .c-indietro qui sotto): rossa come il tasto INDIETRO, la stessa gomma (29.10,
+   Alberto: «i tasti rossi li vedo solo quando sono nella home, appena apro il coso ritorna verde»; prima era verde fosforo) */
+.t-indietro{flex:none;width:30px;height:30px;padding:0 0 3px;border:2px solid #000;border-radius:6px;background:#c74337;color:#fff6ec;font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 0 #000;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+@media (hover:hover){.t-indietro:hover{background:#d4503f}}
 .t-corpo-app{flex:1;min-height:0;overflow:hidden auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.3) transparent;padding:10px 14px 16px}
 .t-carico{display:grid;place-items:center;height:100%}
 .t-carico.piccolo{height:90px}
@@ -191,7 +193,8 @@
 .chat-app .c-schermo{flex:1;border-radius:0;box-shadow:none;background:#080d09}
 .chat-app .c-schermo::after{display:none}
 .chat-app .c-testa{padding:5px 12px 6px 10px}
-.chat-app .c-indietro{flex:none;width:30px;height:30px;padding:0 0 3px;border:2px solid #000;border-radius:6px;background:#1c241d;color:var(--led);font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 0 #000}
+.chat-app .c-indietro{flex:none;width:30px;height:30px;padding:0 0 3px;border:2px solid #000;border-radius:6px;background:#c74337;color:#fff6ec;font:400 22px/1 var(--fa);cursor:pointer;box-shadow:0 2px 0 #000;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+@media (hover:hover){.chat-app .c-indietro:hover{background:#d4503f}}
 .chat-app .c-testa .emo{height:32px}
 .chat-app .c-testa .c-nome{font-size:19px}
 .chat-app .c-giu{bottom:104px}
