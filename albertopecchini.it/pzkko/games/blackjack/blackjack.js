@@ -6,10 +6,16 @@
 // sono quelle vere di tre casinò (regole.js); i $pzk sono gli stessi di tutti i
 // giochi (../pzk.js). Fino a tre caselle, con le puntate laterali dove ci sono.
 //
+// (31.10, Alberto: «il browser non decide più niente») LE CARTE LE DÀ LA BANCA: il sabot e il Tavolo stanno sul server
+// (C:\pzkko-server\banca\giochi\casino-blackjack.mjs, con una copia di regole.js). Qui si mettono le fiches, si chiede
+// («distribuisci», «carta», «raddoppia»…: pzk.fai) e si anima quello che la banca risponde: gli eventi del Tavolo e il
+// tavolo come si vede (V: le carte scoperte, la mano di turno, le mosse ammesse, il sabot). regole.js qui serve solo per
+// le scritte e i punti. Ricaricando a metà mano la mano resta sulla banca, e si ritrova (pzk.tavoloBanca, ritrova()).
+//
 // index.html la apre con import('/games/blackjack/blackjack.js').then((m) => m.apri()).
 
 import * as pzk from '../pzk.js'
-import { REGOLE, LIMITI, PAGA_PP, PAGA_T3, Tavolo, punti, valore } from './regole.js'
+import { REGOLE, LIMITI, PAGA_PP, PAGA_T3, punti, valore } from './regole.js'
 
 const QUI = new URL('.', import.meta.url).href
 const ART = '/art/'
@@ -46,8 +52,11 @@ const R = () => REGOLE[stato.regole]
 const sulTavolo = () => stato.puntate.reduce((s, p) => s + p.base + p.pp + p.t3, 0)
 const attendi = (ms) => new Promise((r) => setTimeout(r, RIDOTTO.matches ? 0 : ms / (stato.veloce ? 3 : 1)))
 
-let tavolo = null
+let V = null // (31.10) il tavolo come l'ha detto la banca nell'ultima risposta (il `vede` di casino-blackjack.mjs)
 let dlg, el = {}, scena = null, motore = null, G = null
+// (31.10) il conto cambiato (entrato, uscito, anche da un'altra scheda: pzk.alCambioConto): cambi conta i cambi (rifai
+// si ferma), altroConto dice che la mano in corso è dell'altro conto: resta sulla sua banca, qui si smette di giocarla
+let cambi = 0, altroConto = false
 
 // ── la finestra ──────────────────────────────────────────────────────────────
 export async function apri() {
@@ -59,7 +68,7 @@ export async function apri() {
     aggiornaBanco()
   }
   if (!motore) motore = avviaMotore().catch((e) => { console.error(e); el.carica.textContent = 'le carte non sono arrivate: riprova più tardi' })
-  else scena?.avvia()
+  else { scena?.avvia(); ritrova() }
 }
 
 async function costruisci() {
@@ -145,7 +154,8 @@ async function costruisci() {
   el.chiede.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) scegli(b.dataset.si === '1' ? 'si' : 'no') })
   dlg.addEventListener('keydown', tastiera)
   new ResizeObserver(() => { if (dlg.open) ridisegna() }).observe(el.campo)
-  pzk.ascolta(() => aggiornaBanco())
+  pzk.ascolta(() => { aggiornaBanco(); ritrova() }) // (31.10: anche la mano aperta che la banca dice dopo, o da un altro telefono)
+  pzk.alCambioConto(cambioConto)
   voce(benvenuto())
   aggiornaBanco()
 }
@@ -165,6 +175,29 @@ function chiudi() {
 
 function voce(t) { if (el.voce) el.voce.textContent = t }
 
+// (31.10) si entra in un conto o se ne esce: pzk.js ha già svuotato il tavolo (le fiches tornano al portafoglio di prima).
+// Puntando, le fiches spariscono e basta (niente pzk.ritira: i soldi sono già tornati); a mano in corso la mano resta
+// all'altro conto sulla banca (la si ritrova rientrando), e qui si smette di giocarla. Se il conto nuovo ha una mano
+// aperta, si riprende quella (ritrova)
+function cambioConto() {
+  cambi++
+  mostrato = null
+  if (stato.fase === 'gioco') {
+    altroConto = true
+    voce('il conto è cambiato: questa mano resta all’altro conto, sulla banca')
+    scegli(null) // (la mossa che si aspettava non arriva più)
+  } else if (stato.fase === 'punta') {
+    if (sulTavolo() > 0 || pile.size) {
+      for (let c = 0; c < CASELLE; c++) stato.puntate[c] = { base: 0, pp: 0, t3: 0 }
+      stato.mosse = []
+      sparisci()
+      voce('il conto è cambiato: le puntate sono tornate al portafoglio di prima')
+    }
+    ritrova()
+  }
+  aggiornaBanco()
+}
+
 function aggiornaBanco() {
   if (!el.saldo) return
   if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
@@ -181,7 +214,7 @@ function aggiornaBanco() {
   el.togli.hidden = el.rifai.hidden = stato.fase === 'gioco'
   el.regole.disabled = !punta
   if (punta && pzk.aSecco()) { el.dai.textContent = 'ricarica'; el.dai.disabled = false }
-  else { el.dai.textContent = 'distribuisci'; el.dai.disabled = !punta || !scena || !stato.puntate.some((p) => p.base > 0) }
+  else { el.dai.textContent = 'distribuisci'; el.dai.disabled = !punta || !scena || rifacendo || !stato.puntate.some((p) => p.base > 0) }
   el.dai.hidden = stato.fase === 'gioco'
   dlg.classList.toggle('chiuso', !punta)
 }
@@ -198,8 +231,7 @@ function cambiaRegole(id) {
     svuota(`${k}${c}`, centro(el.saldo), { svanisce: true })
   }
   stato.mosse = stato.mosse.filter((m) => stato.puntate[m.casella][m.k] > 0)
-  tavolo = new Tavolo(R())
-  scena?.sabotPieno(0, null)
+  scena?.sabotPieno(0, null) // (regole nuove, sabot nuovo: lo mescola la banca alla prima mano)
   salva()
   disegnaTavolo()
   aggiornaBanco()
@@ -428,22 +460,34 @@ async function svuota(key, verso, { dopo = 0, svanisce = true, scala = 0.8 } = {
   await Promise.all(voli)
   p.el.remove()
 }
+/** (31.10) Tutte le pile svaniscono dove sono: fiches che non vanno né al giocatore né al banco (il conto è cambiato). */
+function sparisci() {
+  for (const p of pile.values()) {
+    if (RIDOTTO.matches || !dlg.open) { p.el.remove(); continue }
+    p.el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished.then(() => p.el.remove(), () => p.el.remove())
+  }
+  pile.clear()
+}
 /** Sposta una pila sotto un altro nome (la puntata della casella diventa la puntata della mano). */
 function rinomina(da, a) { const p = pile.get(da); if (!p) return; pile.delete(da); pile.set(a, p); mettiPila(a, p) }
 
 // ── le puntate ───────────────────────────────────────────────────────────────
+/** Una fiche su un posto; false se non si è posata. */
 function posa(key) {
-  if (stato.fase !== 'punta') { voce(stato.fase === 'gioco' ? 'le puntate sono chiuse: gioca la mano' : 'un attimo: il banco raccoglie le carte'); return }
+  if (stato.fase !== 'punta') { voce(stato.fase === 'gioco' ? 'le puntate sono chiuse: gioca la mano' : 'un attimo: il banco raccoglie le carte'); return false }
   const c = Number(key.at(-1)), k = key === `b${c}` ? 'base' : key.slice(0, -1)
+  // (31.10) le laterali solo dove ci sono: «rifai» le posava anche dopo il passaggio a venezia, e poi tavolo.giro diceva di no
+  if (k !== 'base' && !R().laterali) { voce(`a ${R().nome} niente puntate laterali`); return false }
   const v = stato.fiche
   const max = k === 'base' ? LIMITI.max : LIMITI.lateraleMax
-  if (stato.puntate[c][k] + v > max) { voce(`al massimo ${fmt(max)} su questa casella`); return }
-  if (!pzk.punta(GIOCO, v)) { voce(pzk.nonBasta()); scuoti(el.saldo); return }
+  if (stato.puntate[c][k] + v > max) { voce(`al massimo ${fmt(max)} su questa casella`); return false }
+  if (!pzk.punta(GIOCO, v)) { voce(pzk.nonBasta()); scuoti(el.saldo); return false }
   stato.puntate[c][k] += v
   stato.mosse.push({ casella: c, k, v })
   aggiornaBanco()
   voce(spiega(key))
   aggiungi(key, [v], centro(el.scegli.querySelector(`[data-v="${v}"] img`)))
+  return true
 }
 function togli() {
   if (stato.fase !== 'punta' || !stato.mosse.length) return
@@ -460,19 +504,29 @@ function togli() {
   aggiornaBanco()
   if (da) vola(v, da, centro(el.scegli.querySelector(`[data-v="${v}"] img`)), { durata: 300, alto: 24 })
 }
+// (31.10) finché rifai posa, «distribuisci» aspetta (come nelle mine: partiva a metà, con le puntate a metà)
+let rifacendo = false
 async function rifai() {
-  if (stato.fase !== 'punta' || !stato.ultime || sulTavolo() > 0) return
+  if (stato.fase !== 'punta' || !stato.ultime || sulTavolo() > 0 || rifacendo) return
   const ultime = stato.ultime.map((p) => ({ ...p, pp: R().laterali ? p.pp : 0, t3: R().laterali ? p.t3 : 0 }))
   const tot = ultime.reduce((s, p) => s + p.base + p.pp + p.t3, 0)
-  if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
+  if (tot > pzk.puliti()) { voce(`per rifare servono ${fmt(tot)} $pzk${pzk.sporchi() > 0 ? ' puliti' : ''}`); scuoti(el.saldo); return }
   const prima = stato.fiche
-  for (let c = 0; c < CASELLE; c++) for (const k of ['base', 'pp', 't3']) for (const v of pzk.inFiches(ultime[c][k])) {
-    stato.fiche = v
-    posa(k === 'base' ? `b${c}` : `${k}${c}`)
-    await attendi(60)
+  // (31.10) le fiches si posano una alla volta: se intanto cambiano le regole, parte la mano o cambia il conto, ci si ferma
+  const regole = stato.regole, conto = cambi
+  rifacendo = true
+  try {
+    posate: for (let c = 0; c < CASELLE; c++) for (const k of ['base', 'pp', 't3']) for (const v of pzk.inFiches(ultime[c][k])) {
+      if (stato.regole !== regole || stato.fase !== 'punta' || cambi !== conto) break posate
+      stato.fiche = v
+      if (!posa(k === 'base' ? `b${c}` : `${k}${c}`)) break posate
+      await attendi(60)
+    }
+  } finally {
+    rifacendo = false
+    stato.fiche = prima
+    aggiornaBanco()
   }
-  stato.fiche = prima
-  aggiornaBanco()
 }
 function scuoti(e) {
   if (RIDOTTO.matches) return
@@ -572,61 +626,163 @@ async function distribuisci() {
   const sole = pu.find((p) => !p.puntata && (p.pp || p.t3))
   if (sole) { voce(`la laterale della casella ${sole.casella + 1} vuole anche la puntata nel cerchio`); return }
   if (giocate.length < R().caselleMin) { voce(`a ${R().nome}, da soli, si punta su almeno ${R().caselleMin} caselle`); return }
-  if (!tavolo || tavolo.R !== R()) tavolo = new Tavolo(R())
+  if (rifacendo) return
+  // (31.10) il giro lo apre la banca: prende le puntate e dà le carte. Se dice di no (non bastano più, la galera, la rete),
+  // lo si dice e le fiches tornano tutte al saldo: sul tavolo c'erano solo per lo schermo (pzk.punta)
+  stato.fase = 'gioco' // (subito: un secondo tocco, o la banca che risponde e avvisa, non devono ripartire)
+  mostrato = pzk.saldo() // (il saldo resta fermo finché la risposta non sgombra le fiches di qui)
+  aggiornaBanco()
+  const conto = cambi
+  const r = await pzk.fai('blackjack.distribuisci', { regole: stato.regole, puntate: giocate })
+  mostrato = null
+  if (!r.ok || cambi !== conto) {
+    stato.fase = 'punta'
+    if (cambi !== conto) { sparisci(); pzk.sgombra(GIOCO); aggiornaBanco(); ritrova(); return } // (il conto è cambiato intanto)
+    voce(`il banco non distribuisce: ${r.errore}`)
+    scuoti(el.saldo)
+    tornanoFiches()
+    return
+  }
+  pzk.sgombra(GIOCO)
   stato.ultime = stato.puntate.map((p) => ({ ...p }))
   salva()
-  stato.fase = 'gioco'
   stato.mosse = []
+  altroConto = false
+  ripresa = false
+  giroNetto = 0
+  V = r.esito.vede
   aggiornaBanco()
   el.azioni.hidden = true
-  let ev
-  try { ev = tavolo.giro(giocate) } catch (e) { voce(e.message); stato.fase = 'punta'; aggiornaBanco(); return }
   // le mani del giro: le puntate delle caselle diventano le puntate delle mani
   mani.clear()
   ordine.clear()
-  for (const m of tavolo.mani) {
+  for (const m of V.mani) {
     mani.set(m.id, { id: m.id, casella: m.casella, carte: [], dati: [], segno: null })
     ordine.set(m.casella, [m.id])
     rinomina(`b${m.casella}`, `m${m.id}`)
   }
   banco.carte = []; banco.dati = []
   voce('carte!')
+  await recita(r.esito.ev)
+  await giocaGiro()
+}
+
+/** (31.10) Le fiches posate tornano al saldo (la banca non le ha prese). */
+function tornanoFiches() {
+  pzk.sgombra(GIOCO)
+  for (let c = 0; c < CASELLE; c++) stato.puntate[c] = { base: 0, pp: 0, t3: 0 }
+  stato.mosse = []
+  for (const k of [...pile.keys()]) svuota(k, centro(el.saldo))
+  aggiornaBanco()
+}
+
+// il giro, finché la banca non dice che è finito: l'assicurazione, poi le mani una alla volta
+async function giocaGiro() {
   try {
-    await recita(ev)
-    while (tavolo.fase !== 'fine') {
-      if (tavolo.fase === 'assicurazione') await turnoAssicurazione()
-      else if (tavolo.fase === 'gioco') await turnoGioco()
+    while (!altroConto && !ripresa && V && V.fase !== 'fine') {
+      if (V.fase === 'assicurazione') await turnoAssicurazione()
+      else if (V.fase === 'gioco') await turnoGioco()
       else break
     }
   } catch (e) { console.error(e) }
   await fineGiro()
 }
 
+/**
+ * (31.10) Ritrova la mano aperta sulla banca (la pagina ricaricata, un altro telefono, il conto in cui si è appena entrati):
+ * le carte e le fiches vanno subito al loro posto, e si continua da lì. La puntata è già della banca: non torna indietro.
+ */
+function ritrova() {
+  const v = pzk.tavoloBanca(GIOCO)
+  if (!v || (v.fase !== 'gioco' && v.fase !== 'assicurazione') || stato.fase !== 'punta' || rifacendo || !scena || !G || !dlg?.open) return
+  stato.fase = 'gioco'
+  if (pile.size || sulTavolo() > 0) { // (le fiches posate e non giocate erano solo sullo schermo)
+    pzk.sgombra(GIOCO)
+    for (let c = 0; c < CASELLE; c++) stato.puntate[c] = { base: 0, pp: 0, t3: 0 }
+    sparisci()
+  }
+  stato.mosse = []
+  if (v.regole !== stato.regole && REGOLE[v.regole]) { stato.regole = v.regole; el.regole.value = v.regole; salva(); disegnaTavolo() }
+  V = v
+  altroConto = false
+  ripresa = false
+  giroNetto = v.netto ?? 0
+  mani.clear()
+  ordine.clear()
+  for (const m of v.mani) mani.set(m.id, { id: m.id, casella: m.casella, carte: [], dati: [], segno: null, bj: m.bj })
+  for (let c = 0; c < CASELLE; c++) { const ids = v.mani.filter((m) => m.casella === c).map((m) => m.id); if (ids.length) ordine.set(c, ids) }
+  for (const m of v.mani) {
+    const mm = mani.get(m.id)
+    m.carte.forEach((c, k) => {
+      const c3 = scena.nuova(c)
+      c3.traverso = m.raddoppio && k === 2
+      mm.carte.push(c3); mm.dati.push(c)
+      Object.assign(c3.posa, posaCarta(mm, k, c3.traverso), { su: 1 }); c3.applica()
+    })
+    segnaPunti(mm)
+    if (m.chiusa) continue
+    pila(`m${m.id}`).fiches.push(...pzk.inFiches(m.base))
+    if (m.puntata > m.base) pila(`r${m.id}`).fiches.push(...pzk.inFiches(m.puntata - m.base))
+    if (m.ins) pila(`ins${m.casella}`).fiches.push(...pzk.inFiches(m.ins))
+  }
+  banco.carte = []; banco.dati = []
+  v.carteBanco.forEach((c) => { banco.carte.push(scena.nuova(c)); banco.dati.push(c) })
+  banco.carte.forEach((c3, k) => { Object.assign(c3.posa, posaBanco(k, banco.carte.length), { su: banco.dati[k] ? 1 : 0 }); c3.applica() })
+  segnaPunti(banco)
+  for (const [k, p] of pile) mettiPila(k, p)
+  aggiornaSabot()
+  aggiornaBanco()
+  voce('la mano di prima, dov’era rimasta')
+  giocaGiro()
+}
+
 async function turnoAssicurazione() {
-  const m = tavolo.daAssicurare[0], mm = mani.get(m.id)
-  const bj = m.carte.length === 2 && punti(m.carte).tot === 21
-  const costo = m.base / 2
-  attiva(m.id)
-  const puo = bj || pzk.saldo() >= costo
-  voce(bj ? `asso del banco: casella ${m.casella + 1}, blackjack alla pari?` : `asso del banco: assicuri la casella ${m.casella + 1}? costa ${fmt(costo)}${puo ? '' : ' (non ti bastano)'}`)
+  const a = V.assicura, m = V.mani.find((x) => x.id === a.mano)
+  const bj = a.pari, costo = a.costo
+  attiva(a.mano)
+  // (31.10) si punta solo coi soldi puliti: col saldo, che conta anche gli sporchi, il tasto c'era e la puntata no
+  const puo = bj || pzk.puliti() >= costo
+  voce(bj ? `asso del banco: casella ${m.casella + 1}, blackjack alla pari?` : `asso del banco: assicuri la casella ${m.casella + 1}? costa ${fmt(costo)}${puo ? '' : ` (${pzk.nonBasta()})`}`)
   el.chiede.hidden = false
   el.chiede.querySelector('[data-si="1"]').textContent = bj ? 'alla pari' : 'assicura'
   el.chiede.querySelector('[data-si="1"]').disabled = !puo
   el.chiede.querySelector('[data-si="0"]').textContent = 'no'
   el.chiede.querySelector(puo ? '[data-si="1"]' : '[data-si="0"]').focus({ preventScroll: true })
-  const s = await chiedi()
-  el.chiede.hidden = true
-  void mm
-  await recita(tavolo.assicura(s === 'si'))
+  for (;;) {
+    const s = await chiedi()
+    if (s == null || altroConto) return
+    el.chiede.hidden = true
+    // (31.10) l'assicurazione la punta la banca: se dice di no (non bastano più, la galera arrivata intanto) si dice perché
+    // e si richiede; le fiches volano solo se la banca l'ha presa (FA.assicura)
+    const r = await pzk.fai('blackjack.assicura', { si: s === 'si', mano: a.mano })
+    if (altroConto) return
+    if (r.ok) { V = r.esito.vede; await recita(r.esito.ev); return }
+    if (!ancoraQui()) return
+    voce(`niente assicurazione: ${r.errore}`)
+    scuoti(el.saldo)
+    el.chiede.hidden = false
+    el.chiede.querySelector('[data-si="0"]').focus({ preventScroll: true })
+  }
+}
+
+// (31.10) la banca ha detto di no: se la mano sulla banca non è più quella che si vede (giocata da un altro telefono) si
+// smette di giocarla qui (fineGiro raccoglie senza conti, e ritrova la riprende com'è adesso) → false
+let ripresa = false
+function ancoraQui() {
+  const v = pzk.tavoloBanca(GIOCO)
+  if (v && v.fase === V.fase && v.attiva === V.attiva && v.mani?.length === V.mani.length && (v.assicura?.mano ?? null) === (V.assicura?.mano ?? null)) return true
+  voce('la mano è cambiata da un’altra parte: la riprendo com’è adesso')
+  ripresa = true
+  return false
 }
 
 async function turnoGioco() {
-  const m = tavolo.attiva, mm = mani.get(m.id)
-  const az = tavolo.azioni()
-  const soldi = pzk.saldo() >= az.extra
+  const m = V.mani.find((x) => x.id === V.attiva)
+  const az = V.azioni ?? {}
+  const soldi = pzk.puliti() >= az.extra // (31.10: i puliti, come pzk.punta, non il saldo)
   attiva(m.id)
   const p = punti(m.carte)
-  const contro = tavolo.banco[0]
+  const contro = V.carteBanco[0]
   voce(`casella ${m.casella + 1}${ordine.get(m.casella).length > 1 ? ` (mano ${ordine.get(m.casella).indexOf(m.id) + 1})` : ''}: ${p.morbido ? `${p.duro} o ${p.tot}` : p.tot} contro ${contro.r === 'A' ? 'un asso' : `un ${valore(contro.r) === 10 ? '10' : contro.r}`}`)
   el.azioni.hidden = false
   for (const b of el.azioni.children) {
@@ -634,18 +790,25 @@ async function turnoGioco() {
     const ok = az[a] && (a === 'raddoppia' || a === 'dividi' ? soldi : true)
     b.hidden = a === 'resa' && !R().resa
     b.disabled = !ok
-    b.title = !az[a] ? '' : (a === 'raddoppia' || a === 'dividi') && !soldi ? `servono ${fmt(az.extra)} $pzk` : ''
+    b.title = !az[a] ? '' : (a === 'raddoppia' || a === 'dividi') && !soldi ? `servono ${fmt(az.extra)} $pzk puliti` : ''
   }
   el.azioni.querySelector('button:not(:disabled)')?.focus({ preventScroll: true })
-  void mm
   for (;;) {
     const a = await chiedi()
-    const ora = tavolo.azioni()
-    if (!ora[a]) continue
-    if ((a === 'raddoppia' || a === 'dividi') && pzk.saldo() < ora.extra) { voce(`per ${a === 'dividi' ? 'dividere' : 'raddoppiare'} servono ${fmt(ora.extra)} $pzk`); scuoti(el.saldo); continue }
+    if (a == null || altroConto) return
+    if (!az[a]) continue
+    const fare = { raddoppia: 'raddoppiare', dividi: 'dividere' }[a]
+    if (fare && pzk.puliti() < az.extra) { voce(`per ${fare} servono ${fmt(az.extra)} $pzk: ${pzk.nonBasta()}`); scuoti(el.saldo); continue }
+    // (31.10) la mossa la fa la banca (anche la puntata del raddoppio e della divisione): se dice di no, la mossa non c'è e
+    // si dice perché; le fiches del raddoppio volano solo se la banca l'ha presa
     el.azioni.hidden = true
-    await recita(tavolo[a]())
-    return
+    const r = await pzk.fai('blackjack.mossa', { mossa: a, mano: m.id })
+    if (altroConto) return
+    if (r.ok) { V = r.esito.vede; await recita(r.esito.ev); return }
+    if (!ancoraQui()) return
+    voce(fare ? `niente da ${fare}: ${r.errore}` : r.errore)
+    scuoti(el.saldo)
+    el.azioni.hidden = false
   }
 }
 
@@ -667,13 +830,34 @@ function tastiera(e) {
 let inVolo = []
 const atterrate = async () => { const v = inVolo; inVolo = []; await Promise.all(v) }
 
+// (31.10) i soldi di una risposta la banca li ha già passati (pzk.fai: il saldo è già quello nuovo); il tavolo tiene fermo
+// il saldo di prima delle vincite (mostrato) e lo fa salire mentre le fiches arrivano (entra)
+const PAGANO = new Set(['laterali', 'pari', 'assicurazione chiusa', 'resa', 'sballa'])
+const pagati = (ev) => ev.reduce((s, e) => s + (PAGANO.has(e.t) ? e.torna : e.t === 'esito' ? e.mani.reduce((t, m) => t + m.torna, 0) : 0), 0)
 async function recita(ev) {
+  mostrato = Math.max(0, pzk.saldo() - pagati(ev))
   for (const e of ev) await (FA[e.t] ?? (async () => {}))(e)
   await atterrate()
+  mostrato = null
   aggiornaBanco()
 }
 
 function dove(id) { return id === 'banco' ? banco : mani.get(id) }
+
+// (31.10) un pezzo del giro è chiuso: i soldi li ha già regolati la banca (casino-blackjack.mjs, una mano sola a giro:
+// le laterali e l'assicurazione con { mano: false }); qui si tiene il netto del giro per la voce. Col conto cambiato a
+// metà mano niente: la mano è dell'altro conto → false
+function paga(giocato, torna) {
+  if (altroConto) return false
+  giroNetto += torna - giocato
+  return true
+}
+/** Il saldo fermo sul tavolo sale di `torna` (le fiches sono arrivate). */
+function entra(torna) {
+  if (!torna || mostrato == null) return
+  contaSaldo(mostrato, mostrato + torna)
+  mostrato += torna
+}
 
 const FA = {
   async mescola(e) {
@@ -691,7 +875,7 @@ const FA = {
   async brucia() {
     const c = scena.nuova(null)
     aggiornaSabot()
-    voce(tavolo.R.bruciate > 1 ? `brucio ${tavolo.R.bruciate} carte` : 'brucio la prima carta')
+    voce(R().bruciate > 1 ? `brucio ${R().bruciate} carte` : 'brucio la prima carta')
     await scena.muovi(c, { ...scena.sopraScarti() }, { durata: 420, arco: 30 })
     c.via()
     scartate++
@@ -725,10 +909,8 @@ const FA = {
     await attendi(350)
   },
   async laterali(e) {
-    // (29.10 notte) i soldi subito, come in esito; le fiches dopo, col saldo di prima fermo sul tavolo
-    mostrato = pzk.saldo()
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
+    // (29.10 notte) i soldi subito, come in esito; le fiches dopo, col saldo di prima fermo sul tavolo (recita)
+    if (!paga(e.giocato, e.torna)) return // (le fiches svaniscono a fine giro)
     await atterrate()
     for (const k of ['pp', 't3']) {
       const l = e[k]
@@ -742,27 +924,22 @@ const FA = {
         svuota(key, centro(el.saldo))
       } else svuota(key, bancoFiches(), { scala: 0.7 })
     }
-    if (e.torna) contaSaldo(mostrato, mostrato + e.torna)
-    mostrato = null
+    entra(e.torna)
     stato.puntate[e.casella].pp = stato.puntate[e.casella].t3 = 0
     await attendi(e.torna ? 300 : 150)
   },
   async assicurazione() { await atterrate() },
   async assicura(e) {
-    const m = mani.get(e.mano)
-    pzk.punta(GIOCO, e.importo)
+    const m = mani.get(e.mano) // (31.10: la puntata l'ha già presa la banca)
     await aggiungi(`ins${m.casella}`, pzk.inFiches(e.importo), centro(el.saldo))
   },
   async pari(e) {
-    mostrato = pzk.saldo() // (29.10 notte: i soldi subito, le fiches dopo)
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
     const m = mani.get(e.mano)
+    if (!paga(e.giocato, e.torna)) { timbro(m, 'alla pari', 'grigio'); return } // (29.10 notte: i soldi subito, le fiches dopo)
     timbro(m, 'alla pari', 'oro')
     await aggiungi(`m${m.id}`, pzk.inFiches(e.torna - e.giocato).slice(0, 14), bancoFiches(), { passo: 30 })
     await attendi(300)
-    contaSaldo(mostrato, mostrato + e.torna)
-    mostrato = null
+    entra(e.torna)
     await svuota(`m${m.id}`, centro(el.saldo))
   },
   async sbircia(e) {
@@ -788,9 +965,7 @@ const FA = {
     await attendi(200)
   },
   async 'assicurazione chiusa'(e) {
-    mostrato = pzk.saldo() // (29.10 notte: i soldi subito, le fiches dopo)
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
+    if (!paga(e.giocato, e.torna)) return // (29.10 notte: i soldi subito, le fiches dopo)
     const m = mani.get(e.mano)
     const key = `ins${m.casella}`
     if (e.vinta) {
@@ -799,15 +974,13 @@ const FA = {
       await attendi(300)
       svuota(key, centro(el.saldo))
     } else svuota(key, bancoFiches(), { scala: 0.7 })
-    if (e.torna) contaSaldo(mostrato, mostrato + e.torna)
-    mostrato = null
+    entra(e.torna)
     await attendi(200)
   },
   async tocca(e) { await atterrate(); attiva(e.mano) },
   async stai(e) { const m = mani.get(e.mano); m.segno?.classList.remove('attiva') },
   async sballa(e) {
-    pzk.regola(GIOCO, e.giocato, 0) // (29.10 notte: i soldi subito)
-    giroNetto -= e.giocato
+    paga(e.giocato, 0)
     await atterrate()
     const m = mani.get(e.mano)
     segnaPunti(m)
@@ -818,14 +991,12 @@ const FA = {
     aggiornaBanco()
   },
   async raddoppia(e) {
-    const m = mani.get(e.mano)
-    pzk.punta(GIOCO, e.extra)
+    const m = mani.get(e.mano) // (31.10: la puntata l'ha già presa la banca, come per la divisione)
     voce(`raddoppi: ${fmt(e.extra)} in più, una carta sola`)
     await aggiungi(`r${m.id}`, pzk.inFiches(e.extra), centro(el.saldo))
   },
   async dividi(e) {
     const m = mani.get(e.mano)
-    pzk.punta(GIOCO, e.extra)
     const n = { id: e.nuova, casella: m.casella, carte: [m.carte.pop()], dati: [m.dati.pop()], segno: null }
     mani.set(n.id, n)
     ordine.set(m.casella, e.ordine)
@@ -839,10 +1010,9 @@ const FA = {
     await atterrate()
     const m = mani.get(e.mano)
     timbro(m, 'resa', 'grigio')
+    if (!paga(e.giocato, e.torna)) { voce('abbandoni'); return } // (il conto è cambiato: niente metà che torna)
     voce(`abbandoni: ti torna metà, ${fmt(e.torna)} $pzk`)
-    pzk.regola(GIOCO, e.giocato, e.torna)
-    giroNetto += e.torna - e.giocato
-    contaSaldo(pzk.saldo() - e.torna, pzk.saldo())
+    entra(e.torna)
     // metà al banco, metà al giocatore
     const p = pile.get(`m${m.id}`)
     if (p) {
@@ -853,19 +1023,20 @@ const FA = {
     }
   },
   async esito(e) {
-    // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena il banco ha
-    // finito: prima passavano dopo le fiches che volano, e ricaricando a metà la vincita si perdeva. Il tavolo tiene il saldo
-    // di prima (mostrato) finché le fiches non arrivano
-    let netto = 0, torna = 0, giocato = 0
-    for (const x of e.mani) { giocato += x.giocato; torna += x.torna; netto += x.torna - x.giocato }
-    mostrato = pzk.saldo()
-    pzk.regola(GIOCO, giocato, torna)
+    // (29.10 notte, 31.10) i soldi li ha già passati la banca, prima di rispondere: il tavolo tiene il saldo di prima
+    // (mostrato) finché le fiches non arrivano
+    let torna = 0, giocato = 0
+    for (const x of e.mani) { giocato += x.giocato; torna += x.torna }
+    paga(giocato, torna)
     await atterrate()
     attiva(null)
     const b = e.banco
-    voce(b.bj ? 'blackjack del banco' : b.sballa ? `il banco sballa con ${b.tot}` : `il banco fa ${b.tot}`)
+    const dice = b.bj ? 'blackjack del banco' : b.sballa ? `il banco sballa con ${b.tot}` : `il banco fa ${b.tot}`
+    voce(dice)
     if (banco.carte.length) timbro(banco, b.bj ? 'blackjack' : b.sballa ? 'sballa' : String(b.tot), b.sballa ? 'rosso' : '')
     await attendi(500)
+    // (31.10) il conto è cambiato a metà mano: niente vincite né conti nel saldo, le fiches svaniscono a fine giro
+    if (altroConto) { voce(`${dice} · il conto è cambiato a metà mano: la mano è dell’altro conto`); return }
     // le perse al banco, poi le vinte pagate accanto e tutto al giocatore
     const perse = e.mani.filter((x) => x.torna === 0)
     await Promise.all(perse.map((x, k) => { timbro(mani.get(x.mano), 'perde', 'grigio'); return Promise.all([svuota(`m${x.mano}`, bancoFiches(), { dopo: k * 80, scala: 0.7 }), svuota(`r${x.mano}`, bancoFiches(), { dopo: k * 80 + 40, scala: 0.7 })]) }))
@@ -880,21 +1051,21 @@ const FA = {
       else timbro(m, 'perde', 'grigio') // obo: tornano solo raddoppi e divisioni
     }))
     if (vinte.length) await attendi(500)
-    if (torna) contaSaldo(mostrato, mostrato + torna)
-    mostrato = null
+    entra(torna)
     await Promise.all(vinte.map((x, k) => Promise.all([svuota(`m${x.mano}`, centro(el.saldo), { dopo: k * 60 }), svuota(`r${x.mano}`, centro(el.saldo), { dopo: k * 60 + 30 })])))
-    const tutto = giroNetto + netto
+    const tutto = V?.netto ?? giroNetto // (31.10: il netto del giro come l'ha contato la banca)
     voce(`${b.bj ? 'blackjack del banco' : b.sballa ? `il banco sballa (${b.tot})` : `il banco fa ${b.tot}`} · ${tutto > 0 ? `vinci ${fmt(tutto)} $pzk` : tutto < 0 ? `perdi ${fmt(-tutto)} $pzk` : 'pari'}`)
   },
 }
-let giroNetto = 0 // quanto si è vinto o perso prima dell'esito (laterali, rese, sballate, alla pari, assicurazioni)
+let giroNetto = 0 // quanto si è vinto o perso nel giro (laterali, rese, sballate, alla pari, assicurazioni e l'esito: paga)
 let scartate = 0
 
-function quantoPieno() { return tavolo ? tavolo.rimaste / tavolo.carte.length : 0 }
+// (31.10) il sabot come lo dice la banca (V.sabot: quante carte, quante ne restano, quante prima della carta di taglio)
+function quantoPieno() { const s = V?.sabot; return s?.carte ? s.rimaste / s.carte : 0 }
 function aggiornaSabot() {
-  if (!tavolo) return
-  const davanti = tavolo.taglio - tavolo.pos // carte prima della carta di taglio
-  scena.sabotPieno(quantoPieno(), tavolo.ultima || davanti < 0 ? null : davanti / Math.max(1, tavolo.rimaste))
+  const s = V?.sabot
+  if (!s || !scena) return
+  scena.sabotPieno(quantoPieno(), s.ultima || s.davanti < 0 ? null : s.davanti / Math.max(1, s.rimaste))
 }
 
 // a fine mano: le carte nella vaschetta degli scarti, da destra a sinistra (come raccoglie il banco), poi le sue
@@ -930,10 +1101,12 @@ async function fineGiro() {
   attiva(null)
   el.azioni.hidden = el.chiede.hidden = true
   for (let c = 0; c < CASELLE; c++) stato.puntate[c] = { base: 0, pp: 0, t3: 0 }
-  // se qualcosa è rimasto sul tavolo (non dovrebbe), torna al giocatore
-  const resto = pzk.sulTavolo(GIOCO)
-  if (resto > 0) { console.warn('blackjack: restavano', resto); pzk.regola(GIOCO, resto, resto) }
-  for (const k of [...pile.keys()]) svuota(k, centro(el.saldo))
+  // (31.10) quello che resta sul tavolo lo regola la banca; qui le fiches vanno via. Col conto cambiato, o la mano giocata
+  // da un'altra parte (ripresa), svaniscono: la mano vera è sulla banca
+  const via = altroConto || ripresa
+  if (via) sparisci()
+  else for (const k of [...pile.keys()]) svuota(k, centro(el.saldo))
+  altroConto = false
   stato.fase = 'raccolta'
   aggiornaBanco()
   await attendi(1200)
@@ -944,13 +1117,16 @@ async function fineGiro() {
   giroNetto = 0
   stato.fase = 'punta'
   aggiornaBanco()
-  if (tavolo.daMescolare) voce('il sabot è finito: alla prossima mano si mescola')
+  if (V?.sabot?.daMescolare && !via) voce('il sabot è finito: alla prossima mano si mescola')
   if (pzk.aSecco()) voce('hai finito i $pzk: ricarica')
   el.dai.focus({ preventScroll: true })
+  ripresa = false
+  ritrova() // (31.10: il conto nuovo, o la mano cambiata da un'altra parte, ha una mano aperta)
 }
 
 let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches arrivano (i soldi sono già passati)
 function contaSaldo(da, a) {
+  if (altroConto) return // (31.10: un conto dell'altro conto, non di questo saldo)
   const durata = RIDOTTO.matches ? 0 : 800
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }
   contando = true
@@ -970,10 +1146,13 @@ async function avviaMotore() {
   await carte.preparaCarte()
   scena = new Scena(el.canvas)
   scena.veloce = stato.veloce ? 3 : 1
-  tavolo = new Tavolo(R())
   ridisegna()
-  scena.sabotPieno(0, null)
+  // (31.10) il sabot della banca, se c'è (resta fra un giro e l'altro), e la mano aperta, se c'è
+  const v = pzk.tavoloBanca(GIOCO)
+  if (v?.regole === stato.regole) V = v
+  if (V) aggiornaSabot(); else scena.sabotPieno(0, null)
   el.carica.remove()
   scena.avvia()
   aggiornaBanco()
+  ritrova()
 }

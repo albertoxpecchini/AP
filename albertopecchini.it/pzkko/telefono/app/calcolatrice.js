@@ -14,23 +14,25 @@ import { icona } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-const MODI = { gon: ['gon', 'centesimali', 200], deg: ['deg', 'sessagesimali', 180], rad: ['rad', 'radianti', Math.PI] }
+// (dal 29.10 i conti si esportano: li usa anche la calcolatrice di pzk os, telefono/zero/os/calcolatrice.js, con lo stesso stato)
+export const MODI = { gon: ['gon', 'centesimali', 200], deg: ['deg', 'sessagesimali', 180], rad: ['rad', 'radianti', Math.PI] }
 const SCHEDE = [['calcolo', 'calcolo', 'quiz'], ['triangoli', 'triangoli', 'livello'], ['coordinate', 'coordinate', 'pzkkonet'], ['angoli', 'angoli', 'clessidra']]
 
 let host = null, ctx = null
-let S = ricordo('calcolatrice', { tab: 'calcolo', modo: 'gon', expr: '', ans: 0, storia: [], tri: {}, co: {}, ang: { v: '', da: 'deg' } })
+export let S = ricordo('calcolatrice', { tab: 'calcolo', modo: 'gon', expr: '', ans: 0, storia: [], tri: {}, co: {}, ang: { v: '', da: 'deg' } })
+if (!Number.isFinite(S.ans)) S.ans = 0 // (un ∞ o un NaN salvati prima del 31.10: il JSON li aveva fatti null, «ans = −∞»)
 
 // ── i numeri ──
-const aRad = (v, m = S.modo) => (v * Math.PI) / MODI[m][2]
-const daRad = (r, m = S.modo) => (r * MODI[m][2]) / Math.PI
+export const aRad = (v, m = S.modo) => (v * Math.PI) / MODI[m][2]
+export const daRad = (r, m = S.modo) => (r * MODI[m][2]) / Math.PI
 /** Un numero all'italiana: la virgola, fino a 8 decimali significativi, la notazione scientifica per i molto grandi e piccoli. */
-function num(n, dec = 8) {
+export function num(n, dec = 8) {
   if (!Number.isFinite(n)) return Number.isNaN(n) ? 'non definito' : n > 0 ? '∞' : '−∞'
   if (n !== 0 && (Math.abs(n) >= 1e12 || Math.abs(n) < 1e-6)) return n.toExponential(6).replace('.', ',').replace('e', ' × 10^')
   return n.toLocaleString('it-IT', { maximumFractionDigits: dec, useGrouping: Math.abs(n) >= 1e4 })
 }
 /** Gradi sessadecimali → «12° 34' 56,7"». */
-function dms(g) {
+export function dms(g) {
   const s = g < 0 ? '−' : ''
   g = Math.abs(g)
   let d = Math.floor(g), p = Math.floor((g - d) * 60), sec = Math.round(((g - d) * 60 - p) * 60 * 100) / 100
@@ -38,8 +40,8 @@ function dms(g) {
   if (p >= 60) { p -= 60; d++ }
   return `${s}${d}° ${String(p).padStart(2, '0')}' ${sec.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}"`
 }
-const angolo = (r) => `${num(daRad(r), 4)} ${MODI[S.modo][0]}${S.modo === 'deg' ? ` <small>(${dms(daRad(r, 'deg'))})</small>` : ''}`
-const leggiNum = (t) => { const v = Number(String(t ?? '').trim().replace(/\s/g, '').replace(',', '.')); return String(t ?? '').trim() === '' ? null : v }
+export const angolo = (r) => `${num(daRad(r), 4)} ${MODI[S.modo][0]}${S.modo === 'deg' ? ` <small>(${dms(daRad(r, 'deg'))})</small>` : ''}`
+export const leggiNum = (t) => { const v = Number(String(t ?? '').trim().replace(/\s/g, '').replace(',', '.')); return String(t ?? '').trim() === '' ? null : v }
 
 // ── l'espressione: discesa ricorsiva ──
 const pulito = (x) => (Math.abs(x) < 1e-12 ? 0 : x)
@@ -50,7 +52,7 @@ const FUNZ = {
   sqrt: Math.sqrt, cbrt: Math.cbrt, log: Math.log10, ln: Math.log, abs: Math.abs, exp: Math.exp,
 }
 const fatt = (n) => { if (n < 0 || n % 1 || n > 170) return NaN; let r = 1; for (let i = 2; i <= n; i++) r *= i; return r }
-function calcola(testo) {
+export function calcola(testo) {
   const t = testo.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/√/g, 'sqrt').replace(/π/g, 'pi').replace(/,/g, '.').replace(/\s+/g, '').toLowerCase()
   let i = 0
   const vedi = () => t[i], prendi = (c) => (t[i] === c ? (i++, true) : false)
@@ -89,8 +91,8 @@ function calcola(testo) {
 }
 
 // ── i triangoli: lati a b c, angoli α β γ (α opposto ad a) ──
-const LATI = ['a', 'b', 'c'], ANG = ['α', 'β', 'γ']
-function risolvi(dati) {
+export const LATI = ['a', 'b', 'c'], ANG = ['α', 'β', 'γ']
+export function risolvi(dati) {
   const L = LATI.map((k) => leggiNum(dati[k])), G = ANG.map((k) => (leggiNum(dati[k]) === null ? null : aRad(leggiNum(dati[k]))))
   const nL = L.filter((x) => x !== null).length, nG = G.filter((x) => x !== null).length
   if (nL + nG !== 3) return { errore: nL + nG < 3 ? 'servono tre dati' : 'metti solo tre dati (gli altri li trova lei)' }
@@ -132,8 +134,8 @@ function risolvi(dati) {
 }
 
 // ── le coordinate (x Est, y Nord; azimut dal Nord in senso orario) ──
-const azimut = (dx, dy) => { let r = Math.atan2(dx, dy); if (r < 0) r += 2 * Math.PI; return r }
-function gauss(testo) {
+export const azimut = (dx, dy) => { let r = Math.atan2(dx, dy); if (r < 0) r += 2 * Math.PI; return r }
+export function gauss(testo) {
   const p = testo.split(/\n/).map((r) => r.trim()).filter(Boolean).map((r) => r.split(/[;\t]|\s+/).filter(Boolean).map((x) => leggiNum(x)))
   if (p.length < 3) return { errore: 'almeno tre vertici, uno per riga: x ; y' }
   if (p.some((v) => v.length < 2 || v.slice(0, 2).some((x) => x === null || Number.isNaN(x)))) return { errore: 'ogni riga: x ; y (due numeri)' }
@@ -145,11 +147,45 @@ function gauss(testo) {
   return { area: Math.abs(s) / 2, doppia: s, per, n: p.length, verso: s > 0 ? 'antiorario' : 'orario' }
 }
 
+/** Da A, distanza e azimut → B (o null se manca un dato). c: i campi già letti (leggiNum). */
+export function polari(c) {
+  const ok = (...k) => k.every((x) => c[x] !== null && c[x] !== undefined && !Number.isNaN(c[x]))
+  if (!ok('xa', 'ya', 'd', 'az')) return null
+  const r = aRad(c.az), zero = (x) => (Math.abs(x) < 1e-9 * Math.max(1, Math.abs(c.d)) ? 0 : x), xb = c.xa + zero(c.d * Math.sin(r)), yb = c.ya + zero(c.d * Math.cos(r)) // via i residui di sin e cos
+  return { xb, yb, dx: xb - c.xa, dy: yb - c.ya }
+}
+/** Fra due punti: Δx, Δy, la distanza, l'azimut e il reciproco (o null se manca un dato). */
+export function fraDue(c) {
+  const ok = (...k) => k.every((x) => c[x] !== null && c[x] !== undefined && !Number.isNaN(c[x]))
+  if (!ok('x1', 'y1', 'x2', 'y2')) return null
+  const dx = c.x2 - c.x1, dy = c.y2 - c.y1, az = azimut(dx, dy)
+  return { dx, dy, dist: Math.hypot(dx, dy), az, reciproco: (az + Math.PI) % (2 * Math.PI) }
+}
+/** Un angolo scritto (un numero nella misura da, o gradi primi e secondi: 35°30'15") → { gradi, rad } o { errore } o null (vuoto). */
+export function leggiAngolo(testo, da) {
+  const t = String(testo ?? '').trim()
+  if (!t) return null
+  let gradi
+  const m = /^(-?\d+(?:[.,]\d+)?)\s*°\s*(?:(\d+(?:[.,]\d+)?)\s*['′]\s*)?(?:(\d+(?:[.,]\d+)?)\s*["″])?$/.exec(t)
+  if (m) gradi = (m[1].startsWith('-') ? -1 : 1) * (Math.abs(leggiNum(m[1])) + (leggiNum(m[2]) ?? 0) / 60 + (leggiNum(m[3]) ?? 0) / 3600) // (il segno dal testo: -0°30' è −0,5°, Math.sign(-0 || 1) diceva +)
+  else { const v = leggiNum(t); if (v === null || Number.isNaN(v)) return { errore: 'scrivi un numero, o gradi primi e secondi: 35°30\'15"' }; gradi = daRad(aRad(v, da), 'deg') }
+  return { gradi, rad: aRad(gradi, 'deg') }
+}
+/** L'uguale: calcola l'espressione, la mette negli ultimi, ANS prende il risultato, l'espressione si svuota. → il valore (o lancia l'errore). */
+export function registra() {
+  const v = calcola(S.expr)
+  if (Number.isFinite(v)) S.ans = v // (1÷0, asin(2): negli ultimi sì, «= ∞», in ANS no: salvato, il JSON lo fa null)
+  S.storia = [[S.expr, num(v)], ...S.storia.filter(([e]) => e !== S.expr)].slice(0, 8)
+  S.expr = ''
+  ricorda('calcolatrice', S)
+  return v
+}
+
 // ── le schede ──
 const campo = (gruppo, k, etichetta, v) => `<label class="t-ca-campo"><span>${etichetta.replace(/[αβγ]/g, '<i><label class="t-ca-campo"><span>${etichetta}</span></i>')}</span><input data-g="${gruppo}" data-k="${k}" inputmode="decimal" autocomplete="off" value="${esc(v ?? '')}"></label>`
 const modi = () => `<div class="t-za-filtri t-ca-modi">${Object.entries(MODI).map(([k, [s]]) => `<button type="button" data-modo="${k}" class="${S.modo === k ? 'on' : ''}">${s}</button>`).join('')}</div>`
 
-const TASTI = [['sin', 'cos', 'tan', '^', '√'], ['asin', 'acos', 'atan', '(', ')'], ['log', 'ln', 'π', '!', 'ans'], ['7', '8', '9', '÷', 'del'], ['4', '5', '6', '×', 'ac'], ['1', '2', '3', '−', '+'], ['0', ',', 'e', '=']]
+export const TASTI = [['sin', 'cos', 'tan', '^', '√'], ['asin', 'acos', 'atan', '(', ')'], ['log', 'ln', 'π', '!', 'ans'], ['7', '8', '9', '÷', 'del'], ['4', '5', '6', '×', 'ac'], ['1', '2', '3', '−', '+'], ['0', ',', 'e', '=']]
 function calcolo() {
   return `${modi()}
     <div class="t-ca-calc"><div>
@@ -195,25 +231,16 @@ function risultati() {
     out('tri').innerHTML = r.errore ? `<p class="t-cv-err">${esc(r.errore)}</p>` : soluzione(r, 0) + (r.seconda ? soluzione(r.seconda, 1) : '')
   } else if (S.tab === 'coordinate') {
     const c = Object.fromEntries(Object.entries(S.co).map(([k, v]) => [k, leggiNum(v)]))
-    const tutti = (...k) => k.every((x) => c[x] !== null && c[x] !== undefined && !Number.isNaN(c[x]))
-    if (tutti('xa', 'ya', 'd', 'az')) {
-      const r = aRad(c.az), zero = (x) => (Math.abs(x) < 1e-9 * Math.max(1, Math.abs(c.d)) ? 0 : x), xb = c.xa + zero(c.d * Math.sin(r)), yb = c.ya + zero(c.d * Math.cos(r)) // via i residui di sin e cos
-      out('polari').innerHTML = `<div class="t-ca-griglia">${riga('x B', num(xb, 4))}${riga('y B', num(yb, 4))}${riga('Δx = d·sin(θ)', num(xb - c.xa, 4))}${riga('Δy = d·cos(θ)', num(yb - c.ya, 4))}</div>`
-    } else out('polari').innerHTML = ''
-    if (tutti('x1', 'y1', 'x2', 'y2')) {
-      const dx = c.x2 - c.x1, dy = c.y2 - c.y1, az = azimut(dx, dy)
-      out('punti').innerHTML = `<div class="t-ca-griglia">${riga('Δx', num(dx, 4))}${riga('Δy', num(dy, 4))}${riga('distanza AB = √(Δx² + Δy²)', num(Math.hypot(dx, dy), 4))}${riga('azimut (AB) = atan(Δx/Δy), nel quadrante giusto', angolo(az))}${riga('azimut reciproco (BA) = (AB) ± ' + num(daRad(Math.PI), 4), angolo((az + Math.PI) % (2 * Math.PI)))}</div>`
-    } else out('punti').innerHTML = ''
+    const p = polari(c), d = fraDue(c)
+    out('polari').innerHTML = p ? `<div class="t-ca-griglia">${riga('x B', num(p.xb, 4))}${riga('y B', num(p.yb, 4))}${riga('Δx = d·sin(θ)', num(p.dx, 4))}${riga('Δy = d·cos(θ)', num(p.dy, 4))}</div>` : ''
+    out('punti').innerHTML = d ? `<div class="t-ca-griglia">${riga('Δx', num(d.dx, 4))}${riga('Δy', num(d.dy, 4))}${riga('distanza AB = √(Δx² + Δy²)', num(d.dist, 4))}${riga('azimut (AB) = atan(Δx/Δy), nel quadrante giusto', angolo(d.az))}${riga('azimut reciproco (BA) = (AB) ± ' + num(daRad(Math.PI), 4), angolo(d.reciproco))}</div>` : ''
     const g = S.co.vertici?.trim() ? gauss(S.co.vertici) : null
     out('gauss').innerHTML = !g ? '' : g.errore ? `<p class="t-cv-err">${esc(g.errore)}</p>` : `<div class="t-ca-griglia">${riga('area', num(g.area, 4))}${riga('2A = Σ xᵢ·(yᵢ₊₁ − yᵢ₋₁)', num(g.doppia, 4))}${riga('perimetro', num(g.per, 4))}${riga('vertici', `${g.n}, in senso ${g.verso}`)}</div>`
   } else {
-    const t = String(S.ang.v ?? '').trim()
-    if (!t) { out('ang').innerHTML = ''; return }
-    let gradi
-    const m = /^(-?\d+(?:[.,]\d+)?)\s*°\s*(?:(\d+(?:[.,]\d+)?)\s*['′]\s*)?(?:(\d+(?:[.,]\d+)?)\s*["″])?$/.exec(t)
-    if (m) gradi = Math.sign(leggiNum(m[1]) || 1) * (Math.abs(leggiNum(m[1])) + (leggiNum(m[2]) ?? 0) / 60 + (leggiNum(m[3]) ?? 0) / 3600)
-    else { const v = leggiNum(t); if (v === null || Number.isNaN(v)) { out('ang').innerHTML = '<p class="t-cv-err">scrivi un numero, o gradi primi e secondi: 35°30\'15"</p>'; return } gradi = daRad(aRad(v, S.ang.da), 'deg') }
-    const r = aRad(gradi, 'deg')
+    const x = leggiAngolo(S.ang.v, S.ang.da)
+    if (!x) { out('ang').innerHTML = ''; return }
+    if (x.errore) { out('ang').innerHTML = `<p class="t-cv-err">${esc(x.errore)}</p>`; return }
+    const { gradi, rad: r } = x
     out('ang').innerHTML = `<div class="t-ca-griglia">${riga('sessagesimali', dms(gradi))}${riga('sessadecimali', `${num(gradi, 8)}°`)}${riga('centesimali', `${num(daRad(r, 'gon'), 8)} gon`)}${riga('radianti', `${num(r, 10)} rad`)}</div>`
   }
 }
@@ -229,10 +256,7 @@ function disegna() {
 function uguale() {
   if (!S.expr.trim()) return
   try {
-    const v = calcola(S.expr)
-    S.ans = v
-    S.storia = [[S.expr, num(v)], ...S.storia.filter(([e]) => e !== S.expr)].slice(0, 8)
-    S.expr = ''
+    registra()
     disegna()
   } catch (e) { ctx.toast(esc(e.message), { icona: 'no' }) }
 }

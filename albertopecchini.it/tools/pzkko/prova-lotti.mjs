@@ -50,8 +50,8 @@ console.log('· i lotti truccati')
 const prima = r.conto.pzk
 r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'telefono-B-01', lotti: [{ n: 2, d: 5000, persi: 0, v: voceDado(100, 600) }] }] })
 ok(r.conto.pzk === prima && r.scartati?.includes('telefono-B-01:2') && r.avviso, 'le voci non fanno la variazione: scartato, saldo fermo')
-r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'telefono-B-01', lotti: [{ n: 3, d: 9900, persi: 0, v: voceDado(100, 10000) }] }] })
-ok(r.conto.pzk === prima && r.scartati?.includes('telefono-B-01:3'), 'un giro che rende 100 volte: scartato')
+r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'telefono-B-01', lotti: [{ n: 3, d: 19900, persi: 0, v: voceDado(100, 20000) }] }] })
+ok(r.conto.pzk === prima && r.scartati?.includes('telefono-B-01:3'), 'un giro di dado che rende 200 volte (il massimo è 181): scartato')
 r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'telefono-B-01', lotti: [{ n: 4, d: 90000, persi: 0, v: { 'c:chat': [0, 90000] } }] }] })
 ok(r.conto.pzk === prima && r.scartati?.includes('telefono-B-01:4'), '90.000 di colpo: scartato')
 r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'telefono-B-01', lotti: [{ n: 5, d: 10, persi: 0, v: { 'g:../../x': [0, 10] } }] }] })
@@ -73,6 +73,68 @@ ok(righe[0].cn.guadagnati >= righe[0].cn.giochi + (L.lum ?? 0) - 40, 'senza spes
 console.log('· il browser col codice di prima')
 r = await chiama({ a: 'salva', token: tok, pzk: prima - 40 + 100, lg: r.conto.lumaca?.g ?? null, es: r.conto.es })
 ok(r.ok && r.conto.pzk === prima + 60, 'il saldo intero vale ancora (+100)')
+
+// (31.10) i bug trovati nel controllo della banca
+console.log('· la cassa non riceve soldi che non esistono')
+const leggi = () => new Promise((fatto) => {
+  const res = { statusCode: 0, setHeader() {}, end(b) { fatto(JSON.parse(b)) } }
+  handler({ method: 'GET', url: '/api/wallet/', headers: {} }, res)
+})
+const x = await chiama({ a: 'crea', nome: 'secco' + Math.floor(Math.random() * 1e6), pin: '1234' })
+const cassa0 = (await leggi()).banca, saldoX = x.conto.pzk
+r = await chiama({ a: 'salva', token: x.token, code: [{ disp: 'pagina-X-0001', lotti: [{ n: 1, d: -1e8, persi: 0, v: { 'k:shop': [1e8, 0] } }] }] })
+const cassa1 = (await leggi()).banca
+ok(r.ok && r.conto.pzk === 0, 'il saldo si ferma a 0')
+ok(cassa1 - cassa0 === saldoX, `alla cassa va solo quello che c'era (${saldoX}), non 100 milioni (${cassa1 - cassa0})`)
+
+console.log('· i nomi che sono anche proprietà di Object')
+const ctor = await chiama({ a: 'crea', nome: 'constructor', pin: '1234' })
+ok(!ctor.ok || /^pzk\d{6}$/.test(ctor.conto.ind), `«constructor» ha un indirizzo vero (${ctor.conto?.ind ?? ctor.errore})`)
+r = await chiama({ a: 'trova', token: tok, quale: 'constructor', code: [] })
+ok(!r.ok && r.errore === 'quale banconota?', 'la banconota «constructor» non esiste')
+r = await chiama({ a: 'stato', token: tok, code: [] })
+ok(Number.isFinite(r.conto.pzk), 'il saldo resta un numero')
+r = await chiama({ a: 'salva', token: tok, code: [{ disp: '__proto__', lotti: [{ n: 1, d: 10, persi: 0, v: { 'c:chat': [0, 10] } }] }] })
+const s1 = r.conto.pzk
+r = await chiama({ a: 'salva', token: tok, code: [{ disp: '__proto__', lotti: [{ n: 1, d: 10, persi: 0, v: { 'c:chat': [0, 10] } }] }] })
+ok(r.conto.pzk === s1, 'il dispositivo «__proto__» non si applica (né una volta né due)')
+r = await chiama({ a: 'salva', token: tok, code: [{ disp: 'pagina-C-0001', lotti: [{ n: 1, d: 50, persi: 0, v: { 'g:constructor': [50, 100, 1, 1, 50] } }] }] })
+ok(r.ok && r.conto.libro.g.constructor?.every(Number.isFinite), `il gioco «constructor» ha un libro di numeri (${JSON.stringify(r.conto.libro.g.constructor)})`)
+
+// (31.10) le vincite vere che il server scartava: il tetto unico di 50 volte e il limite di tempo anche sulle vincite
+console.log('· le vincite grosse vere passano, i puntati inventati no')
+const y = await chiama({ a: 'crea', nome: 'grosso' + Math.floor(Math.random() * 1e6), pin: '1234' })
+const y0 = y.conto.pzk
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 1, d: 1500, persi: 0, v: voceDado(10, 1510) }] }] })
+ok(r.ok && r.conto.pzk === y0 + 1500 && !r.scartati, `la tripla secca del dado (151 volte) entra (${r.avviso ?? 'ok'})`)
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 2, d: 35000, persi: 0, v: { 'g:roulette': [1000, 36000, 1, 1, 35000] } }] }] })
+ok(r.ok && r.conto.pzk === y0 + 36500 && !r.scartati, `1.000 sul numero giusto subito dopo un altro giro: +35.000 (${r.avviso ?? 'ok'})`)
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 3, d: 30000, persi: 0, v: { 'g:mine': [1000, 31000, 1, 1, 30000] } }] }] })
+ok(r.ok && r.conto.pzk === y0 + 66500 && !r.scartati, `le mine a 31 volte entrano (${r.avviso ?? 'ok'})`)
+const y1 = r.conto.pzk
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 4, d: 1e6, persi: 0, v: { 'g:roulette': [1e6, 2e6, 1, 1, 1e6] } }] }] })
+ok(r.conto.pzk === y1 && r.scartati?.includes('pagina-Y-0001:4') && /più di quanto avevi/.test(r.avviso), `puntato più del saldo: scartato (${r.avviso})`)
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 5, d: 1_499_000, persi: 0, v: { 'g:mine': [1000, 1_500_000, 1, 1, 1_499_000] } }] }] })
+ok(r.conto.pzk === y1 && r.scartati?.includes('pagina-Y-0001:5'), 'le mine oltre il tetto di 1.000.000: scartato')
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 6, d: 3500, persi: 0, v: { 'g:roulette': [100, 3600, 1, 1, 3500] } }] }] })
+ok(r.conto.pzk === y1 + 3500 && !r.scartati, 'la roulette a 36 volte entra')
+r = await chiama({ a: 'salva', token: y.token, code: [{ disp: 'pagina-Y-0001', lotti: [{ n: 7, d: 5900, persi: 0, v: { 'g:roulette': [100, 6000, 1, 1, 5900] } }] }] })
+ok(r.conto.pzk === y1 + 3500 && r.scartati?.includes('pagina-Y-0001:7'), 'la roulette a 60 volte: scartato')
+
+console.log('· il cambio')
+r = await chiama({ a: 'stato', token: tok, code: [] })
+const p0 = r.conto.pzk, e0 = r.conto.eur, t0 = r.t
+r = await chiama({ a: 'converti', token: tok, da: 'pzk', quanto: 100, t: t0, code: [] })
+ok(r.ok, `100 $pzk in EUR€ (${r.errore ?? r.fatto?.eur})`)
+r = await chiama({ a: 'converti', token: tok, da: 'eur', quanto: r.conto.eur, t: t0, code: [] })
+ok(r.ok && r.conto.pzk <= p0 && r.conto.pzk + r.conto.eur * 1e6 >= p0 - 1, `andata e ritorno non fanno guadagnare (${p0} → ${r.conto.pzk} $pzk, ${r.conto.eur} EUR€)`)
+r = await chiama({ a: 'converti', token: tok, da: 'pzk', quanto: 0.5, t: t0, code: [] })
+const eMezzo = r.conto.eur
+for (let i = 0; i < 6; i++) {
+  r = await chiama({ a: 'converti', token: tok, da: 'eur', quanto: r.conto.eur, t: t0, code: [] })
+  if (r.ok) r = await chiama({ a: 'converti', token: tok, da: 'pzk', quanto: 0.5, t: t0, code: [] })
+}
+ok(r.conto.eur <= eMezzo + 1e-9 && r.conto.pzk <= p0, `i giri di mezzo $pzk non creano EUR€ (${eMezzo} → ${r.conto.eur})`)
 
 console.log(fallite ? `\n${fallite} prove fallite, ${passate} passate` : `\ntutte le ${passate} prove passate`)
 process.exit(fallite ? 1 : 0)

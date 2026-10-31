@@ -20,6 +20,17 @@
 //   sinistra l'ora e i widget, a destra le app nove per pagina, divise per genere (PAGINE); si scorrono di lato col dito, la
 //   rotella, il mouse trascinato o le frecce, e i puntini sotto in mezzo dicono quante pagine ci sono e dove sei (si possono
 //   premere). Il puntino cerchiato di rosso è la pagina dove sei; un puntino rosso pieno: lì c'è un'app col pallino.
+// - IL CERCAPERSONE ZERO (29.10, Alberto: «voglio lui come mockup, deve aprirsi con le stesse logiche… è in 3d mi raccomando…
+//   questa versione sarà a 9999 pzk$ e lo sostituirà per sempre nell'account»; poi: «non fare una finestra sopra il modello
+//   3d… lo schermo lo metti esattamente dove è nel modello… rifai da 0 pzk os adattato allo strumento»; telefono/zero/): chi
+//   ha «zero» nello zaino (lo shop) apre quello in 3D al posto della foto. La tela di zero.js (il modello bianco coi tasti
+//   arancioni, il cavo usb-c sulla testata) prende la finestra e lo schermo è DENTRO il 3D: pzk os a 8 bit (zero/os/os.js,
+//   un lcd 256 × 128 a un bit fatto come il sistema del Flipper: barra di stato, desktop con la chiocciolina, menu delle
+//   app, tastiera a croce) è la trama dell'lcd sotto il vetro trasparente del modello. Le logiche sono le stesse: il tasto
+//   sul muro «si ingrandisce» (vola la telecamera, dalla posa della foto a quella zoomata sullo schermo), lo schermo si
+//   accende in 400 ms (la retroilluminazione), INDIETRO è il tasto vero (una mossa indietro; tenuto tre secondi spegne),
+//   la croce e OK muovono pzk os; chiudendo la chiocciolina saluta sull'lcd e si torna sul muro. Le app in HTML di qui
+//   (telefono/app/) nello zero non si usano: pzk os le rifà a 8 bit (per ora la chat). Il vecchio cercapersone resta com'è.
 // Sul cellulare niente cornice: lo schermo prende tutta la finestra e i due tasti diventano una barra in basso.
 // Ogni app è un modulo di telefono/app/ che si carica la prima volta che la apri e poi resta montata (la chat non perde i
 // messaggi quando torni alla home). (Il nome «telefono» è rimasto dalla prima versione, che era un telefono.)
@@ -52,8 +63,15 @@ const PIENO = matchMedia('(max-width:700px),(max-height:520px)') // il cellulare
 // (?v=2: le immagini di /art/ restano 30 giorni nei browser, e dopo il tasto indietro ricolorato del 29.10 Alberto apriva
 // il cercapersone e lo vedeva ancora verde: cambiando la foto si cambia il numero, qui e nel tasto di index.html e storia/)
 const PAGER = { src: '/art/chat-pager-grande/pager-grande.webp?v=2', w: 1341, h: 774, lcd: [8.352, 24.677, 66.294, 56.202] }
+// il cercapersone zero (29.10, vedi in cima): il rig 3D di telefono/zero/zero.js, solo quando nello zaino c'è «zero»
+let zero = null
+let modoCostruito = null // il dialog è fatto per lo zero o per la foto: se cambia (comprato lo zero), si rifà
+const vuoleZero = () => zaino.ha('zero')
+// la foto grande è già pronta quando si tocca il tasto; con lo zero no (30.10, Alberto: «niente cache di quello vecchio»:
+// col cercapersone zero la foto del vecchio non si scarica mai, né qui né nel dialog)
 const precarica = new Image()
-precarica.src = PAGER.src // la foto grande è già pronta quando si tocca il tasto
+if (!vuoleZero()) precarica.src = PAGER.src
+const sorgenteLcd = () => origine?.querySelector('.ct-lcd canvas') ?? document.querySelector('.chat-tasto .ct-lcd canvas')
 
 /** Le app: icona (una delle nostre), colore della piastrella, badge (quanti «da fare» mostrare sul pallino). */
 export const APP = [
@@ -101,24 +119,9 @@ const PAGINE = [
 ]
 
 // LA LAVATRICE DI PRIMA (29.10): fino al pzkstore era nella home di tutti. Se la tiene, regalata, chi quando arriva il
-// pzkstore ha soldi sporchi, un lavaggio in corso o l'ha già usata (una commissione o un lavaggio fra le ultime mosse del
-// conto); agli altri si compra. La decisione si scrive una volta nello zaino (installata o tolta al momento fisso
-// zaino.REGALO, così comprarla o toglierla dopo vince sempre), ma solo dopo che è arrivato lo zaino del server: se un altro
-// dispositivo ha già deciso, vale quella. Intanto la si vede se si avrà.
-let decidendo = null
-function lavatrice() {
-  if (zaino.installata('lavatrice')) return true
-  if (zaino.decisa('lavatrice') || !pzk.conto()) return false
-  decidendo ??= zaino.allineato().then((pronto) => {
-    decidendo = null
-    const c = pzk.conto()
-    if (!pronto || !c || zaino.decisa('lavatrice')) return
-    const usata = (c.mosse ?? []).some((m) => m.tipo === 'lavatrice' || m.tipo === 'lavati')
-    if (pzk.sporchi() > 0 || pzk.lavaggio() || usata) zaino.installa('lavatrice', zaino.REGALO)
-    else zaino.disinstalla('lavatrice', zaino.REGALO)
-  })
-  return pzk.sporchi() > 0 || !!pzk.lavaggio()
-}
+// pzkstore ha soldi sporchi, un lavaggio in corso o l'ha già usata; agli altri si compra. Dal 31.10 lo decide la banca, la
+// prima volta che il conto passa di lì (lo zaino sta sulla banca): qui si guarda e basta
+const lavatrice = () => zaino.installata('lavatrice')
 const PER_PAGINA = 9
 
 let dlg = null, corpo = null, schermo = null, palco = null, vista = null, homeEl = null, tostoEl = null, statoEl = null, ledEl = null, porta = null
@@ -138,16 +141,57 @@ let chiudendo = null, sveglia = null // la chiusura in corso, e come accorciarla
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const ora = () => new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
 
+const foglio = (href, marca) => new Promise((ok) => {
+  if (document.querySelector(`link[href="${href}"]`) || document.querySelector(`link[${marca}]`)) return ok()
+  const l = document.createElement('link')
+  l.rel = 'stylesheet'; l.href = href; l.setAttribute(marca, '')
+  l.onload = l.onerror = () => ok()
+  document.head.appendChild(l)
+})
 function caricaStile() {
-  const foglio = (href, marca) => new Promise((ok) => {
-    if (document.querySelector(`link[href="${href}"]`) || document.querySelector(`link[${marca}]`)) return ok()
-    const l = document.createElement('link')
-    l.rel = 'stylesheet'; l.href = href; l.setAttribute(marca, '')
-    l.onload = l.onerror = () => ok()
-    document.head.appendChild(l)
-  })
   // chat.css ha le variabili e la tipografia di tutte le app, telefono.css il cercapersone e le app
   return (cssPronto ??= Promise.all([foglio('/chat/chat.css', 'data-chat-css'), foglio('/telefono/telefono.css', 'data-telefono')]))
+}
+// le regole dello zero (zero.css): la tela a tutta finestra, il tasto sul muro vestito
+let cssZero = null
+const stileZero = () => (cssZero ??= foglio('/telefono/zero/zero.css', 'data-zero'))
+let os = null // pzk os a 8 bit (zero/os/os.js), lo stesso che gira sul muro
+/** Il rig 3D dello zero e pzk os, una volta: la tela nel dialog, le app nel menu di pzk os, i tasti veri collegati
+ *  (INDIETRO, OK, la croce) e il clic fuori dal cercapersone che chiude. */
+async function preparaZero() {
+  if (zero) return zero
+  await stileZero()
+  const [m, o] = await Promise.all([import('./zero/zero.js'), import('./zero/os/os.js')])
+  os = o
+  zero = m.crea({ dlg, ledEl })
+  dlg.classList.add('zero')
+  // le app del menu di pzk os: quelle di serie e quelle installate dal pzkstore; si rifà quando lo zaino cambia (un'app
+  // comprata compare subito, una tolta sparisce)
+  const appZero = () => APP.filter((a) => !a.se || a.se()).map((a) => ({ id: a.id, nome: a.nome, icona: a.icona }))
+  os.configura({ app: appZero(), tomodachi: sorgenteLcd() })
+  let ultimeApp = appZero().map((a) => a.id).join()
+  zaino.ascolta(() => { const ids = appZero().map((a) => a.id).join(); if (ids !== ultimeApp) { ultimeApp = ids; os.configura({ app: appZero() }) } })
+  os.ascoltaVista((v) => { if (dentro) ricorda('cercapersone', { app: v?.app ?? null }) }) // riaprendo si torna all'app di prima
+  zero.onTasto = (nome, verso) => { if (!dentro || chiudendo) return; if (nome === 'lcd') { if (os.tocca(verso.x, verso.y)) led.colpo(40); return } led.colpo(60); if (nome === 'spegni') chiudi(); else os.tasto(nome === 'croce' ? verso : nome) } // (lcd: il clic del mouse sullo schermo)
+  zero.cliccabile = (x, y) => dentro && !chiudendo && os.cliccabile(x, y)
+  zero.onFuori = () => chiudi()
+  return zero
+}
+// INDIETRO dello zero dalla tastiera (Backspace), come col mouse (zero.js): premuto e lasciato una mossa indietro, tenuto
+// tre secondi spegne (Alberto: «indietro premo una volta, spegni 3 secondi premuto indietro»). Mentre si scrive, Backspace
+// cancella una lettera (os.scrivendo)
+let tenutaIndietro = 0, spentoDaIndietro = false
+function tieniIndietro() {
+  if (tenutaIndietro) return
+  spentoDaIndietro = false
+  zero?.premi('indietro', null, { tieni: true })
+  tenutaIndietro = setTimeout(() => { tenutaIndietro = 0; spentoDaIndietro = true; zero?.lascia('indietro'); chiudi() }, 3000)
+}
+function lasciaIndietro() {
+  zero?.lascia('indietro')
+  if (!tenutaIndietro) return
+  clearTimeout(tenutaIndietro); tenutaIndietro = 0
+  if (!spentoDaIndietro) { led.colpo(60); os?.tasto('indietro') }
 }
 
 // ── la barra di stato vera (29.10, Alberto: «nella topbar del cercapersone metti dati veri tipo quelli del pc tipo wifi») ──
@@ -196,7 +240,7 @@ function costruisci() {
   dlg.className = 'tel'
   dlg.setAttribute('aria-label', 'il cercapersone dei $pzk')
   dlg.innerHTML = `<div class="t-corpo" tabindex="-1">
-    <img class="t-cornice" src="${PAGER.src}" width="${PAGER.w}" height="${PAGER.h}" alt="" draggable="false">
+    <img class="t-cornice"${vuoleZero() ? '' : ` src="${PAGER.src}"`} width="${PAGER.w}" height="${PAGER.h}" alt="" draggable="false">
     <div class="t-cavo-scatola" aria-hidden="true"><div class="t-cavo-gruppo"><div class="t-cavo-filo"></div><img class="t-cavo" src="/art/chat-pager-cavo/spina.webp" width="132" height="556" alt="" loading="lazy" draggable="false"></div></div>
     <div class="t-schermo chat" data-in="home">
       <div class="t-palco">
@@ -227,18 +271,19 @@ function costruisci() {
   ledEl = dlg.querySelector('.t-led')
   porta = dlg.querySelector('.t-porta')
   led.collega(ledEl) // sfarfalla quando il sistema lavora (chat/led.js)
+  modoCostruito = vuoleZero()
   // lo schermo è un vecchio tubo catodico che sfarfalla, come quelli del wallet (games/crt.js), anche prima di accedere
   // (Alberto, 23.10): z 50, sopra la porta (45), la barra di stato e la barra dei tasti del cellulare, sotto il bianco dello
   // spegnimento (60). È «insieme» al cercapersone piccolo e al doppione che vola (chat/chat.js, doppione()): tremano
-  // allo stesso ritmo, e allo scambio fra l'uno e l'altro il tubo non salta
-  tubo(schermo, { z: 50, insieme: true })
+  // allo stesso ritmo, e allo scambio fra l'uno e l'altro il tubo non salta. (Lo zero è un lcd: niente tubo)
+  if (!modoCostruito) tubo(schermo, { z: 50, insieme: true })
   // le crepe del cercapersone scassato (23.10, dopo una morte: fa solo lavorare e ricomprare il nuovo): sopra le righe del
   // tubo (z 55), sotto il bianco dello spegnimento; prima del vetro, che resta l'ultimo figlio. L'immagine c'è da subito,
   // nascosta (.tel.scassato la mostra): quando muori non arriva dopo
   const crepe = new Image()
   Object.assign(crepe, { className: 't-crepe', src: CREPE, alt: '', draggable: false })
   schermo.insertBefore(crepe, schermo.querySelector('.crt-vetro'))
-  dlg.addEventListener('cancel', (e) => { e.preventDefault(); dentro && corrente && !chiudendo ? indietro() : chiudi() }) // Esc: prima indietro, dalla home si chiude
+  dlg.addEventListener('cancel', (e) => { e.preventDefault(); if (zero) { if (chiudendo || !dentro || !os.tasto('indietro')) chiudi(); return } dentro && corrente && !chiudendo ? indietro() : chiudi() }) // Esc: prima indietro, dalla home si chiude
   dlg.addEventListener('click', (e) => { if (e.target === dlg) chiudi() })
   dlg.addEventListener('click', (e) => {
     const t = e.target.closest('[data-t]')
@@ -273,6 +318,9 @@ function costruisci() {
     for (const ev of ['levelchange', 'chargingchange']) b.addEventListener(ev, () => { if (dlg.open) aggiornaStato() })
     if (dlg.open) aggiornaStato()
   }).catch(() => {})
+  // chiuso da fuori (Esc che il browser non lascia fermare, un altro script): sullo zero si rimette a posto quello che il
+  // volo di ritorno avrebbe fatto (il tasto sul muro, il 3D fermo, pzk os al desktop)
+  dlg.addEventListener('close', () => { if (!zero || chiudendo || !dentro) return; dentro = false; giro++; clearInterval(orologio); clearInterval(timerPing); if (origine) origine.style.visibility = ''; dlg.classList.remove('fermo', 'zoom', 'zoom-nascosto', 'zoom-sfondo'); zero.cavo(false); zero.ferma(); os?.home() })
   new ResizeObserver(adatta).observe(dlg)
   PIENO.addEventListener('change', adatta)
 }
@@ -290,6 +338,7 @@ function aggiornaStato() {
   dlg.classList.toggle('scassato', zaino.pagerRotto()) // dopo una morte: le crepe, e le app spente tranne la chat
   bt.querySelectorAll('i').forEach((s, i) => s.classList.toggle('on', b.pct > i * 20))
   bt.querySelector('b').textContent = `${b.pct}%`
+  os?.stato({ ora: ora(), nome: pzk.conto()?.nome ?? '', pct: b.pct, carica: b.carica, tacche: r.tacche }) // (la barra di stato di pzk os, sullo zero)
 }
 /** I pallini di tutte le app, chiesti insieme (non uno dopo l'altro): id → quanti. */
 async function contaBadge() {
@@ -308,6 +357,7 @@ const BASE = 760
 function adatta() {
   if (!dlg || !schermo) return
   dlg.classList.toggle('pieno', PIENO.matches)
+  if (zero) { if (dlg.open && dentro && !dlg.classList.contains('zoom')) zero.misura(); return } // lo zero: niente palco, la posa aperta rifatta se la finestra cambia
   if (PIENO.matches) { palco.style.transform = ''; palco.style.width = ''; palco.style.height = '' }
   else {
     const k = schermo.clientWidth / BASE
@@ -392,11 +442,31 @@ function sfoglia() {
   })
   // le frecce (e pagina su, pagina giù) nella home
   dlg.addEventListener('keydown', (e) => {
-    if (corrente || !dentro || e.altKey || e.ctrlKey || e.metaKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return
+    const ctrlInvio = zero && e.key === 'Enter' && (e.ctrlKey || e.metaKey) // (lo zero: Ctrl+Invio è il tasto OK, anche dove Invio va a capo: l'editor di «codice C»)
+    if (!dentro || e.altKey || ((e.ctrlKey || e.metaKey) && !ctrlInvio) || e.target.closest?.('input, textarea, select, [contenteditable]')) return
+    if (zero) { // lo zero: tutto a pzk os (le frecce sono la croce, Invio è OK, Backspace è INDIETRO o cancella, le lettere si scrivono)
+      const v = { ArrowRight: 'dx', ArrowLeft: 'sx', ArrowUp: 'su', ArrowDown: 'giu' }[e.key]
+      if (v) { e.preventDefault(); zero.premi('croce', v, { tieni: true }); led.colpo(40); os.tasto(v) } // (giù finché il tasto resta premuto)
+      else if (e.key === 'Enter') { e.preventDefault(); if (!e.repeat) { zero.premi('ok', null, { tieni: true }); led.colpo(40); if (ctrlInvio) os.tasto('ok'); else os.invio() } }
+      else if (e.key === 'Backspace') { e.preventDefault(); if (os.scrivendo()) os.cancella(); else if (!e.repeat) tieniIndietro() }
+      else if (e.key === 'Tab') { e.preventDefault(); os.tasto('dx') }
+      else if (e.key === 'Escape') { e.preventDefault(); if (!e.repeat && !chiudendo) { if (!os.tasto('indietro')) chiudi() } } // (qui e non nel cancel del dialog: il secondo Esc di fila Chrome lo chiude senza chiedere)
+      else if (e.key.length === 1) { e.preventDefault(); os.carattere(e.key) }
+      return
+    }
+    if (corrente) return
     const verso = { ArrowRight: 1, PageDown: 1, ArrowLeft: -1, PageUp: -1 }[e.key]
     if (verso) { e.preventDefault(); vaiPagina(pagina + verso) }
   })
+  dlg.addEventListener('keyup', (e) => {
+    if (!zero || e.target.closest?.('input, textarea, select, [contenteditable]')) return
+    if (e.key === 'Backspace') lasciaIndietro()
+    else if (e.key.startsWith('Arrow')) zero.lascia('croce')
+    else if (e.key === 'Enter') zero.lascia('ok')
+  })
 }
+
+
 async function disegnaHome() {
   const d = new Date()
   const sfide = await import('../chat/sfide.js')
@@ -422,6 +492,7 @@ async function disegnaHome() {
   ultimaHome = html
   homeEl.innerHTML = html
   vaiPagina(pagina, { liscio: false })
+
   aggiornaBadge()
   segnaLumaca() // subito, senza aspettare le notizie dalla rete
   caricaNotizia()
@@ -522,6 +593,7 @@ function doveGrande() {
  *  schermo grande si accende. `prepara()` mette pzk os sotto lo schermo spento: parte appena il cercapersone vero è al suo
  *  posto (invisibile ma misurabile, le app si montano con le loro misure) e lavora mentre il doppione vola. */
 async function ingrandisci(prepara) {
+  if (zero) return ingrandisciZero(prepara)
   const r0 = origine?.getBoundingClientRect()
   if (RIDOTTO.matches || !visibile(r0)) { // niente volo: si apre e si accende
     dlg.showModal(); corpo.focus({ preventScroll: true }); allinea(schermo); adatta(); inserisciCavo()
@@ -557,7 +629,50 @@ async function ingrandisci(prepara) {
   dlg.classList.remove('zoom', 'zoom-sfondo')
   await Promise.all([acceso, pronto])
 }
+// ── lo zero (29.10): al posto del doppione vola la telecamera. Aprendo, la tela 3D a tutta finestra disegna il cercapersone
+// esattamente sopra il tasto del muro (la stessa posa della foto, storto uguale), il tasto si nasconde e la telecamera vola
+// alla posa zoomata sullo schermo (420 ms) con pzk os acceso sull'lcd (lo stesso del muro: il desktop con la chiocciolina);
+// arrivata, l'accensione: la retroilluminazione cala e risale (400 ms) e sotto c'è già l'app chiesta. Chiudendo, al contrario:
+// la luce cala, pzk os torna al desktop, la chiocciolina saluta e la telecamera torna sul tasto ──
+async function ingrandisciZero(prepara) {
+  const r0 = origine?.getBoundingClientRect()
+  const volo = !RIDOTTO.matches && visibile(r0)
+  dlg.classList.add('fermo', 'zoom', 'zoom-nascosto')
+  dlg.showModal(); corpo.focus({ preventScroll: true })
+  zero.riprendi(); os.avvia()
+  os.configura({ tomodachi: sorgenteLcd() })
+  os.home()
+  zero.luce(1)
+  if (volo) {
+    await zero.muro(origine) // il 3D sopra il tasto, identico alla foto: il tasto «parte»
+    origine.style.visibility = 'hidden'
+    requestAnimationFrame(() => dlg.classList.add('zoom-sfondo'))
+  }
+  await zero.apri({ ms: volo ? 420 : 0 })
+  inserisciCavo()
+  musichetta('accendi')
+  led.colpo(400)
+  await zero.luce(0.2, 130)
+  await prepara()
+  dlg.classList.remove('zoom-nascosto', 'zoom', 'zoom-sfondo')
+  await zero.luce(1, 270)
+  // al primo accesso la guida (Alberto: «al primo accesso spiega come funziona»); poi, senza conto, l'account (senza conto
+  // non si entra: la home col lucchetto, os.js)
+  Promise.resolve(os.guidaVista() ? null : os.guida()).then(() => { if (dentro && !pzk.conto()) os.apri('account') })
+}
+async function rimpicciolisciZero() {
+  const r0 = origine?.getBoundingClientRect()
+  if (RIDOTTO.matches || !visibile(r0)) return false
+  dlg.classList.add('zoom', 'zoom-nascosto')
+  await zero.chiudi(origine)
+  origine.style.visibility = ''
+  dlg.close()
+  dlg.classList.remove('zoom', 'zoom-nascosto')
+  zero.cavo(false); zero.ferma()
+  return true
+}
 async function rimpicciolisci() {
+  if (zero) return rimpicciolisciZero()
   const r0 = origine?.getBoundingClientRect()
   if (RIDOTTO.matches || !visibile(r0)) return false
   const r1 = doveGrande()
@@ -588,6 +703,7 @@ async function rimpicciolisci() {
 // di colpo, va un filo oltre (lo scatto) e si assesta. Si gira attorno alla cima della punta (transform-origin in
 // telefono.css); la scatola taglia quello che è già dentro la porta.
 function inserisciCavo() {
+  if (zero) { if (dlg.classList.contains('carica') && !PIENO.matches) zero.cavo(true); return } // lo zero: la spina 3D, nella porta sulla testata
   if (!dlg.classList.contains('carica') || PIENO.matches || RIDOTTO.matches) return
   const scatola = dlg.querySelector('.t-cavo-scatola'), gruppo = scatola?.querySelector('.t-cavo-gruppo')
   if (!gruppo) return
@@ -612,10 +728,12 @@ function inserisciCavo() {
 // ── la porta: il tomodachi a tutto schermo, che alla chiusura saluta ──
 let lcdVivo = null // la copia viva della chiocciolina sulla porta
 function mostraPorta() {
+  if (zero) { os.home(); return } // lo zero: il desktop di pzk os, con la chiocciolina (che saluta)
   porta.hidden = false
   if (!lcdVivo) { lcdVivo = copiaLcd(); porta.querySelector('.t-porta-lcd').replaceChildren(lcdVivo) }
 }
 function nascondiPorta() {
+  if (zero) return
   porta.hidden = true
   clearInterval(lcdVivo?.vivo); lcdVivo = null
   porta.querySelector('.t-porta-lcd').replaceChildren()
@@ -625,6 +743,7 @@ function nascondiPorta() {
 // lo schermo e la luce in più che si spegne, in 400 ms. Il primo fotogramma (il punto sul nero) c'è subito: chi la chiama
 // prima di mostrare lo schermo non vede mai pzk os prima del tempo. Lo spegnimento, qui sotto, è la stessa cosa al contrario ──
 function accendiSchermo() {
+  if (zero) return accendiZero()
   for (const a of schermo.getAnimations()) a.cancel()
   schermo.querySelector('.t-bianco')?.remove()
   musichetta('accendi')
@@ -643,8 +762,19 @@ function accendiSchermo() {
   ], tempi).finished.catch(() => {}).finally(() => bianco.remove())
 }
 
+// ── lo zero: lo spegnimento è la retroilluminazione che cala, pzk os che torna al desktop, e la luce che risale sulla
+// chiocciolina (l'accensione sta in ingrandisciZero) ──
+function accendiZero() { return Promise.resolve() }
+async function spegniZero() {
+  musichetta('spegni')
+  await zero.luce(0.2, 300)
+  os.home()
+  await zero.luce(1, 200)
+}
+
 // ── lo spegnimento: come un vecchio tubo catodico, l'immagine si schiaccia in una riga bianca, poi in un punto, e sparisce ──
 async function spegni() {
+  if (zero) return spegniZero()
   for (const a of schermo.getAnimations()) a.cancel() // (chiuso mentre si accendeva)
   schermo.querySelector('.t-bianco')?.remove()
   musichetta('spegni')
@@ -668,6 +798,7 @@ async function spegni() {
 }
 /** Lo schermo si riaccende (il tomodachi ricompare): a scatti, come un lcd. */
 async function riaccendi() {
+  if (zero) return // (la chiocciolina è già sull'lcd 3D)
   for (const a of schermo.getAnimations()) a.cancel()
   if (RIDOTTO.matches) return
   await schermo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'steps(3)' }).finished
@@ -679,9 +810,13 @@ export async function apri(app = null, opz = {}) {
   costruisci()
   if (chiudendo) return // sta salutando: prima finisce di chiudersi
   if (dlg.open) { if (app) await vai(app, opz); else home(); return }
+  // comprato lo zero (o sparito dallo zaino): il dialog si rifà nell'altro modo, da chiuso (le app si rimontano)
+  if (modoCostruito !== vuoleZero()) { zero?.distruggi(); zero = null; dlg.remove(); dlg = null; montate.clear(); ultimaHome = ''; costruisci() }
+  if (vuoleZero()) await preparaZero()
   if (opz.da) origine = opz.da
   const mio = ++giro
   dentro = true
+
   dlg.classList.remove('chiude')
   aggiornaStato()
   misuraPing()
@@ -721,9 +856,11 @@ export async function chiudi() {
         dlg.classList.remove('chiude')
       }
       dlg.close()
+      zero?.ferma()
     }
     dlg.classList.remove('fermo')
     for (const a of schermo.getAnimations()) a.cancel()
+    for (const a of palco.getAnimations()) a.cancel()
     nascondiPorta()
     home()
   })()
@@ -733,6 +870,7 @@ export async function chiudi() {
  *  senza sigla (accendendo). */
 export function home({ subito = false, muto = false } = {}) {
   if (!dlg) return
+  if (zero) { os?.home(); return }
   if (dentro && !pzk.conto()) { vai('account', { scheda: 'conto', muto }); return } // (senza conto non c'è una home: vedi daFare)
   const prima = corrente
   corrente = null
@@ -750,6 +888,7 @@ export function home({ subito = false, muto = false } = {}) {
  *  poi torna all'app di prima, poi alla home; nella home (o sulla porta) non fa niente. daFreccia: il clic viene già dalla
  *  freccia dell'app e l'app non l'ha voluto. */
 export function indietro({ daFreccia = false } = {}) {
+  if (zero) { if (dentro && !chiudendo) { led.colpo(60); os.tasto('indietro') } return }
   if (!dentro || !corrente || chiudendo) return
   led.colpo(60)
   if (!daFreccia) {
@@ -762,6 +901,17 @@ export function indietro({ daFreccia = false } = {}) {
   else home({ subito: true })
 }
 export async function vai(id, opz = {}) {
+  if (zero) { // lo zero: le app sono quelle di pzk os a 8 bit (zero/os/os.js); un'app con l'azione (la banca, prima
+    // del 29.10 il wallet) la fa solo se pzk os non ha la sua
+    const a = APP.find((x) => x.id === id)
+    if (!a) return
+    if (a.azione && !os.pronta(id)) { a.azione(); return }
+    led.colpo(140)
+    if (a.store && a.se && !a.se()) { await os.apri('pzkstore', { comando: id }); return } // (un'app del pzkstore che non hai: la sua scheda, come nel vecchio; prima non succedeva niente)
+    await os.apri(id)
+    if (id === 'chat' && opz.comando && pzk.conto()) (await import('./zero/os/chat.js')).vista().comando(opz.comando) // (senza conto si è aperto l'account: il comando aspetta)
+    return
+  }
   let rimandata = false
   if (dentro && !pzk.conto() && id !== 'account') { daFare = { id, opz }; id = 'account'; opz = { scheda: 'conto' }; rimandata = true }
   let a = APP.find((x) => x.id === id)

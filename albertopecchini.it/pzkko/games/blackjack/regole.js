@@ -306,7 +306,8 @@ export class Tavolo {
     return {
       carta: p.tot < 21 && !(m.assi && R.rsa && due), // gli assi divisi ricevono una carta sola (se si può, si possono ancora dividere)
       stai: !(R.obbligo11 && p.tot <= 11),
-      raddoppia: due && !m.assi && (!m.divisa || R.das) && (R.raddoppio === 'tutte' || (p.duro >= 9 && p.duro <= 11)),
+      // (31.10) a venezia 9, 10 e 11 sono totali duri: con p.duro (l'asso a 1) anche A+8, 9 o 19, raddoppiava
+      raddoppia: due && !m.assi && (!m.divisa || R.das) && (R.raddoppio === 'tutte' || (!p.morbido && p.tot >= 9 && p.tot <= 11)),
       dividi: coppiaOk && this.maniDi(m.casella) < R.mani && (!m.assi || R.rsa),
       resa: R.resa && due && !m.divisa && this.maniDi(m.casella) === 1,
       extra: m.base, // quanto costa raddoppiare o dividere

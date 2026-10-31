@@ -1,6 +1,8 @@
 // Il mercato (23.10): i prezzi di oggi e gli acquisti, in un posto solo, perché lo usano sia il comando «compra» della chat
 // sia lo shop del telefono (telefono/app/negozio.js). Le OFFERTE DEL GIORNO sono tre pezzi a prezzo scontato (−20, −30,
 // −40 %) scelti a sorte con il giorno come seme: tutti vedono le stesse, e cambiano a mezzanotte (di Mantova).
+// (31.10) i prezzi di qui sono quelli da mostrare: gli acquisti li fa la banca (giochi/chat-negozio.mjs, coi prezzi e le
+// offerte calcolati da lei), e incassa() non c'è più (i premi li paga la banca dentro le loro azioni).
 
 import * as pzk from '../games/pzk.js'
 import * as zaino from './zaino.js'
@@ -34,34 +36,20 @@ export const scontoDi = (id) => offerte().find((o) => o.id === id)?.sconto ?? 0
 /** Il prezzo di oggi di un pezzo (con l'offerta, se c'è). */
 export const prezzoDi = (x) => Math.max(1, Math.round(x.prezzo * (1 - scontoDi(x.id))))
 
-/** Incassa un premio (sfide, quiz, missioni): col moltiplicatore del livello e dei bonus «paga», e dei bonus «sfide» se `sfide`. → quanto è arrivato */
-export function incassa(n, { sfide = false } = {}) {
-  const tot = Math.round(n * zaino.moltiplicatore() * (sfide ? 1 + zaino.bonus('sfide') : 1) * 2) / 2
-  if (tot > 0) { pzk.regola('chat', 0, tot, 'conio'); zaino.conta('guadagnati', tot) } // (i premi: soldi nuovi)
-  return tot
-}
-
-/** Compra n pezzi: toglie i $pzk e mette nello zaino. → { ok, x, n, tot, sconto } oppure { ok: false, errore } */
 /** Il cercapersone nuovo al posto di quello scassato (dopo una morte): costa quanto il «cercapersone» del negozio (con
- *  l'offerta del giorno, se c'è), ma non finisce nello zaino: torna il dispositivo. → { ok, tot } o { ok: false, errore, manca } */
-export function ricompraPager() {
-  const tot = prezzoDi(PER_ID.pager)
-  if (!pzk.punta('chat', tot)) return { ok: false, errore: `costa ${tot} $pzk e ne hai ${pzk.saldo()}`, manca: tot - pzk.saldo(), tot }
-  pzk.regola('chat', tot, 0)
-  zaino.conta('comprati', tot)
-  zaino.aggiustaPager()
-  return { ok: true, tot, sconto: scontoDi('pager') }
+ *  l'offerta del giorno, se c'è), ma non finisce nello zaino: torna il dispositivo. → { ok, tot, sconto } o { ok: false, errore, manca }
+ *  (31.10: compra la banca, 'chat.compra' col pager da scassato: prezzi, sconti e soldi puliti sono i suoi) */
+export async function ricompraPager() {
+  const r = await pzk.fai('chat.compra', { id: 'pager' })
+  if (!r.ok) return { ok: false, errore: r.errore ?? 'non è andata', manca: Math.max(0, prezzoDi(PER_ID.pager) - pzk.puliti()) }
+  return { ok: true, tot: r.esito.tot, sconto: r.esito.sconto }
 }
-export function compra(id, n = 1) {
+/** Compra n pezzi (la banca, 'chat.compra': toglie i $pzk puliti e mette nello zaino). → { ok, x, n, tot, sconto } oppure { ok: false, errore } */
+export async function compra(id, n = 1) {
   const x = PER_ID[id]
   if (!x?.prezzo) return { ok: false, errore: 'non lo vendo' }
   if (x.unico && zaino.ha(id)) return { ok: false, errore: 'ce l’hai già' }
-  n = x.unico ? 1 : Math.max(1, Math.min(50, Math.floor(n) || 1))
-  const tot = prezzoDi(x) * n
-  if (!pzk.punta('chat', tot)) return { ok: false, errore: `costa ${tot} $pzk e ne hai ${pzk.saldo()}`, manca: tot - pzk.saldo() }
-  pzk.regola('chat', tot, 0)
-  zaino.aggiungi(id, n)
-  zaino.conta('comprati', tot)
-  zaino.conta('acquisti', n)
-  return { ok: true, x, n, tot, sconto: scontoDi(id) }
+  const r = await pzk.fai('chat.compra', { id, n: x.unico ? 1 : Math.max(1, Math.min(50, Math.floor(n) || 1)) })
+  if (!r.ok) return { ok: false, errore: r.errore ?? 'non è andata' }
+  return { ok: true, x, n: r.esito.n, tot: r.esito.tot, sconto: r.esito.sconto }
 }

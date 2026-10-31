@@ -2,7 +2,8 @@
 // il record di serie e gli argomenti; la partita è una domanda alla volta, col cerchio dei 15 secondi, a sinistra la foto
 // intera quando c'è (con il credito) o se no la domanda scritta grande, a destra le quattro risposte una sotto l'altra; ogni
 // risposta giusta mostra quanto ha pagato, la serie cresce; alla fine il riepilogo. Le domande, i premi e il tetto
-// giornaliero sono quelli della chat.
+// giornaliero sono quelli della chat. (31.10) La partita la fa la banca (chat/quiz.js): una domanda alla volta, senza la
+// giusta; si risponde e la banca dice com'è andata. Mentre risponde i tasti sono fermi.
 
 import * as zaino from '../../chat/zaino.js'
 import * as quiz from '../../chat/quiz.js'
@@ -37,12 +38,12 @@ function ingresso() {
 const grande = (t) => `<h3 class="t-qz-domanda${t.length > 80 ? ' lunga' : ''}">${esc(t)}</h3>`
 
 function domanda() {
-  const d = P.domande[P.i]
+  const d = P.d
   bloccata = false
   // con la foto: la domanda in testa, la foto intera a sinistra e le risposte a destra; senza: la domanda grande a sinistra
-  host.innerHTML = `${ctx.testata(`Quiz · ${P.i + 1}/${P.domande.length}`, `<span class="t-qz-serie${P.serie > 1 ? ' su' : ''}">${icona('fuoco')}${P.serie}</span>`)}
+  host.innerHTML = `${ctx.testata(`Quiz · ${P.i + 1}/${P.n}`, `<span class="t-qz-serie${P.serie > 1 ? ' su' : ''}">${icona('fuoco')}${P.serie}</span>`)}
     <div class="t-corpo-app t-qz t-qz-gioco ${d.img ? 'con-foto' : 'senza-foto'}">
-      <div class="t-qz-punti">${P.domande.map((_, i) => `<i class="${i < P.i ? (P.esiti[i] ? 'si' : 'no') : i === P.i ? 'ora' : ''}"></i>`).join('')}</div>
+      <div class="t-qz-punti">${Array.from({ length: P.n }, (_, i) => `<i class="${i < P.i ? (P.esiti[i] ? 'si' : 'no') : i === P.i ? 'ora' : ''}"></i>`).join('')}</div>
       <div class="t-qz-testa">
         <div class="t-qz-tempo"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle class="v" cx="22" cy="22" r="19" style="animation-duration:${quiz.TEMPO}s"/></svg><b data-sec>${quiz.TEMPO}</b></div>
         <span class="t-qz-diff d${d.diff}">${NOMI[d.diff]} · ${quiz.PAGA[d.diff]} $pzk</span>
@@ -74,12 +75,14 @@ function domanda() {
   }, 200)
 }
 
-function rispondi(i) {
+async function rispondi(i) {
   if (bloccata || !P) return
   bloccata = true
   clearInterval(timer)
-  const d = P.domande[P.i]
-  const r = quiz.rispondi(P, i, Math.max(0, quiz.TEMPO * 1000 - (performance.now() - inizio)))
+  const d = P.d, q = P
+  const r = await quiz.rispondi(P, i)
+  if (q !== P) return // (intanto è uscito dalla partita)
+  if (r.errore) { ctx.toast(esc(r.errore), { icona: 'bot-triste' }); return ingresso() }
   P.esiti.push(r.giusta)
   for (const b of host.querySelectorAll('[data-r]')) {
     b.disabled = true
@@ -102,12 +105,12 @@ function rispondi(i) {
 
 function fine() {
   const p = P
-  const perfetta = p.giuste === p.domande.length
+  const perfetta = p.giuste === p.n
   host.innerHTML = `${ctx.testata('Quiz')}
     <div class="t-corpo-app t-qz t-qz-fine">
-      <div class="t-qz-ico grande">${icona(perfetta ? 'bot-ricco' : p.giuste >= p.domande.length / 2 ? 'bot-ride' : 'bot-triste')}</div>
-      <h3>${p.giuste} su ${p.domande.length}</h3>
-      <p>${perfetta ? 'Perfetto: nessun errore, il bonus è tuo.' : p.giuste >= p.domande.length / 2 ? 'Non male. Sapevi più di quanto sembri.' : 'Si impara anche sbagliando. Soprattutto sbagliando.'}</p>
+      <div class="t-qz-ico grande">${icona(perfetta ? 'bot-ricco' : p.giuste >= p.n / 2 ? 'bot-ride' : 'bot-triste')}</div>
+      <h3>${p.giuste} su ${p.n}</h3>
+      <p>${perfetta ? (p.bonus ? 'Perfetto: nessun errore, il bonus è tuo.' : 'Perfetto: nessun errore (stavolta niente bonus).') : p.giuste >= p.n / 2 ? 'Non male. Sapevi più di quanto sembri.' : 'Si impara anche sbagliando. Soprattutto sbagliando.'}</p>
       <div class="t-qz-punti grandi">${p.esiti.map((x) => `<i class="${x ? 'si' : 'no'}"></i>`).join('')}</div>
       <div class="t-qz-dati"><div><b class="pzk">+${fmt(p.guadagnato)}</b><small>$pzk</small></div><div><b>+${p.xp}</b><small>xp</small></div><div><b>${quiz.restanti()}</b><small>pagate rimaste</small></div></div>
       <div class="t-sh-cta"><button class="c-b nero" type="button" data-ingresso>argomenti</button><button class="c-b" type="button" data-arg="${p.arg === 'tutti' ? '' : p.arg}">ancora</button></div>
@@ -118,8 +121,17 @@ function fine() {
 async function parti(arg) {
   host.innerHTML = `${ctx.testata('Quiz')}<div class="t-carico"><i></i></div>`
   const p = await quiz.nuova(arg || null)
-  if (!p) { ctx.toast(arg === 'giocatori' ? 'servono almeno tre giocatori nel database con qualche punto' : 'niente domande qui', { icona: 'bot-pensa' }); return ingresso() }
+  if (p.errore) { ctx.toast(esc(p.errore), { icona: 'bot-pensa' }); return ingresso() }
   P = { ...p, esiti: [] }
+  apri()
+}
+/** Apre la domanda di adesso sulla banca (il suo tempo parte lì) e la mostra. */
+async function apri() {
+  const q = P
+  bloccata = true
+  const a = await quiz.prossima(P)
+  if (q !== P) return
+  if (a !== true) { ctx.toast(esc(a.errore), { icona: 'bot-triste' }); return ingresso() }
   domanda()
 }
 
@@ -127,7 +139,7 @@ function clic(e) {
   const a = e.target.closest('[data-arg]'), r = e.target.closest('[data-r]')
   if (a) return parti(a.dataset.arg)
   if (r) return rispondi(Number(r.dataset.r))
-  if (e.target.closest('[data-avanti]')) return P?.finita ? fine() : domanda()
+  if (e.target.closest('[data-avanti]')) return P?.finita ? fine() : P && apri()
   if (e.target.closest('[data-ingresso]')) return ingresso()
 }
 

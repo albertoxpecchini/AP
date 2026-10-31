@@ -95,10 +95,21 @@ const MUSICHE = {
   miniera: (c, t) => { for (const k of [0, 0.12, 0.24]) { tono(c, t + k, 2300, 0.05, { onda: 'square', vol: 0.06 }); rumore(c, t + k, 0.03, { f: 5000, q: 2, vol: 0.12 }) } melodia(c, t + 0.4, 'E5 G5 C6:3', { passo: 0.07 }) },
   foto: (c, t) => { rumore(c, t, 0.05, { f: 4000, q: 1.5, vol: 0.3 }); rumore(c, t + 0.06, 0.04, { f: 2500, q: 1.5, vol: 0.2 }); tono(c, t + 0.12, 3200, 0.12, { onda: 'sine', vol: 0.06 }) },
   virtual: (c, t) => melodia(c, t, 'E5 E5 E5 - C5 E5 G5:3', { passo: 0.075 }),
+  // i momenti di virtual sul cercapersone zero (pzk os, os.suoni.sigla: lì la strada di suono.js non c'è), a 8 bit
+  'virtual-fischio': (c, t) => { for (let i = 0; i < 12; i++) tono(c, t + i * 0.026, i % 2 ? 2900 : 3150, 0.03, { vol: 0.045 }) }, // (il trillo del fischietto)
+  'virtual-gol': (c, t) => { MUSICHE['virtual-fischio'](c, t); rumore(c, t + 0.3, 0.9, { f: 900, q: 0.5, vol: 0.1 }); melodia(c, t + 0.34, 'C5 E5 G5 C6:2 G5 C6:4', { passo: 0.07 }) }, // (il fischio, il boato, la fanfara)
+  'virtual-palo': (c, t) => { tono(c, t, 1750, 0.09, { vol: 0.06 }); tono(c, t + 0.08, freq('G4'), 0.5, { onda: 'triangle', fino: freq('C4'), vol: 0.18 }) }, // (il legno, poi l'«uuuh» che cade)
+  'virtual-fiche': (c, t) => { rumore(c, t, 0.03, { f: 2800, q: 3, vol: 0.18 }); tono(c, t + 0.01, 1700, 0.05, { onda: 'sine', vol: 0.07 }) },
+  'virtual-vinta': (c, t) => { for (let i = 0; i < 4; i++) tono(c, t + i * 0.06, 1500 + i * 200, 0.06, { onda: 'sine', vol: 0.07 }); melodia(c, t + 0.28, 'G5 C6 E6 G6:3', { passo: 0.08 }) }, // (le monete, poi la fanfara)
   banca: (c, t) => MUSICHE.wallet(c, t),
+  rapina: (c, t) => melodia(c, t, 'E4 F4 - F#4 G4 - - E4 F4 - F#4 G4 C5 B4:3', { passo: 0.07, onda: 'triangle', vol: 0.2 }), // (pzk os: il passo felpato del ladro)
+  'rapina-colpo': (c, t) => { for (let i = 0; i < 6; i++) tono(c, t + i * 0.05, 1500 + i * 120, 0.05, { onda: 'sine', vol: 0.07 }); melodia(c, t + 0.32, 'C5 E5 G5 C6:3', { passo: 0.08 }) }, // (il colpo riuscito: le monete, poi la fanfara)
+  'rapina-sirena': (c, t) => { for (let i = 0; i < 4; i++) tono(c, t + i * 0.24, i % 2 ? 660 : 880, 0.22, { onda: 'square', vol: 0.06 }) }, // (presi: la sirena dei carabinieri)
   conversioni: (c, t) => { const bit = '101100111010'; [...bit].forEach((b, i) => tono(c, t + i * 0.045, b === '1' ? 1600 : 1100, 0.035, { vol: 0.07 })); tono(c, t + bit.length * 0.045 + 0.03, freq('C6'), 0.18, { onda: 'triangle', vol: 0.15 }) },
   calcolatrice: (c, t) => { melodia(c, t, 'C6 E6 G6', { passo: 0.06, onda: 'sine', vol: 0.12 }); tono(c, t + 0.2, freq('C7'), 0.25, { onda: 'sine', vol: 0.09 }) },
   compilatore: (c, t) => { const r = seme(7); let k = 0; for (let i = 0; i < 9; i++) { rumore(c, t + k, 0.02, { f: 3800, q: 3, vol: 0.18 }); k += 0.04 + r() * 0.05 } melodia(c, t + k + 0.05, 'A5 E6:3', { passo: 0.07, onda: 'square', vol: 0.09 }) },
+  pzkstore: (c, t) => { for (let i = 0; i < 6; i++) tono(c, t + i * 0.045, 700 + i * 180, 0.04, { vol: 0.06 }); melodia(c, t + 0.32, 'C6 G6:2', { passo: 0.07, onda: 'triangle', vol: 0.14 }) }, // (pzk os: lo scaricamento, poi due note)
+  impostazioni: (c, t) => { for (const k of [0, 0.06, 0.12]) rumore(c, t + k, 0.02, { f: 3200, q: 4, vol: 0.12 }); melodia(c, t + 0.2, 'G5 D6:2', { passo: 0.06, vol: 0.08 }) }, // (pzk os: tre scatti d'ingranaggio e due note)
   cucina: (c, t) => { rumore(c, t, 0.5, { f: 6000, q: 0.5, vol: 0.05, tipo: 'highpass' }); tono(c, t + 0.2, freq('A6'), 0.9, { onda: 'sine', vol: 0.1 }); tono(c, t + 0.2, freq('E7'), 0.6, { onda: 'sine', vol: 0.05 }) },
   // il wallet e i giochi grandi (si aprono: chi guarda i dialog, qui sotto)
   wallet: (c, t) => { for (let i = 0; i < 5; i++) { tono(c, t + i * 0.06, freq('B5') * (1 + i * 0.06), 0.05, { vol: 0.08 }); tono(c, t + i * 0.06 + 0.05, freq('E6') * (1 + i * 0.06), 0.2, { vol: 0.07 }) } },

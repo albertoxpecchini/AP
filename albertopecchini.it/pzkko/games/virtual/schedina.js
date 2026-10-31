@@ -1,233 +1,174 @@
-// La schedina di «virtual», in comune fra la finestra grande (virtual.js) e l'app del cercapersone (telefono/app/virtual.js):
-// le scommesse di questo browser (localStorage, pzkko-virtual), i $pzk sul tavolo di ../pzk.js, il pagamento al fischio
-// finale. Una sola copia per pagina: le due interfacce leggono e scrivono qui e si avvisano a vicenda (ascolta). Niente
-// disegno: chi chiama decide cosa dire e come animare.
+// La schedina di «virtual», in comune fra la finestra grande (virtual.js), l'app del cercapersone (telefono/app/virtual.js) e
+// quella di pzk os (telefono/zero/os/virtual.js). Niente disegno: chi chiama decide cosa dire e come animare.
 //
-// Una puntata: { indice, id, quota, puntata, fiches: [[valore, timbro]…], esito: null | 'vinta' | 'persa', pagata, casa,
-// ospite, risultato? }. Due schede possono scrivere nello stesso istante: invece di sovrascriversi si uniscono (unisci):
-// ogni fiche ha un timbro suo, una puntata è l'unione delle fiches viste dalle due parti meno quelle tolte («tolte» tiene i
-// timbri delle fiches ritirate con «togli», così non ricompaiono dalla copia vecchia dell'altra scheda); «pagata» vince su
-// «da pagare».
+// DAL 31.10 LA SCHEDINA È DELLA BANCA (Alberto: «il browser non decide più niente»). Fino a qui stava in questo browser
+// (localStorage pzkko-virtual, unita fra le schede con un timbro per fiche e pagata sotto un lucchetto del browser) e la
+// pagava il browser, sul risultato che calcolava da sé. Ora:
+// - il palinsesto (le partite, le quote della banca, e il risultato con la cronaca solo a partita iniziata) si chiede alla
+//   banca: palinsesto(), che passa quello che arriva a partita.js (dallaBanca) e rimette l'orologio (orologio);
+// - una giocata è pzk.fai('virtual.gioca'): la banca controlla che le giocate siano aperte (secondo la sua ora), prende i
+//   $pzk e blocca la quota; «togli» è pzk.fai('virtual.togli');
+// - la schedina che si vede è quella del conto (pzk.tavoloBanca('virtual'): { banco, schedina, ultime }): uguale da ogni
+//   scheda e da ogni telefono, senza unioni né lucchetti;
+// - le partite finite le paga la banca, una volta sola, alla prima azione di virtual dopo il fischio finale: qui si chiede
+//   e si dice com'è andata (fine, riscuoti).
+// Le fiche sul tavolo di pzk.js (pzk.punta / pzk.ritira) servono solo allo schermo, finché la risposta della banca arriva.
 //
-// DI CHI SONO LE PUNTATE (26.10, Alberto: «senza account ho messo dei soldi su virtual e quando ho loggato ho visto ancora i vecchi
-// soldi = bug, rischio duplicazione»): la schedina segue il portafoglio di games/pzk.js. Senza conto sta nella sessione del
-// browser (sessionStorage, pzkko-virtual: sparisce con la sessione come i suoi 1.000 $pzk); con un conto sta nel suo spazio
-// (localStorage, pzkko-virtual:nome). Entrando o uscendo la schedina cambia insieme ai soldi (pzk.alCambioConto): le puntate della
-// sessione non passano mai nel conto, e quelle del conto tornano solo a quel conto.
+// Una giocata come la manda la banca: { indice, id, quota, puntata, fiches: [[valore, n]…], esito: null | 'vinta' | 'persa',
+// pagata, casa, ospite (le sigle), risultato?, torna? }.
 
 import * as pzk from '../pzk.js'
-import { PER_PUNTATA, fase, partita, vince, scriviRisultato } from './partita.js'
+import { PER_PUNTATA, fase, aperte as giocateAperte, indiceAdesso, partita, dallaBanca, orologio } from './partita.js'
 
 export const GIOCO = 'virtual'
-export const CHIAVE = 'pzkko-virtual'
-const chiave = () => { const o = pzk.proprietario(); return o === 's' ? CHIAVE : `${CHIAVE}:${o.slice(2)}` }
-const deposito = () => (pzk.proprietario() === 's' ? sessionStorage : localStorage)
+const mezzi = (n) => Math.round(n * 2) / 2
 export const fmtQuota = (q) => q.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-/** La vincita di una puntata (a mezzi $pzk). */
-export const vincitaDi = (b) => Math.round(b.puntata * b.quota * 2) / 2
+/** La vincita di una giocata: quella pagata, o quella che pagherebbe (a mezzi $pzk). */
+export const vincitaDi = (b) => (b.pagata && Number.isFinite(b.torna) ? b.torna : mezzi(b.puntata * b.quota))
 
-// ── lo stato ─────────────────────────────────────────────────────────────────
+// ── lo stato: la schedina è quella della banca; qui solo la fiche scelta e i limiti che la banca ha detto ──
+const tavolo = () => pzk.tavoloBanca(GIOCO)
 export const S = {
-  schedina: [], // le ultime (quelle della partita di adesso e le passate, al più 40)
-  fiche: 5, // la fiche scelta (la stessa nelle due interfacce)
-  ultime: null, // le puntate dell'ultima partita (per «rifai»)
-  tolte: [], // i timbri delle fiches ritirate con «togli» (vedi unisci)
+  fiche: 5, // la fiche scelta (la stessa nelle tre interfacce)
+  limiti: { min: 1, giocata: 2000, partita: 10000 }, // (giochi/virtual.mjs, LIMITI: li ridice ogni palinsesto)
+  /** le giocate (le aperte e le ultime pagate), come le ha dette la banca */
+  get schedina() { const s = tavolo()?.schedina; return Array.isArray(s) ? s.filter((b) => PER_PUNTATA.has(b?.id)) : [] },
+  /** le giocate dell'ultima partita pagata (per «rifai») */
+  get ultime() { const u = tavolo()?.ultime; return Array.isArray(u) && u.length ? u : null },
 }
 const ascolti = new Set()
-/** fn() a ogni cambio della schedina (anche da un'altra scheda). Restituisce la funzione per smettere. */
+/** fn() a ogni cambio della schedina o del palinsesto (anche da un'altra scheda o un altro telefono). → la funzione per smettere */
 export function ascolta(fn) { ascolti.add(fn); return () => ascolti.delete(fn) }
-const avvisa = () => { for (const f of ascolti) f() }
+const avvisa = () => { for (const f of ascolti) { try { f() } catch (e) { console.error(e) } } }
 
-// le fiches di una puntata nell'ordine in cui sono state posate (le puntate salvate prima non lo sapevano: si ricostruiscono,
-// con timbri uguali in tutte le schede così l'unione non le raddoppia)
-export function fichesDi(b) {
-  if (Array.isArray(b.fiches) && b.fiches.length && b.fiches.every((x) => Array.isArray(x))) return b.fiches
-  return pzk.inFiches(b.puntata).map((v, i) => [v, b.indice * 1e-3 + i * 1e-6])
-}
-function leggi() {
-  try {
-    const s = JSON.parse(deposito().getItem(chiave()) || 'null')
-    return {
-      schedina: Array.isArray(s?.schedina) ? s.schedina.filter((b) => Number.isInteger(b.indice) && PER_PUNTATA.has(b.id) && b.puntata > 0 && b.quota >= 1) : [],
-      ultime: Array.isArray(s?.ultime) ? s.ultime : null,
-      tolte: Array.isArray(s?.tolte) ? s.tolte : [],
-    }
-  } catch { return { schedina: [], ultime: null, tolte: [] } }
-}
-export function unisci(a, b) {
-  const tolte = [...new Set([...a.tolte, ...b.tolte])].slice(-200)
-  const via = new Set(tolte)
-  const per = new Map()
-  for (const x of [...a.schedina, ...b.schedina]) {
-    const k = `${x.indice}|${x.id}|${x.pagata ? 'p' : 'a'}`
-    const g = per.get(k)
-    if (!g) { per.set(k, { ...x, fiches: fichesDi(x) }); continue }
-    if (x.vista) g.vista = true // (vista da una parte: vista)
-    const timbri = new Set(g.fiches.map((f) => f[1]))
-    g.fiches = [...g.fiches, ...fichesDi(x).filter((f) => !timbri.has(f[1]))].sort((m, n) => m[1] - n[1])
-  }
-  // una puntata pagata in una scheda e ancora aperta nell'altra: conta quella pagata
-  for (const [k, x] of per) if (!x.pagata && per.has(k.slice(0, -1) + 'p')) per.delete(k)
-  const schedina = [...per.values()]
-    .map((x) => { const f = x.fiches.filter((c) => !via.has(c[1])); return { ...x, fiches: f, puntata: f.reduce((t, c) => t + c[0], 0) } })
-    .filter((x) => x.puntata > 0)
-    .sort((m, n) => m.indice - n.indice || (m.fiches[0][1] - n.fiches[0][1]))
-    .slice(-40)
-  return { schedina, ultime: b.ultime ?? a.ultime, tolte }
-}
-/** Rilegge la schedina del browser e la unisce a quella di qui (un'altra scheda può aver scritto). */
-export function carica() {
-  const u = unisci(leggi(), { schedina: S.schedina, ultime: S.ultime, tolte: S.tolte ?? [] })
-  S.schedina = u.schedina; S.ultime = u.ultime; S.tolte = u.tolte
-  return u
-}
-function salva() {
-  const u = carica()
-  try { deposito().setItem(chiave(), JSON.stringify(u)) } catch {}
-  avvisa()
-}
-/** Le puntate della partita `indice`. */
+/** Le giocate della partita `indice`. */
 export const diPartita = (indice) => S.schedina.filter((b) => b.indice === indice)
-/** I $pzk puntati sulla partita `indice`. */
-export const sulTavolo = (indice) => diPartita(indice).reduce((a, b) => a + b.puntata, 0)
-/** Le puntate ancora da pagare, in tutto. */
+/** I $pzk giocati (e non ancora pagati) sulla partita `indice`. */
+export const sulTavolo = (indice) => diPartita(indice).filter((b) => !b.pagata).reduce((a, b) => a + b.puntata, 0)
+/** Le giocate ancora da pagare, in tutto. */
 export const aperte = () => S.schedina.filter((b) => !b.pagata).reduce((a, b) => a + b.puntata, 0)
 
-/** Fa in modo che sul tavolo di pzk.js ci siano almeno `quanto` $pzk (quelli delle puntate aperte), prendendoli dal saldo. */
-export function rimettiSulTavolo(quanto) {
-  const manca = Math.round((quanto - pzk.sulTavolo(GIOCO)) * 2) / 2
-  if (manca <= 0) return
-  if (!pzk.punta(GIOCO, manca)) pzk.punta(GIOCO, Math.min(manca, pzk.saldo()))
+// ── il palinsesto ────────────────────────────────────────────────────────────
+let inVolo = null, chiesto = 0
+/** Chiede alla banca le partite (e intanto la banca paga le finite). Una richiesta per volta: chi chiede insieme aspetta la stessa. */
+export function palinsesto() {
+  if (inVolo) return inVolo
+  const mandata = Date.now()
+  chiesto = mandata
+  inVolo = pzk.fai('virtual.palinsesto').then((d) => {
+    if (d?.ok && d.esito) {
+      orologio(d.esito.ora, mandata, Date.now())
+      for (const v of d.esito.partite ?? []) dallaBanca(v)
+      if (d.esito.limiti) S.limiti = d.esito.limiti
+    }
+    avvisa()
+    return d
+  }).finally(() => { inVolo = null })
+  return inVolo
 }
-/** Il tavolo deve valere quanto le puntate ancora aperte: se un'altra scheda le ha pagate (o tolte), il di più torna nel saldo. */
-export function riconcilia() {
-  const ap = aperte()
-  const troppo = Math.round((pzk.sulTavolo(GIOCO) - ap) * 2) / 2
-  if (troppo > 0) pzk.ritira(GIOCO, troppo)
-  else if (troppo < 0) rimettiSulTavolo(ap)
+/**
+ * La partita `indice` con la cronaca: se la banca non l'ha ancora data (il fischio è appena suonato, o la rete è lenta) la
+ * si richiede, al più ogni secondo e mezzo. Da chiamare a ogni fotogramma della partita: costa niente. → partita(indice)
+ */
+export function cronaca(indice) {
+  const p = partita(indice)
+  if (!p.cronaca && !inVolo && Date.now() - chiesto > 1500) palinsesto()
+  return p
 }
 
 // ── le mosse ─────────────────────────────────────────────────────────────────
 /**
- * Punta la fiche `v` sulla quota `id` della partita `p` (che dev'essere in fase di scommesse: lo controlla chi chiama).
- * → { ok: true, ricaricato } oppure { ok: false, motivo: 'secco' (a secco e niente ricarica: pzk.perche() dice perché) |
- * 'nonbastano' | 'finiti' }.
+ * Gioca `n` $pzk sulla quota `id` della partita `p` (la banca dice di no se le giocate sono chiuse).
+ * → { ok: true, quota, puntata } oppure { ok: false, motivo: 'chiuse' | 'secco' (a secco e niente ricarica: pzk.perche() dice
+ * perché) | 'ricarica' (stanno arrivando altri $pzk: si riprova) | 'nonbastano' | 'finiti' | 'banca' (errore: la sua voce) }.
  */
-export function punta(p, id, v) {
-  let ricaricato = false
-  if (pzk.aSecco()) {
-    if (!pzk.ricarica()) return { ok: false, motivo: 'secco' }
-    ricaricato = true
-  }
-  if (!pzk.punta(GIOCO, v)) return { ok: false, motivo: pzk.saldo() >= 1 ? 'nonbastano' : 'finiti', ricaricato }
-  const q = p.quote[id]
-  // (un'altra scheda può aver appena puntato: si rilegge la schedina del browser prima di scriverla, così non si perde)
-  carica()
-  // la stessa puntata sulla stessa quota si somma
-  const gia = S.schedina.find((b) => b.indice === p.indice && b.id === id && !b.pagata)
-  // ogni fiche come [valore, quando è stata posata]: «togli» toglie l'ultima posata, su qualunque quota sia
-  const timbro = Date.now() + Math.random() / 2 // (unico anche fra due schede nello stesso millisecondo)
-  if (gia) { gia.fiches = [...fichesDi(gia), [v, timbro]]; gia.puntata += v }
-  else S.schedina.push({ indice: p.indice, id, quota: q, puntata: v, fiches: [[v, timbro]], esito: null, pagata: false, casa: p.casa.sigla, ospite: p.ospite.sigla })
-  S.schedina = S.schedina.slice(-40)
-  salva()
-  return { ok: true, ricaricato, quota: q }
+export async function punta(p, id, n) {
+  if (!giocateAperte() || p.indice !== indiceAdesso()) return { ok: false, motivo: 'chiuse' }
+  if (pzk.aSecco()) return pzk.ricarica() ? { ok: false, motivo: 'ricarica', ricaricato: true } : { ok: false, motivo: 'secco' }
+  // la fiche va sul tavolo subito (lo schermo), i $pzk li prende la banca
+  if (!pzk.punta(GIOCO, n)) return { ok: false, motivo: pzk.saldo() >= 1 ? 'nonbastano' : 'finiti' }
+  const d = await pzk.fai('virtual.gioca', { indice: p.indice, id, n })
+  pzk.ritira(GIOCO, n) // (la risposta ha il conto nuovo: la fiche ora è nel banco della banca, o è tornata)
+  avvisa()
+  if (!d?.ok) return { ok: false, motivo: 'banca', errore: d?.errore ?? 'la banca non risponde' }
+  return { ok: true, quota: d.esito.quota, puntata: d.esito.puntata }
 }
-/** «togli»: l'ultima fiche posata sulla partita `indice` torna nel saldo. → { v, id } o null se non c'è niente. */
-export function togli(indice) {
-  carica()
-  const mie = diPartita(indice).filter((b) => !b.pagata)
-  // la quota su cui è stata posata l'ultima fiche, e proprio quella fiche
-  const quando = (x) => fichesDi(x).at(-1)?.[1] ?? 0
-  const b = mie.reduce((a, x) => (a && quando(a) > quando(x) ? a : x), null)
-  if (!b) return null
-  const f = fichesDi(b)
-  const [v, timbro] = f.at(-1)
-  b.fiches = f.slice(0, -1)
-  b.puntata -= v
-  S.tolte = [...(S.tolte ?? []), timbro].slice(-200)
-  if (b.puntata <= 0) S.schedina.splice(S.schedina.indexOf(b), 1)
-  pzk.ritira(GIOCO, v)
-  salva()
-  return { v, id: b.id }
+/** «togli»: l'ultima giocata posata sulla partita `indice` torna nel saldo. → { ok, v, id } o { ok: false, errore } */
+export async function togli(indice) {
+  const d = await pzk.fai('virtual.togli', { indice })
+  avvisa()
+  return d?.ok ? { ok: true, v: d.esito.v, id: d.esito.id } : { ok: false, errore: d?.errore ?? 'la banca non risponde' }
 }
 
-// ── il pagamento ─────────────────────────────────────────────────────────────
+// ── i pagamenti (li fa la banca: qui si chiede e si racconta) ─────────────────
+// com'è andata la partita `indice` secondo la schedina (null se non ci sono giocate pagate)
+function conto(indice) {
+  const mie = diPartita(indice).filter((b) => b.pagata)
+  if (!mie.length) return null
+  return { indice, casa: mie[0].casa, ospite: mie[0].ospite, risultato: mie[0].risultato, giocato: mie.reduce((a, b) => a + b.puntata, 0), torna: mie.reduce((a, b) => a + (b.esito === 'vinta' ? vincitaDi(b) : 0), 0) }
+}
+const dette = new Set() // le partite già raccontate in questa pagina (le interfacce aperte insieme non lo dicono due volte)
 /**
- * Paga le puntate della partita `indice` sul suo risultato ufficiale (tavolino compreso).
- * → { giocato, torna, risultato, p } oppure null se non c'era niente da pagare.
+ * La partita `indice` è finita: si chiede alla banca (che la paga, se non l'ha già fatto da un'altra parte) e si dice
+ * com'è andata. → { indice, casa, ospite, risultato, giocato, torna } la prima volta in questa pagina, se no null. Se
+ * per la banca la partita non è ancora finita (gli orologi), si riprova qualche volta.
  */
-export function paga(indice) {
-  // (un'altra scheda può aver già pagato: si rilegge quello che c'è scritto nel browser)
-  carica()
-  const mie = S.schedina.filter((b) => b.indice === indice && !b.pagata)
-  if (!mie.length) { riconcilia(); return null }
-  const p = partita(indice), r = p.risultato
-  let giocato = 0, torna = 0
-  for (const b of mie) {
-    b.esito = vince(b.id, r) ? 'vinta' : 'persa'
-    b.pagata = true
-    b.risultato = scriviRisultato(r)
-    giocato += b.puntata
-    if (b.esito === 'vinta') torna += vincitaDi(b)
+export async function fine(indice) {
+  if (dette.has(indice) || !diPartita(indice).length) return null
+  dette.add(indice)
+  for (let i = 0; i < 6; i++) {
+    await palinsesto()
+    if (!diPartita(indice).some((b) => !b.pagata)) return conto(indice)
+    await new Promise((ok) => setTimeout(ok, 1500))
   }
-  // il tavolo di pzk.js potrebbe non avere queste puntate: ricaricando la pagina pzk.js rimette nel saldo quello che era
-  // sui tavoli (vedi ../pzk.js), e all'avvio rimettiamo sul tavolo le puntate ancora aperte (avvia); se non bastavano i $pzk
-  // (spesi altrove) la puntata si regola per quanto c'è davvero
-  rimettiSulTavolo(giocato)
-  const g = Math.min(giocato, pzk.sulTavolo(GIOCO))
-  pzk.regola(GIOCO, g, giocato ? (torna * g) / giocato : 0)
-  // le puntate di questa partita restano come «ultime», per «rifai»
-  S.ultime = mie.map((b) => ({ id: b.id, puntata: b.puntata }))
-  salva()
-  return { giocato, torna, risultato: r, p }
+  dette.delete(indice) // (la banca non risponde: ci si riproverà)
+  return null
 }
-/** Le scommesse delle partite già finite che non sono state pagate (la finestra era chiusa): si pagano ora. → quante partite */
-export function pagaScadute() {
-  const adesso = fase().indice
-  const indici = new Set(S.schedina.filter((b) => !b.pagata && b.indice < adesso).map((b) => b.indice))
-  for (const i of indici) paga(i)
-  return indici.size
+/** Le partite finite e non ancora pagate (la finestra era chiusa): la banca le paga ora. → [{ indice, casa, ospite, risultato, giocato, torna }] */
+export async function riscuoti() {
+  const prima = new Set(S.schedina.filter((b) => !b.pagata && b.indice < indiceAdesso()).map((b) => b.indice))
+  if (!prima.size) return []
+  await palinsesto()
+  const out = []
+  for (const i of prima) { const c = !dette.has(i) && !diPartita(i).some((b) => !b.pagata) ? conto(i) : null; if (c) { dette.add(i); out.push(c) } }
+  return out
 }
-/** Il badge per il cercapersone: le puntate pagate che non si sono ancora viste (vinte), più quelle aperte. */
-export const daVedere = () => S.schedina.filter((b) => b.pagata && b.esito === 'vinta' && !b.vista)
-/** Per il badge: 1 se ci sono scommesse aperte sulla partita di adesso e le scommesse chiudono entro un minuto, se no 0. */
+
+// ── il pallino del cercapersone: le vinte non ancora viste (per conto, in questo browser: è solo schermo) ──
+const chiaveViste = () => `pzkko-virtual-viste:${pzk.proprietario()}`
+const visteFino = () => { try { return Number(localStorage.getItem(chiaveViste())) || 0 } catch { return 0 } }
+/** Le giocate vinte che non si sono ancora viste. */
+export const daVedere = () => { const v = visteFino(); return S.schedina.filter((b) => b.pagata && b.esito === 'vinta' && b.indice > v) }
+/** 1 se ci sono giocate sulla partita di adesso e le giocate chiudono entro un minuto, se no 0. */
 export function aperteInChiusura() {
   const f = fase()
   return f.fase === 'scommesse' && f.manca < 60_000 && diPartita(f.indice).some((b) => !b.pagata) ? 1 : 0
 }
-/** Segna viste le puntate pagate (il badge si spegne). */
+/** Segna viste le giocate pagate (il pallino si spegne). */
 export function viste() {
-  let cambiato = false
-  for (const b of S.schedina) if (b.pagata && !b.vista) { b.vista = true; cambiato = true }
-  if (cambiato) salva()
+  const max = Math.max(0, ...S.schedina.filter((b) => b.pagata).map((b) => b.indice))
+  if (max > visteFino()) { try { localStorage.setItem(chiaveViste(), String(max)) } catch {} avvisa() }
 }
 
 // ── l'avvio: una volta per pagina ────────────────────────────────────────────
 let avviato = false
-/** Legge la schedina, rimette sul tavolo le puntate aperte (una ricarica le aveva rimesse nel saldo), paga le partite finite
- *  mentre non c'era nessuno, e ascolta le altre schede. Da chiamare da ogni interfaccia prima di usarla. */
+/** Ascolta il conto (la schedina cambia con ogni risposta della banca, anche da un altro telefono) e fa pagare le partite
+ *  finite mentre non c'era nessuno. Da chiamare da ogni interfaccia prima di usarla. */
 export function avvia() {
   if (avviato) return
   avviato = true
-  carica()
-  rimettiSulTavolo(aperte())
-  pagaScadute()
-  // si è entrati in un conto (o ne si è usciti): è un altro portafoglio, un'altra schedina
-  pzk.alCambioConto(() => {
-    S.schedina = []; S.ultime = null; S.tolte = []
-    carica()
-    rimettiSulTavolo(aperte())
-    pagaScadute()
+  // (le schedine di prima del 31.10 stavano nel browser: non valgono più niente, si tolgono)
+  try { for (const d of [localStorage, sessionStorage]) for (const k of Object.keys(d)) if (k === 'pzkko-virtual' || k.startsWith('pzkko-virtual:')) d.removeItem(k) } catch {}
+  let prima = ''
+  const guarda = () => {
+    const t = JSON.stringify(tavolo() ?? null)
+    if (t === prima) return
+    prima = t
     avvisa()
-  })
-  // un'altra scheda ha puntato o pagato: la schedina si rilegge
-  addEventListener('storage', (e) => {
-    if (e.storageArea !== localStorage || e.key !== chiave()) return
-    const prima = e.newValue
-    const u = carica()
-    if (JSON.stringify(u) !== prima) try { localStorage.setItem(chiave(), JSON.stringify(u)) } catch {}
-    riconcilia()
-    avvisa()
-  })
+    // giocate su partite finite e non pagate: si chiede alla banca, che le paga (al più ogni tre secondi)
+    if (S.schedina.some((b) => !b.pagata && b.indice < indiceAdesso()) && !inVolo && Date.now() - chiesto > 3000) palinsesto()
+  }
+  pzk.osserva(guarda)
+  pzk.alCambioConto(() => { prima = ''; guarda(); palinsesto() })
+  guarda()
 }

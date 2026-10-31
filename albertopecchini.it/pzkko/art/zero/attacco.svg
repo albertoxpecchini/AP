@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1344 776" width="1344" height="776">
+  <!-- il nastro adesivo che tiene il cercapersone zero sulla saracinesca (telefono/zero/muro.js): due pezzi di scotch
+       un po' giallo, strappati a mano, uno in alto a sinistra e uno in basso a destra, con la loro ombra -->
+  <defs>
+    <linearGradient id="n" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff2c2" stop-opacity=".62"/>
+      <stop offset=".45" stop-color="#f6e2a4" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#e9cf86" stop-opacity=".6"/>
+    </linearGradient>
+    <filter id="o" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <g transform="translate(300 128) rotate(-32)">
+    <path d="M-118 -22 L116 -24 L121 -10 L114 4 L120 18 L116 26 L-114 28 L-121 14 L-114 0 L-120 -12 Z" fill="#000" opacity=".28" filter="url(#o)" transform="translate(4 10)"/>
+    <path d="M-118 -22 L116 -24 L121 -10 L114 4 L120 18 L116 26 L-114 28 L-121 14 L-114 0 L-120 -12 Z" fill="url(#n)"/>
+    <path d="M-110 -8 L108 -10" stroke="#fff" stroke-opacity=".35" stroke-width="3"/>
+  </g>
+  <g transform="translate(1212 652) rotate(-32)">
+    <path d="M-104 -20 L102 -22 L107 -9 L101 3 L106 16 L103 24 L-100 26 L-107 13 L-100 0 L-106 -11 Z" fill="#000" opacity=".28" filter="url(#o)" transform="translate(4 10)"/>
+    <path d="M-104 -20 L102 -22 L107 -9 L101 3 L106 16 L103 24 L-100 26 L-107 13 L-100 0 L-106 -11 Z" fill="url(#n)"/>
+    <path d="M-96 -7 L94 -9" stroke="#fff" stroke-opacity=".35" stroke-width="3"/>
+  </g>
+</svg>

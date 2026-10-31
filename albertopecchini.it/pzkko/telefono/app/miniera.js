@@ -27,8 +27,8 @@ let S = ricordo('miniera', { tab: 'postazione', cat: null })
 const scegli = (k, v) => { S = { ...S, [k]: v }; ricorda('miniera', S) }
 
 const pct = (x) => `${x > 0 ? '+' : ''}${(Math.round(x * 1000) / 10).toLocaleString('it-IT')} %`
-const perOra = (n) => `${fmtCorto(Math.round(n * 10) / 10)} $pzk/ora`
-const montatoDi = (m, cat) => { const v = m[cat]; return v ? (typeof v === 'string' ? { id: v, n: 1 } : v) : null }
+export const perOra = (n) => `${fmtCorto(Math.round(n * 10) / 10)} $pzk/ora`
+export const montatoDi = (m, cat) => { const v = m[cat]; return v ? (typeof v === 'string' ? { id: v, n: 1 } : v) : null }
 
 // ── la tela a pixel: la scala intera più grande che entra in maxW × maxH punti del palco, nei pixel veri dello schermo ──
 function tela(cv, w, h, maxW, maxH) {
@@ -100,7 +100,8 @@ function postazione() {
 }
 
 // ── il negozio ──
-function statsTesto(p) {
+/** I numeri di un pezzo in una riga (esportata: anche la miniera del cercapersone zero, os/miniera.js). */
+export function statsTesto(p) {
   const s = p.stats ?? {}
   const pz = (x) => pct(x / 100 > 1 ? x / 100 : x) // i bonus possono essere 0,12 o 12: tutti e due diventano «+12 %»
   switch (p.cat) {
@@ -166,23 +167,27 @@ function esito(r, ok) {
   if (ok) ctx.toast(ok + (r.avvisi?.length ? `<br>${r.avvisi.map(esc).join(' ')}` : ''), { icona: r.avvisi?.length ? 'bot-pensa' : 'si', ms: r.avvisi?.length ? 5200 : 3200 })
   return true
 }
-function clic(e) {
+// (31.10) comprare, montare, vendere e incassare sono azioni della banca (chat/miniera.js): mentre risponde i tasti sono fermi
+let occupato = false
+const banca = async (fai) => { if (occupato) return null; occupato = true; try { return await fai() } finally { occupato = false } }
+async function clic(e) {
   const t = (s) => e.target.closest(s)
   let b
   if ((b = t('[data-tab]'))) { scegli('tab', b.dataset.tab); return disegna() }
   if ((b = t('[data-cat]'))) { scegli('cat', b.dataset.cat); scegli('tab', 'negozio'); return disegna() }
   if ((b = t('[data-negozio]'))) { scegli('cat', b.dataset.negozio); return disegna() }
-  if ((b = t('[data-compra]'))) { const p = M.pezzo(b.dataset.compra); if (esito(M.compra(p.id), `comprato: <b>${esc(p.nome)}</b>`)) disegna(); return }
+  if ((b = t('[data-compra]'))) { const p = M.pezzo(b.dataset.compra), r = await banca(() => M.compra(p.id)); if (r && esito(r, `comprato: <b>${esc(p.nome)}</b>`)) disegna(); return }
   if ((b = t('[data-monta]'))) {
-    const p = M.pezzo(b.dataset.monta), m = montatoDi(M.stato().montati, p.cat), r = m?.id === p.id ? M.monta(p.cat, p.id, m.n + 1) : M.monta(p.cat, p.id)
+    const p = M.pezzo(b.dataset.monta), m = montatoDi(M.stato().montati, p.cat), r = await banca(() => (m?.id === p.id ? M.monta(p.cat, p.id, m.n + 1) : M.monta(p.cat, p.id)))
+    if (!r) return
     const n = montatoDi(M.stato().montati, p.cat)?.n ?? 1
     if (esito(r, `montato: <b>${esc(p.nome)}</b>${n > 1 ? ` ×${n}` : ''}`)) disegna()
     return
   }
-  if ((b = t('[data-smonta]'))) { if (esito(M.smonta(b.dataset.smonta), 'smontato')) disegna(); return }
-  if ((b = t('[data-vendi]'))) { const p = M.pezzo(b.dataset.vendi), r = M.vendi(p.id); if (esito(r, `venduto: +${fmt(r.reso ?? 0)} $pzk`)) disegna(); return }
-  if ((b = t('[data-pronto]'))) { const p = M.PRONTI.find((x) => x.id === b.dataset.pronto); if (esito(M.compraPronto(p.id), `<b>${esc(p.nome)}</b>: comprato e montato`)) { scegli('tab', 'postazione'); disegna() } return }
-  if (t('[data-incassa]')) { const r = M.incassa(); if (esito(r, `incassati <b>+${fmt(r.n)} $pzk</b>`)) disegna() }
+  if ((b = t('[data-smonta]'))) { const cat = b.dataset.smonta, r = await banca(() => M.smonta(cat)); if (r && esito(r, 'smontato')) disegna(); return }
+  if ((b = t('[data-vendi]'))) { const p = M.pezzo(b.dataset.vendi), r = await banca(() => M.vendi(p.id)); if (r && esito(r, `venduto: +${fmt(r.reso ?? 0)} $pzk`)) disegna(); return }
+  if ((b = t('[data-pronto]'))) { const p = M.PRONTI.find((x) => x.id === b.dataset.pronto), r = await banca(() => M.compraPronto(p.id)); if (r && esito(r, `<b>${esc(p.nome)}</b>: comprato e montato`)) { scegli('tab', 'postazione'); disegna() } return }
+  if (t('[data-incassa]')) { const r = await banca(() => M.incassa()); if (r && esito(r, `incassati <b>+${fmt(r.n)} $pzk</b>`)) disegna() }
 }
 
 export function monta(h, c) {

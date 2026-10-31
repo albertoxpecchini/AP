@@ -23,10 +23,15 @@
 // (acc) e da lì si riparte coi numeri nuovi. Il massimo che la memoria tiene è 12 ore × 1.500 $pzk all'ora: un incasso
 // non passa mai i 18.000 $pzk (api/wallet.mjs non accetta salti di saldo di più di 20.000 fra due salvataggi).
 //
-// I SOLDI sono quelli di games/pzk.js (punta e regola, come il mercato): i pezzi si comprano a prezzo pieno, si rivendono
-// a metà (solo quelli non montati); un PC pronto costa i pezzi che mancano, scontati. Lo stato sta nello zaino
-// (zaino.minieraStato: { posseduti: { id: n }, montati: { cat: id | { id, n } }, dal, acc }), che col conto va sul server.
-// posseduti conta tutti i pezzi che hai, anche quelli montati.
+// I SOLDI: i pezzi si comprano a prezzo pieno, si rivendono a metà (solo quelli non montati); un PC pronto costa i pezzi
+// che mancano, scontati. Lo stato sta nello zaino (zaino.minieraStato: { posseduti: { id: n }, montati: { cat: id | { id, n } },
+// dal, acc }). posseduti conta tutti i pezzi che hai, anche quelli montati.
+//
+// DAL 31.10 LA MINIERA LA FA GIRARE LA BANCA (Alberto: «il browser non decide più niente»; giochi/app-miniera.mjs sul server
+// di Alberto, con le stesse regole copiate): comprare, vendere, montare, smontare, i PC pronti e l'incasso sono azioni della
+// banca, coi suoi prezzi e col suo orologio (i $pzk maturano fino all'ora del server: spostare avanti l'ora del computer non
+// mina niente). Qui le regole restano per disegnare e per dire i numeri (calcola, maturati, compatibile, prezzoPronto) e le
+// azioni chiedono (pzk.fai): il risultato arriva con lo zaino nuovo.
 
 import * as pzk from '../games/pzk.js'
 import * as zaino from './zaino.js'
@@ -46,15 +51,8 @@ const FORME = ['mini', 'medio', 'grande', 'aperto']
 const LUNGHE = ['corta', 'media', 'lunga']
 const PLURALE = { corta: 'corte', media: 'medie', lunga: 'lunghe' }
 const AMMESSE = { corta: 'solo schede corte', media: 'schede corte o medie', lunga: 'schede di tutte le lunghezze' }
-const GIOCO = 'miniera' // il «tavolo» di games/pzk.js
 const ORA = 3_600_000
 const PER_CAT = Object.fromEntries(CATEGORIE.map((k) => [k.id, k]))
-/** Quanti pezzi dello stesso modello si possono tenere: quanti se ne montano al massimo (6 schede, 8 ventole, 3 schermi), se no uno. */
-const TIENI = {
-  gpu: Math.max(...PEZZI.filter((x) => x.cat === 'case').map((x) => x.stats.slotGpu)),
-  ventole: Math.max(...PEZZI.filter((x) => x.cat === 'case').map((x) => x.stats.slotVentole)),
-  schermo: Math.max(...PEZZI.filter((x) => x.cat === 'tavolo').map((x) => x.stats.posti)),
-}
 const fmt = (n) => pzk.fmt(n)
 const quante = (n, uno, tanti) => (n === 1 ? uno : tanti.replace('#', fmt(n)))
 
@@ -78,11 +76,6 @@ const postiSchermi = (m) => posto(m, 'tavolo')?.x.stats.posti ?? 1
 function leggi() {
   const s = zaino.minieraStato()
   return { posseduti: { ...(s.posseduti ?? {}) }, montati: { ...(s.montati ?? {}) }, dal: Number(s.dal) || 0, acc: Number(s.acc) || 0 }
-}
-function salva(s) {
-  const posseduti = Object.fromEntries(Object.entries(s.posseduti).filter(([id, n]) => PER_ID[id] && n > 0))
-  const montati = Object.fromEntries(CATEGORIE.map((k) => [k.id, posto(s.montati, k.id)]).filter(([, q]) => q).map(([cat, q]) => [cat, scritto(cat, q.id, q.n)]))
-  zaino.salvaMiniera({ posseduti, montati, dal: s.dal, acc: Math.round(Math.max(0, s.acc) * 1000) / 1000 })
 }
 /** { posseduti: { id: n }, montati: { cat: id | { id, n } }, dal: ms (da quando matura), acc: $pzk maturati prima dell'ultimo cambio } */
 export const stato = () => leggi()
@@ -189,91 +182,25 @@ export function piena(ora = Date.now()) {
   const s = leggi(), c = calcola(s.montati)
   return c.completa && c.perOra > 0 && maturatiDi(s, ora) >= c.perOra * c.capienzaOre - 1e-6
 }
-// prima di cambiare la postazione: quello maturato fin qui resta, e da adesso si conta coi numeri nuovi
-function congela(s) { const ora = Date.now(); s.acc = maturatiDi(s, ora); s.dal = ora }
 
-/** Mette nel saldo i $pzk maturati (a mezzi $pzk: il resto rimane in miniera). → { ok, n } */
-export function incassa() {
-  const s = leggi(), mat = maturatiDi(s), n = Math.floor(mat * 2) / 2
-  if (n < 0.5) return { ok: false, n: 0, errore: 'non c’è ancora niente da incassare' }
-  s.acc = mat - n
-  s.dal = Date.now()
-  salva(s)
-  pzk.regola(GIOCO, 0, n, 'conio') // (26.10) i $pzk minati sono nuovi: conio
-  zaino.conta('minati', n)
-  zaino.conta('guadagnati', n)
-  return { ok: true, n }
+/** Un'azione della miniera sulla banca. → { ok, …esito } o { ok: false, errore, manca? } */
+async function fai(cosa, args = {}) {
+  const d = await pzk.fai(cosa, args)
+  return d?.ok ? { ok: true, ...d.esito } : { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova', ...(d?.manca && { manca: d.manca }) }
 }
+/** Mette nel saldo i $pzk maturati (a mezzi $pzk: il resto rimane in miniera; li conta la banca). → Promise<{ ok, n }> */
+export const incassa = () => fai('miniera.incassa').then((r) => (r.ok ? r : { ...r, n: 0 }))
 
-// ── comprare, vendere, montare ──
-/** Compra n pezzi uguali (prezzo pieno). → { ok, x, n, tot } o { ok: false, errore, manca? } */
-export function compra(id, n = 1) {
-  const x = PER_ID[id]
-  if (!x) return { ok: false, errore: 'questo pezzo non c’è nel catalogo' }
-  n = Math.max(1, Math.floor(n) || 1)
-  const s = leggi(), ho = s.posseduti[id] ?? 0, max = TIENI[x.cat] ?? 1
-  if (ho + n > max) return { ok: false, errore: max === 1 ? 'ce l’hai già: di due non te ne fai niente' : `ne hai già ${fmt(ho)}: più di ${fmt(max)} non ne monti` }
-  const tot = x.prezzo * n
-  if (!pzk.punta(GIOCO, tot)) return { ok: false, errore: `costa ${fmt(tot)} $pzk e ne hai ${fmt(pzk.saldo())}`, manca: tot - pzk.saldo() }
-  pzk.regola(GIOCO, tot, 0)
-  s.posseduti[id] = ho + n
-  salva(s)
-  zaino.conta('comprati', tot)
-  return { ok: true, x, n, tot }
-}
-
-/** Rivende n pezzi non montati, a metà prezzo. → { ok, reso, n } o { ok: false, errore, reso: 0 } */
-export function vendi(id, n = 1) {
-  const x = PER_ID[id]
-  if (!x) return { ok: false, reso: 0, errore: 'questo pezzo non c’è nel catalogo' }
-  n = Math.max(1, Math.floor(n) || 1)
-  const s = leggi(), ho = s.posseduti[id] ?? 0, m = posto(s.montati, x.cat), sopra = m?.id === id ? m.n : 0
-  if (!ho) return { ok: false, reso: 0, errore: 'non ce l’hai' }
-  if (ho - sopra < n) return { ok: false, reso: 0, errore: ho === sopra ? 'è montato: prima smontalo' : `ne puoi vendere ${fmt(ho - sopra)}: gli altri sono montati` }
-  const reso = Math.round(x.prezzo * n) / 2
-  s.posseduti[id] = ho - n
-  salva(s)
-  pzk.regola(GIOCO, 0, reso)
-  return { ok: true, reso, n }
-}
-
-/** Monta un pezzo che hai al suo posto (al posto di quello che c'era). n: quante schede, ventole o schermi (senza n: tutti
- *  quelli che hai, fin dove ci stanno). → { ok, avvisi? } o { ok: false, errore } */
-export function monta(cat, id, n) {
-  const k = PER_CAT[cat]
-  if (!k) return { ok: false, errore: 'questo posto non c’è nella postazione' }
-  const x = PER_ID[id]
-  if (!x) return { ok: false, errore: 'questo pezzo non c’è nel catalogo' }
-  if (x.cat !== cat) return { ok: false, errore: `${x.nome} non è un pezzo da ${k.nome}` }
-  const s = leggi(), ho = s.posseduti[id] ?? 0
-  if (!ho) return { ok: false, errore: `non ce l’hai: prima compralo (${fmt(x.prezzo)} $pzk)` }
-  if (k.multipla && n == null) {
-    const max = { gpu: posto(s.montati, 'case')?.x.stats.slotGpu ?? 1, ventole: posto(s.montati, 'case')?.x.stats.slotVentole ?? 1, schermo: postiSchermi(s.montati) }[cat] ?? 1
-    n = Math.min(ho, Math.max(1, max))
-  }
-  n = k.multipla ? Math.max(1, Math.floor(n) || 1) : 1
-  if (n > ho) return { ok: false, errore: `ne hai ${fmt(ho)}: per montarne ${fmt(n)} comprane ancora ${fmt(n - ho)}` }
-  const nuovi = { ...s.montati, [cat]: scritto(cat, id, n) }
-  const avvisi = cat === 'case' || cat === 'tavolo' ? adatta(nuovi) : []
-  const e = incastri(nuovi, cat)
-  if (e.length) return { ok: false, errore: e[0] }
-  congela(s)
-  s.montati = nuovi
-  salva(s)
-  return avvisi.length ? { ok: true, avvisi } : { ok: true }
-}
-
-/** Toglie il pezzo dal suo posto (resta tuo). Col case escono anche schede e ventole; senza tavolo resta uno schermo. → { ok, avvisi? } */
-export function smonta(cat) {
-  if (!PER_CAT[cat]) return { ok: false, errore: 'questo posto non c’è nella postazione' }
-  const s = leggi()
-  if (!s.montati[cat]) return { ok: true }
-  congela(s)
-  delete s.montati[cat]
-  const avvisi = adatta(s.montati)
-  salva(s)
-  return avvisi.length ? { ok: true, avvisi } : { ok: true }
-}
+// ── comprare, vendere, montare (sulla banca) ──
+/** Compra n pezzi uguali (prezzo pieno). → Promise<{ ok, x, n, tot } | { ok: false, errore, manca? }> */
+export const compra = (id, n = 1) => fai('miniera.compra', { id, n }).then((r) => (r.ok ? { ...r, x: PER_ID[id] } : r))
+/** Rivende n pezzi non montati, a metà prezzo. → Promise<{ ok, reso, n } | { ok: false, errore, reso: 0 }> */
+export const vendi = (id, n = 1) => fai('miniera.vendi', { id, n }).then((r) => (r.ok ? r : { ...r, reso: 0 }))
+/** Monta un pezzo che hai al suo posto (n: quante schede, ventole o schermi; senza n tutti quelli che ci stanno).
+ *  → Promise<{ ok, avvisi? } | { ok: false, errore }> */
+export const monta = (cat, id, n) => fai('miniera.monta', { cat, id, ...(n != null && { n }) })
+/** Toglie il pezzo dal suo posto (resta tuo). → Promise<{ ok, avvisi? }> */
+export const smonta = (cat) => fai('miniera.smonta', { cat })
 
 // ── i PC pronti ──
 /** Quanto costa adesso un PC pronto: i pezzi che mancano (quelli che hai già non si ripagano), con lo sconto.
@@ -291,19 +218,6 @@ export function prezzoPronto(id, s = leggi()) {
 /** I PC pronti di miniera-dati.mjs, con il prezzo: `listino` è tutto il PC scontato, `prezzo` quello che costa adesso a te. */
 export const PRONTI = PRONTI_DATI.map((p) => ({ ...p, listino: prezzoPronto(p.id, { posseduti: {} }).listino, get prezzo() { return prezzoPronto(p.id).tot } }))
 
-/** Compra i pezzi che mancano di un PC pronto e monta tutto (al posto della postazione di prima, che resta tua). → { ok, tot } */
-export function compraPronto(id) {
-  const p = PRONTO_PER_ID[id]
-  if (!p) return { ok: false, errore: 'questo PC non c’è' }
-  const s = leggi(), pr = prezzoPronto(id, s)
-  if (pr.tot > 0) {
-    if (!pzk.punta(GIOCO, pr.tot)) return { ok: false, errore: `costa ${fmt(pr.tot)} $pzk (i pezzi che ti mancano, già scontati) e ne hai ${fmt(pzk.saldo())}`, manca: pr.tot - pzk.saldo() }
-    pzk.regola(GIOCO, pr.tot, 0)
-  }
-  for (const q of pr.mancanti) s.posseduti[q.id] = (s.posseduti[q.id] ?? 0) + q.n
-  congela(s)
-  s.montati = Object.fromEntries(CATEGORIE.map((k) => [k.id, posto(p.pezzi, k.id)]).filter(([, q]) => q).map(([cat, q]) => [cat, scritto(cat, q.id, q.n)]))
-  salva(s)
-  if (pr.tot > 0) zaino.conta('comprati', pr.tot)
-  return { ok: true, tot: pr.tot, comprati: pr.mancanti }
-}
+/** Compra i pezzi che mancano di un PC pronto e monta tutto (al posto della postazione di prima, che resta tua): la banca,
+ *  coi suoi prezzi. → Promise<{ ok, tot, comprati } | { ok: false, errore, manca? }> */
+export const compraPronto = (id) => fai('miniera.compraPronto', { id })

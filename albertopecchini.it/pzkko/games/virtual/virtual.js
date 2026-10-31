@@ -2,17 +2,19 @@
 // grande col nastro, lo schermino a pixel in stile tamagotchi (schermo.js) con la partita, il tabellone (stemmi, nomi,
 // punteggio, minuto, cartellini), le quote stampate sul foglio come un tavolo, le fiches fotografate (le stesse degli
 // altri giochi) e la schedina. Il campionato è infinito e uguale per tutti: ogni cinque minuti una partita (quattro di
-// scommesse, uno di diretta), tutto deciso dall'orario (partita.js). Le quote copiano la forza vera delle squadre, i
-// risultati sono a caso: è la battuta del gioco. Soldi finti: i $pzk di ../pzk.js.
+// scommesse, uno di diretta), tutto deciso dall'orario (partita.js). Le quote copiano la forza vera delle squadre, e i
+// risultati escono dagli stessi gol attesi (dal 31.10: prima erano a caso, e la sfavorita rendeva più della puntata). Soldi finti: i $pzk di ../pzk.js.
 //
-// Le scommesse fatte restano nella schedina (localStorage, pzkko-virtual) e si pagano al fischio finale anche se la
-// finestra era chiusa: riaprendo si trova l'esito. I $pzk puntati stanno sul «tavolo» di pzk.js finché la partita non è
-// pagata, come negli altri giochi (così se la pagina si chiude a metà tornano nel saldo).
+// (31.10, Alberto: «il browser non decide più niente») Le giocate, i risultati e i pagamenti sono della banca
+// (C:\pzkko-server, giochi/virtual.mjs; schedina.js qui): ogni giocata è una richiesta alla banca, che la accetta solo
+// fino a cinque secondi prima del fischio (secondo la sua ora) e blocca la quota; il risultato e la cronaca arrivano dalla
+// banca solo a partita iniziata, e lo schermino li anima; al fischio finale la banca paga, anche se la finestra era chiusa:
+// riaprendo si trova l'esito. La schedina è quella del conto, uguale da ogni scheda e ogni telefono.
 //
 // index.html la apre con import('/games/virtual/virtual.js').then((m) => m.apri()).
 
 import * as pzk from '../pzk.js'
-import { PUNTATE, PER_PUNTATA, fase, partita, minuto, punteggioA, scriviRisultato, GOL_MEDI } from './partita.js'
+import { PUNTATE, PER_PUNTATA, fase, aperte as giocateAperte, adesso, partita, minuto, punteggioA, scriviRisultato, GOL_MEDI, CHIUDE } from './partita.js'
 import { stemmaSVG } from './squadre.js'
 import { Schermo } from './schermo.js'
 import * as SC from './schedina.js'
@@ -95,8 +97,8 @@ async function costruisci() {
       <section class="vi-regole" hidden>
         <h3>come si gioca</h3>
         <p>ogni cinque minuti una partita del campionato inventato di pzkko: quattro minuti per scommettere, un minuto di diretta sullo schermino. È la stessa partita per chiunque sia sul sito in quel momento: se arrivi a metà la vedi dal punto giusto.</p>
-        <p>si punta coi $pzk, che non valgono niente fuori da pzkko.it, su <b>1 X 2</b> e su <b>over / under</b> 1,5 · 2,5 · 3,5 · 4,5 gol. anche più puntate insieme. vincita = puntata × quota, al fischio finale, anche se hai chiuso la finestra.</p>
-        <p class="vi-battuta"><b>le quote copiano la Serie A vera, i risultati no:</b> la forte è quotata bassa e la scarsa alta come da un bookmaker, ma il risultato esce a caso (gol a Poisson, media ${GOL_MEDI.toLocaleString('it-IT')} a squadra, uguale per tutte). la sfavorita vince quanto la favorita. anche il meteo è solo scena.</p>
+        <p>si punta coi $pzk, che non valgono niente fuori da pzkko.it, su <b>1 X 2</b> e su <b>over / under</b> 1,5 · 2,5 · 3,5 · 4,5 gol. anche più puntate insieme, fino a ${(CHIUDE / 1000).toLocaleString('it-IT')} secondi dal fischio. vincita = puntata × quota, la paga la banca al fischio finale, anche se hai chiuso la finestra. il risultato lo sa solo la banca, e lo dice a partita iniziata.</p>
+        <p class="vi-battuta"><b>le quote copiano la Serie A vera, e anche i gol:</b> la forte è quotata bassa e la scarsa alta come da un bookmaker, e il risultato esce dagli stessi gol attesi (gol a Poisson, ${GOL_MEDI.toLocaleString('it-IT')} a squadra in una partita pari, di più per la forte). la favorita vince più spesso, la sfavorita ogni tanto sì. il meteo è solo scena.</p>
         <p>squadre, stemmi e cognomi sono inventati: Juvenclub, Inder, Napule e Mantua non c'entrano con nessuno. rara ma possibile la vittoria a tavolino (3–0), per nebbia, nutrie o blackout: paga lo stesso.</p>
         <button class="vi-piccolo vi-regole-chiudi" type="button">ho capito</button>
       </section>
@@ -144,8 +146,8 @@ async function costruisci() {
   new ResizeObserver(() => { if (dlg.open) { misura(); disegna(true) } }).observe(el.schermoBox)
   pzk.ascolta(() => aggiornaBanco()) // il saldo cambia anche giocando agli altri giochi
   document.addEventListener('visibilitychange', () => { if (!document.hidden && dlg.open) { aggiorna(true); sveglia() } })
-  // un'altra scheda (o l'app del cercapersone) ha puntato o pagato: si ridisegna
-  SC.ascolta(() => { if (dlg.open) { quote(); schedina(); aggiornaBanco() } })
+  // la banca ha risposto (una giocata, il palinsesto, un altro telefono che ha puntato o pagato): si ridisegna
+  SC.ascolta(() => { if (dlg.open) { P = partita(corrente.indice); quote(); schedina(); aggiornaBanco() } })
   schermo = new Schermo(el.canvas)
 }
 
@@ -165,8 +167,8 @@ function ciclo(now) {
   raf = 0
   if (!dlg.open || document.hidden) return
   const f = fase()
-  // è cambiata la fase o la partita: si rifanno il tabellone, le quote, i pagamenti
-  if (f.indice !== corrente.indice || f.fase !== corrente.fase) aggiorna()
+  // è cambiata la fase o la partita (o si sono chiuse le giocate): si rifanno il tabellone, le quote, i pagamenti
+  if (cambiata(f)) aggiorna()
   else corrente = f
   disegna(false, (now - ultimoT) / 1000)
   ultimoT = now
@@ -176,16 +178,19 @@ function ciclo(now) {
   else raf = requestAnimationFrame(ciclo)
 }
 
+const cambiata = (f) => f.indice !== corrente.indice || f.fase !== corrente.fase || giocateAperte(f) !== giocateAperte(corrente)
 /** La fase è cambiata (o la finestra si è aperta): la partita di adesso, le quote, i pagamenti, il tabellone. */
 function aggiorna(apertura = false) {
   const prima = corrente
   corrente = fase()
   P = partita(corrente.indice)
-  if (!apertura && prima.indice !== corrente.indice) {
-    // la partita prima è finita: si paga (le scommesse di quella partita)
-    paga(prima.indice)
-  } else pagaScadute()
+  // la partita prima è finita: la banca la paga, e qui si dice com'è andata; aprendo, quelle finite a finestra chiusa
+  if (!apertura && prima.indice !== corrente.indice) paga(prima.indice)
+  else if (apertura) SC.riscuoti().then((r) => { if (r.length) racconta(r.at(-1)) })
+  // (il palinsesto a ogni cambio: le quote della banca, e dal fischio la cronaca)
+  if (apertura || prima.indice !== corrente.indice || prima.fase !== corrente.fase) SC.palinsesto()
   if (corrente.fase === 'partita' && (apertura || prima.fase !== 'partita')) { if (!apertura) suona('virtual-fischio'); voce(`in diretta: ${P.casa.nome} – ${P.ospite.nome}`) }
+  else if (corrente.fase === 'scommesse' && !giocateAperte(corrente)) voce(`giocate chiuse: ${P.casa.nome} – ${P.ospite.nome} sta per cominciare`)
   else if (corrente.fase === 'scommesse' && !detto) voce(sulTavolo() ? `hai ${fmt(sulTavolo())} $pzk sulla partita: puoi ancora puntare` : `${P.casa.nome} – ${P.ospite.nome}: scegli una fiche e tocca una quota`)
   detto = false
   tabellone()
@@ -194,12 +199,11 @@ function aggiorna(apertura = false) {
   aggiornaBanco()
 }
 
-const pagaScadute = () => SC.pagaScadute()
-function paga(indice) {
-  const r = SC.paga(indice)
-  if (!r) return
-  const { p, torna, risultato } = r
-  voce(torna > 0 ? `${p.casa.sigla}–${p.ospite.sigla} ${scriviRisultato(risultato)}: hai vinto ${fmt(torna)} $pzk` : `${p.casa.sigla}–${p.ospite.sigla} ${scriviRisultato(risultato)}: niente, stavolta`)
+// (31.10) paga la banca: qui si aspetta la sua risposta e si racconta
+function paga(indice) { SC.fine(indice).then((r) => { if (r) racconta(r) }) }
+function racconta({ casa, ospite, risultato, torna }) {
+  if (!dlg?.open) return
+  voce(torna > 0 ? `${casa}–${ospite} ${risultato}: hai vinto ${fmt(torna)} $pzk` : `${casa}–${ospite} ${risultato}: niente, stavolta`)
   detto = true
   if (torna > 0) suona('virtual-vinta')
   SC.viste() // (il badge del cercapersone: l'esito l'ha visto chi ha la finestra aperta)
@@ -220,7 +224,12 @@ function tabellone() {
 }
 let ultimoMin = '', ultimiPunti = ''
 function tabelloneVivo(t) {
-  if (corrente.fase === 'partita') {
+  if (corrente.fase === 'partita' && !P.cronaca) {
+    // (31.10) il fischio è suonato ma la cronaca della banca non è ancora arrivata (SC.cronaca la richiede)
+    if (ultimiPunti !== '0 – 0') { el.punti.textContent = '0 – 0'; ultimiPunti = '0 – 0' }
+    if (ultimoMin !== 'via') { el.minuto.textContent = 'si comincia'; ultimoMin = 'via' }
+    el.conto.textContent = 'IN DIRETTA · aspetto la banca'
+  } else if (corrente.fase === 'partita') {
     const pt = punteggioA(P, Math.max(0, t))
     const sospesa = P.eventi.find((e) => e.tipo === 'sospesa' && e.t <= t)
     const punti = sospesa ? `${P.risultato.casa} – ${P.risultato.ospite}` : `${pt.casa} – ${pt.ospite}`
@@ -233,8 +242,9 @@ function tabelloneVivo(t) {
     const c = schermo.cartelliniA(P, t)
     for (const sq of ['casa', 'ospite']) el[sq].querySelector('.vi-cart').innerHTML = '<i class="g"></i>'.repeat(c.gialli[sq]) + '<i class="r"></i>'.repeat(c.rossi[sq])
   } else {
-    const s = Math.ceil(corrente.manca / 1000), mm = Math.floor(s / 60), ss = s % 60
-    const txt = `si chiude tra ${mm}:${String(ss).padStart(2, '0')}`
+    // (31.10) le giocate chiudono CHIUDE prima del fischio (lo decide la banca): il conto alla rovescia è fino a lì
+    const s = Math.ceil(Math.max(0, corrente.manca - CHIUDE) / 1000), mm = Math.floor(s / 60), ss = s % 60
+    const txt = giocateAperte(corrente) ? `si chiude tra ${mm}:${String(ss).padStart(2, '0')}` : `chiuse · fischio tra ${Math.ceil(corrente.manca / 1000)}s`
     if (el.conto.textContent !== txt) el.conto.textContent = txt
     if (ultimiPunti !== '–') { el.punti.textContent = '–'; ultimiPunti = '–'; el.minuto.textContent = 'scommesse aperte'; ultimoMin = ''; for (const sq of ['casa', 'ospite']) el[sq].querySelector('.vi-cart').innerHTML = '' }
   }
@@ -242,7 +252,7 @@ function tabelloneVivo(t) {
 
 // ── le quote ─────────────────────────────────────────────────────────────────
 function quote() {
-  const aperte = corrente.fase === 'scommesse'
+  const aperte = giocateAperte(corrente)
   for (const b of el.quote.querySelectorAll('.vi-quota')) {
     const id = b.dataset.id
     b.querySelector('.vi-q-val').textContent = fmtQuota(P.quote[id])
@@ -263,46 +273,64 @@ function pila(cont, importo) {
 }
 
 // prima di puntare o togliere si guarda l'orologio vero (col movimento ridotto il ciclo passa solo ogni mezzo secondo)
-function allOra() { const f = fase(); if (f.indice !== corrente.indice || f.fase !== corrente.fase) aggiorna() }
-function punta(id) {
+function allOra() { if (cambiata(fase())) aggiorna() }
+// la fiche più grande che sta in n (per far volare qualcosa quando si gioca un importo intero: «rifai»)
+const ficheDi = (n) => [...pzk.FICHES].reverse().find((f) => f <= n) ?? pzk.FICHES[0]
+/** Gioca `n` sulla quota `id`: la fiche vola subito, la banca risponde dopo (e dice di no se le giocate sono chiuse). → true se è andata */
+async function punta(id, n = stato.fiche) {
   allOra()
-  if (corrente.fase !== 'scommesse') { voce('la partita è in corso: si punta sulla prossima'); return }
-  const v = stato.fiche
-  const r = SC.punta(P, id, v)
+  if (!giocateAperte(corrente)) { voce(corrente.fase === 'scommesse' ? 'le giocate sono chiuse: si punta sulla prossima' : 'la partita è in corso: si punta sulla prossima'); return false }
+  const v = ficheDi(n), b = el.quote.querySelector(`[data-id="${id}"]`)
+  const puo = !pzk.aSecco() && n <= pzk.puliti() && !pzk.inGalera()
+  if (puo) vola(v, centro(el.scegli.querySelector(`[data-v="${v}"] img`) ?? el.saldo), centro(b.querySelector('.vi-q-pila')), { alto: 30 })
+  const r = await SC.punta(P, id, n)
   if (r.ricaricato) voce(`altri ${fmt(pzk.INIZIALE)} $pzk finti: punta`)
   if (!r.ok) {
     aggiornaBanco()
+    if (r.motivo === 'ricarica') return false
     if (r.motivo === 'secco') voce(pzk.perche())
-    else { voce(r.motivo === 'nonbastano' ? pzk.nonBasta() : 'hai finito i $pzk'); scuoti(el.saldo) }
-    return
+    else if (r.motivo === 'chiuse') voce('le giocate sono chiuse: si punta sulla prossima')
+    else { voce(r.motivo === 'banca' ? r.errore : r.motivo === 'nonbastano' ? pzk.nonBasta() : 'hai finito i $pzk'); scuoti(el.saldo) }
+    pila(b.querySelector('.vi-q-pila'), diAdesso().filter((x) => x.id === id && !x.pagata).reduce((a, x) => a + x.puntata, 0))
+    return false
   }
-  const b = el.quote.querySelector(`[data-id="${id}"]`)
-  vola(v, centro(el.scegli.querySelector(`[data-v="${v}"] img`) ?? el.saldo), centro(b.querySelector('.vi-q-pila')), { alto: 30 }).then(() => { pila(b.querySelector('.vi-q-pila'), diAdesso().filter((x) => x.id === id).reduce((a, x) => a + x.puntata, 0)) })
+  pila(b.querySelector('.vi-q-pila'), r.puntata)
   suona('virtual-fiche')
   schedina()
   aggiornaBanco()
   const pu = PER_PUNTATA.get(id)
-  voce(`${pu.nome} a ${fmtQuota(r.quota)}: se va, ${fmt(Math.round(v * r.quota * 2) / 2)} $pzk`)
+  voce(`${pu.nome} a ${fmtQuota(r.quota)}: se va, ${fmt(Math.round(r.puntata * r.quota * 2) / 2)} $pzk`)
+  return true
 }
-// «togli»: l'ultima fiche posata su questa partita torna nel saldo
-function togli() {
+// «togli»: l'ultima fiche posata su questa partita torna nel saldo (se la banca dice che si può ancora)
+let togliendo = false
+async function togli() {
   allOra()
-  if (corrente.fase !== 'scommesse') return
-  const t = SC.togli(corrente.indice)
-  if (!t) return
-  const q = el.quote.querySelector(`[data-id="${t.id}"] .vi-q-pila`)
-  vola(t.v, centro(q), centro(el.scegli.querySelector(`[data-v="${t.v}"] img`) ?? el.saldo), { durata: 300, alto: 24 })
+  if (!giocateAperte(corrente) || togliendo) return
+  togliendo = true
+  const t = await SC.togli(corrente.indice).finally(() => { togliendo = false })
+  if (!t.ok) { voce(t.errore); return }
+  const q = el.quote.querySelector(`[data-id="${t.id}"] .vi-q-pila`), v = ficheDi(t.v)
+  vola(v, centro(q), centro(el.scegli.querySelector(`[data-v="${v}"] img`) ?? el.saldo), { durata: 300, alto: 24 })
+  voce(`tolti ${fmt(t.v)} $pzk`)
   quote(); schedina(); aggiornaBanco()
 }
-// «rifai»: le puntate dell'ultima partita sulla partita di adesso (alle quote di adesso)
+// «rifai»: le giocate dell'ultima partita pagata sulla partita di adesso (alle quote di adesso), una richiesta per quota
+let rifacendo = false
 async function rifai() {
-  if (corrente.fase !== 'scommesse' || !stato.ultime?.length || sulTavolo()) return
+  if (!giocateAperte(corrente) || !stato.ultime?.length || sulTavolo() || rifacendo) return
   const tot = stato.ultime.reduce((a, b) => a + b.puntata, 0)
   if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
-  const prima = stato.fiche
-  for (const u of stato.ultime) for (const v of pzk.inFiches(u.puntata)) { stato.fiche = v; punta(u.id); await new Promise((r) => setTimeout(r, RIDOTTO.matches ? 0 : 70)) }
-  stato.fiche = prima
-  aggiornaBanco()
+  rifacendo = true
+  try {
+    // (una giocata sta nel limite della banca: le più grandi in più pezzi)
+    for (const u of stato.ultime) for (let resto = u.puntata; resto > 0;) {
+      const n = Math.min(resto, SC.S.limiti.giocata)
+      if (!(await punta(u.id, n))) return
+      resto -= n
+      await new Promise((r) => setTimeout(r, RIDOTTO.matches ? 0 : 70))
+    }
+  } finally { rifacendo = false; aggiornaBanco() }
 }
 
 // ── la schedina ──────────────────────────────────────────────────────────────
@@ -312,7 +340,7 @@ function schedina() {
   el.schedina.innerHTML = mie.map((b) => {
     const pu = PER_PUNTATA.get(b.id), diQuesta = b.indice === corrente.indice
     const vinc = SC.vincitaDi(b)
-    const esito = b.pagata ? (b.esito === 'vinta' ? `<b class="vinta">+${fmt(vinc)}</b>` : `<b class="persa">persa</b>`) : diQuesta && corrente.fase === 'partita' ? '<b class="corso">in corso</b>' : `<b class="attesa">→ ${fmt(vinc)}</b>`
+    const esito = b.pagata ? (b.esito === 'vinta' ? `<b class="vinta">+${fmt(vinc)}</b>` : `<b class="persa">persa</b>`) : diQuesta && corrente.fase === 'partita' ? '<b class="corso">in corso</b>' : !diQuesta ? '<b class="corso">in pagamento</b>' : `<b class="attesa">→ ${fmt(vinc)}</b>`
     return `<li class="${b.pagata ? b.esito : diQuesta ? 'aperta' : ''}"><span class="vi-s-partita">${esc(b.casa)}–${esc(b.ospite)}${b.risultato ? ` <i>${esc(b.risultato)}</i>` : ''}</span><span class="vi-s-cosa">${esc(pu.nome)} <small>@ ${fmtQuota(b.quota)}</small></span><span class="vi-s-punt">${fmt(b.puntata)}</span>${esito}</li>`
   }).join('')
 }
@@ -323,9 +351,9 @@ function aggiornaBanco() {
   el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
   const p = pzk.sulTavolo(GIOCO)
   el.puntato.textContent = p ? `sulla partita: ${fmt(p)}` : ''
-  const aperte = corrente.fase === 'scommesse'
+  const aperte = giocateAperte(corrente)
   for (const b of el.scegli.children) { b.setAttribute('aria-pressed', String(Number(b.dataset.v) === stato.fiche)); b.disabled = !aperte }
-  el.togli.disabled = !aperte || !diAdesso().length
+  el.togli.disabled = !aperte || !diAdesso().some((b) => !b.pagata)
   el.rifai.disabled = !aperte || !stato.ultime?.length || !!sulTavolo()
   el.statoT.textContent = aperte ? 'scommesse aperte' : 'scommesse chiuse: si gioca'
   dlg.classList.toggle('chiuso', !aperte)
@@ -356,9 +384,10 @@ let ultimoEvento = null
 function disegna(forza = false, dt = 1 / 60) {
   if (!schermo || !P) return
   const f = corrente
-  const now = Date.now()
+  const now = adesso() // (l'ora della banca)
   let t, fs
-  if (f.fase === 'partita') { t = (now - P.inizio) / 1000; fs = 'partita' }
+  // (31.10) in partita la cronaca è della banca: finché non arriva (SC.cronaca la chiede) lo schermino resta al «si comincia»
+  if (f.fase === 'partita') { P = SC.cronaca(f.indice); t = (now - P.inizio) / 1000; fs = P.cronaca ? 'partita' : 'scommesse'; if (!P.cronaca) t = 0 }
   else { t = -(f.manca / 1000); fs = 'scommesse' }
   schermo.disegna(P, { fase: fs, t, ridotto: RIDOTTO.matches, dt })
   tabelloneVivo(t)

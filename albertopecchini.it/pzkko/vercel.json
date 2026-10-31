@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": true,
-  "functions": { "api/live.mjs": { "maxDuration": 60 } },
   "headers": [
     {
       "source": "/(.*)",

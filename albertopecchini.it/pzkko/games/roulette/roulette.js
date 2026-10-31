@@ -1,13 +1,15 @@
 // La roulette di pzkko.it, in una finestra sopra il muro. Il tavolo, le fiches e
 // il foglio sono cose ferme (SVG e fotografie); la ruota è 3D (three.js) e la
 // pallina la muove la fisica (Rapier, vedi ruota.js): rotola, rallenta, cade,
-// sbatte sui rombi e sulle palette e si ferma dove si ferma. Soldi finti ($pzk,
-// gli stessi del blackjack e degli altri giochi: ../pzk.js).
+// sbatte sui rombi e sulle palette e si ferma in una casella. Il numero però lo
+// estrae la banca (31.10: roulette.gira, sul server di Alberto), e la pallina ci
+// arriva (vedi «il film del giro»). Soldi finti ($pzk, gli stessi del blackjack
+// e degli altri giochi: ../pzk.js).
 //
 // index.html la apre con import('/games/roulette/roulette.js').then((m) => m.apri()).
 
 import { NUMERI, N, DELTA, R_PALLINA, STATORE, ROTORE, PALETTA, ROMBI, colore, verticiRombo } from './ruota.js'
-import { PUNTATE, PUNTATE_PER_ID, FICHES, esito, inFiches } from './regole.js'
+import { PUNTATE, PUNTATE_PER_ID, FICHES, inFiches } from './regole.js'
 import * as pzk from '../pzk.js'
 
 const QUI = new URL('.', import.meta.url).href
@@ -43,10 +45,11 @@ function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ storia: s
 const puntato = () => [...stato.giocate.values()].reduce((a, b) => a + b, 0)
 
 // ── la finestra ──────────────────────────────────────────────────────────────
-let dlg, el = {}, pronta = false, motore = null
+let dlg, el = {}, pronta = false, motore = null, costruendo = null
 
 export async function apri() {
-  if (!dlg) await costruisci()
+  // (31.10) due clic sul volantino mentre arriva il CSS facevano due finestre (e una non si chiudeva): la seconda aspetta la stessa
+  if (!dlg) await (costruendo ??= costruisci())
   if (!dlg.open) {
     dlg.classList.remove('chiude')
     dlg.showModal()
@@ -126,12 +129,23 @@ async function costruisci() {
   el.togli.addEventListener('click', togli)
   el.rifai.addEventListener('click', rifai)
   el.veloce.addEventListener('click', () => { stato.veloce = !stato.veloce; el.veloce.setAttribute('aria-pressed', String(stato.veloce)) })
-  new ResizeObserver(() => { if (dlg.open) { disegnaTavolo(); ridisegnaPile(false); ridimensiona?.() } }).observe(el.campo)
+  // (31.10) mentre si paga le fiches volano via dalle pile: ridisegnarle le rimetteva sul tavolo (e le vincite restavano dov'erano), si ridisegna alla fine
+  new ResizeObserver(() => { if (!dlg.open) return; if (stato.fase === 'paga') ridisegna = true; else { disegnaTavolo(); ridisegnaPile(false) } ridimensiona?.() }).observe(el.campo)
   new ResizeObserver(() => ridimensiona?.()).observe(el.ruota)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) ultimo = performance.now() })
   pronta = true
   voce(!pzk.aSecco() ? 'scegli una fiche e punta' : 'hai finito i $pzk')
   pzk.ascolta(() => { if (!contando) aggiornaBanco() }) // il saldo cambia anche giocando a blackjack
+  // (31.10) si entra in un conto o se ne esce (anche da un'altra scheda): le fiches sul tavolo erano del portafoglio di prima.
+  // Puntando sono già tornate là (pzk.js ha svuotato il tavolo: niente ritira), si tolgono e basta; a giro partito la banca
+  // l'ha giocato e pagato al portafoglio di prima, e qui niente si conta: lo dice fermata
+  pzk.alCambioConto(() => {
+    rifacendo = 0
+    if (stato.fase === 'punta') {
+      if (stato.giocate.size) { sgombra(); voce('hai cambiato conto: le fiches erano dell\'altro, sono tornate là') }
+    } else if (stato.giocate.size) { stato.cambiato = true; mostrato = null }
+    aggiornaBanco()
+  })
   aggiornaBanco()
   aggiornaStoria()
 }
@@ -156,9 +170,9 @@ function aggiornaBanco() {
     b.setAttribute('aria-pressed', String(v === stato.fiche))
     b.disabled = !punta
   }
-  el.togli.disabled = !punta || !stato.mosse.length
+  el.togli.disabled = !punta || !stato.mosse.length || !!rifacendo
   el.rifai.disabled = !punta || !stato.ultime || stato.giocate.size > 0
-  el.gira.disabled = !punta || !motore || !ruota
+  el.gira.disabled = !punta || !motore || !ruota || !!rifacendo
   if (punta && pzk.aSecco() && !stato.giocate.size) {
     el.gira.textContent = 'ricarica'
     el.gira.disabled = false
@@ -364,9 +378,8 @@ function colpetto(p) {
   p.el.animate([{ transform: p.el.style.transform + ' scale(1)' }, { transform: p.el.style.transform + ' scale(.9, .94)', offset: 0.35 }, { transform: p.el.style.transform + ' scale(1)' }], { duration: 160, easing: 'ease-out' })
 }
 
-async function posa(id, evento) {
+async function posa(id, evento, v = stato.fiche) {
   if (stato.fase !== 'punta') { voce('rien ne va plus: aspetta la pallina'); return }
-  const v = stato.fiche
   if (!pzk.punta(GIOCO, v)) { voce(pzk.nonBasta()); scuoti(el.saldo); return }
   if (stato.vinto != null) togliSegno()
   stato.giocate.set(id, (stato.giocate.get(id) ?? 0) + v)
@@ -389,7 +402,7 @@ async function posa(id, evento) {
 }
 
 function togli() {
-  if (stato.fase !== 'punta' || !stato.mosse.length) return
+  if (stato.fase !== 'punta' || !stato.mosse.length || rifacendo) return
   const { id, v } = stato.mosse.pop()
   const p = pile.get(id)
   const img = p.el.lastElementChild
@@ -405,13 +418,24 @@ function togli() {
   if (da) vola(v, da, centro(el.scegli.querySelector(`[data-v="${v}"] img`)), { durata: 300, alto: 24 })
 }
 
+// (31.10) mentre «rifai» posa le fiches «gira» e «togli» aspettano (il giro partiva con metà puntate e le altre finivano nel
+// giro dopo); rifacendo: il numero del rifai in corso, 0 se nessuno (un cambio di conto lo ferma)
+let rifacendo = 0, rifatti = 0
 async function rifai() {
-  if (stato.fase !== 'punta' || !stato.ultime || stato.giocate.size) return
+  if (stato.fase !== 'punta' || !stato.ultime || stato.giocate.size || rifacendo) return
   const tot = [...stato.ultime.values()].reduce((a, b) => a + b, 0)
-  if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
-  const prima = stato.fiche
-  for (const [id, imp] of stato.ultime) for (const v of inFiches(imp)) { stato.fiche = v; posa(id); await attendi(RIDOTTO.matches ? 0 : 70) }
-  stato.fiche = prima
+  // (31.10) si puntano solo i soldi puliti: col saldo (sporchi compresi) diceva di sì e poi ne posava una parte
+  if (tot > pzk.puliti()) { voce(`per rifare servono ${fmt(tot)} $pzk${pzk.sporchi() > 0 ? ` puliti: ne hai ${fmt(pzk.puliti())}` : ''}`); scuoti(el.saldo); return }
+  const mio = rifacendo = ++rifatti
+  aggiornaBanco()
+  // (la fiche va a posa, non in stato.fiche: quella scelta nel frattempo resta)
+  fuori: for (const [id, imp] of stato.ultime) for (const v of inFiches(imp)) {
+    if (rifacendo !== mio || stato.fase !== 'punta') break fuori
+    if (v > pzk.puliti() || pzk.inGalera()) { voce(pzk.nonBasta()); scuoti(el.saldo); break fuori } // (il saldo cambiato da un'altra scheda)
+    posa(id, null, v)
+    await attendi(RIDOTTO.matches ? 0 : 70)
+  }
+  if (rifacendo === mio) rifacendo = 0
   aggiornaBanco()
 }
 
@@ -454,8 +478,11 @@ function togliSegno(tutto = true) {
 }
 
 // ── il giro ──────────────────────────────────────────────────────────────────
+// (31.10, Alberto: il browser non decide più niente) Il numero lo estrae la banca (roulette.gira, sul server di Alberto):
+// a «gira» le puntate partono, la banca le prende, estrae, paga e risponde col numero; poi la pallina ci arriva, con la
+// fisica (il film del giro, sotto). Se la banca dice di no le fiches tornano e la pallina resta dov'è
 async function gira() {
-  if (stato.fase !== 'punta') return
+  if (stato.fase !== 'punta' || rifacendo) return
   if (pzk.aSecco() && !stato.giocate.size) {
     const dati = pzk.ricarica()
     aggiornaBanco()
@@ -466,11 +493,35 @@ async function gira() {
   togliSegno()
   stato.fase = 'gira'
   stato.giro = new Map(stato.giocate)
+  stato.cambiato = false
+  // la risposta porta il conto già finito (puntata presa, vincita pagata): il tavolo tiene fermo il saldo di adesso
+  // (mostrato) finché le fiches non tornano, se no la vincita si vedrebbe prima della pallina
+  mostrato = pzk.saldo()
   aggiornaBanco()
   T?.evid.replaceChildren()
   voce(stato.giocate.size ? 'rien ne va plus' : 'giro senza puntate: guarda e basta')
   el.annuncio.classList.remove('si')
-  ruota.gira({ presa: 0.9 })
+  const r = await pzk.fai('roulette.gira', { puntate: [...stato.giro].map(([id, n]) => ({ id, n })) })
+  if (!r.ok) return rifiutato(r.errore)
+  pzk.sgombra(GIOCO)
+  stato.esito = r.esito
+  filma(r.esito.numero)
+}
+
+// la banca non ha preso il giro (la galera, i soldi, la rete): le fiches tornano tutte, e «rifai» le rimette
+function rifiutato(errore) {
+  mostrato = null
+  const giocate = stato.giro
+  stato.giro = null
+  pzk.sgombra(GIOCO)
+  for (const p of pile.values()) [...p.el.children].forEach((img, j) => vola(p.fiches[j], centro(img), centro(el.scegli.querySelector(`[data-v="${p.fiches[j]}"] img`)), { durata: 360, alto: 24, dopo: j * 22, svanisce: true }))
+  sgombra()
+  if (giocate?.size && !stato.cambiato) stato.ultime = giocate
+  stato.cambiato = false
+  salva()
+  stato.fase = 'punta'
+  aggiornaBanco()
+  voce(`la banca dice di no: ${errore ?? 'riprova'}. le fiches sono tornate`)
 }
 
 // la pallina si è fermata: il numero, il segno, le fiches perse e quelle vinte
@@ -487,20 +538,22 @@ async function fermata(n) {
   el.annuncio.classList.add('si')
   segnaNumero(n)
   const giocate = stato.giro ?? new Map()
-  const conto = esito(giocate, n)
-  // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena la pallina si
-  // ferma (un lotto, games/pzk.js, che parte in quell'istante); le fiches che volano e il saldo che conta sono da vedere: il
-  // tavolo mostra il saldo di prima (mostrato) finché non arrivano
-  mostrato = pzk.saldo()
-  pzk.regola(GIOCO, conto.puntato, conto.torna)
-  voce(giocate.size ? (conto.netto > 0 ? `${n} ${col}: vinci ${fmt(conto.torna)} $pzk` : conto.torna ? `${n} ${col}: ti tornano ${fmt(conto.torna)} $pzk` : `${n} ${col}: il banco si prende tutto`) : `${n} ${col}`)
+  const conto = stato.esito ?? { torna: 0, puntato: 0, netto: 0, vinte: [], perse: [] }
+  stato.esito = null
+  // (31.10) i soldi li ha già spostati la banca quando ha estratto il numero: le fiches che volano e il saldo che conta sono
+  // da vedere (mostrato, il saldo di prima, resta fermo finché non arrivano). Se intanto si è cambiato conto il giro è andato
+  // al portafoglio di prima: tutte le fiches vanno al banco e qui non si conta niente
+  const cambiato = stato.cambiato
+  const perse = cambiato ? [...giocate.keys()] : conto.perse, vinte = cambiato ? [] : conto.vinte
+  // (31.10) «vinci» è quello che si guadagna (prima diceva quanto torna, la puntata compresa: 10 sul pieno → «vinci 360»)
+  voce(!giocate.size ? `${n} ${col}` : cambiato ? `${n} ${col}: hai cambiato conto, il giro è andato a quello di prima` : conto.netto > 0 ? `${n} ${col}: vinci ${fmt(conto.netto)} $pzk` : conto.torna ? `${n} ${col}: ti tornano ${fmt(conto.torna)} $pzk` : `${n} ${col}: il banco si prende tutto`)
   await attendi(RIDOTTO.matches ? 0 : 700)
 
   // le perse: le fiches scivolano via verso il banco (in cima al tavolo), una pila alla volta
   const banco = nelCampo({ x: T.x0 + 1.5 * T.C, y: -10 })
   const voli = []
   let k = 0
-  for (const id of conto.perse) {
+  for (const id of perse) {
     const p = pile.get(id)
     if (!p) continue
     const imgs = [...p.el.children]
@@ -512,13 +565,13 @@ async function fermata(n) {
     k++
   }
   await Promise.all(voli)
-  for (const id of conto.perse) { const p = pile.get(id); p?.el.remove(); pile.delete(id) }
+  for (const id of perse) { const p = pile.get(id); p?.el.remove(); pile.delete(id) }
 
   // le vinte: dal banco arriva la vincita accanto alla pila, poi tutto torna al giocatore
-  if (conto.vinte.length) {
+  if (vinte.length) {
     const arrivi = []
     k = 0
-    for (const id of conto.vinte) {
+    for (const id of vinte) {
       const p = pile.get(id)
       if (!p) continue
       const imp = giocate.get(id), paga = PUNTATE_PER_ID.get(id).paga
@@ -544,7 +597,7 @@ async function fermata(n) {
     const dove = centro(el.saldo)
     const ritorni = []
     k = 0
-    for (const id of conto.vinte) {
+    for (const id of vinte) {
       const p = pile.get(id)
       if (!p) continue
       for (const grp of [p, p.vincita]) {
@@ -556,22 +609,31 @@ async function fermata(n) {
       }
       k++
     }
-    contaSaldo(mostrato, mostrato + conto.torna, RIDOTTO.matches ? 0 : 900)
+    // (31.10) se intanto si è cambiato conto i soldi sono andati a quello di prima: niente conteggio sul saldo di adesso
+    if (!stato.cambiato && mostrato !== null) contaSaldo(mostrato, mostrato + conto.torna, RIDOTTO.matches ? 0 : 900)
     mostrato = null // (durante il conteggio il saldo lo scrive contaSaldo; poi quello vero)
     await Promise.all(ritorni)
-    for (const id of conto.vinte) { const p = pile.get(id); p?.vincita?.el.remove(); p?.el.remove(); pile.delete(id) }
+    for (const id of vinte) { const p = pile.get(id); p?.vincita?.el.remove(); p?.el.remove(); pile.delete(id) }
   }
   mostrato = null
   if (giocate.size) stato.ultime = giocate
-  stato.giocate = new Map()
-  stato.mosse = []
+  sgombra()
   stato.giro = null
-  pile.clear()
-  el.fiches.querySelectorAll('.rl-pila').forEach((e) => e.remove())
   salva()
   stato.fase = 'punta'
+  if (stato.cambiato && !cambiato && conto.torna > 0) voce(`${n} ${col}: hai cambiato conto, la vincita è andata a quello di prima`)
+  stato.cambiato = false
+  if (ridisegna) { ridisegna = false; disegnaTavolo(); ridisegnaPile(false) }
   aggiornaBanco()
   if (pzk.aSecco()) voce(`${n} ${col}. hai finito i $pzk: ricarica`)
+}
+let ridisegna = false // (il tavolo da ridisegnare finito di pagare: vedi il ResizeObserver in costruisci)
+// via le fiches dal tavolo (finito il giro, o le fiches di un altro portafoglio)
+function sgombra() {
+  stato.giocate = new Map()
+  stato.mosse = []
+  pile.clear()
+  el.fiches.querySelectorAll('.rl-pila').forEach((e) => e.remove())
 }
 
 let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches tornano (i soldi sono già passati)
@@ -599,6 +661,8 @@ async function avviaMotore() {
   await document.fonts.load('400 120px Anton').catch(() => {})
   ruota = new Ruota(RAPIER)
   ruota.FISICA = FISICA
+  // (31.10) la pallina parte in una casella a caso: l'anello si gira perché lì ci sia l'ultimo numero uscito
+  if (stato.storia.length) sfasa = mod37(NUMERI.indexOf(stato.storia[0]) - ruota.casella())
   costruisciScena()
   el.carica.remove()
   aggiornaBanco()
@@ -618,21 +682,86 @@ function ciclo(t) {
   ultimo = t
   if (document.hidden) return
   const passo = ruota.FISICA.dt
-  accumulo += dt * (stato.veloce && stato.fase === 'gira' ? 3 : 1)
-  let n = 0
-  while (accumulo >= passo && n < 64) {
-    accumulo -= passo
-    n++
-    const e = ruota.passo()
-    if (e === 'nonvale') { voce('no spin: la pallina si rilancia'); setTimeout(() => ruota.stato === 'nonvale' && ruota.gira({ presa: 0.9 }), 900) }
-    else if (e !== null && stato.fase === 'gira') fermata(e)
+  if (film) {
+    // il giro: si registra avanti (7 ms di fisica al fotogramma) e si guarda la registrazione
+    if (film.fine === null) registra(7)
+    const F = film
+    let fino = F.n - 1
+    // (finché non si sa dove girare l'anello, la pallina non arriva a meno di MARGINE secondi dal rotore)
+    if (!F.piano && F.entra !== null) fino = Math.min(fino, F.entra - Math.round(MARGINE / passo))
+    F.i = Math.max(F.i, Math.min(fino, F.i + (dt * (stato.veloce ? 3 : 1)) / passo))
+    while (F.nonvale.length && F.nonvale[0] <= F.i) { F.nonvale.shift(); voce('no spin: la pallina si rilancia') }
+    const k = Math.floor(F.i) * 8, P = F.pose
+    disegna(P[k], P[k + 1], P[k + 2], P[k + 3], P[k + 4], P[k + 5], P[k + 6], P[k + 7] + anello(F.i) * DELTA)
+    if (F.fine !== null && F.i >= F.fine) { sfasa = F.piano.nuovo; film = null; accumulo = 0; fermata(F.numero) }
+  } else {
+    // fra un giro e l'altro la fisica va dal vivo: il rotore che gira, la pallina ferma nella sua casella
+    accumulo += dt
+    let n = 0
+    while (accumulo >= passo && n < 64) { accumulo -= passo; n++; ruota.passo() }
+    if (n === 64) accumulo = 0
+    const { p, q, angolo } = ruota.pose()
+    disegna(p.x, p.y, p.z, q.x, q.y, q.z, q.w, angolo + sfasa * DELTA)
   }
-  if (n === 64) accumulo = 0
-  const { p, q, angolo } = ruota.pose()
-  rotoreGrp.rotation.y = angolo
-  pallina.position.set(p.x, p.y, p.z)
-  pallina.quaternion.set(q.x, q.y, q.z, q.w)
   renderer.render(scena, camera)
+}
+function disegna(x, y, z, qx, qy, qz, qw, rotore) {
+  rotoreGrp.rotation.y = rotore
+  pallina.position.set(x, y, z)
+  pallina.quaternion.set(qx, qy, qz, qw)
+}
+
+// ── il film del giro (31.10) ─────────────────────────────────────────────────
+// Il numero lo dice la banca, la pallina la muove la fisica: per farli andare d'accordo, appena arriva il numero la fisica
+// del giro corre avanti di nascosto (fino a 30 volte il tempo vero) e quello che si vede è la sua registrazione, passo per
+// passo, che parte subito e le resta dietro. Le 37 caselle della ruota sono uguali, per la fisica: cambia solo il numero
+// dipinto sopra. Così, appena la registrazione dice in che casella si ferma la pallina, l'anello dei numeri (il rotore che
+// si vede, con le caselle, le palette e la torretta) si gira piano di quel tanto che serve perché su quella casella ci sia
+// il numero della banca. Lo si fa mentre la pallina corre sulla pista e il rotore non lo tocca: si vede solo il rotore
+// che va un poco più svelto o più piano, come quando il croupier lo spinge. Il rimbalzo, le palette, la casella sono
+// quelli veri della fisica. Se la registrazione va piano (un telefono lento), quello che si vede la aspetta prima che la
+// pallina scenda (MARGINE); se la pallina non si ferma (no spin) si vede rifare, come prima.
+let film = null
+let sfasa = 0 // di quante caselle l'anello dei numeri è girato rispetto alle caselle della fisica (fra un giro e l'altro)
+const PRIMA = 0.4, MARGINE = 2.5 // s: l'anello è a posto PRIMA che la pallina tocchi il rotore; il tempo minimo per girarlo
+const mod37 = (n) => ((n % N) + N) % N
+function filma(numero) {
+  ruota.gira({ presa: 0.9 })
+  // pose: 8 numeri a passo (la pallina, il suo orientamento, l'angolo del rotore); n i passi registrati, i quello che si vede;
+  // lancio ed entra: il passo in cui la pallina parte sulla pista e quello in cui arriva sopra il rotore
+  film = { pose: [], n: 0, i: 0, numero, fine: null, casella: null, lancio: null, entra: null, attesa: 0, nonvale: [], piano: null }
+}
+function registra(ms) {
+  const F = film, dt = ruota.FISICA.dt, t0 = performance.now()
+  while (F.fine === null && performance.now() - t0 < ms) for (let k = 0; k < 24 && F.fine === null; k++) {
+    if (F.attesa > 0 && --F.attesa === 0) ruota.gira({ presa: 0.9 }) // (no spin: si rilancia dopo 0,9 s, come prima)
+    const prima = ruota.stato
+    const e = ruota.passo()
+    const { p, q, angolo } = ruota.pose()
+    F.pose.push(p.x, p.y, p.z, q.x, q.y, q.z, q.w, angolo)
+    if (prima === 'presa' && ruota.stato === 'gira') { F.lancio = F.n; F.entra = null }
+    else if (ruota.stato === 'gira' && F.lancio !== null && F.entra === null && Math.hypot(p.x, p.z) < 0.31) F.entra = F.n
+    if (e === 'nonvale') { F.nonvale.push(F.n); F.lancio = F.entra = null; F.attesa = Math.round(0.9 / dt) }
+    else if (e !== null) { F.fine = F.n; F.casella = ruota.casella(); pianifica() }
+    F.n++
+  }
+}
+// dove si ferma la pallina si sa: l'anello va girato di d caselle (al più 18, nel verso più corto) fra `da` e `a`
+function pianifica() {
+  const F = film, dt = ruota.FISICA.dt
+  const nuovo = mod37(NUMERI.indexOf(F.numero) - F.casella)
+  let d = mod37(nuovo - sfasa)
+  if (d > N / 2) d -= N
+  const da = Math.max(Math.ceil(F.i) + 1, F.lancio ?? 0)
+  const a = Math.max(da + 1, (F.entra ?? F.fine) - Math.round(PRIMA / dt))
+  F.piano = { da, a, d, base: sfasa, nuovo }
+}
+// di quante caselle è girato l'anello al passo i del film (dolce all'inizio e alla fine)
+function anello(i) {
+  const P = film?.piano
+  if (!P) return sfasa
+  const u = Math.min(1, Math.max(0, (i - P.da) / (P.a - P.da)))
+  return P.base + P.d * u * u * u * (u * (u * 6 - 15) + 10)
 }
 
 // geometria di rivoluzione con le coordinate di texture: u gira in senso orario (come le caselle), v lungo il profilo

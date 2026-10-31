@@ -60,6 +60,11 @@ di partita animata in uno schermino in stile tamagotchi. Si gioca coi **$pzk** d
 
 ## Le quote: seguono la realtà, i risultati no
 
+> **Cambiato il 31.10.2026 (Alberto):** i risultati escono dagli stessi gol attesi delle quote (partita.js). Con la
+> Poisson fissa uguale per tutte, le quote della sfavorita erano troppo alte per la sua probabilità vera, e puntarci
+> rendeva in media il 164%. Le quote restano come sotto; la frase delle regole è «le quote copiano la Serie A vera,
+> e anche i gol».
+
 Questo è il cuore, rispettalo alla lettera:
 
 - **Le quote seguono la forza reale**: la squadra forte è quotata bassa, quella

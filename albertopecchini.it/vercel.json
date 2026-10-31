@@ -5,7 +5,6 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": true,
-  "functions": { "api/live.js": { "maxDuration": 60 } },
   "redirects": [
     { "source": "/portfolio/rivalta-sul-mincio/", "destination": "/portfolio/rivaltasulmincio-it/", "permanent": true },
     { "source": "/portfolio/rivaltasulmincio.it", "destination": "/portfolio/rivaltasulmincio-it/", "permanent": true },

@@ -49,7 +49,8 @@ export function prepara(b) {
   import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
     .then(() => b.querySelector('.ct-lcd')?.append(crepe))
     // e sopra il tubo catodico, lo stesso dello schermo grande e allo stesso ritmo (games/crt.js, «insieme»): l'ingrandimento resta puro
-    .then(() => import('../games/crt.js')).then((c) => c.tubo(b.querySelector('.ct-lcd'), { insieme: true })).catch(() => {})
+    // (lo zero è un lcd, senza tubo: telefono/zero/muro.js toglie il tubo se arriva dopo)
+    .then(() => import('../games/crt.js')).then((c) => { if (!zaino.ha('zero')) c.tubo(b.querySelector('.ct-lcd'), { insieme: true }) }).catch(() => {})
   zaino.ascolta(aggiornaTasto)
   pzk.osserva(() => { aggiornaTasto(); aggiornaSaldo() })
   setInterval(aggiornaTasto, 30_000)
@@ -57,6 +58,8 @@ export function prepara(b) {
 /** Il cercapersone dice «1 msg» quando c'è un premio da riscuotere (il giornaliero, o qualcosa in sospeso). */
 function aggiornaTasto() {
   if (!tasto) return
+  // il cercapersone zero (29.10): comprato nello shop (9.999 $pzk), sul muro c'è lui, per sempre (telefono/zero/muro.js)
+  if (zaino.ha('zero') && !tasto.classList.contains('zero')) import('../telefono/zero/muro.js').then((m) => m.veste(tasto)).catch((e) => console.warn('zero non vestito', e))
   tasto.classList.toggle('msg', zaino.manca('giornaliero') === 0 && !zaino.pagerRotto())
   tasto.classList.toggle('scassato', zaino.pagerRotto()) // le crepe sul vetro (.ct-crepe): ci sono da morto, fino al nuovo
 }
@@ -412,24 +415,24 @@ export async function pensa(ms = 700) {
 }
 
 // ── i soldi, visti dalla chat ──
-/** Paga n $pzk (col moltiplicatore del livello e degli effetti). Di base sono soldi nuovi (il lavoro, i premi: conio, 26.10);
- *  `casa`: li paga la cassa di pzk (la roba venduta, le casse, il gratta e vinci). → quanto è arrivato */
-export function paga(n, { puro = false, casa = false } = {}) {
-  const tot = mezzi(puro ? n : n * zaino.moltiplicatore())
-  if (tot > 0) { pzk.regola('chat', 0, tot, casa ? 'casa' : 'conio'); zaino.conta('guadagnati', tot) }
-  return tot
+// (31.10) DAL 31.10 LA CHAT NON PAGA E NON TOGLIE PIÙ NIENTE: ogni comando chiede alla banca (ctx.fai → pzk.fai,
+// 'chat.pesca', 'chat.slot'…), che tira i dadi, paga, toglie, segna le attese e restituisce l'esito e il conto nuovo.
+/** Chiede alla banca un'azione della chat. L'evento casuale e la morte che arrivano con l'esito restano al comando
+ *  (ctx.__evento, ctx.__morte): esegui li mostra alla fine. → la risposta di pzk.fai ({ ok, esito } o { ok: false, errore }) */
+export async function chiedi(ctx, cosa, args = {}) {
+  led.inizia()
+  let r
+  try { r = await pzk.fai(cosa, args) } catch { r = { ok: false, errore: 'niente rete: riprova' } } finally { led.finisci() }
+  if (r?.ok && r.esito?.evento) ctx.__evento = r.esito.evento
+  if (r?.ok && r.esito?.morte) ctx.__morte = r.esito.morte
+  return r ?? { ok: false, errore: 'la banca non risponde' }
 }
-/** Toglie n $pzk dal saldo (un acquisto, una multa). → false se non bastano */
-export function spendi(n) {
-  n = mezzi(n)
-  if (n <= 0) return true
-  if (!pzk.punta('chat', n)) return false
-  pzk.regola('chat', n, 0)
-  return true
+/** Il no della banca, detto dal bot: l'attesa che non è finita (manca), o il perché. → false (niente evento dopo) */
+export function rifiuto(ctx, r, cmd = '') {
+  if (r.manca > 0) { const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':clessidra: calma', d: `${cmd ? `«${cmd}» lo puoi rifare` : 'si può rifare'} fra <b>${durata(r.manca)}</b>.` }); ctx.tempo(s, Math.min(r.manca, 60_000)); return false }
+  ctx.dì({ colore: 'rosso', av: 'bot-triste', d: r.errore ?? 'non è andata.' })
+  return false
 }
-/** Una puntata: mette n sul tavolo del gioco; poi `regola(gioco, n, torna)` chiude il giro. → false se non bastano */
-export const punta = (gioco, n) => pzk.punta(gioco, mezzi(n))
-export const regola = (gioco, giocato, torna) => { pzk.regola(gioco, giocato, torna); if (torna > giocato) zaino.conta('vinti', torna - giocato); else zaino.conta('persi', giocato - torna) }
 /** Il nome di chi parla (quello del conto, o «tu»). */
 export const nome = () => pzk.conto()?.nome ?? 'tu'
 
@@ -468,27 +471,26 @@ export function durata(ms) {
 }
 
 function ctxDi(args, testo) {
-  return {
+  const ctx = {
     args, testo, zaino, pzk, dì: scheda, scheda, aggiorna, scegli, scrivi, tempo, dormi, inVista, pensa, sistema, utente,
-    paga, spendi, punta, regola, nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
+    nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
     esegui, apriWallet: (sez) => pzk.apriWallet(sez), apriApp: (app, opz) => import('../telefono/telefono.js').then((t) => t.apri(app, opz)), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
-    muori: (motivo) => muori(ctxDi(args, testo), motivo), saleDiLivello: (l) => l && scheda({ colore: 'oro', av: 'bot-ride', t: ':livello: livello ' + l + '!', d: `sei salito di livello: adesso le paghe valgono ×${zaino.moltiplicatore().toLocaleString('it-IT')}.` }),
+    // (31.10) la banca: fai chiede, no dice il suo no, morte mostra la morte che la banca ha deciso (esito.morte)
+    fai: (cosa, a) => chiedi(ctx, cosa, a), no: (r, cmd) => rifiuto(ctx, r, cmd),
+    morte: (m) => { ctx.__morteVista = true; mostraMorte(scheda, m) },
+    saleDiLivello: (l) => l && scheda({ colore: 'oro', av: 'bot-ride', t: ':livello: livello ' + l + '!', d: `sei salito di livello: adesso le paghe valgono ×${zaino.moltiplicatore().toLocaleString('it-IT')}.` }),
   }
+  return ctx
 }
 
-/** La morte (Dank Memer docet): si perde il 20 % dei $pzk liberi (al più 5.000), a meno di avere il cornetto, che si consuma. */
+/** La morte (Dank Memer docet): si perde il 20 % dei $pzk liberi (al più 5.000), a meno di avere il cornetto, che si consuma.
+ *  Dal 31.10 la decide la banca (giochi/chat-comune.mjs, muori) dentro l'azione che fa morire, e la manda nell'esito
+ *  (morte: { motivo, cornetto, restano } o { motivo, persi, max }): qui la si racconta e basta. `dì`: chi scrive la scheda
+ *  (questa chat, o quella di pzk os). */
 export const MORTE = { quota: 0.2, max: 5000 }
-export async function muori(ctx, motivo) {
-  zaino.conta('morti')
-  if (zaino.togli('cornetto')) {
-    scheda({ colore: 'ambra', av: 'bot-occhiolino', t: ':cornetto: il cornetto ha fatto il suo', d: `${motivo}\nSaresti morto, ma il cornetto rosso si è crepato al posto tuo: i $pzk sono salvi. Ne hai ancora ${zaino.quanti('cornetto')}.` })
-    return
-  }
-  const persi = mezzi(Math.min(MORTE.max, pzk.saldo() * MORTE.quota * Math.max(0, 1 + zaino.bonus('morte')))) // il bonsai e il lucchettone ne fanno perdere meno
-  if (persi > 0) pzk.perdi(persi) // (26.10) non vanno alla cassa: cadono per terra, fra i portafogli smarriti che lo spazzino ritrova
-  zaino.rompiPager() // e il cercapersone si rompe: quello scassato fa solo lavorare e ricomprare il nuovo (23.10)
-  if (!lista) return // la chat non è montata (il tasto «muori» della pagina di prova): basta lo stato
-  scheda({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${motivo}\nHai perso ${pzkHtml(persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${persi >= MORTE.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.\nE il :pager: cercapersone si è <b>scassato</b>: adesso fa solo <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, pie: 'un :cornetto: dal negozio ti avrebbe salvato', azioni: AZIONI_SCASSATO })
+export function mostraMorte(dì, m) {
+  if (m.cornetto) return dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':cornetto: il cornetto ha fatto il suo', d: `${m.motivo}\nSaresti morto, ma il cornetto rosso si è crepato al posto tuo: i $pzk sono salvi. Ne hai ancora ${m.restano}.` })
+  dì({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${m.motivo}\nHai perso ${pzkHtml(m.persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${m.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.\nE il :pager: cercapersone si è <b>scassato</b>: adesso fa solo <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, pie: 'un :cornetto: dal negozio ti avrebbe salvato', azioni: AZIONI_SCASSATO })
 }
 // ── il cercapersone scassato: due cose sole, lavorare e ricomprare il nuovo ──
 const RICOMPRA = /^(cercapersone|pager)$/i
@@ -535,10 +537,11 @@ export async function esegui(riga, { muto = false } = {}) {
   inCorso.add(chiave)
   const ctx = ctxDi(args, testo)
   try {
-    const r = await c.fai(ctx)
-    if (c.attesa && r !== false) zaino.aspetta(chiave, c.attesa * 1000)
-    zaino.conta('comandi')
-    if (!c.senzaEventi && r !== false && Math.random() < 0.07) await eventoCasuale(ctx)
+    // (31.10) l'attesa, il conto dei comandi e il dado degli eventi li fa la banca dentro l'azione del comando: qui si
+    // mostrano la morte che è arrivata con un'altra azione (la bestia a cui non si è risposto) e l'evento, se c'è
+    await c.fai(ctx)
+    if (ctx.__morte && !ctx.__morteVista) ctx.morte(ctx.__morte)
+    if (ctx.__evento) await eventoCasuale(ctx, ctx.__evento)
   } catch (e) {
     console.error('chat:', e)
     scheda({ colore: 'rosso', av: 'bot-arrabbiato', t: 'qualcosa si è rotto', d: `${e.message ?? e}` })

@@ -255,11 +255,13 @@ export function avvia(b) {
   tasto = b
   const lcd = tasto.querySelector('.ct-lcd')
   if (!lcd) return
-  lcd.innerHTML = ''
+  // via quello che c'era, tranne la tela di pzk os (.ct-os, telefono/zero/muro.js): dal 30.10 lo zero si veste e si accende
+  // prima che la chat parta, e svuotando tutto (innerHTML = '') lo schermino restava arancio, senza niente
+  for (const e of [...lcd.children]) if (!e.classList.contains('ct-os')) e.remove()
   c = document.createElement('canvas')
   const r = lcd.getBoundingClientRect(), dpr = Math.min(3, devicePixelRatio || 1)
   c.width = Math.max(64, Math.round((r.width || 62) * dpr)); c.height = Math.max(32, Math.round((r.height || 29) * dpr))
-  lcd.appendChild(c)
+  lcd.insertBefore(c, lcd.querySelector('.ct-os'))
   g = c.getContext('2d')
   saldoPrima = pzk.saldo(); mortiPrima = zaino.stat('morti')
   tasto.addEventListener('pointerenter', () => { sopra = true; fino = 0 })

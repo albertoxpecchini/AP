@@ -3,13 +3,15 @@
 // agli angoli, il tavolo stampato sopra (SVG), le fiches fotografate (le stesse
 // degli altri giochi) e la campana di vetro in 3D (three.js) coi tre dadi, che
 // muove la fisica (Rapier, vedi campana.js): la campana si scuote, i dadi
-// saltano e si fermano dove si fermano. Le regole sono quelle vere di Macao o di
-// Atlantic City (regole.js); i $pzk sono gli stessi di tutti i giochi (../pzk.js).
+// saltano e si fermano. Le facce però le tira la banca (31.10: dado.lancia, sul
+// server di Alberto), e i dadi ci arrivano (vedi «il film del colpo»). Le regole
+// sono quelle vere di Macao o di Atlantic City (regole.js); i $pzk sono gli
+// stessi di tutti i giochi (../pzk.js).
 //
 // index.html lo apre con import('/games/dado/dado.js').then((m) => m.apri()).
 
 import * as pzk from '../pzk.js'
-import { REGOLE, PUNTATE, PER_ID, esito, rende, leggi } from './regole.js'
+import { REGOLE, PUNTATE, PER_ID, rende, leggi } from './regole.js'
 
 const QUI = new URL('.', import.meta.url).href
 const ART = '/art/'
@@ -146,6 +148,7 @@ async function costruisci() {
   new ResizeObserver(() => { if (dlg.open) { disegnaTavolo(); ridisegnaPile() } }).observe(el.campo)
   new ResizeObserver(() => { ridimensiona?.(); sporco = true; avvia() }).observe(el.campana)
   pzk.ascolta(() => { if (!contando) aggiornaBanco() }) // il saldo cambia anche giocando agli altri giochi
+  pzk.alCambioConto(cambioConto)
   voce(pzk.aSecco() ? 'hai finito i $pzk' : 'scegli una fiche e punta')
   aggiornaBanco()
   aggiornaStoria()
@@ -174,8 +177,8 @@ function aggiornaBanco() {
   el.togli.disabled = !punta || !stato.mosse.length
   el.rifai.disabled = !punta || !stato.ultime || stato.giocate.size > 0
   el.regole.disabled = !punta
-  el.scuoti.disabled = !punta || !campana
-  if (punta && pzk.aSecco() && !stato.giocate.size) { el.scuoti.textContent = 'ricarica'; el.scuoti.disabled = false }
+  el.scuoti.disabled = !punta || !campana || !!rifacendo
+  if (punta && pzk.aSecco() && !stato.giocate.size && !rifacendo) { el.scuoti.textContent = 'ricarica'; el.scuoti.disabled = false }
   else el.scuoti.textContent = 'scuoti'
   dlg.classList.toggle('chiuso', !punta)
 }
@@ -537,15 +540,23 @@ function togli() {
   if (da) vola(v, da, centro(el.scegli.querySelector(`[data-v="${v}"] img`)), { durata: 300, alto: 24 })
 }
 
+// (31.10) si rifà coi soldi puliti (quelli che si possono puntare: il saldo conta anche gli sporchi), e finché le fiches non
+// sono tutte giù «scuoti» aspetta: prima la campana partiva a metà, con metà puntata, e «rifai» la ricordava così
+let rifacendo = null
 async function rifai() {
-  if (stato.fase !== 'punta' || !stato.ultime || stato.giocate.size) return
+  if (stato.fase !== 'punta' || !stato.ultime || stato.giocate.size || rifacendo) return
   const ultime = [...stato.ultime].filter(([id]) => PER_ID[stato.regole].has(id))
   const tot = ultime.reduce((a, [, v]) => a + v, 0)
-  if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuotiSaldo(); return }
+  if (tot > pzk.puliti()) { voce(pzk.sporchi() > 0 || pzk.inGalera() ? pzk.nonBasta() : `per rifare servono ${fmt(tot)} $pzk`); scuotiSaldo(); return }
   const prima = stato.fiche
-  for (const [id, imp] of ultime) for (const v of pzk.inFiches(imp)) { stato.fiche = v; posa(id); await attendi(70) }
-  stato.fiche = prima
-  aggiornaBanco()
+  const mio = (rifacendo = {})
+  try {
+    fuori: for (const [id, imp] of ultime) for (const v of pzk.inFiches(imp)) { if (rifacendo !== mio || stato.fase !== 'punta') break fuori; stato.fiche = v; posa(id); await attendi(70) }
+  } finally {
+    stato.fiche = prima
+    if (rifacendo === mio) rifacendo = null
+    aggiornaBanco()
+  }
 }
 
 function scuotiSaldo() {
@@ -554,8 +565,11 @@ function scuotiSaldo() {
 }
 
 // ── il colpo ─────────────────────────────────────────────────────────────────
-function scuoti() {
-  if (stato.fase !== 'punta') return
+// (31.10, Alberto: il browser non decide più niente) Le facce le tira la banca (dado.lancia, sul server di Alberto): a
+// «scuoti» le puntate partono, la banca le prende, tira, paga e risponde coi tre dadi; poi la campana si scuote e i dadi ci
+// arrivano (il film del colpo, sotto). Se la banca dice di no le fiches tornano e la campana resta ferma
+async function scuoti() {
+  if (stato.fase !== 'punta' || rifacendo) return
   if (pzk.aSecco() && !stato.giocate.size) {
     const dati = pzk.ricarica()
     aggiornaBanco()
@@ -566,18 +580,36 @@ function scuoti() {
   togliVinte()
   stato.fase = 'scuote'
   stato.giro = new Map(stato.giocate)
+  cambiato = false
+  // la risposta porta il conto già finito: il tavolo tiene fermo il saldo di adesso (mostrato) finché le fiches non tornano
+  mostrato = pzk.saldo()
   aggiornaBanco()
   G?.evid.replaceChildren()
   voce(stato.giocate.size ? 'la campana si scuote: niente più puntate' : 'colpo senza puntate: guarda e basta')
   el.annuncio.classList.remove('si')
-  campana.scuoti()
-  avvia()
+  const r = await pzk.fai('dado.lancia', { regole: stato.regole, giocate: [...stato.giro].map(([id, n]) => ({ id, n })) })
+  if (!r.ok) return rifiutato(r.errore)
+  pzk.sgombra(GIOCO)
+  stato.esito = r.esito
+  await filma(r.esito.dadi)
 }
 
-// un dado è rimasto storto (appoggiato al vetro o a un altro dado): il colpo non vale e la campana si riscuote
-function nonVale() {
-  voce(campana.ultimo === 'lento' ? 'i dadi non si fermano: si riscuote' : 'un dado è rimasto storto: si riscuote')
-  setTimeout(() => { if (campana.stato === 'nonvale') { campana.scuoti(); avvia() } }, RIDOTTO.matches ? 300 : 900)
+// la banca non ha preso il colpo (la galera, i soldi, la rete): le fiches tornano tutte, e «rifai» le rimette
+function rifiutato(errore) {
+  mostrato = null
+  const giocate = stato.giro
+  stato.giro = null
+  pzk.sgombra(GIOCO)
+  for (const p of pile.values()) [...p.el.children].forEach((img, j) => vola(p.fiches[j], centro(img), centro(el.scegli.querySelector(`[data-v="${p.fiches[j]}"] img`)), { durata: 360, alto: 24, dopo: j * 22, svanisce: true }))
+  stato.giocate = new Map()
+  stato.mosse = []
+  pile.clear()
+  el.fiches.querySelectorAll('.dd-pila').forEach((e) => e.remove())
+  if (giocate?.size && !cambiato) stato.ultime = giocate
+  cambiato = false
+  stato.fase = 'punta'
+  aggiornaBanco()
+  voce(`la banca dice di no: ${errore ?? 'riprova'}. le fiches sono tornate`)
 }
 
 // i dadi si sono fermati: le facce, il tavolo che si illumina, le fiches perse e quelle vinte
@@ -595,20 +627,19 @@ async function fermata(dadi) {
   el.annuncio.classList.add('si')
   segnaVinte(dadi)
   const giocate = stato.giro ?? new Map()
-  const conto = esito(giocate, dadi, R())
-  // (29.10 notte, Alberto: «ho vinto un botto, ho visto saldo 8000 e rotti e poi ctrl f5 sono spariti»): i soldi passano
-  // SUBITO, appena la campana dice com'è andata (un lotto, games/pzk.js, che parte in quell'istante); prima passavano solo
-  // dopo tutte le fiches che volano, e ricaricando a metà la vincita si perdeva. Le fiches e il saldo che conta sono da
-  // vedere: il tavolo mostra il saldo di prima (mostrato) finché non arrivano
-  mostrato = pzk.saldo()
-  pzk.regola(GIOCO, conto.puntato, conto.torna)
-  voce(giocate.size ? (conto.netto > 0 ? `${nome}: vinci ${fmt(conto.netto)} $pzk` : conto.torna ? `${nome}: ti tornano ${fmt(conto.torna)} $pzk` : `${nome}: il banco si prende tutto`) : nome)
+  const conto = stato.esito ?? { torna: 0, puntato: 0, netto: 0, vinte: [], perse: [] }
+  stato.esito = null
+  // (31.10) i soldi li ha già spostati la banca quando ha tirato i dadi (la risposta a dado.lancia, prima della campana):
+  // ricaricando a metà non si perde niente. Le fiches e il saldo che conta sono da vedere (mostrato, il saldo di prima, resta
+  // fermo finché non arrivano). Col conto cambiato intanto (cambioConto) il colpo è andato al portafoglio di prima: qui
+  // niente vincita annunciata né contata nel saldo di adesso, tutte le fiches vanno al banco
+  voce(cambiato ? `${nome}: ${DOPO_CAMBIO}` : giocate.size ? (conto.netto > 0 ? `${nome}: vinci ${fmt(conto.netto)} $pzk` : conto.torna ? `${nome}: ti tornano ${fmt(conto.torna)} $pzk` : `${nome}: il banco si prende tutto`) : nome)
   await attendi(700)
 
   // le perse: le fiches scivolano via verso il banco (in cima al tavolo), una pila alla volta
   const banco = bancoFiches()
   const voli = []
-  conto.perse.forEach((id, k) => {
+  ;(cambiato ? [...pile.keys()] : conto.perse).forEach((id, k) => {
     const p = pile.get(id)
     if (!p) return
     const imgs = [...p.el.children]
@@ -622,7 +653,7 @@ async function fermata(dadi) {
   for (const id of conto.perse) { pile.get(id)?.el.remove(); pile.delete(id) }
 
   // le vinte: dal banco arriva la vincita accanto alla pila, poi tutto torna al giocatore
-  if (conto.vinte.length) {
+  if (conto.vinte.length && !cambiato) {
     const arrivi = []
     conto.vinte.forEach(({ id, torna }, k) => {
       const p = pile.get(id)
@@ -644,8 +675,9 @@ async function fermata(dadi) {
     })
     await Promise.all(arrivi)
     await attendi(650)
-    // tutto al giocatore: verso il saldo
-    const dove = centro(el.saldo)
+    // tutto al giocatore: verso il saldo (o al banco, se nel frattempo è cambiato il conto: la vincita è andata a quello di prima)
+    const alBanco = !!cambiato
+    const dove = alBanco ? banco : centro(el.saldo)
     const ritorni = []
     conto.vinte.forEach(({ id }, k) => {
       const p = pile.get(id)
@@ -658,11 +690,12 @@ async function fermata(dadi) {
         })
       }
     })
-    contaSaldo(mostrato, mostrato + conto.torna)
+    if (!alBanco && mostrato !== null) contaSaldo(mostrato, mostrato + conto.torna)
     mostrato = null // (durante il conteggio il saldo lo scrive contaSaldo; poi quello vero)
     await Promise.all(ritorni)
   }
   mostrato = null
+  if (cambiato) voce(`${nome}: ${DOPO_CAMBIO}`)
   aggiornaBanco()
   if (giocate.size) stato.ultime = giocate
   stato.giocate = new Map()
@@ -672,7 +705,34 @@ async function fermata(dadi) {
   el.fiches.querySelectorAll('.dd-pila').forEach((e) => e.remove())
   stato.fase = 'punta'
   aggiornaBanco()
-  if (pzk.aSecco()) voce(`${nome}. hai finito i $pzk: ricarica`)
+  if (pzk.aSecco() && !cambiato) voce(`${nome}. hai finito i $pzk: ricarica`)
+  cambiato = false
+}
+
+// (31.10) si entra o si esce dal conto, anche da un'altra scheda (pzk.alCambioConto): è un altro portafoglio. pzk.js ha già
+// vuotato il tavolo: a puntate non partite le fiches sono tornate al portafoglio di prima (qui si tolgono e basta, niente
+// ritira); a colpo partito la banca l'ha già giocato e pagato al portafoglio di prima, e il saldo di adesso non si tocca
+const DOPO_CAMBIO = 'è cambiato il conto: questo colpo resta al portafoglio di prima'
+let cambiato = false
+function cambioConto() {
+  rifacendo = null
+  if (stato.fase === 'punta') {
+    mostrato = null
+    if (stato.giocate.size || pile.size) {
+      stato.giocate = new Map()
+      stato.mosse = []
+      pile.clear()
+      el.fiches.querySelectorAll('.dd-pila').forEach((e) => e.remove())
+      voce('è cambiato il conto: le fiches sul tavolo sono tornate al portafoglio di prima')
+    }
+    aggiornaBanco()
+    return
+  }
+  if (!stato.giro?.size) return // (un colpo senza puntate: niente soldi di mezzo)
+  cambiato = true
+  mostrato = null
+  if (!contando) aggiornaBanco()
+  if (stato.fase === 'scuote') voce(DOPO_CAMBIO)
 }
 
 let contando = false, mostrato = null // mostrato: il saldo che il tavolo tiene fermo mentre le fiches tornano (i soldi sono già passati)
@@ -694,7 +754,7 @@ function contaSaldo(da, a) {
 // La base di mogano laccato sta ferma; il piatto (nero, col panno verde e il collare d'ottone), il vetro e
 // il pomolo sono il corpo che la fisica scuote, e si muovono con lui. I dadi sono avorio, lucidi, gli spigoli
 // tondi, i punti incavati.
-let THREE, C, campana = null, renderer, scena, camera, macchina, dadi3 = [], raf = 0, ultimo = 0, accumulo = 0, ridimensiona = null, sporco = true
+let THREE, C, campana = null, renderer, scena, camera, macchina, dadi3 = [], raf = 0, ultimo = 0, ridimensiona = null, sporco = true
 
 async function avviaMotore() {
   const [three, rap, cm] = await Promise.all([import(QUI + '../roulette/lib/three.js'), import(QUI + '../roulette/lib/rapier.mjs'), import(QUI + 'campana.js')])
@@ -705,6 +765,8 @@ async function avviaMotore() {
   campana = new C.Campana(RAPIER)
   // i dadi mostrano l'ultimo colpo (se c'è), fermi sul panno
   if (stato.storia[0]) campana.metti(stato.storia[0])
+  GIRI = giriDelCubo()
+  giri = campana.dadi.map(() => new THREE.Quaternion())
   costruisciScena()
   el.carica.remove()
   aggiornaBanco()
@@ -723,33 +785,136 @@ function ciclo(t) {
   raf = requestAnimationFrame(ciclo)
   const dt = Math.min(0.1, (t - ultimo) / 1000)
   ultimo = t
-  if (document.hidden) return
-  const vivo = campana.stato === 'scuote' || campana.stato === 'posa'
-  if (vivo) {
-    const passo = C.FISICA.dt
-    accumulo += dt * (stato.veloce ? 3 : 1)
-    let n = 0
-    while (accumulo >= passo && n < 96) {
-      accumulo -= passo
-      n++
-      const e = campana.passo()
-      if (e === 'nonvale') { nonVale(); break }
-      if (e) { if (stato.fase === 'scuote') fermata(e); break }
-    }
-    if (n === 96) accumulo = 0
-    sporco = true
-  } else accumulo = 0
+  if (document.hidden || registrando) return // (mentre si registra il colpo la campana della fisica non si guarda)
+  if (film) {
+    film.i = Math.min(film.n - 1, film.i + (dt * (stato.veloce ? 3 : 1)) / C.FISICA.dt)
+    metti()
+    renderer.render(scena, camera)
+    sporco = false
+    if (film.i >= film.n - 1) { const F = film; giri = F.giri.map((g) => g.dopo); film = null; if (stato.fase === 'scuote') fermata(F.valori) }
+    return
+  }
   if (sporco) { metti(); renderer.render(scena, camera); sporco = false }
   else ferma() // i dadi sono fermi: niente da ridisegnare finché qualcosa non cambia
 }
 
-// la scena segue la fisica
+// la scena segue la fisica: dal vivo (i dadi fermi) o dalla registrazione del colpo (il film)
 const v3 = (p) => [p.x, p.y, p.z]
 function metti() {
+  if (film) {
+    const P = film.pose, k = Math.floor(film.i) * POSA
+    macchina.position.set(P[k], P[k + 1], P[k + 2])
+    macchina.quaternion.set(P[k + 3], P[k + 4], P[k + 5], P[k + 6])
+    dadi3.forEach((d, j) => { const o = k + 7 + j * 7; d.position.set(P[o], P[o + 1], P[o + 2]); d.quaternion.set(P[o + 3], P[o + 4], P[o + 5], P[o + 6]).multiply(giroDi(film.giri[j], film.i)) })
+    return
+  }
   const { piatto, dadi } = campana.pose()
   macchina.position.set(...v3(piatto.p))
   macchina.quaternion.set(piatto.q.x, piatto.q.y, piatto.q.z, piatto.q.w)
-  dadi.forEach((d, i) => { dadi3[i].position.set(...v3(d.p)); dadi3[i].quaternion.set(d.q.x, d.q.y, d.q.z, d.q.w) })
+  dadi.forEach((d, i) => { dadi3[i].position.set(...v3(d.p)); dadi3[i].quaternion.set(d.q.x, d.q.y, d.q.z, d.q.w).multiply(giri[i]) })
+}
+
+// ── il film del colpo (31.10) ────────────────────────────────────────────────
+// Le facce le tira la banca, i dadi li muove la fisica: per farli andare d'accordo, appena arrivano le facce il colpo si
+// fa prima di nascosto (in un attimo: la fisica corre 20–40 volte il tempo vero) e quello che si vede è la sua
+// registrazione. Se un dado resta storto o non si ferma, il colpo si rifà da capo, dagli stessi dadi fermi, finché non va:
+// chi guarda vede solo quello buono. Un dado della fisica è un cubo, uguale da tutte le parti: i punti dipinti sopra
+// possono stare girati in uno qualunque dei 24 modi in cui un cubo torna su se stesso, e la fisica non se ne accorge.
+// Così per ogni dado si sceglie il giro che porta in alto la faccia della banca (dei quattro buoni, il più vicino a quello
+// di prima), e i punti ci si girano dentro piano (un decimo di secondo) nel momento della scossa in cui il dado ruota più
+// in fretta, in aria: si vede un dado che rotola. I rimbalzi, il vetro, dove si ferma sono quelli veri della fisica.
+let film = null, registrando = false
+let GIRI = null // i 24 giri del cubo su se stesso
+let giri = [] // per ogni dado: come sono girati i punti dipinti rispetto al dado della fisica
+const POSA = 28 // numeri a passo nella registrazione: il piatto (posizione, orientamento) e i tre dadi
+const MEZZO = 0.05 // s: metà del tempo in cui i punti si girano
+
+function giriDelCubo() {
+  const giro = (x, y, z, a) => new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(x, y, z).normalize(), a)
+  const L = [new THREE.Quaternion()]
+  for (const a of [[1, 0, 0], [0, 1, 0], [0, 0, 1]]) for (const k of [1, 2, 3]) L.push(giro(...a, (k * Math.PI) / 2)) // attorno agli assi delle facce
+  for (const a of [[1, 1, 0], [1, -1, 0], [1, 0, 1], [1, 0, -1], [0, 1, 1], [0, 1, -1]]) L.push(giro(...a, Math.PI)) // degli spigoli
+  for (const a of [[1, 1, 1], [1, 1, -1], [1, -1, 1], [-1, 1, 1]]) for (const k of [1, 2]) L.push(giro(...a, (k * 2 * Math.PI) / 3)) // dei vertici
+  return L
+}
+
+async function filma(valori) {
+  registrando = true
+  const f = campana.fotografia()
+  let colpo = null
+  try {
+    for (let prova = 0; prova < 20 && !colpo; prova++) {
+      if (prova) campana.rimetti(f)
+      colpo = await registra()
+      if (!colpo) continue
+      colpo.giri = valori.map((v, j) => pianifica(colpo, j, v))
+      if (colpo.giri.includes(null)) colpo = null
+    }
+  } finally { registrando = false }
+  if (!colpo) {
+    // (venti colpi da rifare di fila: non succede; i dadi si posano sulle facce della banca e basta)
+    campana.metti(valori)
+    giri = campana.dadi.map(() => new THREE.Quaternion())
+    sporco = true
+    avvia()
+    return fermata(valori)
+  }
+  colpo.valori = valori
+  film = colpo
+  avvia()
+}
+// un colpo della fisica, registrato (cedendo il passo alla pagina ogni 8 ms); null se non vale
+async function registra() {
+  const dt = C.FISICA.dt, pose = [], vel = [], max = Math.round(14 / dt)
+  campana.scuoti()
+  let e = null, n = 0, scossa = null, t0 = performance.now()
+  while (e === null && n < max) {
+    e = campana.passo()
+    const { piatto, dadi } = campana.pose()
+    pose.push(piatto.p.x, piatto.p.y, piatto.p.z, piatto.q.x, piatto.q.y, piatto.q.z, piatto.q.w)
+    for (const d of dadi) pose.push(d.p.x, d.p.y, d.p.z, d.q.x, d.q.y, d.q.z, d.q.w)
+    for (const b of campana.dadi) { const w = b.angvel(); vel.push(Math.hypot(w.x, w.y, w.z)) }
+    if (scossa === null && campana.stato !== 'scuote') scossa = n
+    n++
+    if (performance.now() - t0 > 8) { await new Promise((ok) => setTimeout(ok, 0)); t0 = performance.now() }
+  }
+  return Array.isArray(e) ? { pose, vel, n, i: 0, scossa: scossa ?? n } : null
+}
+// per il dado j, che deve mostrare v: il giro dei punti dipinti alla fine, e quando ci si gira dentro
+function pianifica(F, j, v) {
+  const P = F.pose, dt = C.FISICA.dt, fine = (F.n - 1) * POSA + 7 + j * 7
+  const q = new THREE.Quaternion(P[fine + 3], P[fine + 4], P[fine + 5], P[fine + 6])
+  // la faccia del dado della fisica che guarda in su
+  let su = null, alto = -2
+  for (const a of C.ASSI) { const y = new THREE.Vector3(...a).applyQuaternion(q).y; if (y > alto) { alto = y; su = new THREE.Vector3(...a) } }
+  // i giri che ci portano la faccia v dipinta; il più vicino a quello di adesso
+  const faccia = new THREE.Vector3(...C.ASSI[C.FACCE.indexOf(v)]), prima = giri[j]
+  let dopo = prima, vicino = -1
+  for (const g of GIRI) {
+    if (faccia.clone().applyQuaternion(g).dot(su) < 0.99) continue
+    const d = Math.abs(prima.dot(g))
+    if (d > vicino) { vicino = d; dopo = g }
+  }
+  if (vicino > 0.9999) return { prima: prima.clone(), dopo: prima.clone(), da: 0, a: 1 } // (la faccia giusta è già quella)
+  // quando: il decimo di secondo della scossa in cui il dado gira più in fretta (contando il passo più lento), staccato dal
+  // panno; se non ce n'è uno in cui rotola davvero (un dado rimasto sotto gli altri) il colpo non va: null, si rifà
+  const mezzo = Math.round(MEZZO / dt), velo = (i) => F.vel[i * 3 + j] * (P[i * POSA + 7 + j * 7 + 1] > C.LATO / 2 + 0.002 ? 1 : 0.3)
+  let quando = -1, meglio = -1
+  for (let i = Math.round(0.3 / dt); i < F.scossa - 2 * mezzo; i += 4) {
+    let m = Infinity
+    for (let k = i; k <= i + 2 * mezzo && m > meglio; k++) m = Math.min(m, velo(k))
+    if (m > meglio) { meglio = m; quando = i }
+  }
+  if (meglio < ROTOLA) return null
+  return { prima: prima.clone(), dopo: dopo.clone(), da: quando, a: quando + 2 * mezzo }
+}
+const ROTOLA = 8 // rad/s: il dado deve girare almeno così mentre i punti ci si girano dentro (se no si vedrebbero cambiare)
+// il giro dei punti dipinti al passo i del film
+function giroDi(g, i) {
+  if (i <= g.da) return g.prima
+  if (i >= g.a) return g.dopo
+  const u = (i - g.da) / (g.a - g.da)
+  return new THREE.Quaternion().slerpQuaternions(g.prima, g.dopo, u * u * (3 - 2 * u))
 }
 
 function costruisciScena() {

@@ -12,6 +12,18 @@ import path from 'node:path'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 
+// la banca di pzkko (31.10), quella del server di Alberto, caricata una volta sola coi file in memoria (PZKKO_BANCA per
+// un'altra cartella). Il segreto dei token è uno di prova: i token di qui non valgono online
+let bancaCaricata = null
+const banca = () => (bancaCaricata ??= (async () => {
+  const dir = process.env.PZKKO_BANCA || 'C:\\pzkko-server\\banca'
+  process.env.PZKKO_BANCA_SEGRETO ||= 'pzkko-banca-in-locale-' + 'x'.repeat(24)
+  const b = await import(new URL(`file:///${path.join(dir, 'index.mjs').replace(/\\/g, '/')}`).href)
+  await b.collega(null, {})
+  const w = await import(new URL(`file:///${path.join(dir, 'wallet.mjs').replace(/\\/g, '/')}`).href)
+  return { gestisci: b.gestisci, accessoLocale: w.accessoLocale }
+})().catch((e) => { bancaCaricata = null; throw e }))
+
 // bettercallpekko.it è il sito Vite con SITE=bcp. La variabile va messa prima che Vite
 // carichi vite.config.js: site-pages e src/data/assistenza.js la leggono all'import.
 // BCP_STORE=memory vince sulla chiave del Blob in .env.local: in locale non si scrive
@@ -87,6 +99,29 @@ const pzkko = (port) => {
       res.write(': collegata\n\n')
       pagine.add(res)
       return req.on('close', () => pagine.delete(res))
+    }
+    // in locale sempre dentro col conto pzkko (29.10, Alberto: «fai che in local abbia sempre il log fatto con pzkko»):
+    // games/pzk.js lo chiede da solo. Il token lo firma il wallet (accessoLocale), e lo dà solo a chi chiede da questo
+    // computer o dalla rete Tailscale di Alberto, non alla rete di casa o dell'università
+    if (pathname === '/__dev/accesso') {
+      const ip = (req.socket.remoteAddress ?? '').replace(/^::ffff:/, '')
+      const mio = ip === '127.0.0.1' || ip === '::1' || /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip)
+      if (!mio) return res.writeHead(403, { 'Content-Type': 'application/json' }).end('{"ok":false}')
+      return banca().then((b) => b.accessoLocale('pzkko'))
+        .then((d) => res.writeHead(d.ok ? 200 : 404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(d)))
+        .catch((e) => { console.error(e); res.writeHead(500).end() })
+    }
+    // LA BANCA (31.10): /api/wallet, /api/borsa e /api/giocatori online passano dal ponte di Vercel al server di Alberto
+    // (C:\pzkko-server\banca, fuori dal repository). In locale si usa la stessa banca, coi file in memoria (vuota a ogni
+    // avvio: i dati veri non si toccano)
+    const daBanca = /^\/api\/(wallet|borsa|giocatori)\/?$/.exec(pathname)?.[1]
+    if (daBanca) {
+      return banca().then(async (b) => {
+        let corpo = ''
+        if (req.method === 'POST') { const parti = []; for await (const p of req) parti.push(p); corpo = Buffer.concat(parti).toString('utf8') }
+        const r = await b.gestisci(daBanca, { m: req.method === 'HEAD' ? 'GET' : req.method, q: new URL(req.url, 'http://x').search, ip: (req.socket.remoteAddress ?? '').replace(/^::ffff:/, ''), ua: req.headers['user-agent'] ?? '', corpo })
+        res.writeHead(r.status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }).end(r.corpo)
+      }).catch((e) => { console.error(e); res.writeHead(503, { 'Content-Type': 'application/json' }).end('{"ok":false,"offline":true,"errore":"la banca non c’è su questo pc (C:\\\\pzkko-server\\\\banca)"}') })
     }
     // le funzioni di pzkko/api (come su Vercel: /api/meteo → pzkko/api/meteo.mjs)
     const funzione = /^\/api\/([a-z0-9-]+)\/?$/.exec(pathname)?.[1]

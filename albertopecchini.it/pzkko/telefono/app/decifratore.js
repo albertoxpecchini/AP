@@ -4,6 +4,11 @@
 // completare, la parola allo specchio. Due errori si perdonano, al terzo il wallet si blocca (resta nello zaino: si riprova).
 // Aperto, i $pzk escono dal fondo dei portafogli smarriti (api/wallet.mjs, decifra: tre al giorno): soldi puliti, perché
 // erano destinati a sparire. Il pezzo aperto lascia lo zaino.
+//
+// DAL 31.10 I GIOCHINI LI PREPARA LA BANCA (Alberto: «decifra un wallet devi farlo se hai un wallet»; giochi/app-decifratore.mjs
+// sul server di Alberto): prima qui si inventavano, si sapevano le risposte e alla fine si chiedevano i soldi. Ora
+// 'decifratore.apri' controlla che il decifratore sia installato e il pezzo nello zaino, e manda un giochino alla volta senza
+// la risposta; 'decifratore.risolvi' dice se è giusta; risolti tutti e tre, pzk.decifra (la banca: consuma il pezzo e paga).
 
 import * as pzk from '../../games/pzk.js'
 import * as zaino from '../../chat/zaino.js'
@@ -11,21 +16,18 @@ import { icona } from '../../chat/icone.js'
 import { tieni } from '../ricordi.js'
 
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-const caso = (a) => a[Math.floor(Math.random() * a.length)]
-const mescola = (a) => [...a].sort(() => Math.random() - 0.5)
-const PAROLE = ['MANTOVA', 'MINCIO', 'TORTELLI', 'GONZAGA', 'NUTRIA', 'VIRGILIO', 'ZUCCA', 'SBRISOLONA', 'LUCCIO', 'CHIOCCIOLA', 'PIAZZA', 'SARACINESCA']
-const sposta = (w, k) => w.replace(/[A-Z]/g, (c) => String.fromCharCode(((c.charCodeAt(0) - 65 + k + 26) % 26) + 65))
-// i giochini: → { domanda (html), giusta, scelte }
-const GIOCHINI = {
-  cesare: () => { const w = caso(PAROLE); return { domanda: `ogni lettera è spostata di uno in avanti (A→B). Cosa c’era scritto?<code>${sposta(w, 1)}</code>`, giusta: w, scelte: mescola([w, ...mescola(PAROLE.filter((x) => x !== w)).slice(0, 3)]) } },
-  binario: () => { const n = 3 + Math.floor(Math.random() * 13); const b = n.toString(2).padStart(4, '0'); return { domanda: `il pin è in binario: quanto fa in decimale?<code>${b}</code><small>(da destra: 1, 2, 4, 8)</small>`, giusta: String(n), scelte: mescola([n, n + 1, n - 1, n + 2].map(String)) } },
-  sequenza: () => { const a = 2 + Math.floor(Math.random() * 4), d = 2 + Math.floor(Math.random() * 4), s = [0, 1, 2, 3].map((i) => a + i * d); return { domanda: `la prossima cifra della chiave?<code>${s.join(' · ')} · ?</code>`, giusta: String(a + 4 * d), scelte: mescola([a + 4 * d, a + 4 * d + 1, a + 4 * d - 2, a + 5 * d].map(String)) } },
-  specchio: () => { const w = caso(PAROLE); return { domanda: `la password è scritta al contrario: qual è?<code>${[...w].reverse().join('')}</code>`, giusta: w, scelte: mescola([w, ...mescola(PAROLE.filter((x) => x !== w)).slice(0, 3)]) } },
+// le parole intorno al codice, per tipo di giochino (il codice e le scelte li manda la banca)
+export const DOMANDE = {
+  cesare: (c) => `ogni lettera è spostata di uno in avanti (A→B). Cosa c’era scritto?<code>${esc(c)}</code>`,
+  binario: (c) => `il pin è in binario: quanto fa in decimale?<code>${esc(c)}</code><small>(da destra: 1, 2, 4, 8)</small>`,
+  sequenza: (c) => `la prossima cifra della chiave?<code>${esc(c)} · ?</code>`,
+  specchio: (c) => `la password è scritta al contrario: qual è?<code>${esc(c)}</code>`,
 }
 const TIPI = { 'wallet-pzk': ['wallet', 'wallet pzk cifrato'], chiavetta: ['chiavetta', 'chiavetta usb'] }
 
 let host = null, ctx = null
-let P = null // la partita: { id, prove: [giochino…], i, errori, esito }
+let P = null // la partita: { id, v (quello che la banca fa vedere: tipo, i, errori, prova), esito }
+let occupato = false
 
 function lista() {
   const pezzi = Object.keys(TIPI).map((id) => [id, zaino.quanti(id)]).filter(([, n]) => n > 0)
@@ -40,8 +42,8 @@ function partita() {
     return `<div class="t-ra-esito ${e.ok ? 'ok' : 'no'}">${icona(e.ok ? (e.n ? 'bot-ricco' : 'bot-pensa') : 'lucchetto')}<b>${e.ok ? (e.n ? 'aperto' : 'aperto, ma vuoto') : 'bloccato'}</b><span>${e.ok ? (e.n ? `<span class="pzk">+${pzk.fmt(e.n)} $pzk</span> puliti` : 'qualcuno l’aveva già svuotato') : esc(e.errore ?? 'tre errori: riprova più tardi, il pezzo resta nello zaino')}</span></div>
       <div class="t-ac-azioni"><button class="c-b" type="button" data-fai="lista">va bene</button></div>`
   }
-  const g = P.prove[P.i]
-  return `<div class="t-de-schermo"><small>${TIPI[P.id][1]} · passo ${P.i + 1}/3 · errori ${P.errori}/2</small><p>${g.domanda}</p></div>
+  const g = P.v.prova
+  return `<div class="t-de-schermo"><small>${TIPI[P.id][1]} · passo ${P.v.i + 1}/3 · errori ${P.v.errori}/2</small><p>${DOMANDE[g.k]?.(g.codice) ?? esc(g.codice)}</p></div>
     <div class="t-de-scelte">${g.scelte.map((x) => `<button type="button" class="c-b nero" data-r="${esc(x)}">${esc(x)}</button>`).join('')}</div>`
 }
 function disegna() {
@@ -49,28 +51,37 @@ function disegna() {
   host.innerHTML = `${ctx.testata('Decifratore')}<div class="t-corpo-app t-de">${corpo}</div>`
 }
 
+/** Apre un pezzo sulla banca: il primo giochino. */
+async function apri(id) {
+  const d = await pzk.fai('decifratore.apri', { tipo: TIPI[id][0] })
+  if (!d?.ok) return ctx.toast(esc(d?.errore ?? 'la banca non risponde: riprova'), { icona: 'bot-pensa' })
+  P = { id, v: d.esito, esito: null }
+  disegna()
+}
+/** Una risposta: la banca dice se è giusta; tre giuste, la banca decifra e paga. */
 async function risposta(r, b) {
-  const g = P.prove[P.i]
-  if (r !== g.giusta) {
-    b.classList.add('sbagliata'); P.errori++
-    if (P.errori > 2) { P.esito = { ok: false }; return disegna() }
-    setTimeout(() => { P.prove[P.i] = GIOCHINI[caso(Object.keys(GIOCHINI))](); disegna() }, 450)
-    return
-  }
-  b.classList.add('giusta')
-  if (++P.i < 3) return setTimeout(disegna, 300)
-  const d = await pzk.decifra(TIPI[P.id][0])
-  if (d.ok) { zaino.togli(P.id); P.esito = { ok: true, n: d.fatto.n } } else P.esito = { ok: false, errore: d.errore }
+  const q = P
+  const d = await pzk.fai('decifratore.risolvi', { risposta: r })
+  if (q !== P) return
+  if (!d?.ok) { P.esito = { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova' }; return disegna() }
+  const e = d.esito
+  b.classList.add(e.giusta ? 'giusta' : 'sbagliata')
+  if (e.bloccato) { P.esito = { ok: false, ...(e.sparito && { errore: 'il pezzo non è più nello zaino' }) }; return setTimeout(disegna, 450) }
+  if (!e.risolto) { P.v = e; return setTimeout(disegna, e.giusta ? 300 : 450) }
+  const f = await pzk.decifra(P.v.tipo)
+  if (q !== P) return
+  P.esito = f.ok ? { ok: true, n: f.fatto.n } : { ok: false, errore: f.errore }
   disegna()
 }
 
 export function monta(h, c) {
   host = h; ctx = c
   tieni(host, 'decifratore')
-  host.addEventListener('click', (e) => {
+  host.addEventListener('click', async (e) => {
     const a = e.target.closest('[data-apri]'), r = e.target.closest('[data-r]'), f = e.target.closest('[data-fai]'), v = e.target.closest('[data-vai]')
-    if (a) { const tipi = mescola(Object.keys(GIOCHINI)).slice(0, 3); P = { id: a.dataset.apri, prove: tipi.map((t) => GIOCHINI[t]()), i: 0, errori: 0, esito: null }; return disegna() }
-    if (r && !r.classList.contains('giusta') && !r.classList.contains('sbagliata')) return risposta(r.dataset.r, r)
+    if ((a || r) && occupato) return // (la banca sta rispondendo: niente doppi invii)
+    if (a) { occupato = true; try { await apri(a.dataset.apri) } finally { occupato = false } return }
+    if (r && !r.classList.contains('giusta') && !r.classList.contains('sbagliata')) { occupato = true; try { await risposta(r.dataset.r, r) } finally { occupato = false } return }
     if (f?.dataset.fai === 'lista') { P = null; return disegna() }
     if (v) ctx.vai(v.dataset.vai)
   })

@@ -145,6 +145,8 @@ const ICONE = {
   'penne-bic': [OGG, poco('three blue bic ballpoint pens lying side by side, held together by one short strip of clear scotch tape around their middle')],
   'iphone-duo': [OGG, poco('a foldable smartphone opened flat like a book: two glowing screens side by side joined by a thin hinge in the middle, silver frame')],
   peluche: [OGG, poco('a cute plush toy snail made of soft fabric with visible stitches, a brown shell and black sunglasses, the whole toy visible from head to tail')],
+  // il cercapersone zero (29.10, telefono/zero/): il gadget bianco in 3D, coi colori di riferimento di Alberto
+  zero: [OGG, poco('a small white handheld gadget shaped like a flat rounded rectangle lying horizontally, with a glowing orange rectangular lcd screen on the left half and a round orange directional pad with a small orange button on the right, seen from the front')],
   'app-chiudi': [APP, ...tile('black tile; a small thick bright red X')],
   'luccio-salsa': [OGG, poco('a round white plate seen from above at an angle, with a fish fillet covered in green parsley sauce in the middle, the whole round plate visible')],
   // (il mestiere prima della lumachina, se no il modello disegna solo la lumachina)

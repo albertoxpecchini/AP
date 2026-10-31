@@ -66,24 +66,29 @@ function scrivi(el, testo, poi) {
   passo()
 }
 
-function clic(e) {
+// (31.10) cominciare, scegliere e lasciare sono azioni della banca (chat/missioni.js): mentre risponde i tasti sono fermi
+let occupato = false
+async function clic(e) {
+  if (occupato) return
   const c = e.target.closest('[data-compra]')
   if (c) { e.stopPropagation(); return ctx.vai('negozio') }
   const a = e.target.closest('[data-apri]')
   if (a) {
-    const r = missioni.inizia(a.dataset.apri)
+    occupato = true
+    const r = await missioni.inizia(a.dataset.apri).finally(() => { occupato = false })
     if (!r.ok) return ctx.toast(esc(r.errore), { icona: 'bot-pensa' })
     return pagina(a.dataset.apri)
   }
   const s = e.target.closest('[data-scelta]')
   if (s && aperta) {
-    const r = missioni.scegli(aperta, Number(s.dataset.scelta))
+    occupato = true
+    const r = await missioni.scegli(aperta, Number(s.dataset.scelta)).finally(() => { occupato = false })
     if (!r.ok) return ctx.toast(esc(r.errore), { icona: 'bot-pensa' })
     if (r.esito.fine) ctx.toast(`quest finita: ${premio(r.esito.premio)}`, { icona: 'regalo', ms: 4500 })
     if (r.esito.livello) setTimeout(() => ctx.toast(`sei salito al <b>livello ${r.esito.livello}</b>!`, { icona: 'livello' }), 1800)
     return pagina(aperta, r.esito)
   }
-  if (e.target.closest('[data-lascia]') && aperta) { missioni.abbandona(aperta); ctx.toast('quest lasciata: puoi ricominciarla da capo', { icona: 'bot-pensa' }); return elenco() }
+  if (e.target.closest('[data-lascia]') && aperta) { occupato = true; const r = await missioni.abbandona(aperta).finally(() => { occupato = false }); if (!r.ok) return ctx.toast(esc(r.errore), { icona: 'bot-pensa' }); ctx.toast('quest lasciata: puoi ricominciarla da capo', { icona: 'bot-pensa' }); return elenco() }
   if (e.target.closest('[data-elenco]')) return elenco()
 }
 

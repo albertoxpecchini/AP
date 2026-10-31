@@ -2,7 +2,9 @@
 // storpiati ma riconoscibili (stile videogioco senza licenza), la sigla, la città, i colori della maglia di casa e di
 // trasferta (che si vedono addosso agli omini del campo), uno stemma originale disegnato qui in SVG (gli stessi colori
 // sociali e lo stesso «spirito» del vero: una zebra, un biscione, un giglio; mai il logo vero) e una forza da 1 a 100
-// presa dalla realtà. La forza decide SOLO le quote (partita.js): i risultati no.
+// presa dalla realtà. La forza decide le quote e i gol attesi del risultato (partita.js).
+// (31.10) Il risultato lo fa la banca (C:\pzkko-server\banca), con una copia di questa lista: dati/virtual-squadre.mjs. Se
+// si cambia una squadra si cambia là e qui (tools/pzkko/virtual/prova.mjs controlla che le scene siano le stesse).
 //
 // Niente nomi veri di giocatori: i cognomi li inventa cognome(rand), con sillabe italiane a caso.
 //

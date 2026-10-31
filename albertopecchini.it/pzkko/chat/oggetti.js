@@ -66,4 +66,7 @@ export const NUOVI = [
   cosa('portafoglio', 'portafoglio di pelle', 1500, 'usato e customizzato come in Fallout, coi due schermi verdi: quello che vendi vale l’8 % in più.', 'pzk', { vendita: 0.08 }),
   cosa('pager', 'cercapersone', 700, 'quello sotto il wallet, con la chiocciolina dentro: punti esperienza +3 %.', 'pzk', { xp: 0.03 }),
   cosa('peluche', 'peluche della chiocciola', 300, 'la mascotte della banca $pzk, con gli occhiali da sole: punti esperienza +3 %.', 'pzk', { xp: 0.03 }),
+  // il cercapersone zero (29.10, Alberto: «questa versione sarà a 9999 pzk$ e lo sostituirà per sempre nell'account»): il
+  // gadget bianco in 3D (telefono/zero/). Comprato, sul muro e aprendo c'è lui, e non si vende: il vecchio resta a tutti gli altri
+  cosa('zero', 'cercapersone zero', 9999, 'il cercapersone nuovo, in 3D: bianco, coi tasti arancioni, lo schermo a retroilluminazione arancione, la porta usb-c sulla testata e dentro pzk os. Comprato, prende il posto di quello nero sul muro, per sempre. Punti esperienza +10 %, attese −10 %.', 'pzk', { xp: 0.1, attese: -0.1 }),
 ]

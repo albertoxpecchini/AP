@@ -1,20 +1,28 @@
 // Il calendario e le partite di «Virtual», il campionato inventato di pzkko.it. Niente disegno qui: la finestra
-// (virtual.js) e lo schermino (schermo.js) chiedono a questo modulo cosa succede, e la prova
-// (tools/pzkko/virtual/prova.mjs) lo fa girare su migliaia di partite senza browser.
+// (virtual.js) e lo schermino (schermo.js) chiedono a questo modulo cosa succede.
 //
 // IL TEMPO. Il tempo è diviso in cicli di cinque minuti allineati all'orologio: i primi quattro minuti del ciclo le
 // scommesse sono aperte, l'ultimo minuto la partita è in diretta (90' più il recupero compressi in 60 secondi), allo
-// scoccare del ciclo dopo è finita, si paga e si apre la successiva. L'indice della partita è Math.floor(Date.now() /
-// 300000): da quell'indice, con un generatore seminato, escono le squadre, le quote, il meteo e tutta la cronaca. Così
-// chiunque apra pzkko.it vede LA STESSA partita nello stesso momento, chi arriva a metà la vede dal punto giusto e
-// ricaricare non cambia niente.
+// scoccare del ciclo dopo è finita, si paga e si apre la successiva. L'indice della partita è Math.floor(ora / 300000):
+// da quell'indice, con un generatore seminato, escono le squadre, le quote, il meteo e le formazioni. Così chiunque apra
+// pzkko.it vede LA STESSA partita nello stesso momento, chi arriva a metà la vede dal punto giusto e ricaricare non cambia
+// niente. (31.10) L'ora è quella della banca: adesso() corregge l'orologio del browser con quello che la banca dice a ogni
+// palinsesto (orologio), così un telefono avanti di un minuto non chiude le scommesse quando per la banca sono aperte.
 //
-// LE QUOTE SEGUONO LA REALTÀ, I RISULTATI NO. Le quote si calcolano dalla forza vera delle squadre (squadre.js: le big
-// alte, le neopromosse e la Serie B basse) con un fattore campo leggero e un pizzico di rumore dal seme, come farebbe un
+// LE QUOTE SEGUONO LA REALTÀ. Le quote si calcolano dalla forza vera delle squadre (squadre.js: le big alte, le
+// neopromosse e la Serie B basse) con un fattore campo leggero e un pizzico di rumore dal seme, come farebbe un
 // bookmaker: gol attesi dalla differenza di forza, probabilità di 1 X 2 e dei totali da una Poisson, un margine del
-// 6,5%, arrotondate ai centesimi e mai sotto 1,05. Il risultato invece esce da una Poisson di media fissa (GOL_MEDI,
-// 1,35 a squadra) uguale per tutte, che della forza non sa niente: la sfavorita vince quanto la favorita. È voluto, è la
-// battuta del gioco. Anche il meteo è solo scena: non tocca il risultato.
+// 6,5%, arrotondate ai centesimi e mai sotto 1,05. Il meteo è solo scena: non tocca il risultato.
+//
+// IL RISULTATO E LA CRONACA NON SONO PIÙ QUI (31.10, Alberto: «il browser non decide più niente»). Fino a oggi il
+// risultato usciva da un secondo seme, anche lui dall'indice (mulberry32), scritto qui: chiunque poteva calcolare in
+// anticipo i risultati di tutte le partite. Ora li decide la banca (C:\pzkko-server, giochi/virtual.mjs: il seme è un
+// HMAC del segreto del server, i gol dalle stesse forze delle quote, il doppio giallo che diventa rosso, gli espulsi che
+// non giocano più), che li manda solo a partita iniziata, col palinsesto (schedina.js). Qui resta la scena, che serve per
+// disegnare anche prima di chiedere (e senza rete): la stessa che costruisce la banca, dallo stesso seme pubblico, con le
+// stesse quote. dallaBanca() aggiunge alla scena quello che la banca ha detto (le quote, il risultato, la cronaca), e
+// partita() li dà insieme: risultato null ed eventi vuoti finché la banca non li ha dati. La prova
+// tools/pzkko/virtual/prova.mjs controlla che la scena di qui e quella della banca siano la stessa.
 
 import { SQUADRE, SERIE_A, SERIE_B, cognome } from './squadre.js'
 
@@ -34,15 +42,28 @@ export const PUNTATE = [
   ...SOGLIE.flatMap((s) => [{ id: `O${s}`, nome: `over ${s.toLocaleString('it-IT')}`, dice: `più di ${s.toLocaleString('it-IT')} gol in tutto` }, { id: `U${s}`, nome: `under ${s.toLocaleString('it-IT')}`, dice: `meno di ${s.toLocaleString('it-IT')} gol in tutto` }]),
 ]
 export const PER_PUNTATA = new Map(PUNTATE.map((p) => [p.id, p]))
+/** (31.10) Le giocate si chiudono 5 secondi prima del fischio: lo decide la banca (giochi/virtual.mjs, CHIUDE). */
+export const CHIUDE = 5000
 
 // ── l'orologio del campionato ────────────────────────────────────────────────
-export const indiceAdesso = (now = Date.now()) => Math.floor(now / CICLO)
+// (31.10) quanto l'orologio della banca è avanti rispetto a quello del browser
+let scarto = 0
+/** L'ora della banca, come la sa il browser. */
+export const adesso = () => Date.now() + scarto
+/** La banca ha detto che ore sono (`ora`), in una risposta chiesta a `mandata` e arrivata a `ricevuta` (Date.now()). */
+export function orologio(ora, mandata, ricevuta) {
+  if (!Number.isFinite(ora) || !(ricevuta >= mandata) || ricevuta - mandata > 10_000) return // (una risposta lenta non dice l'ora giusta)
+  scarto = ora - (mandata + ricevuta) / 2
+}
+export const indiceAdesso = (now = adesso()) => Math.floor(now / CICLO)
 /** Dove siamo nel ciclo: { indice, fase: 'scommesse' | 'partita', manca (ms alla chiusura o alla fine), t (secondi di partita, 0–60) }. */
-export function fase(now = Date.now()) {
+export function fase(now = adesso()) {
   const indice = Math.floor(now / CICLO), dentro = now - indice * CICLO
   if (dentro < SCOMMESSE) return { indice, fase: 'scommesse', manca: SCOMMESSE - dentro, t: 0 }
   return { indice, fase: 'partita', manca: CICLO - dentro, t: (dentro - SCOMMESSE) / 1000 }
 }
+/** Le giocate sono aperte nella fase `f` (fino a CHIUDE prima del fischio). */
+export const aperte = (f = fase()) => f.fase === 'scommesse' && f.manca > CHIUDE
 
 // ── il generatore seminato (mulberry32) ──────────────────────────────────────
 /** Un generatore riproducibile: rand() dà un numero fra 0 e 1, sempre gli stessi per lo stesso seme. */
@@ -56,18 +77,8 @@ export function generatore(seme) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
-// due semi diversi per la stessa partita: uno per squadre, quote e scena (che DEVONO dipendere dall'indice), uno a parte
-// per il risultato. Così è anche evidente nel codice che il risultato non legge niente delle squadre
+// il seme della scena: squadre, quote, meteo, formazioni (dall'indice: è pubblico). Il seme del risultato lo ha la banca
 const semeScena = (indice) => (Math.imul(indice, 2654435761) ^ 0x5bd1e995) >>> 0
-const semeRisultato = (indice) => (Math.imul(indice ^ 0x7f4a7c15, 1597334677) + 0x3c6ef372) >>> 0
-
-/** Una Poisson di media `media`, con rand. */
-export function poisson(media, rand) {
-  const L = Math.exp(-media)
-  let k = 0, p = rand()
-  while (p > L) { k++; p *= rand() }
-  return k
-}
 
 // ── le probabilità da cui nascono le quote ───────────────────────────────────
 const fattoriale = (n) => { let f = 1; for (let i = 2; i <= n; i++) f *= i; return f }
@@ -117,12 +128,6 @@ export function minuto(t) {
   if (t < T.fine2) { const m = 45 + Math.floor(((t - T.via2) / (T.fine2 - T.via2)) * 45) + 1; return { min: m, extra: 0, scritta: `${m}'` } }
   if (t < T.fine) { const e = Math.floor(((t - T.fine2) / (T.fine - T.fine2)) * 3) + 1; return { min: 90, extra: e, scritta: `90+${e}'` } }
   return { min: 90, extra: 3, scritta: 'FINE', finita: true }
-}
-/** Il secondo di partita in cui cade il minuto m (1–93), con una frazione a caso dentro il minuto. */
-function secondoDelMinuto(m, frazione = 0.5) {
-  if (m <= 45) return ((m - 1 + frazione) / 45) * T.fine1
-  if (m <= 90) return T.via2 + ((m - 46 + frazione) / 45) * (T.fine2 - T.via2)
-  return T.fine2 + ((m - 91 + frazione) / 3) * (T.fine - T.fine2)
 }
 
 // ── il meteo della città di casa, coerente col clima e con la stagione ──────
@@ -179,25 +184,39 @@ function meteoDi(squadra, inizio, rand) {
   return { tipo, temp: Math.round(temp), notte, sera, forza: 0.5 + rand() * 0.5, mese, ora }
 }
 
-// ── le cause buffe della vittoria a tavolino ─────────────────────────────────
-export const CAUSE = [
-  'blackout dei riflettori', 'invasione di nutrie', 'il pallone è finito nel canale e non ce n\'era un altro', 'gli ospiti hanno sbagliato stadio',
-  'l\'arbitro ha perso il fischietto', 'il bar dello stadio ha finito le brioche', 'un drone del fantacalcio sul campo', 'la squadra di casa è rimasta chiusa negli spogliatoi',
-]
-const CAUSA_NEBBIA = 'nebbia fitta: non si vede la porta'
-
 // ── la partita ───────────────────────────────────────────────────────────────
-const cache = new Map()
+const scene = new Map(), dalla = new Map(), pronte = new Map()
+const tieni = (m, k, v, max) => { m.set(k, v); if (m.size > max) m.delete(m.keys().next().value) }
+/** La scena della partita con quell'indice: squadre, quote, meteo, formazioni, maglie, le ultime cinque «uscite». */
+export function scena(indice) {
+  let p = scene.get(indice)
+  if (!p) { p = costruisci(indice); tieni(scene, indice, p, 40) }
+  return p
+}
+let avvisato = false
 /**
- * La partita con quell'indice: squadre, quote, meteo, formazioni, le ultime cinque «uscite» inventate, il risultato
- * ufficiale e la cronaca (eventi con il secondo in cui cadono). Tutto dal seme: uguale per chiunque la chieda.
+ * (31.10) Quello che la banca dice di una partita (una voce del palinsesto: { indice, casa, ospite, quote, stato,
+ * risultato?, eventi? }). Il risultato e gli eventi ci sono solo dal fischio d'inizio.
+ */
+export function dallaBanca(v) {
+  if (!Number.isInteger(v?.indice)) return
+  const s = scena(v.indice)
+  if ((v.casa !== s.casa.id || v.ospite !== s.ospite.id) && !avvisato) { avvisato = true; console.warn('virtual: la scena del sito e quella della banca non sono la stessa partita', v.indice) }
+  const prima = dalla.get(v.indice)
+  if (prima?.eventi && !v.eventi) return // (la cronaca, una volta data, resta)
+  tieni(dalla, v.indice, v, 40)
+  pronte.delete(v.indice)
+}
+/**
+ * La partita con quell'indice: la scena, con le quote, il risultato ufficiale e la cronaca (eventi con il secondo in cui
+ * cadono) come li ha detti la banca. Finché la banca non ha dato la cronaca: risultato null, eventi [], cronaca false.
  */
 export function partita(indice) {
-  let p = cache.get(indice)
+  let p = pronte.get(indice)
   if (p) return p
-  p = costruisci(indice)
-  if (cache.size > 40) cache.delete(cache.keys().next().value)
-  cache.set(indice, p)
+  const s = scena(indice), b = dalla.get(indice)
+  p = { ...s, quote: b?.quote ?? s.quote, risultato: b?.risultato ?? null, eventi: b?.eventi ?? [], cronaca: !!b?.eventi, stato: b?.stato ?? null }
+  tieni(pronte, indice, p, 40)
   return p
 }
 
@@ -229,16 +248,7 @@ function costruisci(indice) {
   if (simili(maglie.casa.colori, maglie.ospite.colori)) maglie.ospite = { colori: ospite.fuori, disegno: 'pieno' } // (fuori è sempre diversa da casa)
   const portieri = { casa: portiere(maglie.casa.colori, maglie.ospite.colori), ospite: portiere(maglie.ospite.colori, maglie.casa.colori) }
 
-  // ── IL RISULTATO: dal suo seme, con la Poisson fissa. Non legge niente di quanto sopra ──
-  const rr = generatore(semeRisultato(indice))
-  const golCasa = poisson(GOL_MEDI, rr), golOspite = poisson(GOL_MEDI, rr)
-  const tavolino = rr() < 1 / 120 ? (rr() < 0.5 ? 'casa' : 'ospite') : null
-
-  // ── la cronaca: i gol veri messi al loro minuto, e intorno la scena (dal seme della scena) ──
-  const eventi = cronaca({ golCasa, golOspite, tavolino, rand, formazioni, meteo })
-  const risultato = tavolino ? { casa: tavolino === 'casa' ? 3 : 0, ospite: tavolino === 'ospite' ? 3 : 0, tavolino, causa: eventi.find((e) => e.tipo === 'sospesa').causa } : { casa: golCasa, ospite: golOspite, tavolino: null }
-  // il punteggio sul campo, prima della sospensione (per il tabellone durante la partita)
-  return { indice, inizio, fine: inizio + DURATA, casa, ospite, forze: { casa: casa.forza, ospite: ospite.forza }, quote, prob, attesi: { casa: lc, ospite: lo }, meteo, formazioni, maglie, portieri, ultime, risultato, eventi }
+  return { indice, inizio, fine: inizio + DURATA, casa, ospite, forze: { casa: casa.forza, ospite: ospite.forza }, quote, prob, attesi: { casa: lc, ospite: lo }, meteo, formazioni, maglie, portieri, ultime }
 }
 
 // due maglie si somigliano se i colori principali sono vicini
@@ -256,155 +266,11 @@ function formazione(rand) {
   return numeri.map((n, i) => ({ n, nome: cognome(rand), ruolo: i === 0 ? 'P' : i <= 2 ? 'D' : i === 3 ? 'C' : i === 4 ? 'A' : 'R' }))
 }
 
-// Gli eventi della cronaca, ognuno con il secondo t in cui cade e quanto dura la sua messa in scena (dur). Tipi:
-// inizio, intervallo, ripresa, fine, gol (squadra, chi, rigore?, punteggio), tiro (esito: fuori | palo | parata),
-// rimessa, fallo, giallo, rosso, rigore (esito: parato | fuori: quelli segnati sono «gol» con rigore: true),
-// infortunio (chi, entra), sospesa (causa). I grandi eventi stanno ad almeno 3,2 s l'uno dall'altro.
-function cronaca({ golCasa, golOspite, tavolino, rand, formazioni, meteo }) {
-  const ev = []
-  const minutoLibero = (occupati, lontano = 2) => {
-    for (let k = 0; k < 40; k++) {
-      const m = 2 + Math.floor(rand() * 90) // 2..91
-      if (occupati.every((o) => Math.abs(o - m) >= lontano)) return m
-    }
-    return 2 + Math.floor(rand() * 90)
-  }
-  const chi = (squadra, { noPortiere = true } = {}) => { const f = formazioni[squadra]; const i = noPortiere ? 1 + Math.floor(rand() * 4) : Math.floor(rand() * 5); return { i, n: f[i].n, nome: f[i].nome } }
-  const grandi = [] // i minuti già presi dai grandi eventi
-  // i gol
-  const gol = []
-  for (let i = 0; i < golCasa; i++) gol.push({ squadra: 'casa', m: minutoLibero(grandi, 3) });
-  for (let i = 0; i < golOspite; i++) gol.push({ squadra: 'ospite', m: minutoLibero(grandi, 3) })
-  for (const g of gol) grandi.push(g.m)
-  gol.sort((a, b) => a.m - b.m)
-  // il rigore: una partita su sette ne ha uno; se quella squadra ha segnato, uno dei suoi gol è su rigore, se no è sbagliato
-  let rigoreSbagliato = null
-  if (rand() < 0.14) {
-    const sq = rand() < 0.5 ? 'casa' : 'ospite'
-    const suoi = gol.filter((g) => g.squadra === sq)
-    if (suoi.length && rand() < 0.75) suoi[Math.floor(rand() * suoi.length)].rigore = true
-    else { const m = minutoLibero(grandi, 3); grandi.push(m); rigoreSbagliato = { squadra: sq, m, esito: rand() < 0.6 ? 'parato' : 'fuori' } }
-  }
-  // cartellini: gialli (in media 2,5, al più 4), un rosso una partita su quattordici
-  const gialli = Math.min(4, poisson(2.5, rand))
-  const cartellini = []
-  const ammoniti = { casa: new Set(), ospite: new Set() }
-  for (let i = 0; i < gialli; i++) {
-    const sq = rand() < 0.5 ? 'casa' : 'ospite', c = chi(sq), m = minutoLibero(grandi, 3)
-    grandi.push(m)
-    cartellini.push({ tipo: 'giallo', squadra: sq, m, chi: c })
-    ammoniti[sq].add(c.i)
-  }
-  let rosso = null
-  if (rand() < 1 / 14) {
-    const sq = rand() < 0.5 ? 'casa' : 'ospite', c = chi(sq), m = 15 + Math.floor(rand() * 70)
-    grandi.push(m)
-    rosso = { tipo: 'rosso', squadra: sq, m, chi: c, doppio: ammoniti[sq].has(c.i) && cartellini.some((k) => k.squadra === sq && k.chi.i === c.i && k.m < m) }
-  }
-  // l'infortunio: una su otto; esce in barella ed entra la riserva
-  let infortunio = null
-  if (rand() < 0.125) {
-    const sq = rand() < 0.5 ? 'casa' : 'ospite', c = chi(sq), m = minutoLibero(grandi, 3)
-    grandi.push(m)
-    infortunio = { tipo: 'infortunio', squadra: sq, m, chi: c, entra: formazioni[sq][5 + Math.floor(rand() * 2)] }
-  }
-  // i quasi gol, le rimesse e i falli: la scena fra un grande evento e l'altro
-  const piccoli = []
-  const nTiri = 4 + poisson(3, rand), nRimesse = 2 + Math.floor(rand() * 3), nFalli = 2 + Math.floor(rand() * 3)
-  const occupati = [...grandi]
-  for (let i = 0; i < nTiri; i++) { const m = minutoLibero(occupati, 2); occupati.push(m); const r = rand(); piccoli.push({ tipo: 'tiro', squadra: rand() < 0.5 ? 'casa' : 'ospite', m, esito: r < 0.45 ? 'fuori' : r < 0.6 ? 'palo' : 'parata' }) }
-  for (let i = 0; i < nRimesse; i++) { const m = minutoLibero(occupati, 2); occupati.push(m); piccoli.push({ tipo: 'rimessa', squadra: rand() < 0.5 ? 'casa' : 'ospite', m, lato: rand() < 0.5 ? 'alto' : 'basso' }) }
-  for (let i = 0; i < nFalli; i++) { const m = minutoLibero(occupati, 2); occupati.push(m); piccoli.push({ tipo: 'fallo', squadra: rand() < 0.5 ? 'casa' : 'ospite', m }) }
-  // con la pioggia qualcuno scivola (solo scena)
-  if (meteo.tipo === 'pioggia') for (let i = 0; i < 1 + Math.floor(rand() * 2); i++) { const m = minutoLibero(occupati, 2); occupati.push(m); piccoli.push({ tipo: 'scivola', squadra: rand() < 0.5 ? 'casa' : 'ospite', m, chi: chi(rand() < 0.5 ? 'casa' : 'ospite') }) }
-
-  // tutti insieme, in secondi, poi la sospensione se c'è
-  let punteggio = { casa: 0, ospite: 0 }
-  const tutti = []
-  for (const g of gol) tutti.push({ tipo: 'gol', squadra: g.squadra, m: g.m, rigore: !!g.rigore, chi: chi(g.squadra) })
-  if (rigoreSbagliato) tutti.push({ tipo: 'rigore', ...rigoreSbagliato, chi: chi(rigoreSbagliato.squadra) })
-  tutti.push(...cartellini)
-  if (rosso) tutti.push(rosso)
-  if (infortunio) tutti.push(infortunio)
-  tutti.push(...piccoli)
-  for (const e of tutti) e.t = secondoDelMinuto(e.m, 0.15 + rand() * 0.7)
-  tutti.sort((a, b) => a.t - b.t)
-  // i grandi eventi ad almeno 3,2 s l'uno dall'altro, i piccoli ad almeno 1,2 s da tutto (spostati in avanti); un piccolo
-  // evento che non ci sta più (la fine, l'intervallo) si lascia cadere, un grande si schiaccia all'indietro quanto basta
-  const grande = (e) => ['gol', 'rigore', 'giallo', 'rosso', 'infortunio'].includes(e.tipo)
-  const sistemati = []
-  let ultimoGrande = -10, ultimo = 0.6 // (il primo evento dopo il fischio d'inizio)
-  for (const e of tutti) {
-    const minimo = grande(e) ? Math.max(ultimoGrande + 3.2, ultimo + 1.4) : ultimo + 1.2
-    if (e.t < minimo) e.t = minimo
-    // mai a cavallo dell'intervallo
-    if (e.t > T.fine1 - 1.6 && e.t < T.via2 + 0.6) e.t = T.via2 + 0.6 + (e.t - (T.fine1 - 1.6)) * 0.2
-    if (e.t > T.fine - 1.4) {
-      if (!grande(e)) continue
-      e.t = T.fine - 1.4
-      // i grandi di prima arretrano, a catena, finché stanno a 3,2 s
-      for (let j = sistemati.length - 1, lim = e.t; j >= 0; j--) { const g = sistemati[j]; if (!grande(g)) continue; if (g.t > lim - 3.2) g.t = lim - 3.2; if (g.t > T.fine1 - 1.6 && g.t < T.via2 + 0.6) g.t = T.fine1 - 1.6; lim = g.t }
-    }
-    sistemati.push(e)
-    ultimo = e.t
-    if (grande(e)) ultimoGrande = e.t
-  }
-  tutti.length = 0
-  tutti.push(...sistemati)
-  // (i piccoli che l'arretramento ha lasciato addosso a un grande si tolgono)
-  for (let j = tutti.length - 1; j >= 0; j--) { const e = tutti[j]; if (grande(e)) continue; if (tutti.some((g) => g !== e && grande(g) && Math.abs(g.t - e.t) < 1.1)) tutti.splice(j, 1) }
-  tutti.sort((a, b) => a.t - b.t)
-  for (const e of tutti) { e.m = minuto(e.t).min; e.minuto = minuto(e.t).scritta }
-  // il punteggio dopo ogni gol, i secondi gialli diventano l'espulsione già scritta
-  for (const e of tutti) if (e.tipo === 'gol') { punteggio = { ...punteggio, [e.squadra]: punteggio[e.squadra] + 1 }; e.punteggio = punteggio }
-  ev.push({ tipo: 'inizio', t: 0, dur: 1.2, minuto: "1'" })
-  ev.push(...tutti)
-  ev.push({ tipo: 'intervallo', t: T.fine1, dur: T.via2 - T.fine1, minuto: '45\'' }, { tipo: 'ripresa', t: T.via2, dur: 1, minuto: '46\'' })
-  if (tavolino) {
-    const ts = secondoDelMinuto(12 + Math.floor(rand() * 70), 0.5)
-    const causa = meteo.tipo === 'nebbia' ? CAUSA_NEBBIA : CAUSE[Math.floor(rand() * CAUSE.length)]
-    const prima = ev.filter((e) => e.t < ts - 1.5 || e.tipo === 'inizio')
-    prima.push({ tipo: 'sospesa', t: Math.max(ts, 4), dur: T.fine - Math.max(ts, 4), minuto: minuto(ts).scritta, causa, aChi: tavolino })
-    prima.sort((a, b) => a.t - b.t)
-    for (const e of prima) e.dur ??= durata(e)
-    return prima
-  }
-  ev.push({ tipo: 'fine', t: T.fine, dur: 10, minuto: 'FINE' })
-  ev.sort((a, b) => a.t - b.t)
-  for (const e of ev) e.dur ??= durata(e)
-  return ev
-}
-/** Quanto dura la messa in scena di un evento, in secondi. */
-export function durata(e) {
-  switch (e.tipo) {
-    case 'gol': return e.rigore ? 5.2 : 4.4
-    case 'rigore': return 4.2
-    case 'giallo': return 2.6
-    case 'rosso': return 3.4
-    case 'infortunio': return 3.6
-    case 'tiro': return 1.1
-    case 'rimessa': return 0.9
-    case 'fallo': return 0.9
-    case 'scivola': return 1
-    default: return 1
-  }
-}
-
 /** Il punteggio sul campo a t secondi (prima dell'eventuale sospensione). */
 export function punteggioA(p, t) {
   let c = 0, o = 0
   for (const e of p.eventi) if (e.tipo === 'gol' && e.t <= t) { if (e.squadra === 'casa') c++; else o++ }
   return { casa: c, ospite: o }
-}
-
-/** Una puntata vince? (`id` di PUNTATE, sul risultato ufficiale, tavolino compreso). */
-export function vince(id, risultato) {
-  const { casa, ospite } = risultato, tot = casa + ospite
-  if (id === '1') return casa > ospite
-  if (id === 'X') return casa === ospite
-  if (id === '2') return casa < ospite
-  const s = Number(id.slice(1))
-  return id[0] === 'O' ? tot > s : tot < s
 }
 /** Il risultato come si scrive: «2–1», «3–0 a tavolino». */
 export const scriviRisultato = (r) => `${r.casa}–${r.ospite}${r.tavolino ? ' a tavolino' : ''}`

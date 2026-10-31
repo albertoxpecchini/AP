@@ -196,53 +196,9 @@ export const PER_ID = Object.fromEntries([...NEGOZIO, ...PESCI, ...ANIMALI, ...R
 /** Il nome di un oggetto, come si scrive nello zaino. */
 export const nomeDi = (id) => PER_ID[id]?.nome?.replace(/^(un’|un |una |uno |il |la |l’)/i, '') ?? id
 
-// ── quiz: domanda, risposte (la prima è quella giusta, poi si mescolano), difficoltà 1–3 ──
-export const QUIZ = [
-  ['Il fiume che fa i laghi di Mantova?', ['il Mincio', 'il Po', 'l’Adige', 'l’Oglio'], 1],
-  ['Il poeta nato a Mantova (ad Andes)?', ['Virgilio', 'Dante', 'Ovidio', 'Petrarca'], 1],
-  ['La famiglia che ha governato Mantova per quattro secoli?', ['i Gonzaga', 'i Medici', 'gli Sforza', 'gli Este'], 1],
-  ['Il piatto tipico di Mantova?', ['i tortelli di zucca', 'i pizzoccheri', 'le orecchiette', 'la carbonara'], 1],
-  ['Quanti laghi circondano Mantova?', ['tre', 'uno', 'due', 'cinque'], 1],
-  ['Il palazzo con la Sala dei Giganti?', ['Palazzo Te', 'Palazzo Ducale', 'Palazzo Pitti', 'Palazzo Madama'], 2],
-  ['Chi ha dipinto la Camera degli Sposi?', ['Mantegna', 'Giotto', 'Raffaello', 'Caravaggio'], 2],
-  ['L’opera di Verdi ambientata a Mantova?', ['Rigoletto', 'Aida', 'Nabucco', 'La traviata'], 2],
-  ['Il dolce mantovano che si rompe col pugno?', ['la sbrisolona', 'il pandoro', 'la pastiera', 'il tiramisù'], 1],
-  ['La bestia col dente arancione che vive nel Mincio?', ['la nutria', 'il castoro', 'la lontra', 'il tasso'], 1],
-  ['Il festival dei libri di Mantova, a settembre?', ['Festivaletteratura', 'Salone del Libro', 'Lucca Comics', 'Umbria Jazz'], 2],
-  ['Chi ha progettato Palazzo Te?', ['Giulio Romano', 'Bramante', 'Palladio', 'Brunelleschi'], 3],
-  ['Il quartiere di Mantova oltre il lago, dove c’è il Mantegna?', ['Cittadella', 'Lunetta', 'Borgo Virgiliana', 'Te Brunetti'], 3],
-  ['La derivata di x²?', ['2x', 'x', 'x²/2', '2'], 1],
-  ['Il limite di sin(x)/x per x → 0?', ['1', '0', 'infinito', 'non esiste'], 2],
-  ['L’integrale di 1/x?', ['ln|x| + c', 'x² + c', '1/x² + c', 'e^x + c'], 2],
-  ['Quanto fa 7 × 8?', ['56', '54', '48', '64'], 1],
-  ['La radice quadrata di 169?', ['13', '12', '14', '17'], 1],
-  ['Quanti bit in un byte?', ['8', '4', '16', '32'], 1],
-  ['Il linguaggio che gira nel browser?', ['JavaScript', 'Python', 'Java', 'C'], 1],
-  ['Il tag HTML per un link?', ['<a>', '<link>', '<href>', '<url>'], 2],
-  ['Il codice HTTP di «non trovato»?', ['404', '500', '200', '301'], 1],
-  ['Un hash a 256 bit molto usato?', ['SHA-256', 'MD5', 'CRC32', 'ROT13'], 2],
-  ['In CSS, come si centra un flex orizzontalmente?', ['justify-content: center', 'align-items: center', 'text-align: center', 'margin: center'], 3],
-  ['Il modello di gpt che disegna le immagini di pzkko?', ['gpt-image-2', 'DALL·E 1', 'Stable Diffusion', 'Midjourney'], 3],
-  ['Quante carte in un mazzo da poker senza jolly?', ['52', '40', '54', '48'], 1],
-  ['Quanto paga un numero pieno alla roulette?', ['35 a 1', '17 a 1', '36 a 1', '30 a 1'], 2],
-  ['Nel blackjack, quanto vale l’asso?', ['1 o 11', '1', '11', '10'], 1],
-  ['La probabilità di fare 7 con due dadi?', ['1/6', '1/12', '1/36', '1/7'], 2],
-  ['In quale anno è morto Virgilio?', ['19 a.C.', '44 a.C.', '14 d.C.', '70 a.C.'], 3],
-  ['La capitale dell’Australia?', ['Canberra', 'Sydney', 'Melbourne', 'Perth'], 2],
-  ['Il pianeta più grande del sistema solare?', ['Giove', 'Saturno', 'Terra', 'Nettuno'], 1],
-  ['L’elemento con simbolo Fe?', ['il ferro', 'il fluoro', 'il fosforo', 'il francio'], 1],
-  ['Chi ha scritto «I promessi sposi»?', ['Manzoni', 'Leopardi', 'Verga', 'Foscolo'], 1],
-  ['Quanti anni ha la Torre dell’Orologio di Mantova, più o meno?', ['550', '200', '900', '100'], 3],
-  ['Il lago di Mantova che non c’è più (prosciugato)?', ['il lago Paiolo', 'il lago Superiore', 'il lago di Mezzo', 'il lago Inferiore'], 3],
-  ['Cosa raffigura lo stemma di Mantova?', ['una croce rossa su fondo bianco', 'un leone', 'una chiocciola', 'un’aquila'], 3],
-  ['Il campionato in cui gioca il Mantova nel 2025-26?', ['Serie B', 'Serie A', 'Serie C', 'Serie D'], 2],
-  ['Il ponte che attraversa il lago di Mezzo?', ['ponte di San Giorgio', 'ponte Vecchio', 'ponte Milvio', 'ponte dei Sospiri'], 2],
-  ['Quanto vale pi greco, arrotondato a due cifre?', ['3,14', '3,41', '3,12', '3,16'], 1],
-  ['Il verso del cavedano?', ['nessuno, è un pesce', 'miao', 'muuu', 'coccodè'], 1],
-  ['Cosa si mette nei tortelli di zucca oltre alla zucca?', ['amaretti e mostarda', 'nutella', 'tonno', 'cioccolato'], 2],
-  ['Il nome dell’euro finto del wallet di pzkko?', ['EUR€ (l’euroshit)', 'il pzkEuro', 'il lirone', 'il dollaro gonzaga'], 2],
-  ['Chi dà i 1.000 $pzk a chi è a secco?', ['il sussidio', 'il sindaco', 'la nonna', 'Virgilio'], 2],
-]
+// ── quiz (31.10, Alberto: «il browser non decide più niente»): le domande con le risposte giuste non stanno più qui (chi
+// apriva la console le sapeva). Stanno sulla banca, sul pc di Alberto: banca/dati/testi.mjs (il quiz «a caso» del telefono)
+// e banca/dati/chat-domande.mjs (il quiz lampo e i minigiochi della chat) ──
 
 // ── le parole da riscrivere (veloce, riscrivi) ──
 export const PAROLE = ['chiocciola', 'saracinesca', 'tortelli', 'sbrisolona', 'nutria', 'Mantova', 'Gonzaga', 'Virgilio', 'Mincio', 'cavedano', 'mortadella', 'cercapersone', 'portafoglio', 'roulette', 'blackjack', 'anguilla', 'luccio', 'siluro', 'piazza', 'cornetto', 'lattina', 'Rigoletto', 'mantegna', 'mostarda', 'fionda', 'cinghiale', 'fagiano', 'anfora', 'fossile', 'tesoro', 'streamer', 'bidello', 'tatuatore', 'salumiere', 'avvocato', 'sindaco', 'zanzara', 'piccione', 'scarpa', 'bottiglia', 'banconota', 'clessidra', 'diamante', 'ciliegia', 'campana', 'trifoglio', 'anguria', 'pzkko', 'euroshit', 'sussidio', 'elemosina', 'giornaliero']

@@ -3,7 +3,8 @@
 // WebAssembly). Lo usa la finestra del gioco (moneta.js, che ci disegna sopra la
 // moneta e il piatto in 3D con three.js) e lo usano le prove senza browser
 // (tools/pzkko/moneta/prova.mjs): la moneta che si vede e quella che si simula
-// sono la stessa. Niente sorteggi: testa o croce lo decide come cade.
+// sono la stessa. Niente sorteggi qui: testa o croce lo decide come cade (31.10:
+// nel gioco la faccia la tira la banca, e moneta.js ci fa arrivare la moneta).
 //
 // Unità: metri, chilogrammi, secondi; y in alto. La moneta ha la testa sulla
 // faccia +y e la croce sulla −y (nel suo sistema). Il piatto è centrato
@@ -127,6 +128,22 @@ export class Moneta {
     b.setAngvel({ x: 0, y: 0, z: 0 }, true)
     this.stato = 'ferma'
     this.risultato = faccia
+  }
+
+  /**
+   * (31.10) La moneta ferma di nuovo nella posa `posa` ({ p, q }, da pose()): il gioco prova il lancio di nascosto
+   * (moneta.js, il film del lancio) e, se non vale, lo riprova da capo prima di farlo vedere.
+   */
+  rimetti({ p, q }) {
+    const b = this.corpo
+    b.setBodyType(this.R.RigidBodyType.Dynamic, true)
+    b.setTranslation(p, true)
+    b.setRotation(q, true)
+    b.setLinvel({ x: 0, y: 0, z: 0 }, true)
+    b.setAngvel({ x: 0, y: 0, z: 0 }, true)
+    this.urti.length = 0
+    this.stato = 'ferma'
+    this.risultato = this.faccia()
   }
 
   /** Quale faccia guarda in su (o null se non è piatta) e quanto (il coseno dell'inclinazione, con il segno). */

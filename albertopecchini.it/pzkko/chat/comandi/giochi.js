@@ -1,42 +1,77 @@
-// I giochi via comando: quiz, veloce, slot, dadi, moneta (nati qui) e roulette, blackjack, mine, dado (le regole sono
-// quelle dei giochi veri in games/*/regole.js: stessi pagamenti, stesso banco). Le puntate passano dal tavolo «chat-<gioco>»
-// di games/pzk.js (punta → regola), come negli altri giochi.
-import * as zaino from '../zaino.js'
-import { MINIGIOCHI } from '../minigiochi.js'
-import { PUNTATE_PER_ID as ROULETTE, esito as esitoRoulette } from '../../games/roulette/regole.js'
-import { sabot, punti, RANGHI } from '../../games/blackjack/regole.js'
-import { Partita, MINE, LIMITI as LIMITI_MINE, nuovoSeme, scriviMolt, nomeCasella } from '../../games/mine/regole.js'
-import { REGOLE as REGOLE_DADO, PER_ID as DADO, esito as esitoDado, leggi as leggiDadi } from '../../games/dado/regole.js'
+// I giochi via comando: veloce, slot, dadi, moneta (nati qui) e roulette, blackjack, mine, dado (le regole sono quelle dei
+// giochi veri in games/*/regole.js: stessi pagamenti, stesso banco).
+// DAL 31.10 LI GIOCA LA BANCA (Alberto: «il browser non decide più niente»): qui si legge cosa si vuole puntare, si chiede
+// alla banca ('chat.slot', 'chat.roulette', 'chat.blackjack'… in C:\pzkko-server\banca\giochi\chat-giochi.mjs), che tira,
+// paga e segna le attese, e si mostra quello che è uscito con le animazioni di prima. Le carte coperte, le mine e la parola
+// del veloce stanno sulla banca finché non tocca vederle.
+import { punti } from '../../games/blackjack/regole.js'
+import { scriviMolt, nomeCasella, MINE, LIMITI as LIMITI_MINE } from '../../games/mine/regole.js'
+import { suTela } from '../minigiochi.js'
 
-const ROSSI = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36])
-const d6 = () => 1 + Math.floor(Math.random() * 6)
 const DADO_ICONE = Array.from({ length: 7 }, (_, i) => `<span class="c-carta">${i}</span>`) // le facce come cartellini
 const faccia = (n) => `<b class="pzk">${n}</b>`
 
-/** Controlla e mette sul tavolo la puntata: → l'importo, o null (ha già detto perché). */
+/** Legge la puntata scritta: → l'importo, o null (ha già detto perché). Il saldo e i limiti veri li controlla la banca. */
 function puntata(ctx, gioco, s, min, max) {
   const n = ctx.importo(s, Math.min(max, ctx.pzk.saldo()))
   if (!Number.isFinite(n)) { ctx.dì({ colore: 'rosso', d: `quanto punti? Es. <code>${gioco} 50</code> (anche 1k, metà, tutto).` }); return null }
   if (n < min || n > max) { ctx.dì({ colore: 'rosso', d: `si punta da ${ctx.fmt(min)} a ${ctx.fmt(max)} $pzk.` }); return null }
-  if (!ctx.punta(`chat-${gioco}`, n)) {
-    if (ctx.pzk.aSecco()) { if (ctx.pzk.ricarica()) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', d: `eri a secco: ${ctx.pzkHtml(1000)} nuovi. Ripeti la puntata.` }); else ctx.dì({ colore: 'ambra', d: ctx.pzk.perche() || 'sei a secco.' }) }
-    else ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `non ti bastano: hai ${ctx.pzkHtml(ctx.pzk.saldo())}.` })
-    return null
-  }
   return n
 }
-const fine = (ctx, gioco, giocato, torna) => { ctx.regola(`chat-${gioco}`, giocato, torna); return torna - giocato }
+/** La banca ha detto di no a una puntata: a secco si ricarica (gli ospiti, il sussidio), se no il suo perché. → false */
+function rifiutata(ctx, r, gioco) {
+  if (ctx.pzk.aSecco()) {
+    if (ctx.pzk.ricarica()) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', d: `eri a secco: ${ctx.pzkHtml(1000)} nuovi. Ripeti la puntata.` })
+    else ctx.dì({ colore: 'ambra', d: ctx.pzk.perche() || 'sei a secco.' })
+    return false
+  }
+  return ctx.no(r, gioco)
+}
 const esitoHtml = (ctx, netto) => (netto > 0 ? `<b>+${ctx.fmt(netto)}</b> $pzk` : netto < 0 ? `<span class="meno">−${ctx.fmt(-netto)}</span> $pzk` : 'pari')
+
+// la roulette e il sic bo: quello che si scrive → la puntata della banca
+const ROULETTE = { rosso: 'rosso', nero: 'nero', pari: 'pari', dispari: 'dispari', basso: 'basso', '1-18': 'basso', alto: 'alto', '19-36': 'alto' }
+function suRoulette(cosa) {
+  let m
+  if (/^(\d|[12]\d|3[0-6])$/.test(cosa)) return `pieno:${Number(cosa)}`
+  if ((m = /^dozzina ?([123])$/.exec(cosa))) return `dozzina:${m[1]}`
+  if ((m = /^colonna ?([123])$/.exec(cosa))) return `colonna:${m[1]}`
+  return ROULETTE[cosa] ?? null
+}
+function suDado(cosa) {
+  let m
+  if (['piccolo', 'grande', 'pari', 'dispari', 'triple'].includes(cosa)) return cosa
+  if ((m = /^(?:totale )?(\d{1,2})$/.exec(cosa)) && +m[1] >= 4 && +m[1] <= 17) return `totale:${+m[1]}`
+  if ((m = /^coppia (?:di )?([1-6])$/.exec(cosa))) return `coppia:${m[1]}`
+  if ((m = /^tripla (?:di )?([1-6])$/.exec(cosa))) return `tripla:${m[1]}`
+  if ((m = /^([1-6]) e ([1-6])$/.exec(cosa)) && m[1] !== m[2]) return `combinazione:${Math.min(m[1], m[2])}-${Math.max(m[1], m[2])}`
+  if ((m = /^(?:singolo|il) ([1-6])$/.exec(cosa))) return `singolo:${m[1]}`
+  return null
+}
 
 export const GIOCHI = [
   {
     nomi: ['veloce', 'fast', 'riflessi'], cat: 'giochi', icona: 'fulmine', breve: 'una parola compare all’improvviso: riscrivila, paga in base al tempo', uso: 'veloce', attesa: 30,
     async fai(ctx) {
-      const r = await MINIGIOCHI.veloce(ctx)
-      if (!r.ok) return ctx.scheda({ colore: 'grigio', av: 'bot-triste', d: r.nota })
-      const n = ctx.paga(Math.round(Math.max(30, 300 - r.tempo / 15)))
-      ctx.scheda({ colore: 'oro', av: 'bot-ride', t: ':fulmine: ' + (r.tempo < 2000 ? 'fulmine' : r.tempo < 4000 ? 'svelto' : 'bradipo'), d: `${r.nota} ${ctx.pzkHtml(n)}.` })
-      ctx.saleDiLivello(zaino.daiXp(5))
+      const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, riscrivila.' })
+      await ctx.inVista(s)
+      // (31.10) la banca dice fra quanto compare, e la parola la dà solo passato quel tempo: il tempo lo conta lei
+      const a = await ctx.fai('chat.veloce', {})
+      if (!a.ok) return ctx.aggiorna(s, { colore: a.manca ? 'ambra' : 'grigio', av: 'bot-triste', t: a.manca ? ':clessidra: calma' : '', d: a.manca ? `«veloce» lo puoi rifare fra <b>${ctx.durata(a.manca)}</b>.` : a.errore ?? 'non è andata.' })
+      await ctx.dormi(a.esito.ritardo)
+      const v = await ctx.fai('chat.veloce', { via: true })
+      if (!v.ok) return ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', d: v.errore ?? 'non è andata.' })
+      ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: '' })
+      suTela(s, v.esito.parola)
+      const ferma = ctx.tempo(s, 10000)
+      const scritto = await ctx.scrivi(10000)
+      ferma()
+      const r = await ctx.fai('chat.veloce', { risposta: scritto })
+      if (!r.ok) return ctx.no(r, 'veloce')
+      const e = r.esito
+      if (!e.ok) return ctx.scheda({ colore: 'grigio', av: 'bot-triste', d: e.nota })
+      ctx.scheda({ colore: 'oro', av: 'bot-ride', t: ':fulmine: ' + (e.tempo < 2000 ? 'fulmine' : e.tempo < 4000 ? 'svelto' : 'bradipo'), d: `${e.nota} ${ctx.pzkHtml(e.n)}.` })
+      ctx.saleDiLivello(e.livello)
     },
   },
   {
@@ -45,23 +80,17 @@ export const GIOCHI = [
     async fai(ctx) {
       const n = puntata(ctx, 'slot', ctx.args[0], 1, 500)
       if (n === null) return false
-      const RULLO = [['ciliegia', 9], ['limone', 9], ['anguria', 8], ['uva', 8], ['trifoglio', 7], ['stella', 6], ['campana', 5], ['bar', 5], ['diamante', 3], ['sette', 2], ['chiocciola-oro', 1]]
-      const tot = RULLO.reduce((a, [, p]) => a + p, 0)
-      const gira = () => { let r = Math.random() * tot; for (const [s, p] of RULLO) { r -= p; if (r < 0) return s } return 'ciliegia' }
-      const esce = [gira(), gira(), gira()]
+      const r = await ctx.fai('chat.slot', { n })
+      if (!r.ok) return rifiutata(ctx, r, 'slot')
+      const { esce, molt, torna } = r.esito
       const s = ctx.dì({ colore: 'ambra', t: ':sette: slot', html: `<div class="c-rulli gira"><div>${ctx.icona('sette')}</div><div>${ctx.icona('sette')}</div><div>${ctx.icona('sette')}</div></div>`, pie: `puntati ${ctx.fmt(n)}` })
       const rulli = s.querySelectorAll('.c-rulli div')
       await ctx.inVista(s) // i rulli si fermano quando si vedono girare, non mentre la scheda si scrive
       for (let i = 0; i < 3; i++) { await ctx.dormi(700); rulli[i].innerHTML = ctx.icona(esce[i]); rulli[i].style.animation = 'none'; rulli[i].querySelector('.emo').style.animation = 'none' }
       s.querySelector('.c-rulli').classList.remove('gira')
-      const [a, b, c] = esce
-      let molt = 0
-      if (a === b && b === c) molt = { 'chiocciola-oro': 50, sette: 20, diamante: 12, campana: 8 }[a] ?? 5
-      else if (a === b || b === c || a === c) molt = 1.5
-      const torna = Math.round(n * molt * 2) / 2
-      const netto = fine(ctx, 'slot', n, torna)
+      const a = esce[0], netto = torna - n
       ctx.aggiorna(s, { colore: molt >= 5 ? 'oro' : molt ? 'verde' : 'grigio', av: molt >= 5 ? 'bot-ricco' : molt ? 'bot-ride' : 'bot-triste', t: molt >= 5 ? `:${a}: :${a}: :${a}: JACKPOT ×${molt}` : molt ? 'due uguali' : 'niente', html: `<div class="c-rulli">${esce.map((x) => `<div>${ctx.icona(x)}</div>`).join('')}</div>`, pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(2)
+      ctx.saleDiLivello(r.esito.livello)
     },
   },
   {
@@ -69,15 +98,15 @@ export const GIOCHI = [
     async fai(ctx) {
       const n = puntata(ctx, 'dadi', ctx.args[0], 1, 1000)
       if (n === null) return false
+      const r = await ctx.fai('chat.dadi', { n })
+      if (!r.ok) return rifiutata(ctx, r, 'dadi')
+      const { io, tu, torna } = r.esito
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':dadi: dadi', d: 'tiro io, poi tu…' })
       await ctx.inVista(s, 900)
-      const io = [d6(), d6()], tu = [d6(), d6()]
-      const si = io[0] + io[1], st = tu[0] + tu[1]
       await ctx.dormi(600)
-      const torna = st > si ? n * 2 : st === si ? n : 0
-      const netto = fine(ctx, 'dadi', n, torna)
-      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : netto ? 'rosso' : 'grigio', av: netto > 0 ? 'bot-triste' : netto ? 'bot-ride' : 'bot-pensa', t: `:dadi: ${netto > 0 ? 'hai vinto' : netto ? 'ho vinto io' : 'pari'}`, campi: [['pzk (il bot)', `${DADO_ICONE[io[0]]} ${DADO_ICONE[io[1]]} = ${faccia(si)}`], [ctx.nome(), `${DADO_ICONE[tu[0]]} ${DADO_ICONE[tu[1]]} = ${faccia(st)}`]], pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(2)
+      const netto = torna - n
+      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : netto ? 'rosso' : 'grigio', av: netto > 0 ? 'bot-triste' : netto ? 'bot-ride' : 'bot-pensa', t: `:dadi: ${netto > 0 ? 'hai vinto' : netto ? 'ho vinto io' : 'pari'}`, campi: [['pzk (il bot)', `${DADO_ICONE[io[0]]} ${DADO_ICONE[io[1]]} = ${faccia(io[0] + io[1])}`], [ctx.nome(), `${DADO_ICONE[tu[0]]} ${DADO_ICONE[tu[1]]} = ${faccia(tu[0] + tu[1])}`]], pie: esitoHtml(ctx, netto) })
+      ctx.saleDiLivello(r.esito.livello)
     },
   },
   {
@@ -89,33 +118,31 @@ export const GIOCHI = [
       if (!['testa', 'croce'].includes(scelta)) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>moneta 50 testa</code> (o croce).' })
       const n = puntata(ctx, 'moneta', a, 1, 1000)
       if (n === null) return false
+      const r = await ctx.fai('chat.moneta', { n, lato: scelta })
+      if (!r.ok) return rifiutata(ctx, r, 'moneta')
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':testa: la moneta gira…' })
       await ctx.inVista(s, 1100)
-      const esce = crypto.getRandomValues(new Uint8Array(1))[0] % 2 ? 'testa' : 'croce'
-      const netto = fine(ctx, 'moneta', n, esce === scelta ? n * 2 : 0)
+      const esce = r.esito.uscito, netto = r.esito.torna - n
       ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'rosso', av: netto > 0 ? 'bot-ride' : 'bot-occhiolino', t: `:${esce}: ${esce}`, d: `avevi detto ${scelta}.`, pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(1)
+      ctx.saleDiLivello(r.esito.livello)
     },
   },
   {
     nomi: ['roulette', 'rl'], cat: 'giochi', icona: 'roulette', breve: 'roulette 50 rosso · nero, pari, dispari, basso, alto, dozzina 2, colonna 3, o un numero', uso: 'roulette <puntata> <rosso|nero|pari|dispari|basso|alto|dozzina 1-3|colonna 1-3|0-36>',
     async fai(ctx) {
       const [imp, ...resto] = ctx.args
-      const cosa = resto.join(' ').toLowerCase().trim()
-      const id = /^(\d|[12]\d|3[0-6])$/.test(cosa) ? `pieno:${Number(cosa)}` : { rosso: 'semplice:rosso', nero: 'semplice:nero', pari: 'semplice:pari', dispari: 'semplice:dispari', basso: 'semplice:1-18', '1-18': 'semplice:1-18', alto: 'semplice:19-36', '19-36': 'semplice:19-36' }[cosa]
-        ?? (/^dozzina ?([123])$/.exec(cosa) ? [...ROULETTE.values()].filter((p) => p.tipo === 'dozzina')[Number(RegExp.$1) - 1].id : /^colonna ?([123])$/.exec(cosa) ? [...ROULETTE.values()].filter((p) => p.tipo === 'colonna')[Number(RegExp.$1) - 1].id : null)
-      const p = id && ROULETTE.get(id)
-      if (!p) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>roulette 50 rosso</code>: rosso, nero, pari, dispari, basso (1-18), alto (19-36), dozzina 1-3, colonna 1-3, o un numero da 0 a 36.' })
+      const su = suRoulette(resto.join(' ').toLowerCase().trim())
+      if (!su) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>roulette 50 rosso</code>: rosso, nero, pari, dispari, basso (1-18), alto (19-36), dozzina 1-3, colonna 1-3, o un numero da 0 a 36.' })
       const n = puntata(ctx, 'roulette', imp, 1, 1000)
       if (n === null) return false
-      const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':roulette: rien ne va plus', d: `${ctx.fmt(n)} su <b>${p.nome}</b> (paga ${p.paga} a 1). La pallina gira…` })
+      const r = await ctx.fai('chat.roulette', { n, su })
+      if (!r.ok) return rifiutata(ctx, r, 'roulette')
+      const { numero, colore, nome, paga, torna } = r.esito
+      const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':roulette: rien ne va plus', d: `${ctx.fmt(n)} su <b>${nome}</b> (paga ${paga} a 1). La pallina gira…` })
       await ctx.inVista(s, 1600)
-      const numero = crypto.getRandomValues(new Uint8Array(1))[0] % 37
-      const e = esitoRoulette(new Map([[id, n]]), numero)
-      const netto = fine(ctx, 'roulette', e.puntato, e.torna)
-      const col = numero === 0 ? 'verde' : ROSSI.has(numero) ? 'rosso' : 'nero'
-      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'grigio', av: netto > 0 ? 'bot-ricco' : 'bot-triste', t: `:roulette: ${numero} ${col}`, d: `${ctx.fmt(n)} su ${p.nome}: ${netto > 0 ? 'vinta' : 'persa'}.`, pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(2)
+      const netto = torna - n
+      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'grigio', av: netto > 0 ? 'bot-ricco' : 'bot-triste', t: `:roulette: ${numero} ${colore}`, d: `${ctx.fmt(n)} su ${nome}: ${netto > 0 ? 'vinta' : 'persa'}.`, pie: esitoHtml(ctx, netto) })
+      ctx.saleDiLivello(r.esito.livello)
     },
   },
   {
@@ -124,43 +151,34 @@ export const GIOCHI = [
     async fai(ctx) {
       const n = puntata(ctx, 'blackjack', ctx.args[0], 5, 1000)
       if (n === null) return false
-      const mazzo = sabot(6)
-      let i = 0
-      const pesca = () => mazzo[i++]
-      const tu = [pesca(), pesca()], banco = [pesca(), pesca()]
+      let r = await ctx.fai('chat.blackjack', { n })
+      // (una mano rimasta aperta, una pagina ricaricata a metà: si riprende quella, la puntata è già sul tavolo della banca)
+      let e = r.ok ? r.esito : r.aperta ? { ...ctx.pzk.tavoloBanca('chat-blackjack'), fine: false } : null
+      if (!e) return rifiutata(ctx, r, 'blackjack')
+      if (!r.ok) ctx.dì({ colore: 'ambra', av: 'bot-pensa', d: 'avevi una mano aperta: la finiamo.' })
       const carta = (c, coperta = false) => (coperta ? '<span class="c-carta coperta"></span>' : `<span class="c-carta${c.s === 'c' || c.s === 'q' ? ' rossa' : ''}">${c.r}<small>${{ c: '♥', q: '♦', f: '♣', p: '♠' }[c.s]}</small></span>`)
-      const mano = (m, nascosta = false) => `<div class="c-carte">${m.map((c, k) => carta(c, nascosta && k === 1)).join('')}</div>`
-      const vista = (nascosta, nota = '') => ({ colore: 'ambra', t: ':carte: blackjack', html: `<p>banco${nascosta ? '' : ` · ${punti(banco).tot}`}</p>${mano(banco, nascosta)}<p>${ctx.nome()} · ${punti(tu).tot}${punti(tu).morbido ? ' (morbido)' : ''}</p>${mano(tu)}${nota ? `<p>${nota}</p>` : ''}`, pie: `puntati ${ctx.fmt(n)}` })
-      const s = ctx.dì(vista(true))
-      let giocato = n, torna = 0, raddoppiato = false
-      const bjTu = punti(tu).tot === 21, bjBanco = punti(banco).tot === 21
-      if (!bjTu && !bjBanco) {
-        for (;;) {
-          const p = punti(tu)
-          if (p.tot >= 21) break
-          const prima = tu.length === 2 && !raddoppiato && ctx.pzk.saldo() >= n
-          const r = await ctx.scegli(s, [{ id: 'carta', eti: 'carta' }, { id: 'stai', eti: 'stai', stile: 'nero' }, ...(prima ? [{ id: 'raddoppia', eti: 'raddoppia', stile: 'verde' }] : [])], 30000)
-          if (r === null || r === 'stai') break
-          if (r === 'raddoppia') { ctx.punta('chat-blackjack', n); giocato += n; raddoppiato = true; tu.push(pesca()); ctx.aggiorna(s, vista(true, 'raddoppiato: una carta e basta.')); break }
-          tu.push(pesca())
-          ctx.aggiorna(s, vista(true))
+      const mano = (m, coperta = false) => `<div class="c-carte">${m.map((c) => carta(c)).join('')}${coperta ? carta(null, true) : ''}</div>`
+      const vista = (e, nota = '') => ({ colore: 'ambra', t: ':carte: blackjack', html: `<p>banco${e.fine ? ` · ${punti(e.delBanco).tot}` : ''}</p>${mano(e.delBanco, !e.fine)}<p>${ctx.nome()} · ${punti(e.tu).tot}${punti(e.tu).morbido ? ' (morbido)' : ''}</p>${mano(e.tu)}${nota ? `<p>${nota}</p>` : ''}`, pie: `puntati ${ctx.fmt(e.giocato)}` })
+      const s = ctx.dì(vista(e))
+      let noRaddoppio = false
+      while (!e.fine) {
+        const prima = e.tu.length === 2 && !e.raddoppiato && !noRaddoppio
+        const scelta = await ctx.scegli(s, [{ id: 'carta', eti: 'carta' }, { id: 'stai', eti: 'stai', stile: 'nero' }, ...(prima ? [{ id: 'raddoppia', eti: 'raddoppia', stile: 'verde' }] : [])], 30000)
+        r = await ctx.fai('chat.blackjack', { mossa: scelta ?? 'stai' })
+        if (!r.ok) {
+          if (scelta === 'raddoppia') { noRaddoppio = true; ctx.aggiorna(s, vista(e, `niente raddoppio: ${r.errore ?? 'non bastano i soldi'}.`)); continue }
+          return ctx.no(r, 'blackjack')
         }
+        const prima2 = e
+        e = r.esito
+        if (!e.fine) ctx.aggiorna(s, vista(e))
+        else if (scelta === 'raddoppia') { ctx.aggiorna(s, vista({ ...e, delBanco: prima2.delBanco, fine: false }, 'raddoppiato: una carta e basta.')); await ctx.dormi(500) }
       }
-      const pt = punti(tu)
-      if (pt.tot <= 21 && !bjTu) { while (punti(banco).tot < 17) { banco.push(pesca()); ctx.aggiorna(s, vista(false)); await ctx.dormi(500) } }
-      const pb = punti(banco)
-      let nota
-      if (bjTu && !bjBanco) { torna = giocato * 2.5; nota = 'BLACKJACK! Paga 3 a 2.' }
-      else if (bjTu && bjBanco) { torna = giocato; nota = 'blackjack tutti e due: pari.' }
-      else if (bjBanco) { torna = 0; nota = 'il banco ha blackjack.' }
-      else if (pt.tot > 21) { torna = 0; nota = `sballato con ${pt.tot}.` }
-      else if (pb.tot > 21) { torna = giocato * 2; nota = `il banco sballa con ${pb.tot}: vinto.` }
-      else if (pt.tot > pb.tot) { torna = giocato * 2; nota = `${pt.tot} contro ${pb.tot}: vinto.` }
-      else if (pt.tot === pb.tot) { torna = giocato; nota = `${pt.tot} pari: la puntata torna.` }
-      else { torna = 0; nota = `${pt.tot} contro ${pb.tot}: perso.` }
-      const netto = fine(ctx, 'blackjack', giocato, torna)
-      ctx.aggiorna(s, { ...vista(false, `<b>${nota}</b>`), colore: netto > 0 ? 'oro' : netto ? 'grigio' : 'blu', av: netto > 0 ? 'bot-ricco' : netto ? 'bot-triste' : 'bot-pensa', pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(3)
+      // il banco scopre e tira, una carta alla volta
+      for (let k = 2; k < e.delBanco.length; k++) { ctx.aggiorna(s, vista({ ...e, delBanco: e.delBanco.slice(0, k) })); await ctx.dormi(500) }
+      const netto = e.torna - e.giocato
+      ctx.aggiorna(s, { ...vista(e, `<b>${e.nota}</b>`), colore: netto > 0 ? 'oro' : netto ? 'grigio' : 'blu', av: netto > 0 ? 'bot-ricco' : netto ? 'bot-triste' : 'bot-pensa', pie: esitoHtml(ctx, netto) })
+      ctx.saleDiLivello(e.livello)
     },
   },
   {
@@ -170,54 +188,62 @@ export const GIOCHI = [
       const m = Math.min(MINE.max, Math.max(MINE.min, parseInt(ctx.args[1]) || MINE.prima))
       const n = puntata(ctx, 'mine', ctx.args[0], LIMITI_MINE.min, LIMITI_MINE.max)
       if (n === null) return false
-      const g = Partita.nuova({ puntata: n, m, semeGiocatore: nuovoSeme(8), giro: 1 })
-      const s = ctx.dì({ colore: 'ambra', t: `:mina: mine · ${m} mine`, d: `clicca una casella. Moltiplicatore ${scriviMolt(g.centesimi)}, incassi ${ctx.fmt(g.vincita)}.`, pie: `puntati ${ctx.fmt(n)}` })
-      const celle = Array.from({ length: 25 }, (_, i) => ({ id: String(i), eti: '', stile: 'nero', title: nomeCasella(i) }))
-      let esitoFinale = null
-      const grigliaP = ctx.scegli(s, celle, 0, { griglia: 'g5', onPremuto: (id, b, riga) => {
-        const ev = g.scopri(Number(id))
-        for (const e of ev) {
-          if (e.t === 'gemma') { b.innerHTML = ctx.icona('gemma'); b.classList.add('aperta'); b.disabled = true; s.querySelector('.c-testo').innerHTML = ctx.conIcone(`gemme ${e.k} · moltiplicatore ${scriviMolt(e.centesimi)} · incassi <b>${ctx.fmt(e.vincita)}</b>`) }
-          if (e.t === 'mina') { b.innerHTML = ctx.icona('mina'); b.classList.add('bum') }
-          if (e.t === 'fine') { esitoFinale = e; for (const k of e.mine) { const bb = riga.querySelector(`[data-id="${k}"]`); if (bb && !bb.classList.contains('bum')) { bb.innerHTML = ctx.icona('mina'); bb.style.opacity = '.5' } } }
-        }
-        return esitoFinale ? 'fine' : 'continua'
+      let r = await ctx.fai('chat.mine', { n, m })
+      // (un campo rimasto aperto: si riprende quello)
+      let e = r.ok ? r.esito : r.aperta ? (() => { const t = ctx.pzk.tavoloBanca('chat-mine'); return t ? { n: t.n, m: t.m, scoperte: t.scoperte ?? [], k: t.scoperte?.length ?? 0, fine: false } : null })() : null
+      if (!e) return rifiutata(ctx, r, 'mine')
+      const s = ctx.dì({ colore: 'ambra', t: `:mina: mine · ${e.m} mine`, d: `clicca una casella.${e.k ? ` gemme ${e.k}.` : ''}`, pie: `puntati ${ctx.fmt(e.n)}` })
+      const celle = Array.from({ length: 25 }, (_, i) => ({ id: String(i), eti: e.scoperte.includes(i) ? ':gemma:' : '', stile: 'nero', title: nomeCasella(i) }))
+      // ogni casella la scopre la banca: un clic alla volta (mentre una risposta viaggia, gli altri clic aspettano)
+      let occupato = false, finito, riga = null
+      const fine = new Promise((ok) => { finito = ok })
+      const chiudi = (esito, b = null) => {
+        if (b && esito.esito === 'mina') { b.innerHTML = ctx.icona('mina'); b.classList.add('bum') }
+        for (const k of esito.mine ?? []) { const bb = riga?.querySelector(`[data-id="${k}"]`); if (bb && !bb.classList.contains('bum')) { bb.innerHTML = ctx.icona('mina'); bb.style.opacity = '.5' } }
+        for (const bb of s.querySelectorAll('button')) bb.disabled = true
+        finito(esito)
+      }
+      ctx.scegli(s, celle, 0, { griglia: 'g5', onPremuto: (id, b, rg) => {
+        riga = rg
+        if (occupato || b.disabled) return 'continua'
+        occupato = true
+        ctx.fai('chat.mine', { casella: Number(id) }).then((x) => {
+          occupato = false
+          if (!x.ok) return ctx.no(x, 'mine')
+          const v = x.esito
+          if (v.esito !== 'mina') { b.innerHTML = ctx.icona('gemma'); b.classList.add('aperta'); b.disabled = true; s.querySelector('.c-testo').innerHTML = ctx.conIcone(`gemme ${v.k} · moltiplicatore ${scriviMolt(v.centesimi)} · incassi <b>${ctx.fmt(v.vincita)}</b>`) }
+          if (v.fine) chiudi(v, b)
+        })
+        return 'continua'
       } })
-      const incassaP = ctx.scegli(s, [{ id: 'incassa', eti: ':pzk: incassa', stile: 'verde' }], 0)
-      await Promise.race([grigliaP, incassaP])
-      if (!esitoFinale) { try { esitoFinale = g.incassa()[0] } catch { esitoFinale = { t: 'fine', esito: 'incassa', giocato: n, torna: n, k: 0, centesimi: 100, mine: g.mine() } } for (const b of s.querySelectorAll('button')) b.disabled = true }
-      else for (const b of s.querySelectorAll('.c-bottoni button')) b.disabled = true
-      const e = esitoFinale
-      const netto = fine(ctx, 'mine', e.giocato, e.torna)
-      ctx.scheda({ colore: e.esito === 'incassa' ? 'oro' : 'rosso', av: e.esito === 'incassa' ? 'bot-ricco' : 'bot-morto', t: e.esito === 'incassa' ? `:gemma: incassato ${scriviMolt(e.centesimi)}` : ':mina: BUM', d: e.esito === 'incassa' ? `${e.k} gemme: ${ctx.pzkHtml(e.torna)}.` : `le mine erano in ${e.mine.map(nomeCasella).join(', ')}.`, pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(3)
+      ctx.scegli(s, [{ id: 'incassa', eti: ':pzk: incassa', stile: 'verde' }], 0).then(async (premuto) => {
+        if (premuto !== 'incassa') return
+        while (occupato) await ctx.dormi(80)
+        const x = await ctx.fai('chat.mine', { incassa: true })
+        if (x.ok) chiudi(x.esito); else ctx.no(x, 'mine')
+      })
+      const v = await fine
+      const netto = v.torna - v.n
+      ctx.scheda({ colore: v.esito === 'incassa' ? 'oro' : 'rosso', av: v.esito === 'incassa' ? 'bot-ricco' : 'bot-morto', t: v.esito === 'incassa' ? `:gemma: incassato ${scriviMolt(v.centesimi)}` : ':mina: BUM', d: v.esito === 'incassa' ? `${v.k} gemme: ${ctx.pzkHtml(v.torna)}.` : `le mine erano in ${v.mine.map(nomeCasella).join(', ')}.`, pie: esitoHtml(ctx, netto) })
+      ctx.saleDiLivello(v.livello)
     },
   },
   {
     nomi: ['dado', 'sicbo'], cat: 'giochi', icona: 'dadi', breve: 'il sic bo (tre dadi, regole di Macao): dado 50 piccolo · grande, pari, dispari, totale 10, coppia 4, tripla 6, triple, 2 e 5, singolo 3', uso: 'dado <puntata> <puntata del tavolo>',
     async fai(ctx) {
-      const R = REGOLE_DADO.macao, T = DADO.macao
       const [imp, ...resto] = ctx.args
-      const cosa = resto.join(' ').toLowerCase().trim()
-      let id = null, mm
-      if (['piccolo', 'grande', 'pari', 'dispari', 'triple'].includes(cosa)) id = cosa
-      else if ((mm = /^(?:totale )?(\d{1,2})$/.exec(cosa)) && +mm[1] >= 4 && +mm[1] <= 17) id = `totale:${+mm[1]}`
-      else if ((mm = /^coppia (?:di )?([1-6])$/.exec(cosa))) id = `coppia:${mm[1]}`
-      else if ((mm = /^tripla (?:di )?([1-6])$/.exec(cosa))) id = `tripla:${mm[1]}`
-      else if ((mm = /^([1-6]) e ([1-6])$/.exec(cosa)) && mm[1] !== mm[2]) id = `combinazione:${Math.min(mm[1], mm[2])}-${Math.max(mm[1], mm[2])}`
-      else if ((mm = /^(?:singolo|il) ([1-6])$/.exec(cosa))) id = `singolo:${mm[1]}`
-      const p = id && T.get(id)
-      if (!p) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>dado 50 piccolo</code>: piccolo, grande, pari, dispari, totale 4-17, coppia 1-6, tripla 1-6, triple, «2 e 5», singolo 1-6.' })
+      const su = suDado(resto.join(' ').toLowerCase().trim())
+      if (!su) return ctx.dì({ colore: 'rosso', d: 'si scrive <code>dado 50 piccolo</code>: piccolo, grande, pari, dispari, totale 4-17, coppia 1-6, tripla 1-6, triple, «2 e 5», singolo 1-6.' })
       const n = puntata(ctx, 'dado', imp, 1, 1000)
       if (n === null) return false
-      const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':dadi: sic bo', d: `${ctx.fmt(n)} su <b>${p.nome}</b> (paga ${Array.isArray(p.paga) ? p.paga.join('/') : p.paga} a 1). I dadi rotolano…` })
+      const r = await ctx.fai('chat.dado', { n, su })
+      if (!r.ok) return rifiutata(ctx, r, 'dado')
+      const { dadi, nome, paga, torna } = r.esito
+      const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: ':dadi: sic bo', d: `${ctx.fmt(n)} su <b>${nome}</b> (paga ${Array.isArray(paga) ? paga.join('/') : paga} a 1). I dadi rotolano…` })
       await ctx.inVista(s, 1300)
-      const dadi = [d6(), d6(), d6()]
-      const e = esitoDado(new Map([[id, n]]), dadi, R)
-      const netto = fine(ctx, 'dado', e.puntato, e.torna)
-      const l = leggiDadi(dadi)
-      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'grigio', av: netto > 0 ? 'bot-ricco' : 'bot-triste', t: `:dadi: ${dadi.map((d) => DADO_ICONE[d]).join(' ')} = ${l.tot} (${l.nome})`, d: `${p.nome}: ${netto > 0 ? 'vinta' : 'persa'}.`, pie: esitoHtml(ctx, netto) })
-      zaino.daiXp(2)
+      const netto = torna - n, tot = dadi[0] + dadi[1] + dadi[2], tripla = dadi[0] === dadi[1] && dadi[1] === dadi[2]
+      ctx.aggiorna(s, { colore: netto > 0 ? 'oro' : 'grigio', av: netto > 0 ? 'bot-ricco' : 'bot-triste', t: `:dadi: ${dadi.map((d) => DADO_ICONE[d]).join(' ')} = ${tot} (${tripla ? `tripla di ${dadi[0]}` : tot <= 10 ? 'piccolo' : 'grande'})`, d: `${nome}: ${netto > 0 ? 'vinta' : 'persa'}.`, pie: esitoHtml(ctx, netto) })
+      ctx.saleDiLivello(r.esito.livello)
     },
   },
 ]

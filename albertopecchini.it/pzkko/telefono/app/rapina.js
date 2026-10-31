@@ -14,10 +14,14 @@ import { icona } from '../../chat/icone.js'
 import { tieni } from '../ricordi.js'
 
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
-const resta = (t) => { const m = Math.max(0, Math.ceil((t - Date.now()) / 60000)); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min` }
+export const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
+export const resta = (t) => { const m = Math.max(0, Math.ceil((t - Date.now()) / 60000)); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min` }
 const p = (n) => `<span class="pzk">${pzk.fmt(n)} $pzk</span>`
-const PROB = { 2: 32, 3: 40, 4: 48 }
+// (esportati dal 29.10 per la rapina di pzk os, telefono/zero/os/rapina.js: le stesse probabilità e lo stesso bottino del server)
+export const PROB = { 2: 32, 3: 40, 4: 48 }
+/** Il bottino a testa in una banda di n, con la cassa che c'è (api/wallet.mjs, colpo: il 3 % più l'1 % a testa, al più 15.000). */
+export const bottino = (cassa, n) => Math.min((cassa * (0.03 + 0.01 * n)) / n, 15000)
+export const CAUZIONE = 3000, ORE_GALERA = 6 // (come CAUZIONE di api/_economia.mjs e le sei ore del colpo andato male: il browser l'api non la può importare)
 
 let host = null, ctx = null, S = { colpo: null, cassa: null, errore: null, codice: '' }, giro = 0
 
@@ -51,7 +55,7 @@ function disegna() {
       <form class="t-ra-entra"><input name="codice" maxlength="4" autocomplete="off" placeholder="ABCD" value="${esc(S.codice)}" aria-label="il codice del colpo"><button class="c-b" type="submit">entra</button></form>
     </div>
     <h4 class="t-sh-sez">come funziona</h4>
-    <table class="t-ra-regole"><tr><th>banda</th><th>riuscita</th><th>bottino a testa</th></tr>${[2, 3, 4].map((n) => `<tr><td>${n}</td><td>${PROB[n]} %</td><td>${S.cassa != null ? p(Math.min((S.cassa * (0.03 + 0.01 * n)) / n, 15000)) : '…'}</td></tr>`).join('')}</table>
+    <table class="t-ra-regole"><tr><th>banda</th><th>riuscita</th><th>bottino a testa</th></tr>${[2, 3, 4].map((n) => `<tr><td>${n}</td><td>${PROB[n]} %</td><td>${S.cassa != null ? p(bottino(S.cassa, n)) : '…'}</td></tr>`).join('')}</table>
     <p class="t-ac-nota">⚠ se va male: <b>6 ore di galera</b> e una multa (il 20 % dei soldi puliti, al più 5.000). Il bottino è sporco: per spenderlo si lava nella lavatrice, che si compra nel pzkstore del cercapersone (5.000 puliti, una volta; poi 2.000 a lavaggio), o si aspettano 96 giorni. Un colpo al giorno; il conto deve avere 48 ore.</p>`)
 }
 

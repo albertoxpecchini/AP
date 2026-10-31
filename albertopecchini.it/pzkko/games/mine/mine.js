@@ -8,10 +8,17 @@
 // si prende tutto e scoppia davvero, e la bruciatura resta sul foglio. I $pzk
 // sono gli stessi di tutti i giochi (../pzk.js).
 //
+// (31.10, Alberto: «il browser non decide più niente») LE MINE LE POSA LA BANCA (C:\pzkko-server\banca\giochi\
+// casino-mine.mjs, con una copia di regole.js): prima il seme del banco nasceva qui, e chi apriva la console sapeva dove
+// stavano. Qui si punta, si chiede («gioca», «scopri c3», «incassa»: pzk.fai) e si anima quello che la banca risponde; del
+// giro si sa solo quello che si vede (le caselle girate, l'impronta del seme del banco), e a fine giro arrivano le mine e
+// il seme, che qui si ricontrollano (regole.js: impronta, posaMine). Ricaricando a metà il giro resta sulla banca e si
+// ritrova (pzk.tavoloBanca, ritrova()).
+//
 // index.html la apre con import('/games/mine/mine.js').then((m) => m.apri()).
 
 import * as pzk from '../pzk.js'
-import { LATO, CASELLE, MINE, LIMITI, MASSIMO, BANCO, centesimi, vincita, scriviMolt, nomeCasella, nuovoSeme, Partita } from './regole.js'
+import { LATO, CASELLE, MINE, LIMITI, MASSIMO, BANCO, centesimi, vincita, scriviMolt, nomeCasella, nuovoSeme, impronta, posaMine } from './regole.js'
 
 const QUI = new URL('.', import.meta.url).href
 const ART = '/art/'
@@ -31,8 +38,7 @@ const stato = {
   mosse: [], // le fiches posate, in ordine (per «togli»)
   ultima: 0, // la puntata dell'ultimo giro (per «rifai»)
   veloce: false,
-  seme: '', // il seme del giocatore: resta nel browser
-  giro: 0, // quanti giri ha giocato questo browser (entra nel conto delle mine)
+  seme: '', // il seme del giocatore: va alla banca a ogni giro (entra nel conto delle mine, insieme al seme del banco)
   storia: [], // gli ultimi giri: il moltiplicatore incassato in centesimi, 0 = mina
   partita: null,
   bruciature: [], // le esplosioni sul foglio: { i, seme }
@@ -43,14 +49,13 @@ function carica() {
     if (s) {
       if (Number.isInteger(s.m) && s.m >= MINE.min && s.m <= MINE.max) stato.m = s.m
       if (typeof s.seme === 'string' && /^[0-9a-f]{8,64}$/.test(s.seme)) stato.seme = s.seme
-      if (Number.isInteger(s.giro) && s.giro >= 0) stato.giro = s.giro
       if (Array.isArray(s.storia)) stato.storia = s.storia.filter((c) => Number.isInteger(c) && c >= 0).slice(0, 12)
       if (s.ultima > 0 && s.ultima <= LIMITI.max) stato.ultima = s.ultima
     }
   } catch {}
   if (!stato.seme) stato.seme = nuovoSeme(8)
 }
-function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ m: stato.m, seme: stato.seme, giro: stato.giro, storia: stato.storia, ultima: stato.ultima })) } catch {} }
+function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify({ m: stato.m, seme: stato.seme, storia: stato.storia, ultima: stato.ultima })) } catch {} }
 const attendi = (ms) => new Promise((r) => setTimeout(r, RIDOTTO.matches ? 0 : ms / (stato.veloce ? 3 : 1)))
 
 let dlg, el = {}, scena = null, motore = null, G = null
@@ -65,7 +70,7 @@ export async function apri() {
     aggiornaBanco()
   }
   if (!motore) motore = avviaMotore().catch((e) => { console.error(e); el.carica.textContent = 'le tessere non sono arrivate: riprova più tardi' })
-  else scena?.avvia()
+  else { scena?.avvia(); ritrova() }
 }
 
 async function costruisci() {
@@ -143,7 +148,8 @@ async function costruisci() {
   el.veloce.addEventListener('click', () => { stato.veloce = !stato.veloce; el.veloce.setAttribute('aria-pressed', String(stato.veloce)); if (scena) scena.veloce = stato.veloce ? 3 : 1 })
   dlg.addEventListener('keydown', tastiera)
   new ResizeObserver(() => { if (dlg.open) ridisegna() }).observe(el.campo)
-  pzk.ascolta(() => aggiornaBanco())
+  pzk.ascolta(() => { aggiornaBanco(); ritrova() }) // (31.10: anche il giro aperto che la banca dice dopo, o da un altro telefono)
+  pzk.alCambioConto(cambioConto)
   voce(pzk.aSecco() ? 'hai finito i $pzk: ricarica' : 'tocca le fiches per puntare, poi gioca')
   aggiornaStoria()
   aggiornaBanco()
@@ -176,7 +182,7 @@ function aggiornaBanco() {
   el.gioca.classList.toggle('incassa', gioco)
   if (gioco) {
     el.gioca.textContent = P.k ? `incassa ${fmt(P.vincita)}` : 'incassa'
-    el.gioca.disabled = !P.k
+    el.gioca.disabled = !P.k || aspetta
     el.gioca.title = P.k ? `${scriviMolt(P.centesimi)} della puntata` : 'prima trova una gemma'
   } else if (punta && pzk.aSecco() && !stato.puntata) {
     el.gioca.textContent = 'ricarica'
@@ -184,7 +190,7 @@ function aggiornaBanco() {
     el.gioca.title = ''
   } else {
     el.gioca.textContent = 'gioca'
-    el.gioca.disabled = !punta || !scena || !stato.puntata
+    el.gioca.disabled = !punta || !scena || !stato.puntata || !!rifacendo
     el.gioca.title = ''
   }
   dlg.classList.toggle('chiuso', !gioco)
@@ -390,7 +396,7 @@ function disegnaBruciature() {
 let attiva = 12
 function aggiornaZone() {
   if (!G?.zone) return
-  const P = stato.partita, finito = P?.finita, mine = finito ? new Set(P.mine()) : null
+  const P = stato.partita, finito = P?.finita, mine = finito ? new Set(P.mine) : null
   const gioco = stato.fase === 'gioco'
   G.zone.forEach((z, i) => {
     const trovata = P && (stato.fase === 'gioco' || stato.fase === 'fine') && P.scoperte.includes(i)
@@ -536,10 +542,19 @@ function togli() {
   disegnaScala()
   if (da) vola(v, da, centro(el.scegli.querySelector(`[data-v="${v}"] img`)), { durata: 300, alto: 24 })
 }
+// (31.10) si rifà coi soldi puliti (quelli che si possono puntare: il saldo conta anche gli sporchi), e finché le fiches non
+// sono tutte giù «gioca» aspetta: prima partiva a metà, e l'ultima puntata diventava quella a metà
+let rifacendo = null
 async function rifai() {
-  if (stato.fase !== 'punta' || !stato.ultima || stato.puntata > 0) return
-  if (stato.ultima > pzk.saldo()) { voce(`per rifare servono ${fmt(stato.ultima)} $pzk`); scuoti(el.saldo); return }
-  for (const v of pzk.inFiches(stato.ultima)) { posa(v); await attendi(60) }
+  if (stato.fase !== 'punta' || !stato.ultima || stato.puntata > 0 || rifacendo) return
+  if (stato.ultima > pzk.puliti()) { voce(pzk.sporchi() > 0 || pzk.inGalera() ? pzk.nonBasta() : `per rifare servono ${fmt(stato.ultima)} $pzk`); scuoti(el.saldo); return }
+  const mio = (rifacendo = {})
+  try {
+    for (const v of pzk.inFiches(stato.ultima)) { if (rifacendo !== mio || stato.fase !== 'punta') break; posa(v); await attendi(60) }
+  } finally {
+    if (rifacendo === mio) rifacendo = null
+    aggiornaBanco()
+  }
 }
 function scuoti(e) {
   if (RIDOTTO.matches) return
@@ -549,13 +564,27 @@ function scuoti(e) {
 // ── il giro ──────────────────────────────────────────────────────────────────
 async function gioca() {
   if (stato.fase === 'gioco') return incassa()
-  if (stato.fase !== 'punta' || !scena) return
+  if (stato.fase !== 'punta' || !scena || rifacendo) return
   if (pzk.aSecco() && !stato.puntata) { const dati = pzk.ricarica(); aggiornaBanco(); voce(dati ? `altri ${fmt(pzk.INIZIALE)} $pzk finti: punta` : pzk.perche()); return }
   if (!stato.puntata) { voce('prima punta: tocca una fiche'); scuoti(el.scegli); return }
-  let P
-  try { P = Partita.nuova({ puntata: stato.puntata, m: stato.m, semeGiocatore: stato.seme, giro: stato.giro + 1 }) } catch (e) { voce(e.message); return }
-  stato.giro = P.giro
-  stato.partita = P
+  // (31.10) il giro lo apre la banca: prende la puntata e posa le mine (le tiene lei). Se dice di no (non bastano più, la
+  // galera, la rete) lo si dice e le fiches tornano al saldo: sul tavolo c'erano solo per lo schermo (pzk.punta)
+  stato.fase = 'prepara' // (subito: un secondo tocco, o la banca che risponde e avvisa, non devono ripartire)
+  mostrato = pzk.saldo() // (fermo finché la risposta non sgombra le fiches di qui)
+  aggiornaBanco()
+  const r = await pzk.fai('mine.inizia', { puntata: stato.puntata, mine: stato.m, seme: stato.seme })
+  mostrato = null
+  if (stato.fase !== 'prepara') return // (il conto è cambiato intanto: cambioConto ha già sgombrato)
+  if (!r.ok) {
+    stato.fase = 'punta'
+    voce(`il banco non gioca: ${r.errore}`)
+    scuoti(el.saldo)
+    tornanoFiches()
+    return
+  }
+  pzk.sgombra(GIOCO)
+  const P = (stato.partita = vista(r.esito.vede))
+  cambiato = null
   stato.ultima = stato.puntata
   stato.mosse = []
   salva()
@@ -565,6 +594,7 @@ async function gioca() {
   mostraProva()
   voce('si rimescola…')
   await scena.riordina()
+  if (stato.partita !== P) return // (il conto è cambiato mentre si rimescolava: lascia)
   for (const t of [...el.segni.children]) t.remove()
   stato.fase = 'gioco'
   disegnaScala()
@@ -574,27 +604,146 @@ async function gioca() {
   G.zone[attiva]?.focus({ preventScroll: true })
 }
 
-function tocca(i) {
-  if (stato.fase === 'punta') { voce(stato.puntata ? 'premi gioca: le mine si nascondono' : 'prima punta, poi gioca'); return }
-  if (stato.fase !== 'gioco') return
-  const P = stato.partita
-  if (P.scoperte.includes(i)) { voce(`${nomeCasella(i)} è già scoperta`); return }
-  attiva = i
-  const ev = P.scopri(i)
-  if (P.finita) stato.fase = 'fine'
+/** (31.10) Il giro come lo dice la banca (il `vede` di casino-mine.mjs), con i nomi che usa il resto della finestra. */
+function vista(v) {
+  const fine = v.fase === 'fine', scoperte = [...v.scoperte]
+  const girate = new Set(scoperte)
+  if (fine && v.esito === 'mina') girate.add(v.ultima)
+  return {
+    giro: v.giro, puntata: v.puntata, m: v.m, scoperte, k: v.k, centesimi: v.centesimi, vincita: fine ? v.torna : v.vincita,
+    impronta: v.impronta, semeGiocatore: v.semeGiocatore, finita: fine, esito: fine ? v.esito : null, ultima: v.ultima ?? null,
+    mine: fine ? v.mine : null, semeBanco: fine ? v.semeBanco : null,
+    coperte: Array.from({ length: CASELLE }, (_, i) => i).filter((i) => !girate.has(i)),
+  }
+}
+/** (31.10) Le fiches posate tornano al saldo (la banca non le ha prese). */
+function tornanoFiches() {
+  pzk.sgombra(GIOCO)
+  stato.puntata = 0
+  stato.mosse = []
+  svuota('p', centro(el.saldo))
   aggiornaBanco()
   disegnaScala()
   aggiornaZone()
-  recita(ev)
 }
-function aCaso() { if (stato.fase === 'gioco') tocca(stato.partita.aCaso()) }
+
+// (31.10) una mossa alla volta: finché la banca non ha risposto, gli altri tocchi aspettano
+let aspetta = false
+async function tocca(i) {
+  if (stato.fase === 'punta') { voce(stato.puntata ? 'premi gioca: le mine si nascondono' : 'prima punta, poi gioca'); return }
+  if (stato.fase !== 'gioco' || aspetta) return
+  const P = stato.partita
+  if (P.scoperte.includes(i)) { voce(`${nomeCasella(i)} è già scoperta`); return }
+  attiva = i
+  await mossa('mine.scopri', { casella: i })
+}
+function aCaso() { const c = stato.partita?.coperte; if (stato.fase === 'gioco' && c?.length) tocca(c[Math.floor(Math.random() * c.length)]) }
 function incassa() {
-  if (stato.fase !== 'gioco' || !stato.partita.k) return
-  const ev = stato.partita.incassa()
-  stato.fase = 'fine'
+  if (stato.fase !== 'gioco' || !stato.partita.k || aspetta) return
+  return mossa('mine.incassa', {})
+}
+// (29.10 notte, 31.10) i soldi li passa la banca prima di rispondere (anche la mina e l'incasso da sé all'ultima gemma):
+// ricaricando a metà non si perde e non torna niente. Il tavolo tiene il saldo di prima (mostrato) finché le fiches non
+// arrivano
+async function mossa(cosa, args) {
+  const giro = stato.partita.giro
+  aspetta = true
+  aggiornaBanco()
+  const r = await pzk.fai(cosa, args)
+  aspetta = false
+  if (stato.fase !== 'gioco' || stato.partita?.giro !== giro) return // (il conto è cambiato intanto)
+  if (!r.ok) {
+    voce(r.errore)
+    scuoti(el.saldo)
+    // il giro sulla banca non è più questo (giocato da un altro telefono): si lascia, e si ritrova com'è adesso
+    const v = pzk.tavoloBanca(GIOCO)
+    if (v?.fase !== 'gioco' || v.giro !== giro || v.k !== stato.partita.k) lascia('il giro è cambiato da un’altra parte: lo riprendo com’è adesso')
+    else aggiornaBanco()
+    return
+  }
+  const P = (stato.partita = vista(r.esito.vede))
+  const fine = r.esito.ev.find((e) => e.t === 'fine')
+  if (fine) { stato.fase = 'fine'; if (fine.torna > 0) mostrato = Math.max(0, pzk.saldo() - fine.torna) }
+  void P
   aggiornaBanco()
   disegnaScala()
-  recita(ev)
+  aggiornaZone()
+  recita(r.esito.ev)
+}
+
+/**
+ * (31.10) Ritrova il giro aperto sulla banca (la pagina ricaricata, un altro telefono, il conto in cui si è appena entrati):
+ * la puntata nel cerchio, le gemme già trovate, e si continua da lì. La puntata è già della banca: non torna indietro.
+ */
+function ritrova() {
+  const v = pzk.tavoloBanca(GIOCO)
+  if (v?.fase !== 'gioco' || stato.fase !== 'punta' || rifacendo || !scena || !G || !dlg?.open) return
+  if (stato.puntata || pile.size) { pzk.sgombra(GIOCO); for (const p of pile.values()) p.el.remove(); pile.clear() } // (erano solo sullo schermo)
+  stato.mosse = []
+  const P = (stato.partita = vista(v))
+  stato.puntata = P.puntata
+  stato.ultima = P.puntata
+  if (P.m !== stato.m) { stato.m = P.m; el.quante.value = String(P.m); salva() }
+  cambiato = null
+  stato.fase = 'gioco'
+  pila('p').fiches.push(...pzk.inFiches(P.puntata))
+  mettiPila('p', pile.get('p'))
+  for (const i of P.scoperte) scena.gira(i, 'vuota').then(() => scena.gemma(i))
+  mostraProva()
+  disegnaScala()
+  aggiornaZone()
+  aggiornaBanco()
+  voce(`il giro di prima, dov’era rimasto: ${P.k ? `${parola(P.k, 'gemma', 'gemme')}, incassi ${fmt(P.vincita)}` : 'trova le gemme'}`)
+}
+/** (31.10) Il giro di qui si lascia (resta sulla banca a chi l'ha aperto): le fiches svaniscono, le tessere tornano coperte. */
+function lascia(perche) {
+  voce(perche)
+  stato.partita = null
+  stato.puntata = 0
+  stato.mosse = []
+  mostrato = null
+  for (const k of [...pile.keys()]) svuota(k, bancoFiches(), { scala: 0.7 })
+  stato.fase = 'prepara'
+  aggiornaBanco()
+  ;(scena ? scena.riordina() : Promise.resolve()).then(() => {
+    stato.fase = 'punta'
+    for (const t of [...el.segni.children]) t.remove()
+    el.prova.hidden = true
+    disegnaScala()
+    aggiornaZone()
+    aggiornaBanco()
+    ritrova()
+  })
+}
+
+// (31.10) si entra o si esce dal conto, anche da un'altra scheda (pzk.alCambioConto): è un altro portafoglio. pzk.js ha già
+// vuotato il tavolo: a puntata non partita le fiches sono tornate al portafoglio di prima (qui si tolgono e basta, niente
+// ritira); a giro aperto il giro resta sulla banca all'altro conto (rientrando lo si ritrova), e qui si lascia; a fine giro
+// il saldo di adesso non si tocca. Se il conto nuovo ha un giro aperto, si riprende quello (ritrova)
+const DOPO_CAMBIO = 'è cambiato il conto: questo giro resta al portafoglio di prima'
+let cambiato = null // null, 'durante' (prima dei soldi) o 'dopo' (i soldi erano già passati)
+function cambioConto() {
+  rifacendo = null
+  if (stato.fase === 'punta' || stato.fase === 'prepara' && !stato.partita) {
+    mostrato = null
+    if (stato.puntata || pile.size) {
+      stato.puntata = 0
+      stato.mosse = []
+      for (const p of pile.values()) p.el.remove()
+      pile.clear()
+      voce('è cambiato il conto: le fiches sul tavolo sono tornate al portafoglio di prima')
+    }
+    stato.fase = 'punta'
+    aggiornaBanco()
+    disegnaScala()
+    aggiornaZone()
+    ritrova()
+    return
+  }
+  if (stato.fase === 'gioco' || stato.fase === 'prepara') return lascia('è cambiato il conto: il giro resta all’altro conto, sulla banca')
+  cambiato = 'dopo'
+  mostrato = null
+  aggiornaBanco()
 }
 
 function solleva(i, su) {
@@ -633,39 +782,44 @@ const FA = {
     const P = stato.partita
     const mine = new Set(e.mine)
     const svelate = scena.svela(P.coperte.map((i) => ({ i, tipo: mine.has(i) ? 'mina' : 'gemma' })), e.esito === 'mina' ? P.ultima : P.scoperte.at(-1))
-    if (e.esito === 'mina') {
-      pzk.regola(GIOCO, e.giocato, 0)
+    if (cambiato) {
+      // (31.10) il conto è cambiato mentre il giro finiva: niente vincita contata nel saldo di adesso, le fiches al banco
+      mostrato = null
+      voce(DOPO_CAMBIO)
+      await Promise.all([svuota('p', bancoFiches(), { scala: 0.7 }), svuota('v', bancoFiches(), { scala: 0.7, dopo: 60 })])
+    } else if (e.esito === 'mina') {
       voce(`boom: ${nomeCasella(P.ultima)} era una mina. perdi ${fmt(e.giocato)} $pzk`)
       await svuota('p', bancoFiches(), { scala: 0.7 })
     } else {
-      const utile = e.torna - e.giocato
-      // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, all'incasso; le
-      // fiches che arrivano e il saldo che conta sono da vedere: il tavolo tiene il saldo di prima (mostrato) fino ad allora
-      mostrato = pzk.saldo()
-      pzk.regola(GIOCO, e.giocato, e.torna)
+      const utile = e.torna - e.giocato // («vinci»: la vincita netta; i soldi li ha già passati la banca)
       voce(`${e.k === CASELLE - P.m ? 'tutte le gemme! ' : ''}incassi ${fmt(e.torna)} $pzk (${scriviMolt(e.centesimi)}${e.torna >= MASSIMO ? ', il massimo' : ''})`)
       timbro({ x: G.vinto.x, y: G.vinto.y - G.vinto.r - 8 }, `+${fmt(utile)}`, 'oro')
       if (utile > 0) await aggiungi('v', pzk.inFiches(utile).slice(0, 16), bancoFiches(), { passo: 34 })
       await attendi(450)
-      contaSaldo(mostrato, mostrato + e.torna)
-      mostrato = null
-      await Promise.all([svuota('p', centro(el.saldo)), svuota('v', centro(el.saldo), { dopo: 60 })])
+      if (cambiato) { // (cambiato mentre le fiches arrivavano: la vincita è andata al portafoglio di prima)
+        mostrato = null
+        voce(DOPO_CAMBIO)
+        await Promise.all([svuota('p', bancoFiches(), { scala: 0.7 }), svuota('v', bancoFiches(), { scala: 0.7, dopo: 60 })])
+      } else {
+        contaSaldo(mostrato, mostrato + e.torna)
+        mostrato = null
+        await Promise.all([svuota('p', centro(el.saldo)), svuota('v', centro(el.saldo), { dopo: 60 })])
+      }
     }
     stato.storia = [e.esito === 'mina' ? 0 : e.centesimi, ...stato.storia].slice(0, 12)
     salva()
     aggiornaStoria()
     mostraProva()
     await svelate
-    // se qualcosa è rimasto sul tavolo (non dovrebbe), torna al giocatore
-    const resto = pzk.sulTavolo(GIOCO)
-    if (resto > 0) { console.warn('mine: restavano', resto); pzk.regola(GIOCO, resto, resto) }
     stato.puntata = 0
     stato.fase = 'punta'
     aggiornaBanco()
     disegnaScala()
     aggiornaZone()
-    if (pzk.aSecco()) voce('hai finito i $pzk: ricarica')
+    if (pzk.aSecco() && !cambiato) voce('hai finito i $pzk: ricarica')
+    cambiato = null
     el.gioca.focus({ preventScroll: true })
+    ritrova() // (31.10: il conto nuovo ha un giro aperto)
   },
 }
 
@@ -689,19 +843,22 @@ function aggiornaStoria() {
   el.storia.innerHTML = stato.storia.map((c) => (c ? `<li class="vinta">${scriviMolt(c)}</li>` : '<li class="mina">boom</li>')).join('')
 }
 
-// la stampa piccola della prova: prima del giro l'impronta del seme del banco, dopo il seme (si copia per rifare il conto)
+// la stampa piccola della prova: prima del giro l'impronta del seme del banco, dopo il seme (si copia per rifare il conto).
+// (31.10) Il seme e le mine li manda la banca a fine giro: qui si ricontrolla che il seme abbia l'impronta mostrata
+// all'inizio e che dia proprio quelle mine (regole.js); se no si dice
+const provato = (P) => P.finita && impronta(P.semeBanco) === P.impronta && posaMine(P.semeBanco, P.semeGiocatore, P.giro, P.m).slice().sort((a, b) => a - b).join() === P.mine.slice().sort((a, b) => a - b).join()
 function mostraProva() {
   const P = stato.partita
   if (!P) return
   el.prova.hidden = false
-  el.prova.textContent = P.finita ? `giro ${fmt(P.giro)} · seme ${P.semeBanco.slice(0, 10)}… · copia` : `giro ${fmt(P.giro)} · impronta ${P.impronta.slice(0, 10)}…`
+  el.prova.textContent = P.finita ? `giro ${fmt(P.giro)} · seme ${P.semeBanco.slice(0, 10)}… · ${provato(P) ? 'verificato' : 'NON TORNA'} · copia` : `giro ${fmt(P.giro)} · impronta ${P.impronta.slice(0, 10)}…`
   el.prova.title = P.finita ? 'il seme del banco: con l’impronta di prima dimostra che le mine erano già lì. tocca per copiare tutto' : 'le mine sono già sotto: questa è l’impronta (sha-256) del seme del banco, che si vede a fine giro. tocca per copiarla'
 }
 async function copiaProva() {
   const P = stato.partita
   if (!P) return
   const righe = [`mine di pzkko.it, giro ${P.giro}`, `impronta del seme del banco (sha-256): ${P.impronta}`]
-  if (P.finita) righe.push(`seme del banco: ${P.semeBanco}`, `seme del giocatore: ${P.semeGiocatore}`, `mine: ${P.m}, nelle caselle ${P.mine().map(nomeCasella).join(', ')}`, 'le mine: HMAC-SHA256(seme del banco, «giocatore:giro:cursore»), 4 byte per numero, ognuno pesca una casella fra quelle rimaste; le prime sono le mine')
+  if (P.finita) righe.push(`seme del banco: ${P.semeBanco}`, `seme del giocatore: ${P.semeGiocatore}`, `mine: ${P.m}, nelle caselle ${P.mine.map(nomeCasella).join(', ')}`, `ricontrollato qui: ${provato(P) ? 'torna' : 'NON torna'}`, 'le mine: HMAC-SHA256(seme del banco, «giocatore:giro:cursore»), 4 byte per numero, ognuno pesca una casella fra quelle rimaste; le prime sono le mine')
   try { await navigator.clipboard.writeText(righe.join('\n')); voce(P.finita ? 'copiati il seme, l’impronta e le mine del giro' : 'copiata l’impronta: il seme arriva a fine giro') } catch { voce(`impronta ${P.impronta}`) }
 }
 
@@ -730,4 +887,5 @@ async function avviaMotore() {
   el.carica.remove()
   scena.avvia()
   aggiornaBanco()
+  ritrova() // (31.10: il giro aperto sulla banca, se c'è)
 }

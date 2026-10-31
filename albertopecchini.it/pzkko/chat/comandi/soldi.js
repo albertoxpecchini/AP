@@ -1,7 +1,9 @@
 // I soldi: aiuto, saldo, profilo, attese, i premi giornalieri, l'elemosina, la classifica, manda.
+// (31.10) i premi e l'elemosina li dà la banca ('chat.premio', 'chat.elemosina': giochi/chat-soldi.mjs), con la serie e
+// l'attesa contate con la sua ora; qui si chiede e si racconta.
 import * as zaino from '../zaino.js'
 import { conti } from '../../games/libro.mjs'
-import { PERSONAGGI, nomeDi } from '../testi.js'
+import { nomeDi } from '../testi.js'
 
 const ORA = 3600_000, GIORNO = 24 * ORA
 const PREMI = { giornaliero: { ogni: GIORNO, base: 300, nome: 'giornaliero', bonus: 50, max: 7 }, settimanale: { ogni: 7 * GIORNO, base: 1500, nome: 'settimanale', bonus: 200, max: 4 }, mensile: { ogni: 30 * GIORNO, base: 5000, nome: 'mensile', bonus: 500, max: 3 } }
@@ -12,12 +14,10 @@ function premio(id) {
     nomi: [id, ...(id === 'giornaliero' ? ['daily', 'giorno'] : id === 'settimanale' ? ['weekly', 'settimana'] : ['monthly', 'mese'])], cat: 'soldi', icona: 'regalo',
     breve: `il premio ${P.nome}: ${P.base} $pzk, di più se torni ogni volta`, uso: id, attesa: P.ogni / 1000,
     async fai(ctx) {
-      const s = zaino.serie(id)
-      // la serie continua se si torna entro due periodi
-      const n = s.ultimo && Date.now() - s.ultimo < 2 * P.ogni ? Math.min(P.max, s.n + 1) : 1
-      zaino.segnaSerie(id, n)
-      const tot = ctx.paga(P.base + P.bonus * (n - 1))
-      const liv = zaino.daiXp(id === 'giornaliero' ? 20 : id === 'settimanale' ? 60 : 150)
+      // la serie continua se si torna entro due periodi (la conta la banca)
+      const r = await ctx.fai('chat.premio', { quale: id })
+      if (!r.ok) return ctx.no(r, id)
+      const { n, tot, livello: liv } = r.esito
       ctx.dì({ colore: 'oro', av: 'bot-ricco', t: `:regalo: premio ${P.nome}`, d: `${ctx.pzkHtml(tot)} per te.${n > 1 ? ` Serie di <b>${n}</b> di fila${n >= P.max ? ' (il massimo)' : ''}: +${P.bonus * (n - 1)} di bonus.` : ' Torna fra un po’ per la serie: ogni volta di fila vale di più.'}`, pie: `il prossimo fra ${ctx.durata(P.ogni)}` })
       ctx.saleDiLivello(liv)
     },
@@ -67,15 +67,13 @@ export const SOLDI = [
   {
     nomi: ['elemosina', 'beg', 'chiedi'], cat: 'soldi', icona: 'banconota', breve: 'chiedi a chi passa: 0–150 $pzk, o una risposta acida', uso: 'elemosina', attesa: 30,
     async fai(ctx) {
-      const p = ctx.caso(PERSONAGGI)
-      await ctx.pensa(600)
-      if (Math.random() < 0.3) return ctx.dì({ colore: 'grigio', av: 'bot-triste', t: p.nome, d: `«${p.no}»` })
-      const n = ctx.tra(5, 150)
-      const tot = ctx.paga(n)
-      let extra = ''
-      if (p.oggetto && Math.random() < 0.15) { zaino.aggiungi(p.oggetto); extra = `\nE ti lascia anche :${p.oggetto}: ${nomeDi(p.oggetto)}.` }
-      ctx.dì({ t: p.nome, d: `${p.si.replace('{n}', ctx.fmt(tot))}${extra}`, pie: `+${ctx.fmt(tot)} $pzk` })
-      ctx.saleDiLivello(zaino.daiXp(4))
+      const [r] = await Promise.all([ctx.fai('chat.elemosina', {}), ctx.pensa(600)])
+      if (!r.ok) return ctx.no(r, 'elemosina')
+      const e = r.esito
+      if (!e.si) return ctx.dì({ colore: 'grigio', av: 'bot-triste', t: e.nome, d: `«${e.frase}»` })
+      const extra = e.oggetto ? `\nE ti lascia anche :${e.oggetto.id}: ${e.oggetto.nome}.` : ''
+      ctx.dì({ t: e.nome, d: `${e.frase}${extra}`, pie: `+${ctx.fmt(e.tot)} $pzk` })
+      ctx.saleDiLivello(e.livello)
     },
   },
   // la classifica è in giocatori.js (usa il database dei giocatori)

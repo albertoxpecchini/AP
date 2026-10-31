@@ -4,10 +4,11 @@
 // due righe, il prezzo o «installata», e la scheda di ognuna con tutto (cosa fa, quanto costa adesso e quanto costa dopo,
 // come si usa, cosa serve, le novità) e il tasto «compra e scarica» (o «scarica», per quelle gratis).
 //
-// - SI PAGA COME NELLO SHOP: coi $pzk PULITI alla cassa di pzk (pzk.punta + pzk.regola, come chat/mercato.js): i soldi
-//   sporchi non valgono, in galera non si compra (pzk.punta dice di no a tutti e due). Senza conto non si compra niente
-//   (il cercapersone senza conto apre già l'Account; la chat lo dice).
-// - L'APP COMPRATA SI INSTALLA nello zaino (chat/zaino.js, installa: vale su tutti i dispositivi del conto) e compare nella
+// - SI PAGA COME NELLO SHOP: coi $pzk PULITI alla cassa di pzk: i soldi sporchi non valgono, in galera non si compra. Senza
+//   conto non si compra niente (il cercapersone senza conto apre già l'Account; la chat lo dice). Dal 31.10 (Alberto: «il
+//   browser non decide più niente») comprare e togliere sono azioni della banca (giochi/app-pzkstore.mjs sul server di
+//   Alberto, «pzkstore.compra» e «pzkstore.togli»), coi prezzi della banca: qui il catalogo è per la vetrina.
+// - L'APP COMPRATA SI INSTALLA nello zaino (lo installa la banca: vale su tutti i dispositivi del conto) e compare nella
 //   home, nella pagina dei soldi (telefono.js, PAGINE). Aperta senza averla (un link, il tasto della rapina, l'ultima app
 //   aperta) porta qui, sulla sua scheda (telefono.js, vai).
 // - SI PUÒ TOGLIERE, SENZA RIMBORSO: i soldi sono già della cassa di pzk, come per tutto quello che si compra; per riaverla
@@ -97,29 +98,24 @@ function ostacolo(x) {
   if (x.prezzo > pzk.puliti()) return { errore: `costa ${fmt(x.prezzo)} $pzk puliti e ne hai ${fmt(pzk.puliti())}${pzk.sporchi() > 0 ? ` (i soldi sporchi non valgono: ne hai ${fmt(pzk.sporchi())})` : ''}`, manca: x.prezzo - pzk.puliti() }
   return null
 }
-/** Compra e installa. → { ok, x, tot } o { ok: false, errore, manca? } */
-export function compra(id) {
+/** Compra e installa: (31.10) lo fa la banca (giochi/app-pzkstore.mjs), coi suoi prezzi, alla cassa di pzk; qui si dice prima
+ *  quello che manca, con le parole dell'app. → Promise<{ ok, x, tot } | { ok: false, errore, manca? }> */
+export async function compra(id) {
   const x = PER_ID[id]
   if (!x) return { ok: false, errore: 'nel pzkstore non c’è' }
   if (zaino.installata(id)) return { ok: false, errore: `${x.nome.toLowerCase()} ce l’hai già: è nella home, nella pagina dei soldi` }
   const no = ostacolo(x)
   if (no) return { ok: false, ...no }
-  if (x.prezzo > 0) {
-    if (!pzk.punta('chat', x.prezzo)) return { ok: false, errore: pzk.nonBasta() }
-    pzk.regola('chat', x.prezzo, 0) // alla cassa di pzk, come lo shop
-    zaino.conta('comprati', x.prezzo)
-    zaino.conta('acquisti', 1)
-  }
-  zaino.installa(id)
-  return { ok: true, x, tot: x.prezzo }
+  const d = await pzk.fai('pzkstore.compra', { id })
+  return d?.ok ? { ok: true, x, tot: d.esito.tot } : { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova', ...(d?.manca && { manca: d.manca }) }
 }
-/** Toglie l'app dal cercapersone (senza rimborso). → { ok } o { ok: false, errore } */
-export function togli(id) {
+/** Toglie l'app dal cercapersone (senza rimborso): anche questo sulla banca. → Promise<{ ok, x } | { ok: false, errore }> */
+export async function togli(id) {
   const x = PER_ID[id]
   if (!x || !zaino.installata(id)) return { ok: false, errore: 'non è installata nel cercapersone' }
   if (id === 'lavatrice' && pzk.lavaggio()) return { ok: false, errore: 'la lavatrice ha un lavaggio dentro: la togli quando l’hai ritirato' }
-  zaino.disinstalla(id)
-  return { ok: true, x }
+  const d = await pzk.fai('pzkstore.togli', { id })
+  return d?.ok ? { ok: true, x } : { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova' }
 }
 
 // ── l'app ──
@@ -199,7 +195,7 @@ const vaiVista = (v, extra = {}) => {
   if (nuova) dallAlto(host)
 }
 
-function clic(e) {
+async function clic(e) {
   const b = e.target.closest('[data-act]')
   if (!b || b.disabled) return
   const a = b.dataset.act, id = b.dataset.id
@@ -207,7 +203,8 @@ function clic(e) {
   if (a === 'scheda') return vaiVista('scheda', { id })
   if (a === 'conto') return ctx.vai('account', { scheda: 'conto' })
   if (a === 'compra') {
-    const r = compra(id)
+    b.disabled = true // (finché la banca non risponde: niente doppi acquisti)
+    const r = await compra(id)
     if (!r.ok) { S.esito = { ok: false, html: esc(r.errore) }; ctx.toast(esc(r.errore), { icona: 'bot-triste' }); return disegna() }
     S.esito = { ok: true, html: `<b>${esc(r.x.nome)}</b> ${fatta(r.x)}${r.tot ? ` (−${fmt(r.tot)} $pzk)` : ''}: ${la(r.x)} trovi nella home del cercapersone, nella pagina dei soldi.` }
     ctx.toast(`<b>${esc(r.x.nome.toLowerCase())}</b> ${fatta(r.x)}: è nella home`, { icona: r.x.icona })
@@ -216,7 +213,7 @@ function clic(e) {
   if (a === 'togli') {
     const x = PER_ID[id]
     if (!confirm(`togliere ${x.nome.toLowerCase()} dal cercapersone?\nniente rimborso: per riaver${la(x)} ${la(x)} ricompri a ${fmt(x.prezzo)} $pzk.`)) return
-    const r = togli(id)
+    const r = await togli(id)
     S.esito = r.ok ? { ok: true, html: `<b>${esc(x.nome)}</b> ${x.f ? 'tolta' : 'tolto'} dal cercapersone.` } : { ok: false, html: esc(r.errore) }
     return disegna()
   }

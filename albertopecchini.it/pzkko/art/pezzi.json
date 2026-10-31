@@ -1284,6 +1284,10 @@
   "peluche": {
    "w": 186,
    "h": 153
+  },
+  "zero": {
+   "w": 195,
+   "h": 138
   }
  },
  "chat-pager-grande": {

@@ -667,13 +667,13 @@ export class Schermo {
       }
     }
     scena.palla = palle[0]; scena.palla2 = palle[1]
-    // la presentazione: a rotazione, ogni 12 secondi un cartello diverso (le squadre, il meteo, «quote vere, risultati a caso»)
+    // la presentazione: a rotazione, ogni 12 secondi un cartello diverso (le squadre, il meteo, «le quote copiano la Serie A vera, e anche i gol»)
     const tt = manca, giro = Math.floor(tt / 14) % 3, dentro = tt % 14
     if (dentro < 7) {
       const m = p.meteo
       const meteoTxt = { sereno: 'SERENO', nuvole: 'NUVOLOSO', pioggia: 'PIOGGIA', nebbia: 'NEBBIA', neve: 'NEVE', vento: 'VENTO FORTE' }[m.tipo]
       if (giro === 0) scena.pannello = { riga: `${p.casa.citta.toUpperCase().slice(0, 12)}`, riga2: `${meteoTxt} ${m.temp}°`, riga3: m.notte ? 'IN NOTTURNA' : m.sera ? 'AL TRAMONTO' : 'DI GIORNO' }
-      else if (giro === 1) scena.pannello = { riga: 'LE QUOTE COPIANO', riga2: 'LA SERIE A VERA', riga3: 'I RISULTATI NO' }
+      else if (giro === 1) scena.pannello = { riga: 'LE QUOTE COPIANO', riga2: 'LA SERIE A VERA', riga3: 'E ANCHE I GOL' }
       else scena.pannello = { riga: `SERIE ${p.casa.serie}${p.casa.serie !== p.ospite.serie ? ' CONTRO ' + p.ospite.serie : ''}`, riga2: 'FORZA E ULTIME 5', riga3: '(INVENTATE)' }
     }
     const mm = Math.floor(manca / 60), ss = Math.floor(manca % 60)

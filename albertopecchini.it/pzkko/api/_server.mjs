@@ -1,6 +1,6 @@
 // Il server dei dati sul pc di Alberto (28.10, C:\pzkko-server\server.mjs): dalla notte del 28.10 Vercel Blob è bloccato
 // su tutto l'account (le soglie gratuite del piano Hobby superate), e i file JSON che stavano lì stanno là. Questo è il
-// pezzo delle funzioni: lo stesso archivio di _archivio.mjs ({ etag(), read(), write(db, etag) }), con le richieste al
+// pezzo delle funzioni: un archivio ({ etag(), read(), write(db, etag) }), con le richieste al
 // server invece che a Blob.
 //
 // Si accende con due variabili nel progetto Vercel: PZKKO_SERVER_URL (l'indirizzo del tunnel, https) e
@@ -37,8 +37,7 @@ export const serverGiu = () => Date.now() < stato.giuFino
 const sha = (b) => createHash('sha256').update(b).digest('hex')
 const errore = (msg, extra = {}) => Object.assign(new Error(`server dei dati: ${msg}`), extra)
 
-async function chiama({ url, segreto }, metodo, nome, { corpo = null, ifMatch = '', ifNoneMatch = '' } = {}) {
-  const indirizzo = `/v1/f/${nome}`
+async function chiama({ url, segreto }, metodo, nome, { corpo = null, ifMatch = '', ifNoneMatch = '', indirizzo = `/v1/f/${nome}` } = {}) {
   const ts = String(Date.now()), nonce = randomBytes(24).toString('base64url')
   const buf = corpo === null ? null : Buffer.from(corpo, 'utf8')
   const lung = String(buf?.length ?? 0), impronta = buf ? sha(buf) : ''
@@ -73,6 +72,35 @@ async function chiama({ url, segreto }, metodo, nome, { corpo = null, ifMatch = 
   }
   stato.giuFino = 0
   return { status: r.status, etag, testo }
+}
+
+/**
+ * IL PONTE (31.10, Alberto: «tutti i dati degli account nel mio server … nessun codice accessibile da fuori»): la banca
+ * (i conti, i giochi, lo zaino, la borsa, i giocatori) gira sul pc di Alberto, dentro C:\pzkko-server, e il suo codice non
+ * sta in questo repository. Le funzioni /api/wallet, /api/borsa e /api/giocatori fanno solo da passaggio: portano la
+ * richiesta del browser al server (POST /v1/api/<nome>, firmata come le altre, con l'indirizzo di chi chiede, che così il
+ * server può usare per i limiti) e ne riportano la risposta, la cui firma si controlla prima di consegnarla.
+ */
+export async function ponte(nome, req, res, { max = 16 * 1024 } = {}) {
+  const opz = serverOpzioni()
+  const manda = (status, body, cache = 'no-store') => { res.statusCode = status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', cache); res.end(typeof body === 'string' ? body : JSON.stringify(body)) }
+  const pausa = { ok: false, offline: true, errore: 'la banca è in pausa (il server di pzkko è spento): riprova fra poco' }
+  if (!opz || serverGiu()) return manda(503, pausa, 'public, s-maxage=5')
+  let testo = ''
+  if (req.method === 'POST') {
+    try {
+      if (req.body !== undefined && req.body !== null) testo = typeof req.body === 'string' ? req.body : JSON.stringify(req.body)
+      else { const parti = []; let n = 0; for await (const p of req) { n += p.length; if (n > max) throw new Error('troppo'); parti.push(p) } testo = Buffer.concat(parti).toString('utf8') }
+    } catch { return manda(400, { ok: false, errore: 'richiesta sbagliata' }) }
+    if (testo.length > max) return manda(413, { ok: false, errore: 'richiesta troppo grande' })
+  } else if (req.method !== 'GET' && req.method !== 'HEAD') { res.setHeader('Allow', 'GET, POST'); return manda(405, { ok: false, errore: 'solo GET e POST' }) }
+  const q = new URL(req.url, 'http://x').search
+  const busta = JSON.stringify({ m: req.method === 'HEAD' ? 'GET' : req.method, q, ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim().slice(0, 64), ua: String(req.headers['user-agent'] ?? '').slice(0, 200), corpo: testo })
+  let r
+  try { r = await chiama(opz, 'PUT', null, { corpo: busta, indirizzo: `/v1/api/${nome}` }) } catch (e) { console.warn(`ponte ${nome}:`, e.message); return manda(503, pausa) }
+  let d
+  try { d = JSON.parse(r.testo.toString('utf8')) } catch { return manda(502, { ok: false, errore: 'la banca ha risposto male' }) }
+  return manda(d.status ?? 200, d.corpo ?? '{}', d.cache ?? 'no-store')
 }
 
 /** L'archivio del file `nome` (es. pzkko/wallet.json) sul server: { etag(), read() → { db, etag }, write(db, etag) → bool }. */

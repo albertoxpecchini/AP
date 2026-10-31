@@ -14,7 +14,7 @@ import { icona } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
 const SCHEDE = [['conto', 'conto', 'app-account'], ['cambio', 'cambio', 'eur'], ['invia', 'invia', 'banconota'], ['altro', 'altro', 'lucchetto']]
-const RISERVATI = /^\s*(pzkko|alberto|albertopecchini|pecchini|admin|banca|bancapzk|root)\s*$/i // come NOMI_PROTETTI in api/wallet.mjs
+export const RISERVATI = /^\s*(pzkko|alberto|albertopecchini|pecchini|admin|banca|bancapzk|root)\s*$/i // come NOMI_PROTETTI in api/wallet.mjs (anche lo zero, os/account.js)
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const fmt = pzk.fmt, fmtEur = pzk.fmtEur
 const data = (t, ora = false) => new Date(t).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: 'numeric', month: 'short', ...(ora ? { hour: '2-digit', minute: '2-digit' } : { year: 'numeric' }) })
@@ -44,14 +44,21 @@ function conto(c) {
     <div class="t-ac-azioni"><button class="c-b" type="button" data-fai="sincronizza">sincronizza</button><button class="c-b nero" type="button" data-fai="esci">esci</button></div>
     <h4 class="t-sh-sez">le ultime mosse</h4><ul class="t-ac-mosse">${mosse(c)}</ul>`
 }
-function mosse(c) {
-  const NOMI = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato' }
+const NOMI_MOSSE = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato' }
+/** Una mossa del conto in parole: { quando, cosa, n, segno }. Anche l'account del cercapersone zero (telefono/zero/os/account.js)
+ *  passa da qui, così le due liste dicono le stesse cose. */
+export function descriviMossa(m) {
+  const NOMI = NOMI_MOSSE
   const pct = (p) => `${p < 0 ? '−' : '+'}${Math.abs(p).toFixed(2).replace('.', ',')} %`
+  const quando = new Date(m.t).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  const segno = ['in-eur', 'inviato', 'cauzione', 'lavatrice'].includes(m.tipo) || m.verso === 'meno' ? 'meno' : ['indirizzo', 'lavati', 'puliti'].includes(m.tipo) ? '' : 'piu'
+  const cosa = m.tipo === 'inviato' || m.tipo === 'ricevuto' ? `${NOMI[m.tipo]} ${m.nome ?? ''} (${m.a ?? m.da})` : m.tipo === 'indirizzo' ? `${NOMI[m.tipo]}: ${m.da} → ${m.a}` : m.tipo === 'in-eur' || m.tipo === 'in-pzk' ? `${NOMI[m.tipo]} a ${m.cambio?.toFixed(4)}` : m.tipo === 'lumaca' && typeof m.pct === 'number' ? `${NOMI.lumaca} ${pct(m.pct)}` : NOMI[m.tipo] ?? m.tipo
+  const n = m.tipo === 'in-eur' ? `−${fmt(m.n)} $pzk → +${fmtEur(m.eur)} €` : m.tipo === 'in-pzk' ? `−${fmtEur(m.eur)} € → +${fmt(m.n)} $pzk` : m.n != null ? `${segno === 'meno' ? '−' : '+'}${fmt(m.n)} $pzk` : ''
+  return { quando, cosa, n, segno }
+}
+function mosse(c) {
   return [...(c.mosse ?? [])].reverse().map((m) => {
-    const quando = new Date(m.t).toLocaleString('it-IT', { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-    const segno = ['in-eur', 'inviato', 'cauzione', 'lavatrice'].includes(m.tipo) || m.verso === 'meno' ? 'meno' : ['indirizzo', 'lavati', 'puliti'].includes(m.tipo) ? '' : 'piu'
-    const cosa = m.tipo === 'inviato' || m.tipo === 'ricevuto' ? `${NOMI[m.tipo]} ${m.nome ?? ''} (${m.a ?? m.da})` : m.tipo === 'indirizzo' ? `${NOMI[m.tipo]}: ${m.da} → ${m.a}` : m.tipo === 'in-eur' || m.tipo === 'in-pzk' ? `${NOMI[m.tipo]} a ${m.cambio?.toFixed(4)}` : m.tipo === 'lumaca' && typeof m.pct === 'number' ? `${NOMI.lumaca} ${pct(m.pct)}` : NOMI[m.tipo] ?? m.tipo
-    const n = m.tipo === 'in-eur' ? `−${fmt(m.n)} $pzk → +${fmtEur(m.eur)} €` : m.tipo === 'in-pzk' ? `−${fmtEur(m.eur)} € → +${fmt(m.n)} $pzk` : m.n != null ? `${segno === 'meno' ? '−' : '+'}${fmt(m.n)} $pzk` : ''
+    const { quando, cosa, n, segno } = descriviMossa(m)
     return `<li><span>${quando} · ${esc(cosa)}</span><b class="${segno}">${n}</b></li>`
   }).join('') || '<li><span>niente ancora</span></li>'
 }

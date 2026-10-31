@@ -13,7 +13,8 @@ import { tieni, ricordo, ricorda } from '../ricordi.js'
 
 const GODBOLT = 'https://godbolt.org/api/compiler/cg142/compile', WANDBOX = 'https://wandbox.org/api/compile.json'
 const OPZIONI = ['-std=c17', '-Wall', '-O1', '-lm']
-const ESEMPI = {
+// (dal 29.10 gli esempi e la compilazione si esportano: li usa anche «codice C» di pzk os, telefono/zero/os/compilatore.js)
+export const ESEMPI = {
   ciao: ['ciao, come ti chiami?', '#include <stdio.h>\n\nint main(void) {\n    char nome[50];\n    printf("come ti chiami? ");\n    scanf("%49s", nome);\n    printf("\\nciao %s, benvenuto su pzkko!\\n", nome);\n    return 0;\n}\n', 'alberto'],
   somma: ['somma di due numeri', '#include <stdio.h>\n\nint main(void) {\n    double a, b;\n    scanf("%lf %lf", &a, &b);\n    printf("%.2f + %.2f = %.2f\\n", a, b, a + b);\n    return 0;\n}\n', '3.5 4'],
   fattoriale: ['fattoriale (ricorsione)', '#include <stdio.h>\n\nunsigned long long fatt(int n) {\n    return n <= 1 ? 1 : n * fatt(n - 1);\n}\n\nint main(void) {\n    int n;\n    scanf("%d", &n);\n    for (int i = 0; i <= n; i++)\n        printf("%2d! = %llu\\n", i, fatt(i));\n    return 0;\n}\n', '10'],
@@ -23,7 +24,7 @@ const ESEMPI = {
 }
 
 let host = null, ctx = null, inCorso = false, salva = 0
-let S = ricordo('compilatore', { codice: ESEMPI.ciao[1], input: ESEMPI.ciao[2], tab: 'input' })
+export let S = ricordo('compilatore', { codice: ESEMPI.ciao[1], input: ESEMPI.ciao[2], tab: 'input' })
 let ultimo = null // l'ultima esecuzione: { compilato, messaggi, errori: [{ line, column, text, severity }], out, err, codice, ms, dove }
 
 const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -58,6 +59,19 @@ async function wandbox(codice, input) {
   const compilato = !errori.some((e) => e.severity === 3) && j.status !== undefined
   return { compilato, messaggi, errori, out: j.program_output ?? '', err: pulisci(j.program_error ?? ''), codice: compilato ? Number(j.status) : null, dove: 'GCC · Wandbox' }
 }
+/** Compila ed esegue: GCC su Compiler Explorer, se non risponde Wandbox. → { compilato, messaggi, errori, out, err, codice, dove, ms }
+ *  o { rete: true, testo, ms } se nessuno dei due risponde. */
+export async function compila(codice, input) {
+  const t0 = performance.now()
+  let r
+  try {
+    try { r = await godbolt(codice, input) } catch { r = await wandbox(codice, input) }
+  } catch (e) {
+    r = { rete: true, testo: e.name === 'AbortError' ? 'i compilatori ci mettono troppo: riprova fra poco' : 'i compilatori non rispondono: sei offline?' }
+  }
+  r.ms = performance.now() - t0
+  return r
+}
 async function esegui() {
   if (inCorso) return
   inCorso = true
@@ -65,13 +79,7 @@ async function esegui() {
   ultimo = null
   pannello()
   led.inizia()
-  const t0 = performance.now()
-  try {
-    try { ultimo = await godbolt(S.codice, S.input) } catch { ultimo = await wandbox(S.codice, S.input) }
-  } catch (e) {
-    ultimo = { rete: true, testo: e.name === 'AbortError' ? 'i compilatori ci mettono troppo: riprova fra poco' : 'i compilatori non rispondono: sei offline?' }
-  } finally { led.finisci(); inCorso = false }
-  ultimo.ms = performance.now() - t0
+  try { ultimo = await compila(S.codice, S.input) } finally { led.finisci(); inCorso = false }
   pannello()
   segnaRighe()
 }

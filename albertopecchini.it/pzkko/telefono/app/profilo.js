@@ -3,9 +3,12 @@
 //   uno per uno (le mani, quante vinte, il puntato, il netto, il colpo migliore: chat/zaino.js, giro, che games/pzk.js chiama
 //   a ogni regola), la vita col bot, i progressi e, col conto, la tua posizione nelle classifiche (api/giocatori).
 // - MODIFICA: la faccia (gli avatar di art/chat-avatar/ e gli adesivi del bot, in cinque rarità: cinque comuni sono di
-//   tutti, le altre si comprano coi $pzk, le leggendarie vanno prima sbloccate), il colore, la cornice e il motto. Si salvano nello zaino (zaino.salvaProfilo) e col conto vanno nella riga
+//   tutti, le altre si comprano coi $pzk, le leggendarie vanno prima sbloccate), il colore, la cornice e il motto. Si salvano nello zaino e col conto vanno nella riga
 //   pubblica del database (api/_giocatori.mjs): nell'app Giocatori gli altri vedono la tua faccia, il colore e il motto.
 // I numeri sono quelli di questo browser (lo zaino) anche senza conto; le classifiche solo col conto.
+// (31.10, Alberto: «il browser non decide più niente») comprare una faccia e salvare il profilo sono azioni della banca
+// (giochi/app-profilo.mjs sul server di Alberto, «profilo.compraFaccia» e «profilo.salva»): i prezzi sono i suoi, e salva solo
+// le facce tue, i colori e le cornici di queste liste, il motto corto. Le liste e i prezzi qui servono a mostrarli.
 
 import * as zaino from '../../chat/zaino.js'
 import * as db from '../../chat/db.js'
@@ -124,20 +127,31 @@ function modifica() {
       <p class="t-pf-nota">${pzk.conto() ? 'faccia, colore e motto li vedono tutti nell’app giocatori.' : 'senza conto il profilo resta in questa scheda del browser.'}</p></section>`
 }
 
-const nomeAv = (id) => (id.startsWith('av-') ? id.slice(3) : nomeDi(id))
+export const nomeAv = (id) => (id.startsWith('av-') ? id.slice(3) : nomeDi(id))
 /** La vetrina di una faccia non tua: la rarità, il prezzo, il tasto per comprarla (o cosa manca per sbloccarla). */
 function vetrina(id) {
   const r = rarita(id), b = bloccato(id), costa = prezzo(id), basta = pzk.saldo() >= costa
   return `<div class="t-pf-vetrina" style="--ra:${r.colore}">${icona(id)}<div><b>${esc(nomeAv(id))}</b><small>${r.nome}</small>${b ? `<p>prima va sbloccata: ${esc(b)}</p>` : ''}</div>
     <button class="c-b" type="button" data-compra="${id}"${b || !basta ? ' disabled' : ''}>${b ? 'bloccata' : basta ? `compra · ${pzk.fmtCorto(costa)} $pzk` : `costa ${pzk.fmtCorto(costa)} $pzk`}</button></div>`
 }
-function compra(id) {
-  const b = bloccato(id), costa = prezzo(id)
-  if (b) return ctx.toast(`prima va sbloccata: ${esc(b)}`, { icona: 'lucchetto' })
-  if (!pzk.punta('chat', costa)) return ctx.toast(`costa ${pzk.fmtCorto(costa)} $pzk e ne hai ${pzk.fmtCorto(pzk.saldo())}`, { icona: 'no' })
-  pzk.regola('chat', costa, 0)
+/** Compra una faccia (la banca, coi suoi prezzi). Anche il profilo del cercapersone zero (telefono/zero/os/profilo.js) passa
+ *  da qui: una regola sola. → Promise<{ ok: true } | { ok: false, errore, bloccata }> */
+export async function compraFaccia(id) {
+  const b = bloccato(id)
+  if (b) return { ok: false, errore: `prima va sbloccata: ${b}`, bloccata: true }
+  const d = await pzk.fai('profilo.compraFaccia', { id })
+  return d?.ok ? { ok: true } : { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova', bloccata: !!d?.bloccata }
+}
+/** Salva i pezzi del profilo che cambiano ({ av?, col?, cor?, mot? }) sulla banca. → Promise<{ ok } | { ok: false, errore }> */
+export async function salva(cambia) {
+  const d = await pzk.fai('profilo.salva', cambia)
+  return d?.ok ? { ok: true } : { ok: false, errore: d?.errore ?? 'la banca non risponde: riprova' }
+}
+const salvaQui = (cambia) => salva(cambia).then((r) => { if (!r.ok) ctx.toast(esc(r.errore), { icona: 'no' }); return r })
+async function compra(id) {
+  const r = await compraFaccia(id)
+  if (!r.ok) return ctx.toast(esc(r.errore), { icona: r.bloccata ? 'lucchetto' : 'no' })
   vedi = null
-  zaino.salvaProfilo({ avs: [...(zaino.profilo().avs ?? []), id], av: id })
   ctx.toast(`faccia nuova: ${esc(nomeAv(id))} (${rarita(id).nome})`, { icona: id })
 }
 
@@ -161,21 +175,21 @@ function clic(e) {
   if (t) { if (S.tab !== t.dataset.tab) { S.tab = t.dataset.tab; dallAlto(host); disegna() } return }
   if (av) {
     const id = av.dataset.av
-    if (mio(id)) { vedi = null; return zaino.salvaProfilo({ av: id }) }
+    if (mio(id)) { vedi = null; return salvaQui({ av: id }) }
     vedi = vedi === id ? null : id // non è tua: la vetrina col prezzo
     return disegna()
   }
   const c = e.target.closest('[data-compra]')
   if (c) return compra(c.dataset.compra)
-  if (col) return zaino.salvaProfilo({ col: col.dataset.col })
-  if (cor) return zaino.salvaProfilo({ cor: cor.dataset.cor })
+  if (col) return salvaQui({ col: col.dataset.col })
+  if (cor) return salvaQui({ cor: cor.dataset.cor })
   if (e.target.closest('[data-banca]')) ctx.vai('account')
 }
-function invia(e) {
+async function invia(e) {
   if (!e.target.matches('.t-pf-motto')) return
-  e.preventDefault()
+  e.preventDefault() // (prima dell'await: se no il modulo partirebbe davvero)
   const mot = e.target.mot.value.replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 60)
-  zaino.salvaProfilo({ mot })
+  if (!(await salvaQui({ mot })).ok) return
   ctx.toast(mot ? 'motto salvato' : 'motto tolto', { icona: 'si' })
 }
 

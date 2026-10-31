@@ -1513,14 +1513,17 @@ sola alla volta, uguale per chiunque sia sul sito in quel momento; si gioca coi 
   «spirito»: una zebra, un biscione, un giglio, un lupo, un ciuccio, una vespa; mai il logo vero) e
   una **forza da 1 a 100** presa dalla realtà. I cognomi dei giocatori sono sillabe italiane a
   caso. Gli accoppiamenti: A contro A (52%), B contro B (34%), un incrocio A–B il 14% delle volte.
-- **Le quote seguono la realtà, i risultati no.** Le quote si calcolano come farebbe un
+- **Le quote e i risultati seguono la realtà** (dal 31.10.2026; prima i risultati erano a caso, vedi
+  sotto). Le quote si calcolano come farebbe un
   bookmaker: gol attesi dalla differenza di forza (più 4 punti di fattore campo e un filo di rumore
   dal seme), probabilità di 1 X 2 e dei totali da due Poisson, margine del 6,5%, centesimi, mai
   sotto 1,05 (1 X 2 sommano al 106,5% in probabilità implicita, over e under della stessa soglia
   pure). Inder–Vicentini dà 1,07 · 11,05 · 26,85; Juvenclub–Milano 2,29 · 3,66 · 2,82. Il
-  **risultato** invece esce da un altro seme con una **Poisson di media fissa 1,35 a squadra**,
-  uguale per tutte: non legge niente delle squadre. La sfavorita vince quanto la favorita; è la
-  battuta del gioco, scritta nelle regole («le quote copiano la Serie A vera, i risultati no»).
+  **risultato** esce da un altro seme con le **stesse Poisson** (i gol attesi di casa e ospite):
+  la forte vince più spesso, la sfavorita ogni tanto, e il banco tiene il suo margine. Le regole
+  lo dicono così: «le quote copiano la Serie A vera, e anche i gol». Fino al 31.10 il risultato
+  usava una Poisson di media fissa 1,35 a squadra uguale per tutte, e la sfavorita vinceva quanto
+  la favorita: con le sue quote alte, puntarci rendeva in media il 164%.
   Una partita su 120 finisce **a tavolino** (3–0, per nebbia, blackout dei riflettori, invasione di
   nutrie, gli ospiti che sbagliano stadio…): paga come tale.
 - **Le puntate**: 1 X 2 e over/under con soglie 1,5 · 2,5 · 3,5 · 4,5, anche insieme, con le fiches
@@ -2432,6 +2435,413 @@ ho visto ancora i vecchi soldi: rischio duplicazione» (Alberto).
   (`pzkko-virtual`, sparisce con la sessione), col conto in `localStorage` (`pzkko-virtual:nome`); entrando o uscendo si cambia
   schedina e le puntate aperte si rimettono sul tavolo del portafoglio giusto. Le puntate vecchie nella chiave `pzkko-virtual` di
   `localStorage` (prima di questa regola, di proprietario ignoto) non si leggono più.
+
+## Il cercapersone zero (29.10, telefono/zero/, art/zero/, tools/pzkko/zero/)
+
+Alberto: «voglio lui come mockup, deve aprirsi con le stesse logiche, ovviamente quando lo apro zoom sullo schermo e mettici
+pzkos, poi voglio retroill arancione e sfondi arancioni, le icone tieni le mie, fai una cosa su misura, anche il cavo della
+ricarica nel posto giusto, è in 3d mi raccomando. NON ELIMINARE IL VECCHIO CERCAPERSONE perché questa versione sarà a 9999pzk$
+e lo sostituirà per sempre nell'account». I colori di riferimento (la sua immagine): corpo bianco, croce, tasto e scritta
+arancioni, lo schermo arancione a pixel scuri, il puntino nero del led.
+
+**Nello shop** (`chat/oggetti.js`, reparto «cose di pzk», `zero`, 9.999 $pzk, da tenere: xp +10 %, attese −10 %; l'icona
+`art/chat-pzk/zero.webp` di rd-plus come le altre; il traguardo «il salto di qualità»). Comprato, è nello zaino, quindi nel
+conto: sul muro e aprendo c'è lui, per sempre (non si vende). Chi non ce l'ha vede il cercapersone nero di prima, che non
+cambia di una riga.
+
+**Il modello** è l'OBJ di Rhino del mockup (34 MB, 169 000 vertici, in mm: Y l'asse lungo, X il corto col bordo di sopra a
+X−, Z lo spessore col fronte a Z+). `tools/pzkko/zero/modello.mjs <file.obj>` tiene solo quello che si vede (i due gusci, la
+cornice dello schermo, croce, OK e INDIETRO, la staffa della porta usb-c, la finestra dell'IR, il vetro, il tubicino del led,
+i contatti dorati, le stampe sul retro; via viti, micro sd, scheda, il delfino disegnato sullo schermo e la scritta
+«FLIPPER» in rilievo) e scrive `art/zero/zero.glb`: 1,2 MB, 107 000 triangoli, posizioni in int16
+(KHR_mesh_quantization), senza normali (le calcola il browser: i vertici sono già doppi sugli spigoli). Dal modello si è
+letto dove stanno le cose: lo schermo di vetro a x −0,1–39,1 e y 5,5–29,5 (l'lcd acceso dentro, 37,2 × 22 mm), la croce a
+x 40–63 con OK in mezzo, INDIETRO a x 61,5–69,5 in basso, il led a x 40–43, il foro dell'usb-c sulla testata destra (x 76,
+in basso, 9 × 3,5 mm), lo slot della micro sd sul bordo di sotto, i fori del GPIO sul bordo di sopra.
+
+**Il 3D** (`telefono/zero/zero.js`, three.js r186 in `telefono/zero/lib/three.js` con GLTFLoader, RoomEnvironment e
+RoundedBoxGeometry, da `tools/pzkko/zero/motore.mjs`): una tela a tutta finestra dentro il dialog del cercapersone, la stanza
+di luce per i riflessi della plastica, una luce chiave con le ombre; i materiali coi colori di riferimento; la scritta
+«pzkko» sotto lo schermo disegnata a un tratto solo, tonda, arancione (niente carattere da caricare: è uguale in foto e dal
+vivo); l'lcd è una tela arancione con la griglia dei pixel e, durante il volo e la chiusura, la chiocciolina del tasto. La
+**telecamera** si scrive a mano (makePerspective coi quattro lati del tronco): la posa **muro** è di tre quarti (da
+destra-sopra-davanti, il tronco simmetrico sul centro del cercapersone); la posa **aperta** guarda dritta sul fronte (il
+piano dell'immagine parallelo al fronte, così lo schermo si proietta in un rettangolo esatto e pzk os in HTML ci si
+appoggia nitido, senza prospettiva) ma sta spostata a destra oltre la testata, così si vede la testata destra col foro
+dell'usb-c e il cavo che entra. L'inquadratura va da poco prima dello schermo a poco oltre la porta (87,5 mm) quando ci
+stanno almeno 19 px per mm; se la finestra è stretta lo schermo vince e la testata esce dal bordo. Fra le due pose si
+interpola posizione, rotazione e i quattro lati.
+
+**Le stesse logiche** (`telefono.js`, in modo zero): aprendo, la tela disegna il cercapersone ESATTAMENTE sopra il tasto del
+muro (la stessa posa della foto, storto uguale: la telecamera ruota dei gradi del tasto, e il tronco si allarga a tutta la
+finestra attorno al rettangolo del tasto), il tasto si nasconde, la telecamera vola alla posa aperta (420 ms) con la
+chiocciolina sull'lcd 3D; arrivata, pzk os (il piano HTML sull'lcd, `.z-piano`, nascosto durante il volo) si accende come un
+lcd in 400 ms (la retroilluminazione che sale con un colpo di luce, il contenuto che si riempie a scatti) e, in carica, il
+cavo entra nella porta sulla testata: arriva da destra inclinato, tocca, si raddrizza cercando il buco, spinge e SCATTA
+dentro (le stesse tappe del cavo di prima). I **tasti sono veri**: si premono col mouse (il raggio sulla tela: INDIETRO si
+abbassa, la croce s'inclina dal lato premuto) e dalla tastiera (frecce, Invio, Backspace). INDIETRO fa una mossa indietro e
+nella home chiude (è l'unico tasto: fa anche da CHIUDI, come toccare fuori ed Esc); la croce nella home sceglie una
+piastrella (cerchiata d'inchiostro) e ai bordi gira pagina, OK la apre; nelle app su e giù scorrono. Il led 3D segue le
+classi del led di prima (lampeggia piano con qualcosa da fare, sfarfalla quando il sistema lavora). Chiudendo: pzk os si
+spegne (si riempie di scuro a scatti e la luce cala), l'lcd 3D mostra la chiocciolina che saluta, e la telecamera torna sul
+tasto. Sul cellulare pzk os è a tutta finestra come prima: la tela sfuma via quando si accende e torna chiudendo. Se si
+compra lo zero col cercapersone aperto, vale dalla prossima apertura (il dialog si rifà).
+
+**Sul muro** (`telefono/zero/muro.js`, da `chat/chat.js` aggiornaTasto): lo stesso tasto `.chat-tasto` vestito da zero: la foto
+`art/zero/zero-piccolo.webp` (la scena 3D fotografata nella posa muro da `tools/pzkko/zero/foto.mjs`, 1344 × 776, le
+proporzioni del tasto di prima), l'lcd con la chiocciolina portato sui quattro angoli dello schermo in foto con una
+matrix3d (l'omografia, `muro-dati.js` scritto da foto.mjs), il led dov'è il tubicino, il nastro adesivo (`art/zero/attacco.svg`)
+al posto del chiodo. Appena la pagina è tranquilla si scaldano il modello e three.js, così al tocco il volo parte subito.
+`tools/pzkko/zero/prova.mjs` apre la home in Chromium con uno zaino finto che ha lo zero e fotografa il muro, il volo, lo
+schermo acceso, il cavo, la croce e la chiusura (`tools/pzkko/lavoro/zero/prova-*.png`).
+
+**pzk os a 8 bit** (29.10 sera, Alberto: «non fare una finestra sopra il modello 3d come adesso (si vede e fa schifo)… il
+modello ha trasparenza quindi lo schermo lo metti esattamente dove è nel modello… prendi flipper zero os e riscrivilo con le
+mie app, impara come funziona e usalo per rifare le app, aumenta i pixel dello schermo ma mantieni stile 8bit, fai solo app
+chat completissima»; prima c'era un piano HTML con le app di telefono/app/ ricolorate sopra la tela, poi per un'ora il
+firmware vero del Flipper in WebAssembly, tolti tutti e due): lo schermo dello zero è DENTRO il 3D. `telefono/zero/os/`:
+- `lcd.js`: l'lcd 256 × 128 a un bit (il doppio del Flipper, 128 × 64), con pixel, righe, cornici smussate, testo, bitmap,
+  inversione e ritaglio; la tela 768 × 384 (tre texel per pixel con un filo di griglia) con la tavolozza della
+  retroilluminazione (luce 0–1: accesa arancione #f7a13a e inchiostro #221408, spenta bruna ma leggibile). zero.js la stende
+  come trama di un piano a z 0,9 sotto il vetro del modello, che è trasparente e riflette la stanza; muro.js la ricopia sul
+  tasto del muro.
+- `font.js`: il carattere 5 × 7 disegnato a mano, glifo per glifo (ASCII, le accentate, €, ♥, le frecce).
+- `icone.js`: le icone di Alberto a un bit col retino di Bayer 4 × 4 (il bordo bianco dell'adesivo resta spento, il
+  soggetto diventa inchiostro), per il menu, le schede e le griglie.
+- `os.js`: il nucleo, fatto come il firmware del Flipper: la barra di stato in cima (ora, rete a tacche, nome del conto,
+  batteria), il desktop con l'animazione a tutto schermo (la chiocciolina di chat/tomodachi.js, le sue 32 × 16 celle a
+  8 × 8 pixel: lì c'è il delfino), OK che apre il menu principale (la lista delle app con l'icona a sinistra, la voce scelta
+  rovesciata, la barra di scorrimento), le app come viste impilate (INDIETRO torna sotto), i dialoghi con la cornice
+  smussata, la tastiera sullo schermo che si usa con la croce (come la TextInput del Flipper). Un giro di disegno ogni
+  100 ms, solo se qualcosa è cambiato. I sei tasti sono quelli del Flipper: telefono.js li manda dai tasti 3D (zero.js, il
+  raggio) e dalla tastiera vera (frecce, Invio, Backspace che cancella una lettera o, a riga vuota, è INDIETRO; tenuto tre
+  secondi spegne; Esc è INDIETRO; le lettere si scrivono).
+- `chat.js`: l'app Chat completa. I comandi sono QUELLI VERI (chat/comandi/*, lo stesso motore di chat/chat.js: attese,
+  eventi casuali, scassato, soldi, morte): ogni comando riceve un ctx come quello della chat in HTML, ma le schede, i tasti,
+  le griglie dei minigiochi (mine, gratta e vinci), i rulli della slot, le barre del tempo e la riga da scrivere si
+  disegnano a pixel (una maniglia finta fa da elemento per i comandi che toccano il DOM: querySelector dei rulli, dei
+  tasti, del testo). Le schede: la barra a sinistra, l'icona di Alberto e il titolo, il testo a 40 colonne, i campi, il
+  piè, i tasti di seguito. Si scrive dalla tastiera vera (Invio manda) o, con OK a riga vuota, da quella sullo schermo;
+  sopra la riga i suggerimenti di chat/predittivo.js (comandi e argomenti: sinistra/destra scelgono, OK o Tab completano);
+  a riga vuota sinistra/destra ripescano le scelte rapide (zaino.rapidi) o le azioni di seguito dell'ultima scheda; su e
+  giù scorrono; quando un minigioco aspetta una scelta la croce va sui suoi tasti o sulle celle della griglia e OK preme;
+  quando aspetta una parola la riga lo dice. La storia resta (sessione o conto). Le altre app del menu dicono «in arrivo»:
+  si fanno quando Alberto dà l'ok sulla chat.
+- In telefono.js, in modo zero: vai/home/indietro vanno a pzk os; l'accensione è la retroilluminazione che cala e risale
+  (400 ms) con sotto già l'app chiesta; chiudendo la luce cala, pzk os torna al desktop, la chiocciolina saluta e la
+  telecamera torna sul tasto. Senza conto la chat gira nella sessione (l'app Account a 8 bit arriverà con le altre).
+
+**Il secondo giro** (29.10 sera, Alberto: «è storto lo schermo… rifai icone in svg consumando pochissimo… pzkko sta solo sul
+lato sotto non a cavallo della smussatura… è troppo luminoso il modello 3d… in base a dove metto il mouse si inclini
+leggermente… rifai la home e al primo accesso spiega come funziona… fai impostazioni per regolare la luminosità, i suoni,
+il led rosso… la home con dati importanti come i miei soldi e le cose da fare oggi… evita di mettere negli angoli cose che
+con l'inclinazione non si vedono… la luce deve essere = a quella del sito… i riflessi identici delle auto, lampioni»):
+- `os/icone.js`: le icone sono tracciati SVG scritti nel file (viewBox 16 × 16, una lista di `path` per icona: le app,
+  la chiocciola del bot, le gemme e le mine, i simboli della slot, il regalo, la clessidra…), riempiti su una tela della
+  misura chiesta e ridotti a un bit: niente immagini da scaricare, sagome pulite anche a 16 pixel. Un nome senza SVG
+  ricade sulla webp di Alberto col retino, come riserva.
+- La **home** (`os.js`, home_): a sinistra la chiocciolina (128 × 64, le sue celle a 4 × 4), a destra i $pzk (grandi), il
+  livello con la barra degli xp, le sfide fatte e se il premio giornaliero è pronto; sotto, nel riquadro «da fare oggi»,
+  fino a tre righe (il premio da riscuotere, la lumachina che ha combinato qualcosa, le quest pronte, le sfide con
+  avanzamento); i dati si rileggono a ogni cambio dello zaino o del conto. Il suggerimento «OK menu · ↓ chat» sta in mezzo
+  in basso. Tutto dentro un margine di 6 pixel (`MARGINE`): le punte dello schermo sono stondate e con l'inclinazione
+  sparirebbero.
+- La **guida** (`os.guida`): quattro pagine di dialogo (i tasti, la home, la chat, spegnere) al primo accesso
+  (localStorage `pzkko-zero-guida`), e di nuovo dalle impostazioni.
+- Le **impostazioni** (`os/impostazioni.js`, nel menu per ultime): luminosità (cinque tacche: la luce massima dell'lcd,
+  `lcd.regola`), suoni (lo stesso interruttore del sito, `pzkko-suono`), led rosso (spento resta spento anche sul muro),
+  inclina col mouse, rivedi la guida. In localStorage `pzkko-zero-impostazioni`; chi le usa si mette in ascolto.
+- **La luce è quella del sito** (`zero/luce.js`): il sole di Mantova a quest'ora (lo stesso calcolo NOAA di scena/luci.js,
+  copiato per non caricare la scena; l'ora di `window.pzkkoOrologio`, anche quella della regia) fa la luce direzionale
+  (direzione, colore rosso quando è basso, forza che va a zero la sera); il cielo è la luce diffusa; di notte, dalle
+  variabili della pagina (`window.pzkkoPagina.luci`: notte, lampioni, auto-x/auto-l/auto-c) si accendono la lampada a
+  muro sopra la saracinesca e i fari dell'auto che passa (una luce che scorre da sinistra a destra davanti al
+  cercapersone). I riflessi: se la scena 3D della home è accesa (`window.pzkkoScena`), ogni 1,5 s si fotografano davvero le
+  sei facce del posto dal punto del cercapersone (`luce.cattura`: la telecamera della scena girata sulle sei direzioni,
+  64 × 64 letti dalla sua tela) e diventano l'ambiente (PMREM); se no, un cielo disegnato con l'ora (il sole, l'orizzonte
+  arancione dei lampioni, la striscia calda dei fari dove sta l'auto). Esposizione 0,7. La foto del tasto sul muro è
+  scattata con una luce fissa di giorno (`FISSA`): aprendo, il 3D parte con quella e passa alla luce vera durante il volo
+  (`luceMescola`), al ritorno il contrario, così non si vede mai un cambio secco.
+- **L'inclinazione col mouse** (`zero.js`, `inclinazione`): da aperto il cercapersone (con l'lcd, la scritta e la spina,
+  che stanno nel suo `corpo`) ruota piano attorno al suo centro verso il mouse (±5° in su e in giù, ±7° di lato), torna
+  dritto quando il mouse esce; si spegne nelle impostazioni.
+- **Lo schermo sul muro non è più storto**: i quattro angoli dell'lcd per la matrix3d del tasto si prendono alla
+  superficie del vetro (z 2,1), dove l'occhio vede lo schermo; a z 0,9 (dove sta il piano dell'lcd) la parallasse della
+  vista di tre quarti lo spostava.
+
+**La scritta** «PZKKO» sta sulla fascia inclinata a 30° sotto il fronte (sondata nel modello con `prova.mjs --sonda`: da y 1,0
+z 1,97 a y −5,5 z −1,78; dai vertici dell'OBJ avevo preso la parete interna del guscio e la scritta stava 1,4 mm dentro la
+plastica, sul muro si vedeva e aprendo no), non a cavallo dello smusso: a pixel, maiuscola, inclinata, PIENA, coi tratti
+spessi tre celle e gli angoli smussati, come il logo «FLIPPER» stampato sul Flipper vero (le foto di Alberto, 29.10):
+disegnata a blocchi in zero.js (scritta), niente carattere. INDIETRO: premuto una volta una mossa indietro, tenuto tre
+secondi spegne (Alberto, 29.10).
+Lo schermo riempie tutta la finestra del vetro meno 0,8 mm di bordo scuro (37,6 × 22,4 mm, angoli 2,2 mm), come nei render
+ufficiali; la porta usb-c è il foro in mezzo alla testata destra (sondato: y 4,6–13,9, z −10,1–−6,6, centro y 9,25 z −8,4),
+non il forellino in basso, che è quello del laccetto.
+
+**Il terzo giro** (29.10 notte, Alberto: «quando premo a destra non si preme ma si solleva… nel tutorial c'è scritto avanti
+freccia destra ma devo premere ok… la presa deve entrare centratissima al buco… dal cavo esce un cilindro stondato… schermo
+storto neanche modificato… scritta pzkko inesistente… tasto indietro funziona ma non è animato… fai tutti i tasti che fin
+che non tolgo il dito lui rimane premuto»):
+- La croce: destra e sinistra giravano col segno sbagliato (l'asse X del modello è «giù» nel mondo). Ora il lato premuto
+  scende, e la croce si abbassa anche un filo.
+- Tutti i tasti restano giù finché si tiene (mouse, dito e tastiera: `premi(…, { tieni: true })` e `lascia` al rilascio),
+  e premuti si scuriscono (ogni tasto ha il suo materiale): da davanti l'abbassarsi di 0,9 mm quasi non si vede, il colore
+  sì.
+- Nel dialogo con un tasto solo («avanti ▶» nella guida) anche destra va avanti, oltre a OK.
+- La spina: la linguetta d'argento ha la sezione dell'usb-c vero (8,3 × 2,5 mm, i lati corti a semicerchio, `Shape` +
+  `ExtrudeGeometry`), il corpo nero è squadrato (smusso 0,9 mm, non 2,2), la guaina è un tronco a sezione quadrata che si
+  stringe dal corpo al filo (una RoundedBox coi vertici scalati), non un cilindro. La spina entra nel centro sondato del
+  buco (9,25, −8,4).
+- Il tasto sul muro: foto.mjs non ripartiva (il suo server non sapeva i MIME di json/mjs che pzk os importa dalla chat), per
+  cui la foto e muro-dati.js erano ancora quelli vecchi e «lo schermo storto» era rimasto storto. Ora i MIME sono gli
+  stessi di prova.mjs, la foto è rifatta, e `prova.mjs --muro` scatta il tasto a 4× (prova-tasto.png e, senza lcd,
+  prova-tasto-nudo.png) per vedere se lo schermo sta nel vetro. In più la tela di pzk os sul tasto (muro.js, vivo) è grande
+  quanto il vetro in pixel veri (ridisegnata al cambio di misura, passando da una 256 × 128 a pixel netti): la vecchia
+  256 stretta in 230 px con `image-rendering: pixelated` saltava delle righe e le scritte venivano a gradini.
+- Di notte il cercapersone era color sabbia: la lampada ha il colore di quella della scena (0xffe4c0) e metà forza, il
+  cielo disegnato per i riflessi è grigio-blu come il buio del sito.
+- Per misurare il modello dal browser: `rig.sonda(da, verso)` (un raggio nelle coordinate del corpo) e
+  `prova.mjs --sonda`, che stampa il profilo della fascia e la mappa della testata; `rig.scritta(dz)` e `rig.dove(tasto)`
+  per il collaudo.
+
+**Le regole per le app** (29.10 notte, Alberto: «fai delle regole e poi salvatele e memorizzale per sempre su come creare
+app in pzk os dentro al flipper senza bugs e usando i tasti presenti e senza bugs grafici con l'aggiunta di icone, animazioni e
+suoni tutti funzionanti»): stanno in `telefono/zero/os/REGOLE.md`, col modello da copiare, e vanno lette prima di ogni app.
+Insieme sono arrivati: `os/suoni.js` (il bip di ogni tasto e la sigla di ogni app che si apre, in un posto solo: prima il
+cercapersone 3D era muto), `PRONTE` in os.js (le app pronte si registrano lì e il menu smette da sé di dire «presto»), la
+sigla delle impostazioni in suono/interfaccia.js, e il collaudo `prova.mjs --app=<id>` (con `--suoni`): apre l'app, preme
+tutti e sei i tasti, salva l'lcd a ogni passo e controlla da solo angoli, margini, glifi, icone mancanti, errori e bip.
+Al primo giro ha trovato sei difetti, ora corretti: l'errore «reading 'fermo'» della barra del tempo della chat, la barra
+delle schede a x 3 fuori dal margine, il «›» del prompt senza glifo, il cursore sopra la «s» di «scrivi», il bollino «↓ 1»
+attaccato ai messaggi, la riga della barra di stato fino nei due angoli stondati; e a occhio il ▶ delle impostazioni
+scritto fuori dalla fascia scura (invisibile) e «◀ indietro» nella vista «in arrivo» (◀ è la freccia sinistra).
+
+**Il rider e il clic** (29.10 notte, Alberto: «come faccio a premere quando faccio lavoro rider? le freccie non vanno per la
+sequenza, fammele andare, e metti per sicurezza anche il click del mous»). Due guasti: la finta scheda di os/chat.js
+(`maniglia`) tornava null per `[data-fatte]`, e alla prima svolta la consegna andava in errore; e i tre tasti in fila
+volevano la croce per spostarsi e OK per premere. Ora un selettore `[data-…]` scrive nel corpo della scheda, e quando i
+tasti di una scelta sono direzioni (sinistra, dritto o centro, destra, giù: la consegna, il rigore) le frecce li premono
+subito, il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic». Il clic del mouse sullo schermo 3D:
+zero.js colpisce il piano dell'lcd e ne ricava il pixel (`rig.puntoLcd` fa il contrario, per le prove), pzk os preme la
+zona che c'è lì (`os.zona`, `os.tocca`; la manina solo sopra una zona). Si cliccano i tasti, le azioni, i suggerimenti e
+il bollino «↓» della chat, le righe del menu, le righe e le frecce delle impostazioni, i tasti dei dialoghi e della
+tastiera, «OK menu» e «chat» della home. `prova.mjs --rider` fa un turno intero con due frecce e due clic e controlla che
+sia contato. Resta da fare: il nastro dei cestini dello spazzino costruisce pezzi HTML veri, che nello zero non si
+vedono.
+
+**In locale è il predefinito** (29.10 notte, Alberto: «fai che sia questo il predefinito senza comprare nulla»): su
+localhost e sugli indirizzi numerici del server di prova (anche dal telefono) il cercapersone zero c'è sempre, senza
+comprarlo (`PROVA_ZERO` in chat/zaino.js); `?vecchio` rimette il cercapersone nero. Su pzkko.it niente cambia: si compra
+nello shop a 9.999 $pzk.
+
+**Il cavo lungo** (29.10 notte, Alberto: «fai un cavo più lungo almeno il triplo che esca dalla pagina»): il filo della
+spina scende per 60 cm invece di 16 (la stessa curva, poi giù dritto), così la sua fine non si vede in nessuna finestra.
+Il cavo entra quando il browser dice che il computer è in carica: un PC fisso dice sempre 100 % in carica, e lì il cavo
+c'è sempre. `prova.mjs --misura=3440x1440` prova una finestra qualsiasi.
+
+**L'app profilo** (29.10 notte, Alberto: «ora crea app profilo fatta benissimo»): `telefono/zero/os/profilo.js`, la seconda
+app vera di pzk os dopo la chat. La logica è quella del profilo del cercapersone vecchio (telefono/app/profilo.js), da cui
+ora si esportano `compraFaccia` e `nomeAv`: l'acquisto di una faccia è una regola sola per tutti e due. Sei pagine che si
+sfogliano con ← → (e ↑ ↓) coi pallini in alto e lo scorrimento di lato: il cartellino (la faccia, il bollino del livello,
+il nome, l'indirizzo e la data, il titolo, i soldi sporchi o la galera, il motto, la barra degli xp che si riempie
+entrando, tutto dentro la cornice scelta disegnata davvero: nastro, oro doppia, neon a puntini, pixel a gradini), i soldi
+(coi puntini fra nome e numero), i giochi grandi (la tabella mani, vinte, netto, colpo), la vita col bot, i progressi, le
+classifiche (col conto, da chat/db.js; senza, o col server che non risponde, lo dice). OK apre la modifica: l'anteprima
+del cartellino sopra, e quattro righe (la faccia, il colore come trama a un bit, la cornice, il motto con la tastiera).
+La faccia: la griglia di tutte le 33, quelle non tue sbiadite, quella in uso sottolineata, sotto la scelta in grande con la
+rarità e cosa fa OK; si compra con un dialogo (sigla «negozio»), le chiuse dicono cosa manca. Tutto si clicca anche col
+mouse. Il testo degli altri (nome, motto, titolo) passa da `txt`: un carattere senza glifo diventa «?». Icone SVG nuove:
+trofeo, matita, lucchetto; e app-profilo rifatta in un tracciato solo (in due, i dettagli si riempivano e nel menu era un
+blocco nero). Il collaudo ha guadagnato `--tasti` (anche `clic@x×y`), `--peggiori` e `--misura`. Trovati e corretti
+guardando le foto: «dal Invalid Date» senza data di creazione, il campione del colore invisibile nella riga scelta, il
+bollino «liv 129» fuori dal riquadro, le virgolette « » del motto che uscivano come «<».
+
+**L'app account** (29.10 notte, Alberto: «fai app account con stesse serietà»): `telefono/zero/os/account.js`. La logica è
+quella dell'account del cercapersone vecchio e del wallet (games/pzk.js); dall'app vecchia ora si esportano `RISERVATI` e
+`descriviMossa`, così le due liste dicono le stesse cose. Senza conto: crea (il nome, la chiave nascosta per i nomi di
+Alberto, il PIN due volte perché non si recupera) o entra (nome e PIN); dopo, si apre l'app che si voleva. Col conto,
+cinque pagine: il conto (OK: sincronizza o esci, l'uscita si conferma), le mosse, il cambio (il verso, il cursore 0–100 %,
+la conferma), invia (l'indirizzo a cifre e il nome di chi è, quanti, la conferma), altro (l'indirizzo una volta sola, il
+PIN vecchio-nuovo-ripetuto, instagram). Mentre si aspetta il server, la rotellina in fondo e nessun doppio invio; l'esito
+resta in fondo. **Senza conto non si entra** anche sullo zero (os.js, `LIBERE`: account e impostazioni): la home diventa un
+lucchetto con «OK entra o crea il conto», all'accensione senza conto si apre l'account, e un comando mandato alla chat
+aspetta il conto. Nuovi in pzk os: `os.cifre` (le caselle per PIN, indirizzi e quantità), la tastiera `nascosto`, i titoli
+troppo lunghi tagliati da soli, `os/pezzi.js` (i pezzi comuni di profilo e account). Il collaudo: `--server-finto`,
+`--senzaconto`, e i testi più larghi dello schermo. Corretti strada facendo: la striscia dell'esito negli angoli stondati, il
+tasso grande che usciva (il centro misurava a scala 1), «invii … dal» senza data, un titolo e una riga troppo lunghi, e la
+riga «liv 129 · 4614/15420 xp» della home che usciva a destra (ora, se non ci sta, la percentuale).
+
+**In locale sempre dentro come pzkko** (29.10 notte, Alberto: «fai che in local abbia sempre il log fatto con pzkko»): sul
+server di prova (localhost e gli indirizzi numerici) games/pzk.js, se non è già dentro come pzkko, chiede `/__dev/accesso`
+a tools/dev.mjs, che lo dà solo a chi chiede da questo computer o dalla rete Tailscale (100.64.0.0/10; dalla rete di casa
+o dell'università: 403). Il token lo firma il wallet con `accessoLocale` (api/wallet.mjs): esportata ma non è l'handler,
+quindi online non c'è nessun indirizzo che la chiami. Niente PIN nel codice. In locale l'archivio del wallet sta in memoria
+(senza il server in casa nel file d'ambiente) e si svuota a ogni avvio: il conto pzkko (pzk398893, l'indirizzo riservato)
+nasce lì, senza PIN, la prima volta che serve; con l'archivio vero non si crea niente. `?ospite` nell'indirizzo lascia senza
+conto (il lucchetto del cercapersone). I collaudi (prova.mjs) hanno il loro server senza quella rotta: non cambiano.
+
+**Le app di pzk os, una per una** (29.10 notte, Alberto: «crea uno alla volta shop, pzkstore, sfide, quiz, quest, giocatori, zaino,
+miniera, foto, virtual, banca, rapina, bin&hex, calcoli, codice C, cucina e impostazioni; falle tutte maniacalmente
+perfette»). Tutte su `os/pezzi.js` (`pagine`, `elenco`, `puntini`, la striscia), con la logica dell'app vecchia
+esportata da telefono/app/ e non copiata, e il collaudo di REGOLE.md su ogni vista.
+
+- **Lo shop** (`os/negozio.js`): le pagine offerte del giorno (col conto alla rovescia a mezzanotte), tutto, i cinque
+  reparti, il carrello. In cima a ogni lista la riga dell'ordine (OK: le opzioni: ordine, «posso comprarli», cerca); scrivendo
+  dalla tastiera si cerca, INDIETRO toglie la ricerca. La scheda: l'icona grande, il prezzo pieno barrato e quello d'oggi, la
+  descrizione che scorre con ↑ ↓, i bonus, i tasti ♥ − + carrello compra (comprare si conferma). Il carrello: OK su una riga
+  (togli, uno in meno, uno in più), paga (si conferma), svuota. Lo scontrino si stampa riga per riga col ticchettio e la sigla
+  della cassa. Dal negozio vecchio si esportano `prodotti`, `compraRighe`, `ORDINI`, `contoAllaRovescia` e le chiavi del
+  carrello e dei preferiti (gli stessi per tutti e due). Corretti strada facendo: comprando subito dalla scheda il carrello si
+  svuotava (anche nel vecchio), l'a capo nel testo diventava «?» (`txt`), l'icona dello shop sembrava un lucchetto (ora una
+  bottega con la tenda a righe), le virgolette « » uscivano come < > (ora hanno il loro glifo).
+
+- **Il pzkstore** (`os/pzkstore.js`): la vetrina (due righe, le app con icona, nome, una riga, prezzo o «installata», «!» se
+  ti servirebbe, i puliti che hai e gli sporchi che qui non valgono) e la scheda: l'icona grande, genere e versione, lo stato, il
+  testo intero che scorre con ↑ ↓ (cosa fa, in breve, come si usa, cosa serve, le novità, togliere), sotto compra e scarica o
+  apri e togli, tutto confermato. Catalogo, prezzi, acquisto e rimozione sono quelli del pzkstore vecchio. Nuovi: la sigla
+  «pzkstore» (lo scaricamento), il menu di pzk os che si rifà quando lo zaino cambia (un'app comprata compare subito),
+  `impagina`, `scorrevole`, `bottoni` e `senzaHtml` in pezzi.js (il testo lungo va a capo a 37: a destra restano le frecce).
+
+- **Le sfide** (`os/sfide.js`): in cima i giorni di fila, quante oggi coi tre pallini (pieno fatta, a metà pronta) e fra
+  quanto arrivano le nuove; sotto le tre sfide (icona, difficoltà e cosa fare, la barra, a che punto, il premio) e il bonus del
+  giorno. OK: «riscuoti» se è pronta (con la moneta), «vai» se no, che apre l'app dove si fa: la chat col comando giusto
+  (`os.apri(id, { comando })`, nuovo), lo shop, il quiz, le quest. Dal vecchio si esportano `DOVE` e `aMezzanotte`. Il
+  collaudo ha guadagnato `conta@statistica@n` (lo zaino conta come dopo un'azione vera), per portare le sfide a «pronta».
+
+- **Il quiz** (`os/quiz.js`): l'ingresso (le regole in una riga, le pagate di oggi, il record, gli argomenti); la domanda
+  (a che punto e i pallini, la barra dei 15 secondi che si accorcia e gli ultimi tre che ticchettano, la difficoltà col premio,
+  la serie, il testo, le risposte A–D con ↑ ↓ e OK o coi tasti a–d e 1–4, la scelta lunga che scorre da sola); risposto, la
+  giusta col ✓ e la tua sbagliata con la x incorniciate, la spiegazione al posto della domanda, il premio in fondo. Le foto
+  dei quiz (Wikimedia, imgur) arrivano a un bit col retino di Bayer e i livelli stirati; se il browser non le lascia leggere, si
+  tira a indovinare. INDIETRO in partita chiede se lasciare (e il tempo si ferma). Il riepilogo: quante giuste, i pallini, il
+  guadagno, argomenti e ancora. Domande, premi e tetto sono quelli di chat/quiz.js.
+
+- **Le quest** (`os/missioni.js`): l'elenco (quante finite, ogni storia con icona, nome, stato e una riga; il lucchetto o la
+  stella sull'icona), e la storia in due tempi: il testo a tutto schermo che si scrive da solo in un secondo col ticchettio (OK
+  lo finisce, poi OK le scelte), le scelte una per riga col costo, il rischio o perché non si può, e «lascia la quest»
+  confermato. INDIETRO dalle scelte rilegge, dal testo torna all'elenco (la quest resta in corso). Cosa ha fatto la scelta di
+  prima passa nella striscia; la fine ha il premio su due righe. Una bloccata dice cosa manca e porta allo shop; una che
+  consuma un oggetto lo dice prima di cominciare. Tutto da chat/missioni.js.
+
+- **I giocatori** (`os/giocatori.js`): quattro pagine. Le classifiche (in cima quale, OK le diciassette; il podio coi numeri
+  rovesciati, la faccia, il nome, il valore), le notizie (icona, testo su due righe, quanto fa), cerca (scrivendo dalla
+  tastiera o OK sulla riga in cima), io (l'avviso urgente della lumachina con «ho capito», la sua salute con la barra, oggi,
+  gli ultimi giorni, il tuo profilo, i rivali, la banca in numeri: scorre con ↑ ↓). La scheda di un giocatore: la faccia, il
+  titolo, il livello con la barra, i numeri, le classifiche, i leggendari, «manda $pzk» (la chat, comando «manda»). Ogni
+  pagina dice se il server non risponde. Dal vecchio si esportano `fa`, `giornoBreve`, `pctTesto`, `pzkTesto`,
+  `semeSessione`. Nuovi: l'icona `app-giocatori` (mancava: nel menu non c'era), la lente, le barre in `impagina`, e nel
+  collaudo il database dei giocatori finto (`--server-finto`).
+
+- **Lo zaino** (`os/zaino.js`): le pagine sono i filtri (tutto, da usare, da tenere, attrezzi, casse, da vendere); in cima gli
+  effetti in corso col tempo che resta e i bonus di adesso, sotto i pezzi con icona, nome e quanti. La scheda: icona grande, nome,
+  quanti e quanto vale, cosa fa e il bonus (scorre se serve), i tasti usa (si consuma qui, con la sigla dello zaino), gratta,
+  apri, vendi, vendi tutto (la chat), allo shop o compra ancora. Dal vecchio si esportano `FILTRI`, `tipoDi`, `azioniDi`,
+  `usa`, `nomeCorto`, `resto`. Il collaudo ha guadagnato `prendi@pezzo@n`.
+
+- **La miniera** (`os/miniera.js`): la pixel art di chat/miniera-pixel.js portata a un bit (la luce col retino di Bayer; la
+  scena in negativo, perché è una stanza buia con le cose accese: il colore del muro diventa carta, le luci inchiostro). La
+  postazione: la scena in piccolo, i maturati che crescono da soli con la barra della memoria, produzione, temperatura, hash,
+  resa; OK incassa (la moneta), ↓ la guardi a schermo intero, senza barra, coi pixel veri del disegno (200 × 125). I pezzi: le
+  dodici categorie col pezzo montato o «manca!»; OK il negozio della categoria (disegno a metà, nome, numeri, prezzo o «ne
+  hai»), la scheda (il disegno 38 × 38, i numeri, se va bene col resto, compra confermato, monta o monta +1, smonta, vendi
+  confermato). I PC pronti: la scheda col disegno, la produzione, il prezzo (il listino barrato) e «compra e monta». Dal vecchio
+  si esportano `statsTesto`, `perOra`, `montatoDi`.
+
+- **Le foto** (`os/foto.js`): le 126 foto vere dei quiz (chat/immagini.js, Wikimedia e Imgur). La galleria: miniature
+  cinque per riga con la cornice doppia sulla scelta, le frecce si muovono e la riga scorre, sotto cosa è. La foto: a tutto
+  schermo senza la barra (dentro le punte stondate), sotto cosa è e il credito; ← → la prima e la dopo (anche il clic sui lati),
+  OK o INDIETRO tornano. Il caricamento a un bit sta ora in `icone.foto` (lo usa anche il quiz) e fa la diffusione dell'errore
+  (Floyd–Steinberg a serpentina): sulle foto più dettaglio del retino di Bayer, che faceva la griglia. Una foto che il browser
+  non lascia leggere ha il punto di domanda.
+
+- **Virtual** (`os/virtual.js`): il campionato virtuale del gioco grande, la stessa partita (games/virtual/partita.js, il
+  ciclo di cinque minuti deciso dall'orario) e la stessa schedina (games/virtual/schedina.js). Lo schermino è quello del
+  gioco (games/virtual/schermo.js) con le due primitive, il pixel e il rettangolo, che scrivono la luce in un buffer
+  (`lumi`); poi la luce diventa trama a un bit. In campo la resa si adatta al fotogramma: le due luci più frequenti sono
+  l'erba, a puntini radi, il più scuro pieno, il più chiaro carta (di notte e con la pioggia gli omini non spariscono più).
+  Tre pagine: la partita (lo schermino a metà, il tabellone, la voce; ↓ a schermo intero, senza barra, dieci fotogrammi al
+  secondo), le quote (la fiche, 1 X 2 e gli over/under, si punta nei quattro minuti prima del fischio) e la schedina.
+  Finita la partita la schedina paga e lo dice, coi suoni del gioco.
+
+- **La banca** (`os/banca.js`): il wallet della home a un bit («in portafoglio solo saldo e borsa»). Sullo zero non apre
+  più il wallet: telefono.js fa l'`azione` di un'app solo se pzk os non ha la sua. Tre pagine. Il portafoglio: i $pzk
+  liberi a sette segmenti come i led del wallet (i segmenti spenti a puntini sottili), gli euro che valgono, i sporchi e
+  quelli sul tavolo, gli EUR€ e la targhetta con l'indirizzo. Aprendo si fa la prova dei segmenti, e quando il saldo cambia
+  le cifre corrono fino al numero nuovo con la moneta. OK porta all'account. La borsa (api/borsa.mjs): il cambio grande,
+  la variazione del periodo, la linea che si disegna da sinistra con l'area a puntini, l'apertura tratteggiata e l'ultimo
+  punto che lampeggia. ↑ ↓ cambiano il periodo, che si ricorda insieme al pomello del wallet. OK, o il clic sul grafico,
+  accende il cursore: ← → lo spostano e in cima c'è il cambio di quel momento. I numeri: il cambio e l'inverso, le
+  variazioni, i $pzk in giro, quanto valgono e su quanti conti. Senza rete dice che la borsa è chiusa. Il carattere ha
+  ora ▲ ▼ ≈, e il collaudo col `--server-finto` ha anche una borsa finta.
+
+- **La rapina** (`os/rapina.js`): il colpo alla cassa di pzk, con le regole del server (api/wallet.mjs) e dell'app vecchia,
+  che ora esporta le probabilità, il bottino a testa, la cauzione e le ore di galera. La prima pagina cambia secondo com'è
+  messo il colpo. La cassa: quanto c'è dentro, organizza o entra col codice (quattro lettere dalla tastiera). Il colpo
+  aperto: il codice grande, i secondi che corrono, la banda con la riuscita; chi organizza ha «via!» con la conferma. Lo
+  stato si chiede ogni tre secondi. Il via: la cassaforte che si scassina per un secondo (un tasto la salta). Riuscito: il
+  sacco che salta, la quota e il bottino, la lavatrice o la sua scheda nel pzkstore. Presi: il lampeggiante, poi la cella
+  con le sbarre che si scuotono, quando esci e la cauzione. Con un colpo aperto ← → scelgono i tasti, e allora la pagina
+  delle regole sparisce dalla testata, così ◀ ▶ non mentono. L'esito già visto si ricorda per conto: il server ridà
+  l'ultimo colpo per due ore, e «va bene» prima lo rifaceva vedere (anche nell'app vecchia). Nuovi: la sigla della rapina,
+  i suoni del colpo riuscito e della sirena, le icone del sacco e della sirena, e nel `--server-finto` i colpi
+  (`--rapina=presi`, `--rapina=galera`).
+
+- **bin·hex** (`os/conversioni.js`): le conversioni fra le basi, coi conti dell'app vecchia (BigInt, la parte dopo la
+  virgola, il complemento a 2) e la stessa scelta ricordata. «Come si fa» dell'app vecchia ora è fatto di dati (`passi`:
+  testi, tabelle, l'esito) che lei trasforma in html come prima (uguale su 56 casi provati) e pzk os in righe. Le righe,
+  in tondo con ↑ ↓: il numero (OK la tastiera, o la tastiera vera; il cursore lampeggia), la base in cui è scritto e i bit
+  (◀ ▶ sul valore, anche col clic), i risultati che si riscrivono da sinistra quando il numero cambia (OK lo vedi intero, e
+  lì OK lo copia), e «come si fa verso». I passaggi: le divisioni coi resti, le potenze o i gruppi di bit, in colonne
+  allineate, l'esito in una fascia; ← → cambiano la base d'arrivo, coi pallini in testata.
+
+- **Calcoli** (`os/calcolatrice.js`): la scientifica del geometra, con i conti e lo stato della vecchia, che ora esporta
+  l'espressione, l'uguale (`registra`), i triangoli, le coordinate (`polari`, `fraDue`, `gauss`) e gli angoli
+  (`leggiAngolo`): sono la stessa calcolatrice con due facce, e la scheda aperta si ricorda per tutte e due. Quattro pagine.
+  Il calcolo: l'espressione, il risultato mentre scrivi, gon, gradi o radianti, gli ultimi da riprendere; OK, o scrivere
+  dalla tastiera vera, apre il tastierino coi 34 tasti della vecchia, dove Invio è l'uguale. I triangoli: tre dati, e a
+  destra il triangolo vero quando si chiude, col pezzo scelto segnato; il risultato coi passaggi e la seconda soluzione. Le
+  coordinate: da A con distanza e azimut a B, fra due punti, l'area di Gauss coi vertici uno per uno. Gli angoli: le
+  quattro misure e il goniometro che lo disegna. Nuovi in pzk os: `os.numero`, il tastierino dei numeri (il meno, la
+  virgola, e per gli angoli ° ′ ″), perché la tastiera di lettere non ha né il meno né la virgola; e nel carattere
+  √ π α β γ ² ³ ½ Δ θ ∞ ± ÷ Σ, coi pedici come lettere normali.
+
+- **Codice C** (`os/compilatore.js`): il compilatore C vero dell'app vecchia, che ora esporta `compila` (GCC 14.2 su
+  Compiler Explorer, se non risponde Wandbox) e gli esempi; il codice e l'input sono lo stesso stato suo. Una vista sola,
+  perché ← → muovono il cursore: l'editor coi numeri di riga, il cursore che lampeggia, le righe con un errore col numero
+  rovesciato, e dalla tastiera vera Invio va a capo tenendo il rientro, la graffa chiusa torna indietro, Backspace
+  cancella. OK apre il menu: esegui, scrivi qui, a capo, cancella, l'input per scanf, l'ultimo output, gli esempi. L'output:
+  mentre compila la rotellina e i punti che corrono, poi gli avvisi rovesciati, quello che ha stampato, il codice d'uscita,
+  i secondi e dove; OK lo rifà. Provato davvero: «ciao alberto, benvenuto su pzkko!». Nuovi: la tastiera di sistema con
+  `simboli: true` (graffe, parentesi, punto e virgola, operatori), Ctrl+Invio sullo zero è il tasto OK (prima la tastiera
+  vera lo ignorava), e nel collaudo il token `okvero`.
+
+- **La cucina** (`os/cucina.js`): le ricette del Mincio alla Cooking Mama, con la nonna (un'icona nuova: la crocchia, gli
+  occhiali, il sorriso) che commenta nel fumetto. Le ricette, i voti, le medaglie e i premi sono della cucina vecchia, che
+  ora esporta anche `chiudi`: i $pzk, gli xp, il piatto nello zaino e il record passano da lì. I sei minigiochi sono rifatti
+  per i tasti, con la barra del tempo e il clic che fa OK. Taglia: OK quando il coltello è sulla riga. Ordina: ← → e OK,
+  quelli già nella pentola col ✓ e la scelta che salta al prossimo. Mescola: → ↓ ← ↑ in giro, col mestolo che segue (o il
+  clic sui quarti). Impasta: OK più in fretta che puoi. Versa: OK apre il sacco e OK lo chiude (la vecchia si teneva
+  premuta, e le regole non vogliono tasti tenuti), il getto che scende e la fascia segnata anche fuori dal bicchiere.
+  Cuoci: OK ferma la lancetta. Il voto lampeggia, la fine dà medaglia, record e premi, e «rifalla» o «le ricette».
+
+- **Le impostazioni** (`os/impostazioni.js`), riviste: la testata e il suggerimento in fondo come tutte le altre (prima
+  non dicevano quali tasti premere), la luminosità che con OK gira in tondo (al massimo si fermava), il › sulle righe che
+  aprono qualcosa, e due righe nuove. Il cercapersone: modello, sistema, schermo, tasti, il conto, la luminosità e i suoni
+  di adesso. Come di fabbrica: con la conferma rimette luminosità, led e inclinazione, e la riga lampeggia; i suoni restano,
+  perché sono l'interruttore di tutto il sito.
+
+**Mai più il cercapersone vecchio per un attimo** (30.10, Alberto: «quando ricarico il local per qualche ms vedo il vecchio
+cercapersone e poi arriva il flipper: toglilo definitivamente, niente cache di quello vecchio»). Il tasto sul muro nasceva
+nell'html con la foto del vecchio e il chiodo, e lo vestiva da zero la chat, che parte quando la pagina è tranquilla (anche
+dopo quattro secondi); intanto la scena 3D ricopiava il vecchio. Ora le foto del tasto non hanno src nell'html: lo script
+scritto subito dopo il tasto (index.html e storia/index.html) decide prima del primo disegno, in locale o con lo zero nello
+zaino, e chiama muro.js subito. zero.css sta nella testa della pagina; lcd e led restano nascosti finché muro.js non li
+mette sul vetro (`.vestito`). Con lo zero non si scaricano mai pager-piccolo.webp né pager-grande.webp (telefono.js non la
+precarica e il dialog dello zero non ha la cornice vecchia). Provato nel browser: ricaricando due volte e aprendo, nessuna
+richiesta delle foto vecchie; con `?vecchio` torna il vecchio. Poi (Alberto: «adesso non vedo più lo schermino con le cose ma lo vedo tutto arancio»): la chiocciolina della chat,
+partendo dopo pzk os, svuotava l'lcd del tasto (innerHTML = '') e si portava via la tela di pzk os. Ora chat/tomodachi.js
+toglie tutto tranne .ct-os, e muro.js passa la chiocciolina al desktop appena arriva.
 
 ## Gli strumenti (tools/)
 

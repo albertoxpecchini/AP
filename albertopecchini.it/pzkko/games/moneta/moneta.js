@@ -3,9 +3,11 @@
 // (SVG, le due facce ricalcate a matita), le fiches fotografate (le stesse), e la
 // moneta d'ottone in 3D (scena.js) che la fisica lancia davvero (Rapier, vedi
 // lancio.js): sale girando, cade nel piatto di legno, rimbalza, rotola, ondeggia
-// e si ferma come si ferma. Testa e croce pagano 1 a 1; dopo una vincita, «lascia
-// o raddoppia?»: si incassa, o si rilancia tutto. Soldi finti ($pzk, gli stessi
-// degli altri giochi: ../pzk.js).
+// e si ferma. La faccia però la tira la banca (31.10: moneta.lancia, sul server
+// di Alberto), e la moneta ci arriva (vedi «il film del lancio»). Testa e croce
+// pagano 1 a 1; dopo una vincita, «lascia o raddoppia?»: si incassa, o si
+// rilancia tutto (la vincita intanto sta sul tavolo della banca, e ricaricando si
+// ritrova). Soldi finti ($pzk, gli stessi degli altri giochi: ../pzk.js).
 //
 // index.html la apre con import('/games/moneta/moneta.js').then((m) => m.apri()).
 
@@ -58,6 +60,7 @@ export async function apri() {
     ridisegnaPile()
     aggiornaBanco()
   }
+  ritrova()
   if (!motore) motore = avviaMotore().catch((e) => { console.error(e); el.carica.textContent = 'la moneta non è arrivata: riprova più tardi' })
   else { scena?.misura(el.piatto.clientWidth, el.piatto.clientHeight); sveglia() }
 }
@@ -135,6 +138,8 @@ async function costruisci() {
   new ResizeObserver(() => { if (dlg.open) { disegnaTavolo(); ridisegnaPile() } }).observe(el.campo)
   new ResizeObserver(() => { if (scena) { scena.misura(el.piatto.clientWidth, el.piatto.clientHeight); sveglia() } }).observe(el.piatto)
   pzk.ascolta(() => { if (!contando) aggiornaBanco() }) // il saldo cambia anche giocando agli altri giochi
+  pzk.alCambioConto(cambioConto)
+  pzk.osserva(ritrova) // (31.10) il tavolo della banca: arriva col conto, e lo può cambiare un altro telefono
   voce(pzk.aSecco() ? 'hai finito i $pzk' : 'scegli una fiche e punta su testa o croce')
   aggiornaBanco()
   aggiornaStoria()
@@ -152,8 +157,9 @@ function voce(t) { if (el.voce) el.voce.textContent = t }
 
 function aggiornaBanco() {
   if (!el.saldo) return
-  if (!contando) el.saldo.textContent = `$pzk ${fmt(pzk.saldo())}`
-  const p = pzk.sulTavolo(GIOCO)
+  if (!contando) el.saldo.textContent = `$pzk ${fmt(mostrato ?? pzk.saldo())}`
+  // (31.10) quello che il tavolo mostra, non quello che la banca ha già sul suo (la vincita si vedrebbe prima della moneta)
+  const p = puntato()
   el.puntato.textContent = p ? `sul tavolo: ${fmt(p)}` : ''
   const punta = stato.fase === 'punta', raddoppio = stato.fase === 'raddoppio'
   for (const b of el.scegli.children) {
@@ -165,9 +171,10 @@ function aggiornaBanco() {
   el.togli.disabled = !punta || !stato.mosse.length
   el.rifai.disabled = !punta || !stato.ultime || puntato() > 0
   el.lascia.hidden = !raddoppio
-  if (raddoppio) { el.lancia.textContent = 'raddoppia'; el.lancia.disabled = false }
-  else if (punta && pzk.aSecco() && !puntato()) { el.lancia.textContent = 'ricarica'; el.lancia.disabled = false }
-  else { el.lancia.textContent = 'lancia'; el.lancia.disabled = !punta || !lancio }
+  el.lascia.disabled = !!chiedendo
+  if (raddoppio) { el.lancia.textContent = 'raddoppia'; el.lancia.disabled = !!chiedendo }
+  else if (punta && pzk.aSecco() && !puntato() && !rifacendo) { el.lancia.textContent = 'ricarica'; el.lancia.disabled = false }
+  else { el.lancia.textContent = 'lancia'; el.lancia.disabled = !punta || !lancio || !!rifacendo }
   dlg.classList.toggle('chiuso', !punta && !raddoppio)
 }
 
@@ -368,19 +375,34 @@ function togli() {
   vola(v, da, dallaFiche(v), { durata: 300, alto: 24 })
 }
 
+// (31.10) si rifà coi soldi puliti (quelli che si possono puntare: il saldo conta anche gli sporchi), e finché le fiches non
+// sono tutte giù «lancia» aspetta: prima la moneta partiva con metà puntata, e «rifai» la ricordava così
+let rifacendo = null
 async function rifai() {
-  if (stato.fase !== 'punta' || !stato.ultime || puntato()) return
+  if (stato.fase !== 'punta' || !stato.ultime || puntato() || rifacendo) return
   const tot = stato.ultime.testa + stato.ultime.croce
-  if (tot > pzk.saldo()) { voce(`per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
+  if (tot > pzk.puliti()) { voce(pzk.sporchi() > 0 || pzk.inGalera() ? pzk.nonBasta() : `per rifare servono ${fmt(tot)} $pzk`); scuoti(el.saldo); return }
   const prima = stato.fiche
-  for (const l of LATI) for (const v of pzk.inFiches(stato.ultime[l])) { stato.fiche = v; posa(l); await attendi(70) }
-  stato.fiche = prima
-  aggiornaBanco()
+  const mio = (rifacendo = {})
+  try {
+    fuori: for (const l of LATI) for (const v of pzk.inFiches(stato.ultime[l])) { if (rifacendo !== mio || stato.fase !== 'punta') break fuori; stato.fiche = v; posa(l); await attendi(70) }
+  } finally {
+    stato.fiche = prima
+    if (rifacendo === mio) rifacendo = null
+    aggiornaBanco()
+  }
 }
 
-// mentre si sceglie se raddoppiare: tutta la puntata passa sull'altra faccia
+// mentre si sceglie se raddoppiare: tutta la puntata passa sull'altra faccia (31.10: sul tavolo della banca, prima; poi qui)
 async function sposta(l) {
-  if (stato.fase !== 'raddoppio' || stato.giocate[l] || !T) return
+  if (stato.fase !== 'raddoppio' || stato.giocate[l] || !T || chiedendo) return
+  chiedendo = true
+  aggiornaBanco()
+  const r = await pzk.fai('moneta.sposta', { lato: l })
+  chiedendo = false
+  aggiornaBanco()
+  if (!r.ok) { voce(`la banca dice di no: ${r.errore ?? 'riprova'}`); ritrova(); return }
+  if (stato.fase !== 'raddoppio' || stato.giocate[l]) return
   const da = altro(l), imp = stato.giocate[da]
   const p = pile.get(da)
   stato.giocate[l] = imp
@@ -422,8 +444,12 @@ function segna(l, anima = true) {
 function togliSegno() { if (T) T.segno.innerHTML = ''; stato.uscita = null }
 
 // ── il lancio ────────────────────────────────────────────────────────────────
-function lancia() {
-  if (stato.fase !== 'punta') return
+// (31.10, Alberto: il browser non decide più niente) La faccia la tira la banca (moneta.lancia, moneta.raddoppia, sul
+// server di Alberto): le puntate partono a «lancia», la banca le prende, tira e paga, e la vincita la tiene lei sul suo
+// tavolo per «lascia o raddoppia»; poi la moneta vola e ci arriva (il film del lancio, sotto). Se la banca dice di no le
+// fiches tornano e la moneta resta dov'è
+async function lancia() {
+  if (stato.fase !== 'punta' || rifacendo) return
   if (pzk.aSecco() && !puntato()) {
     const dati = pzk.ricarica()
     aggiornaBanco()
@@ -433,27 +459,90 @@ function lancia() {
   if (!lancio) return
   stato.base = { ...stato.giocate }
   stato.raddoppi = 0
-  via(puntato() ? 'va!' : 'lancio senza puntate: guarda e basta')
+  parte(puntato() ? 'va!' : 'lancio senza puntate: guarda e basta')
+  const r = await pzk.fai('moneta.lancia', { testa: stato.giro.testa, croce: stato.giro.croce })
+  if (!r.ok) return rifiutato(r.errore)
+  pzk.sgombra(GIOCO)
+  inAria(r.esito)
 }
 
-function raddoppia() {
-  if (stato.fase !== 'raddoppio') return
-  stato.raddoppi++
-  via(`raddoppio${stato.raddoppi > 1 ? ` n. ${stato.raddoppi}` : ''}: ${fmt(puntato())} $pzk in aria`)
+async function raddoppia() {
+  if (stato.fase !== 'raddoppio' || chiedendo) return
+  const n = stato.raddoppi + 1
+  parte(`raddoppio${n > 1 ? ` n. ${n}` : ''}: ${fmt(puntato())} $pzk in aria`)
+  const r = await pzk.fai('moneta.raddoppia')
+  if (!r.ok) {
+    // la vincita resta sul tavolo della banca (se c'è ancora: un altro telefono può averla già incassata)
+    mostrato = null
+    stato.fase = 'raddoppio'
+    stato.giro = null
+    aggiornaBanco()
+    voce(`la banca dice di no: ${r.errore ?? 'riprova'}`)
+    ritrova()
+    return
+  }
+  stato.raddoppi = r.esito.raddoppi
+  inAria(r.esito)
 }
 
-function via(frase) {
+// rien ne va plus: il tavolo si chiude e si aspetta la banca
+function parte(frase) {
   togliSegno()
   stato.fase = 'vola'
   stato.giro = { ...stato.giocate }
+  cambiato = false
+  // la risposta porta il conto già finito: il tavolo tiene fermo il saldo di adesso (mostrato) finché le fiches non tornano
+  mostrato = pzk.saldo()
   aggiornaBanco()
   T?.evid.replaceChildren()
   voce(frase)
   el.annuncio.classList.remove('si')
+}
+// la banca ha tirato: la moneta vola e arriva sulla sua faccia
+function inAria(esito) {
+  stato.esito = esito
   el.piatto.classList.remove('lente')
   scena.inquadra('piatto', { durata: 520 })
-  lancio.lancia()
+  filma(esito.faccia)
   sveglia()
+}
+
+// la banca non ha preso il lancio (la galera, i soldi, la rete, una vincita già sul tavolo): le fiches tornano tutte
+function rifiutato(errore) {
+  mostrato = null
+  const g = stato.giro
+  stato.giro = null
+  pzk.sgombra(GIOCO)
+  for (const p of pile.values()) [...p.el.children].forEach((img, j) => vola(p.fiches[j], centro(img), dallaFiche(p.fiches[j]), { durata: 360, alto: 24, dopo: j * 22, svanisce: true }))
+  const cambio = cambiato
+  fine()
+  if (g && g.testa + g.croce && !cambio) stato.ultime = g
+  aggiornaBanco()
+  voce(`la banca dice di no: ${errore ?? 'riprova'}. le fiches sono tornate`)
+  ritrova()
+}
+
+// (31.10) il giro aperto sta sulla banca (c.tavoli.moneta: banco, lato, raddoppi): ricaricando la pagina, o da un altro
+// telefono, la vincita di «lascia o raddoppia» si ritrova sul tavolo; e se un altro telefono la incassa, la sposta o la
+// raddoppia, qui il tavolo va dietro
+function ritrova() {
+  if (!T || !el.fiches || chiedendo) return
+  const t = pzk.tavoloBanca(GIOCO), aperto = t?.banco > 0 && LATI.includes(t.lato)
+  if (stato.fase === 'raddoppio' && !aperto) { fine(); voce('la vincita sul tavolo non c’è più: incassata da un altro telefono?'); return }
+  if (!aperto || (stato.fase !== 'punta' && stato.fase !== 'raddoppio')) return
+  if (stato.fase === 'punta' && (puntato() || rifacendo)) return // (le fiches di adesso: la banca dirà di no al lancio, e poi si ritrova)
+  if (stato.fase === 'raddoppio' && stato.giocate[t.lato] === t.banco && stato.raddoppi === (t.raddoppi ?? 0)) return
+  const prima = stato.fase
+  stato.giocate = { testa: 0, croce: 0, [t.lato]: t.banco }
+  stato.raddoppi = t.raddoppi ?? 0
+  stato.mosse = []
+  pile.clear()
+  el.fiches.replaceChildren()
+  pila(t.lato).fiches = pzk.inFiches(t.banco)
+  ridisegnaPile()
+  stato.fase = 'raddoppio'
+  aggiornaBanco()
+  voce(`${prima === 'punta' ? 'ritrovato il giro di prima: ' : ''}sul tavolo ci sono ${fmt(t.banco)} $pzk su ${t.lato}: lascia o raddoppia?`)
 }
 
 // la moneta si è fermata: la faccia, il segno, le fiches perse e quelle vinte
@@ -465,6 +554,16 @@ async function fermata(l) {
   stato.conta[l]++
   salva()
   aggiornaStoria()
+  const g = stato.giro ?? { testa: 0, croce: 0 }
+  const vinta = g[l], persa = g[altro(l)]
+  const tot = vinta + persa
+  // (31.10) i soldi li ha già spostati la banca quando ha tirato la faccia: la vincita sta sul suo tavolo per «lascia o
+  // raddoppia» (rimessa), o, se lì non può tornare (la galera, i soldi sporchi, il tetto dei raddoppi: perche), è già nel
+  // saldo. Qui si vede soltanto: il saldo resta quello di prima (mostrato) finché le fiches non tornano. Col conto cambiato
+  // a moneta in aria (cambioConto) il giro è andato al portafoglio di prima, e qui niente vincita
+  const esito = stato.esito ?? { rimessa: false }
+  stato.esito = null
+  const rimessa = !!esito.rimessa
   el.piatto.classList.add('lente')
   await scena.inquadra('moneta', { durata: 1000 })
   el.annuncio.textContent = l
@@ -472,16 +571,12 @@ async function fermata(l) {
   void el.annuncio.offsetWidth
   el.annuncio.classList.add('si')
   segna(l)
-  const g = stato.giro ?? { testa: 0, croce: 0 }
-  const vinta = g[l], persa = g[altro(l)]
-  const tot = vinta + persa
-  // (29.10 notte, come nei dadi: «ho vinto un botto … ctrl f5 sono spariti») i soldi passano SUBITO, appena la moneta cade:
-  // la vincita pagata e rimessa sul tavolo per «lascia o raddoppia» (il saldo non cambia: passa dal saldo al tavolo), o la
-  // puntata alla cassa. Le fiches che volano dopo sono da vedere
-  if (vinta) { pzk.regola(GIOCO, tot, 2 * vinta); pzk.punta(GIOCO, 2 * vinta) }
-  else if (tot) pzk.regola(GIOCO, tot, 0)
-  voce(!tot ? l : vinta ? `${l}: vinci ${fmt(vinta)} $pzk` : stato.raddoppi ? `${l}: il raddoppio è andato` : `${l}: il banco si prende tutto`)
+  if (cambiato) return annulla(l)
+  // (31.10) il netto, non la puntata vinta: 10 su testa e 10 su croce, esce testa, diceva «vinci 10» e si era pari
+  const netto = 2 * vinta - tot
+  voce(!tot ? l : vinta ? (netto > 0 ? `${l}: vinci ${fmt(netto)} $pzk` : `${l}: ti tornano ${fmt(2 * vinta)} $pzk${netto ? `, ne perdi ${fmt(-netto)}` : ', sei pari'}`) : stato.raddoppi ? `${l}: il raddoppio è andato` : `${l}: il banco si prende tutto`)
   await attendi(650)
+  if (cambiato) return annulla(l)
 
   // le perse: le fiches scivolano via verso il banco (in cima al tavolo)
   const banco = nelCampo({ x: T.w / 2, y: -14 })
@@ -516,6 +611,25 @@ async function fermata(l) {
     // (i conti sono già fatti, appena caduta la moneta: tutto resta sul tavolo per «lascia o raddoppia»)
     stato.giocate[l] = 2 * vinta
     await attendi(450)
+    if (cambiato) return annulla(l)
+    if (!rimessa) {
+      // la vincita è già nel saldo: le fiches vanno al giocatore e il giro finisce
+      voce(`${l}: ${netto > 0 ? `vinci ${fmt(netto)} $pzk` : `ti tornano ${fmt(2 * vinta)} $pzk`}, già nel saldo. niente raddoppio: ${esito.perche ?? pzk.nonBasta()}`)
+      if (mostrato !== null) contaSaldo(mostrato, mostrato + 2 * vinta, RIDOTTO.matches ? 0 : 900)
+      mostrato = null
+      const dove = centro(el.saldo), voli = []
+      for (const [grp, fiches] of [[p?.el, p?.fiches], [accanto, vincita]]) {
+        if (!grp) continue
+        ;[...grp.children].forEach((img, j) => {
+          const da = centro(img)
+          img.style.visibility = 'hidden'
+          voli.push(vola(fiches[j] ?? 1, da, dove, { durata: 480, alto: 34, dopo: j * 22, svanisce: true, scala: 0.8 }))
+        })
+      }
+      await Promise.all(voli)
+      fine()
+      return
+    }
     const n0 = p.el.children.length
     await Promise.all([...accanto.children].map((img, j) => {
       const da = centro(img)
@@ -523,25 +637,34 @@ async function fermata(l) {
       return vola(vincita[j] ?? 1, da, nelCampo({ x: c.x, y: c.y - Math.min(n0 + j, 13) * ALTO }), { durata: 300, alto: 16, dopo: j * 30 })
     }))
     accanto.remove()
+    if (cambiato) return annulla(l)
     p.fiches = pzk.inFiches(2 * vinta)
     ridisegnaPile()
     colpetto(p)
     stato.mosse = []
+    mostrato = null // (il saldo non è cambiato: la vincita è sul tavolo della banca)
     stato.fase = 'raddoppio'
     aggiornaBanco()
     voce(`${l}! sul tavolo ${fmt(2 * vinta)} $pzk: lascia o raddoppia?`)
+    ritrova() // (se intanto un altro telefono l'ha toccata)
     return
   }
+  if (cambiato) return annulla(l)
   fine()
   if (pzk.aSecco()) voce(`${l}. hai finito i $pzk: ricarica`)
 }
 
-// «lascia»: tutto quello che c'è sul tavolo torna al giocatore
+// «lascia»: tutto quello che c'è sul tavolo torna al giocatore (31.10: lo incassa la banca, moneta.lascia; non è una mano a
+// sé, nelle statistiche contava un giro in più)
 async function lascia() {
-  if (stato.fase !== 'raddoppio') return
+  if (stato.fase !== 'raddoppio' || chiedendo) return
   stato.fase = 'paga'
   aggiornaBanco()
-  const imp = puntato()
+  const prima = (mostrato = pzk.saldo())
+  const r = await pzk.fai('moneta.lascia')
+  mostrato = null
+  if (!r.ok) { stato.fase = 'raddoppio'; aggiornaBanco(); voce(`la banca dice di no: ${r.errore ?? 'riprova'}`); ritrova(); return }
+  const imp = r.esito.torna
   voce(`incassi ${fmt(imp)} $pzk`)
   const dove = centro(el.saldo)
   const voli = []
@@ -550,14 +673,43 @@ async function lascia() {
     img.style.visibility = 'hidden'
     voli.push(vola(p.fiches[j] ?? 1, da, dove, { durata: 480, alto: 34, dopo: j * 22, svanisce: true, scala: 0.8 }))
   })
-  contaSaldo(pzk.saldo(), pzk.saldo() + imp, RIDOTTO.matches ? 0 : 900)
-  pzk.regola(GIOCO, imp, imp)
+  contaSaldo(prima, prima + imp, RIDOTTO.matches ? 0 : 900)
   await Promise.all(voli)
   fine()
 }
 
+// (31.10) si entra o si esce dal conto, anche da un'altra scheda (pzk.alCambioConto): è un altro portafoglio. pzk.js ha già
+// vuotato il tavolo: le puntate non lanciate sono tornate al portafoglio di prima, e la vincita di «lascia o raddoppia»
+// resta sul tavolo della banca di quel conto (la si ritrova rientrando); qui si tolgono e basta. A moneta in aria la banca
+// ha già giocato e pagato il giro al portafoglio di prima, e il saldo di adesso non si tocca
+const DOPO_CAMBIO = 'è cambiato il conto: questo giro resta al portafoglio di prima'
+let cambiato = false
+function cambioConto() {
+  rifacendo = null
+  if (stato.fase === 'punta' || stato.fase === 'raddoppio') {
+    const cerano = puntato() > 0 || pile.size > 0
+    fine()
+    if (cerano) voce('è cambiato il conto: le fiches sul tavolo sono tornate al portafoglio di prima')
+    ritrova()
+    return
+  }
+  const g = stato.giro
+  if (!(g && g.testa + g.croce)) return // (un lancio senza puntate: niente soldi di mezzo)
+  cambiato = true
+  mostrato = null
+  if (stato.fase === 'vola') voce(DOPO_CAMBIO)
+}
+// il giro finisce senza pagare niente nel saldo di adesso
+function annulla(l) {
+  voce(`${l}: ${DOPO_CAMBIO}`)
+  fine()
+  ritrova()
+}
+
 // fine del giro: il tavolo vuoto, si punta di nuovo
 function fine() {
+  cambiato = false
+  mostrato = null
   if (stato.base && stato.base.testa + stato.base.croce) stato.ultime = stato.base
   stato.base = null
   stato.giocate = { testa: 0, croce: 0 }
@@ -570,7 +722,9 @@ function fine() {
   aggiornaBanco()
 }
 
-let contando = false
+// mostrato: il saldo che il tavolo tiene fermo mentre la moneta vola (la banca ha già pagato); chiedendo: una mossa che
+// aspetta la risposta della banca (sposta), intanto niente altre mosse
+let contando = false, mostrato = null, chiedendo = false
 function contaSaldo(da, a, durata) {
   if (!durata) { el.saldo.textContent = `$pzk ${fmt(a)}`; return }
   contando = true
@@ -585,7 +739,7 @@ function contaSaldo(da, a, durata) {
 }
 
 // ── la moneta 3D e la fisica ─────────────────────────────────────────────────
-let lancio = null, scena = null, FISICA = null, raf = 0, ultimo = 0, accumulo = 0
+let lancio = null, scena = null, FISICA = null, raf = 0, ultimo = 0
 
 async function avviaMotore() {
   const [rap, fisica, { Scena }] = await Promise.all([import(QUI + '../roulette/lib/rapier.mjs'), import(QUI + 'lancio.js'), import(QUI + 'scena.js')])
@@ -593,11 +747,13 @@ async function avviaMotore() {
   await RAPIER.init()
   FISICA = fisica.FISICA
   lancio = new fisica.Moneta(RAPIER)
+  // (31.10) la moneta parte su una faccia a caso: le facce dipinte si girano perché in su ci sia l'ultima uscita
+  if (stato.storia[0] && lancio.faccia() !== stato.storia[0]) girata = { x: 1, y: 0, z: 0, w: 0 }
   scena = new Scena(el.canvas)
   scena.cambiato = sveglia
   scena.misura(el.piatto.clientWidth, el.piatto.clientHeight)
   const { p, q } = lancio.pose()
-  scena.posa(p, q)
+  scena.posa(p, molt(q, girata))
   scena.inquadra('piatto', { durata: 0 })
   el.carica.remove()
   aggiornaBanco()
@@ -617,26 +773,103 @@ function ciclo(t) {
   const dt = Math.min(0.1, (t - ultimo) / 1000)
   ultimo = t
   if (document.hidden || !dlg.open) { cancelAnimationFrame(raf); raf = 0; return }
-  const inAria = lancio.stato === 'presa' || lancio.stato === 'vola'
-  if (inAria) {
-    accumulo += dt * (stato.veloce ? 3 : 1)
-    let n = 0
-    while (accumulo >= FISICA.dt && n < 120) {
-      accumulo -= FISICA.dt
-      n++
-      const e = lancio.passo()
-      if (e === 'nonvale') {
-        accumulo = 0
-        voce(lancio.ultimo === 'appoggiata' ? 'la moneta è rimasta appoggiata al bordo: non vale, si rilancia' : 'la moneta non si ferma: non vale, si rilancia')
-        setTimeout(() => { if (lancio.stato === 'nonvale' && stato.fase === 'vola') { lancio.lancia(); sveglia() } }, 1100)
-        break
-      }
-      if (e) { accumulo = 0; fermata(e); break }
-    }
-    if (n === 120) accumulo = 0
-    const { p, q } = lancio.pose()
-    scena.posa(p, q)
+  const F = film
+  if (F) {
+    F.i = Math.min(F.n - 1, F.i + (dt * (stato.veloce ? 3 : 1)) / FISICA.dt)
+    const k = Math.floor(F.i) * POSA, P = F.pose
+    scena.posa({ x: P[k], y: P[k + 1], z: P[k + 2] }, molt({ x: P[k + 3], y: P[k + 4], z: P[k + 5], w: P[k + 6] }, giroDi(F, F.i)))
+    if (F.i >= F.n - 1) { girata = F.dopo; film = null; if (stato.fase === 'vola') fermata(F.faccia) }
   }
   const muove = scena.fotogramma(t)
-  if (!inAria && !muove) { cancelAnimationFrame(raf); raf = 0 }
+  if (!F && !muove) { cancelAnimationFrame(raf); raf = 0 }
+}
+
+// ── il film del lancio (31.10) ───────────────────────────────────────────────
+// La faccia la tira la banca, la moneta la muove la fisica: per farli andare d'accordo, appena arriva la faccia il lancio si
+// fa prima di nascosto (in un attimo: la fisica corre 50–100 volte il tempo vero) e quello che si vede è la sua
+// registrazione. Se la moneta resta appoggiata al bordo o non si ferma, il lancio si rifà da capo, dalla stessa moneta
+// ferma, finché non va: chi guarda vede solo quello buono. La moneta della fisica è uguale dalle due parti: le facce dipinte
+// possono stare capovolte (mezzo giro attorno a un diametro) e la fisica non se ne accorge. Così, se la registrazione cade
+// sulla faccia sbagliata, le facce dipinte fanno mezzo giro in più mentre la moneta vola, attorno all'asse su cui sta già
+// girando (6–11 giri al secondo: un decimo di secondo in cui gira un poco più in fretta), prima che tocchi il piatto. Il
+// volo, i rimbalzi, dove si ferma sono quelli veri della fisica.
+let film = null
+let girata = { x: 0, y: 0, z: 0, w: 1 } // come stanno le facce dipinte rispetto alla moneta della fisica (dritte o capovolte)
+const POSA = 10 // numeri a passo nella registrazione: posizione, orientamento, rotazione (rad/s)
+
+function filma(faccia) {
+  const inizio = lancio.pose()
+  let colpo = null
+  for (let prova = 0; prova < 20 && !colpo; prova++) {
+    if (prova) lancio.rimetti(inizio)
+    colpo = registra()
+  }
+  if (!colpo) {
+    // (venti lanci da rifare di fila: non succede; la moneta si posa sulla faccia della banca e basta)
+    lancio.metti(faccia, inizio.p.x, inizio.p.z)
+    girata = { x: 0, y: 0, z: 0, w: 1 }
+    const { p, q } = lancio.pose()
+    scena.posa(p, q)
+    return fermata(faccia)
+  }
+  colpo.faccia = faccia
+  pianifica(colpo)
+  film = colpo
+}
+// un lancio della fisica, registrato; null se non vale
+function registra() {
+  const dt = FISICA.dt, max = Math.round((FISICA.attesa + 2) / dt), pose = []
+  lancio.lancia()
+  let e = null, n = 0, via = null, giu = null
+  while (e === null && n < max) {
+    const prima = lancio.stato
+    e = lancio.passo()
+    const { p, q } = lancio.pose(), w = lancio.corpo.angvel()
+    pose.push(p.x, p.y, p.z, q.x, q.y, q.z, q.w, w.x, w.y, w.z)
+    if (prima === 'presa' && lancio.stato === 'vola') via = n
+    else if (via !== null && giu === null && lancio.stato === 'vola' && lancio.tocca()) giu = n
+    n++
+  }
+  lancio.urti.length = 0
+  return (e === 'testa' || e === 'croce') && via !== null ? { pose, n, i: 0, fisica: e, via, giu } : null
+}
+// se la registrazione cade sulla faccia sbagliata: il mezzo giro in più, quando (un terzo del volo) e attorno a che asse
+function pianifica(F) {
+  F.prima = F.dopo = girata
+  F.da = 0; F.a = 1; F.asse = null
+  const dritte = ruotaV(girata, [0, 1, 0])[1] > 0
+  if ((dritte ? F.fisica : altro(F.fisica)) === F.faccia) return
+  const dt = FISICA.dt, giu = F.giu ?? F.via + Math.round(0.35 / dt)
+  F.da = F.via + Math.round((giu - F.via) * 0.3)
+  F.a = Math.max(F.da + 1, Math.min(giu - Math.round(0.03 / dt), F.da + Math.round(0.12 / dt)))
+  // l'asse del giro, nella moneta e poi nelle facce dipinte, steso nel piano della moneta (il mezzo giro deve capovolgerla)
+  const k = F.da * POSA, P = F.pose
+  let a = ruotaV(coniugato(girata), ruotaV(coniugato({ x: P[k + 3], y: P[k + 4], z: P[k + 5], w: P[k + 6] }), [P[k + 7], P[k + 8], P[k + 9]]))
+  const l = Math.hypot(a[0], a[2])
+  a = l > 1e-6 ? [a[0] / l, 0, a[2] / l] : [1, 0, 0]
+  F.asse = a
+  F.dopo = molt(girata, qAsse(a, Math.PI))
+}
+// come stanno le facce dipinte al passo i del film
+function giroDi(F, i) {
+  if (!F.asse || i <= F.da) return F.prima
+  if (i >= F.a) return F.dopo
+  const u = (i - F.da) / (F.a - F.da)
+  return molt(F.prima, qAsse(F.asse, Math.PI * u * u * (3 - 2 * u)))
+}
+
+// i quaternioni (a poi b, nel sistema di a), il giro di `ang` attorno al versore a, l'inverso, un vettore ruotato
+function molt(a, b) {
+  return {
+    w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+    x: a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+    y: a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+    z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+  }
+}
+const qAsse = ([x, y, z], ang) => { const s = Math.sin(ang / 2); return { x: x * s, y: y * s, z: z * s, w: Math.cos(ang / 2) } }
+const coniugato = (q) => ({ x: -q.x, y: -q.y, z: -q.z, w: q.w })
+function ruotaV(q, [x, y, z]) {
+  const tx = 2 * (q.y * z - q.z * y), ty = 2 * (q.z * x - q.x * z), tz = 2 * (q.x * y - q.y * x)
+  return [x + q.w * tx + (q.y * tz - q.z * ty), y + q.w * ty + (q.z * tx - q.x * tz), z + q.w * tz + (q.x * ty - q.y * tx)]
 }

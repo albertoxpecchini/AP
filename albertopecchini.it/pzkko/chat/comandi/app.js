@@ -1,5 +1,6 @@
 // I comandi delle app del telefono, giocabili anche dalla chat: telefono, shop, virtual, sfide, missioni, quest, quiz.
-// (La logica sta in sfide.js, missioni.js, quiz.js, mercato.js; l'interfaccia grande è nelle app di telefono/app/.)
+// (La logica sta in sfide.js, missioni.js, quiz.js, mercato.js, e dal 31.10 sulla banca: quelli chiedono, la banca fa; l'interfaccia
+// grande è nelle app di telefono/app/.)
 import * as pzk from '../../games/pzk.js'
 import * as zaino from '../zaino.js'
 import * as sfide from '../sfide.js'
@@ -29,21 +30,24 @@ async function giocaQuiz(ctx, arg) {
   if (arg === 'lista' || arg === '?') return ctx.dì({ colore: 'blu', t: ':quiz: gli argomenti', d: 'otto domande, 15 secondi l’una, ogni risposta giusta paga. Scegli:', azioni: argomenti.map(([id, nome, ico]) => [`quiz ${id}`, `:${ico}: ${nome}`]) })
   const scelto = arg ? argomenti.find(([id, nome]) => id.startsWith(arg) || nome.startsWith(arg))?.[0] : null
   if (arg && !scelto) return ctx.dì({ colore: 'rosso', d: `non c’è l’argomento «${esc(arg)}»: <code>quiz lista</code>.` })
+  // (31.10) la partita la fa la banca (chat/quiz.js): le domande arrivano una alla volta senza la giusta, e il tempo lo misura lei
   const p = await quiz.nuova(scelto)
-  if (!p) return ctx.dì({ colore: 'grigio', av: 'bot-triste', d: scelto === 'giocatori' ? 'ci sono pochi giocatori nel database: servono almeno tre conti con qualche punto.' : 'non ho domande per questo argomento.' })
+  if (p.errore) return ctx.dì({ colore: 'grigio', av: 'bot-triste', d: esc(p.errore) })
   const rest = quiz.restanti()
-  const intro = ctx.dì({ colore: 'blu', t: `:quiz: quiz · ${argomenti.find(([id]) => id === scelto)?.[1] ?? 'di tutto un po’'}`, d: `${p.domande.length} domande, ${quiz.TEMPO} secondi l’una. ${rest > 0 ? `Ogni risposta giusta paga da ${quiz.PAGA[1]} a ${quiz.PAGA[3]} $pzk (se rispondi in fretta, di più). Oggi ne restano <b>${rest}</b> pagate.` : 'Le risposte pagate di oggi sono finite: è solo un allenamento (punti esperienza).'}` })
+  const intro = ctx.dì({ colore: 'blu', t: `:quiz: quiz · ${argomenti.find(([id]) => id === scelto)?.[1] ?? 'di tutto un po’'}`, d: `${p.n} domande, ${quiz.TEMPO} secondi l’una. ${rest > 0 ? `Ogni risposta giusta paga da ${quiz.PAGA[1]} a ${quiz.PAGA[3]} $pzk (se rispondi in fretta, di più). Oggi ne restano <b>${rest}</b> pagate.` : 'Le risposte pagate di oggi sono finite: è solo un allenamento (punti esperienza).'}` })
   await ctx.inVista(intro, 900)
   const NOMI = ['', 'facile', 'media', 'difficile']
   while (!p.finita) {
-    const d = p.domande[p.i]
-    const s = ctx.dì({ colore: 'blu', t: `:quiz: ${p.i + 1}/${p.domande.length} · ${NOMI[d.diff]}`, d: esc(d.q), img: d.img, pie: d.credito || undefined })
+    const aperta = await quiz.prossima(p) // (il tempo della banca parte qui, dopo l'introduzione o l'esito di prima)
+    if (aperta !== true) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: esc(aperta.errore) })
+    const d = p.d
+    const s = ctx.dì({ colore: 'blu', t: `:quiz: ${p.i + 1}/${p.n} · ${NOMI[d.diff]}`, d: esc(d.q), img: d.img, pie: d.credito || undefined })
     const ferma = ctx.tempo(s, quiz.TEMPO * 1000)
-    await ctx.inVista(s) // il bonus di velocità conta da quando la domanda è scritta, come la barra
-    const t0 = Date.now()
+    await ctx.inVista(s)
     const id = await ctx.scegli(s, d.risposte.map((t, i) => ({ id: String(i), eti: esc(t), stile: 'nero' })), quiz.TEMPO * 1000)
     ferma()
-    const r = quiz.rispondi(p, id == null ? null : Number(id), Math.max(0, quiz.TEMPO * 1000 - (Date.now() - t0)))
+    const r = await quiz.rispondi(p, id == null ? null : Number(id))
+    if (r.errore) return ctx.aggiorna(s, { colore: 'rosso', av: 'bot-triste', t: ':quiz: la banca dice di no', d: esc(r.errore) })
     ctx.aggiorna(s, {
       colore: r.giusta ? 'oro' : 'rosso', av: r.giusta ? 'bot-ride' : 'bot-triste',
       t: `:quiz: ${r.giusta ? 'giusto!' : id == null ? 'tempo scaduto' : 'sbagliato'}`,
@@ -53,8 +57,8 @@ async function giocaQuiz(ctx, arg) {
     ctx.saleDiLivello(r.livello)
     await ctx.dormi(r.nota ? 1900 : 1200)
   }
-  const perfetta = p.giuste === p.domande.length
-  ctx.dì({ colore: perfetta ? 'oro' : 'blu', av: perfetta ? 'bot-ricco' : 'bot', t: `:trofeo: ${p.giuste} su ${p.domande.length}`, d: perfetta ? 'PERFETTO. Nessun errore: il bonus delle partite perfette è tuo.' : p.giuste >= p.domande.length / 2 ? 'non male. Sapevi più di quanto sembri.' : 'si impara anche sbagliando. Soprattutto sbagliando.',
+  const perfetta = p.giuste === p.n
+  ctx.dì({ colore: perfetta ? 'oro' : 'blu', av: perfetta ? 'bot-ricco' : 'bot', t: `:trofeo: ${p.giuste} su ${p.n}`, d: perfetta ? (p.bonus ? 'PERFETTO. Nessun errore: il bonus delle partite perfette è tuo.' : 'PERFETTO. Nessun errore (stavolta niente bonus).') : p.giuste >= p.n / 2 ? 'non male. Sapevi più di quanto sembri.' : 'si impara anche sbagliando. Soprattutto sbagliando.',
     campi: [['guadagnati', ctx.pzkHtml(p.guadagnato)], ['esperienza', `+${p.xp} xp`], ['pagate rimaste oggi', String(quiz.restanti())]], azioni: [[`quiz ${scelto ?? ''}`.trim(), ':quiz: ancora', 'oro'], ['quiz lista', 'cambia argomento']] })
 }
 
@@ -96,7 +100,7 @@ export const APP = [
       if (!x) return elenco(ctx, s, ctx.args[0] ? `nel pzkstore non c’è «${esc(ctx.args[0])}». ` : '') && false
       const apri = [`pzkstore ${x.id}`, `:${x.icona}: apri ${nomeApp(x)}`, 'oro']
       if (zaino.installata(x.id)) return ctx.dì({ colore: 'grigio', d: `${nomeApp(x)} ce l’hai già: è nel cercapersone, nella home (pagina dei soldi).`, azioni: [apri] }) && false
-      const r = s.compra(x.id)
+      const r = await s.compra(x.id) // (31.10: la banca, coi suoi prezzi)
       if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', t: `:${x.icona}: ${nomeApp(x)}: ${ctx.fmt(x.prezzo)} $pzk puliti`, d: `${esc(r.errore)}.`, azioni: pzk.conto() ? [['pzkstore ' + x.id, ':app-pzkstore: la scheda nel pzkstore']] : [['telefono', ':app-account: crea il conto (cercapersone)', 'oro']] }) && false
       await ctx.pensa(900)
       return ctx.dì({ colore: 'verde', av: 'bot-occhiolino', t: `:${x.icona}: ${nomeApp(x)} ${fatta(x)}`, d: `${x.breve} Adesso:\n${x.come.slice(1).map((t, i) => `${i + 1}. ${t}`).join('\n')}`, azioni: [apri], pie: x.prezzo ? `−${ctx.fmt(x.prezzo)} $pzk puliti, alla cassa di pzk` : 'gratis' })
@@ -145,8 +149,9 @@ export const APP = [
     async fai(ctx) {
       if (ctx.args[0]?.toLowerCase().startsWith('risc')) {
         let n = 0, pzk = 0
-        for (const x of sfide.oggi().sfide.filter((s) => s.pronta)) { const r = sfide.riscuoti(x.id); if (r.ok) { n++; pzk += r.pzk; ctx.saleDiLivello(r.livello) } }
-        const b = sfide.riscuotiBonus()
+        // (31.10) ogni riscossione è un'azione della banca, una dopo l'altra: il bonus dopo le tre
+        for (const x of sfide.oggi().sfide.filter((s) => s.pronta)) { const r = await sfide.riscuoti(x.id); if (r.ok) { n++; pzk += r.pzk; ctx.saleDiLivello(r.livello) } }
+        const b = sfide.oggi().bonusPronto ? await sfide.riscuotiBonus() : { ok: false }
         if (!n && !b.ok) return ctx.dì({ colore: 'grigio', av: 'bot-pensa', d: 'niente da riscuotere: finisci prima una sfida.' })
         ctx.dì({ colore: 'oro', av: 'bot-ricco', t: ':regalo: riscosso', d: `${n ? `${n} sfid${n === 1 ? 'a' : 'e'}: ${ctx.pzkHtml(pzk)}.` : ''}${b.ok ? `\nBonus del giorno: ${ctx.pzkHtml(b.pzk)} e una :${b.cassa}: (serie di ${b.serie}).` : ''}` })
         return schedaSfide(ctx)
@@ -170,13 +175,14 @@ export const APP = [
       const id = missioni.elenco().find((m) => m.id.startsWith((ctx.args[0] ?? '').toLowerCase()) || m.nome.toLowerCase().includes((ctx.args[0] ?? '').toLowerCase()))?.id
       if (!ctx.args[0] || !id) return ctx.esegui('missioni', { muto: true })
       const n = parseInt(ctx.args[1])
+      // (31.10) cominciare e scegliere sono azioni della banca (chat/missioni.js)
       if (!n) {
-        const r = missioni.inizia(id)
-        if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-pensa', d: r.errore })
+        const r = await missioni.inizia(id)
+        if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-pensa', d: esc(r.errore) })
         return schedaMissione(ctx, id)
       }
-      const r = missioni.scegli(id, n - 1)
-      if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-pensa', d: r.errore })
+      const r = await missioni.scegli(id, n - 1)
+      if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-pensa', d: esc(r.errore) })
       await ctx.pensa(500)
       if (r.esito.fine) { ctx.saleDiLivello(r.esito.livello); return schedaMissione(ctx, id, r.esito) }
       schedaMissione(ctx, id, r.esito)

@@ -27,7 +27,7 @@ export const FOGLI_CHAT = {
   // …le cose (i volantini, gli annunci, gli scontrini)…
   'chat-roba': ['eastpak', 'ciao-px', 'landini', 'stampante', 'iphone-duo', 'stufa', 'bonsai', 'penne-bic', 'tucson', 'manuale-landini'],
   // …e le cose di pzk (la spazzatura del brand, la porta, il neon, il wallet)
-  'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche'],
+  'chat-pzk': ['luckypzkko', 'gomma', 'tombino', 'lucchettone', 'citofono', 'pzkkonet', 'portachiavi', 'petizione', 'neon', 'portafoglio', 'pager', 'peluche', 'zero'], // zero (29.10): il cercapersone nuovo in 3D, da 9.999 $pzk (telefono/zero/)
   // le app del cercapersone grande (telefono/): piastrelle adesivo intere, e i tre tasti della barra del cellulare
   'chat-app': ['app-chat', 'app-shop', 'app-sfide', 'app-quiz', 'app-quest', 'app-giocatori', 'app-zaino', 'app-foto', 'app-banca', 'app-home', 'app-indietro', 'app-chiudi'],
   // la piastrella di virtual (23.10 sera; dal 26.10 a pixel come le altre: tools/pzkko/virtual/icona.mjs, il disegno a

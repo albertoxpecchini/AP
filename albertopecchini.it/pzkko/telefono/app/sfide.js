@@ -8,12 +8,12 @@ import { icona } from '../../chat/icone.js'
 import { fmt } from '../../games/pzk.js'
 import { tieni } from '../ricordi.js'
 
-// dove si fa ogni sfida: [app, comando per la chat]
-const DOVE = { pesca: ['chat', 'pesca'], caccia: ['chat', 'caccia'], scava: ['chat', 'scava'], comandi: ['chat', 'aiuto'], guadagna: ['chat', 'lavora'], vinci: ['chat', 'slot 20'], compra: ['negozio'], quiz: ['quiz'], lavora: ['chat', 'lavora'], missione: ['missioni'] }
+// dove si fa ogni sfida: [app, comando per la chat] (esportata: anche le sfide del cercapersone zero, os/sfide.js)
+export const DOVE = { pesca: ['chat', 'pesca'], caccia: ['chat', 'caccia'], scava: ['chat', 'scava'], comandi: ['chat', 'aiuto'], guadagna: ['chat', 'lavora'], vinci: ['chat', 'slot 20'], compra: ['negozio'], quiz: ['quiz'], lavora: ['chat', 'lavora'], missione: ['missioni'] }
 const COLORI = ['facile', 'media', 'difficile']
 
 let host = null, ctx = null, timer = 0
-function aMezzanotte() {
+export function aMezzanotte() {
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }).formatToParts(new Date())
   const v = (t) => Number(p.find((x) => x.type === t).value)
   const s = 86400 - ((v('hour') % 24) * 3600 + v('minute') * 60 + v('second'))
@@ -46,17 +46,20 @@ function disegna() {
     </div>`
 }
 
-function clic(e) {
+// (31.10) riscuotere è un'azione della banca (chat/sfide.js): il tasto si spegne finché non risponde, niente doppi invii
+async function clic(e) {
   const r = e.target.closest('[data-riscuoti]'), v = e.target.closest('[data-vai]'), b = e.target.closest('[data-bonus]')
+  if ((r ?? b)?.disabled) return
+  if (r ?? b) (r ?? b).disabled = true
   if (r) {
-    const x = sfide.riscuoti(r.dataset.riscuoti)
-    if (!x.ok) return ctx.toast(x.errore, { icona: 'bot-pensa' })
+    const x = await sfide.riscuoti(r.dataset.riscuoti)
+    if (!x.ok) { r.disabled = false; return ctx.toast(x.errore, { icona: 'bot-pensa' }) }
     ctx.toast(`sfida fatta: <b class="pzk">+${fmt(x.pzk)} $pzk</b> e +${x.xp} xp${x.livello ? ` · livello ${x.livello}!` : ''}`, { icona: 'regalo' })
     return disegna()
   }
   if (b) {
-    const x = sfide.riscuotiBonus()
-    if (!x.ok) return ctx.toast(x.errore, { icona: 'bot-pensa' })
+    const x = await sfide.riscuotiBonus()
+    if (!x.ok) { b.disabled = false; return ctx.toast(x.errore, { icona: 'bot-pensa' }) }
     ctx.toast(`bonus del giorno: <b class="pzk">+${fmt(x.pzk)} $pzk</b> e una cassa · serie ${x.serie}`, { icona: 'cassa-comune', ms: 4000 })
     return disegna()
   }

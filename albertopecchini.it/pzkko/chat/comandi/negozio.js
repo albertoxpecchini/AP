@@ -1,4 +1,6 @@
 // Lo zaino e il negozio: zaino, negozio, compra, vendi, usa, info, apri (le casse), gratta.
+// (31.10) comprare, vendere, usare, aprire e grattare li fa la banca ('chat.compra', 'chat.vendi', 'chat.usa', 'chat.apri',
+// 'chat.gratta': giochi/chat-negozio.mjs); qui le vetrine e i racconti.
 import * as zaino from '../zaino.js'
 import { NEGOZIO, PER_ID, PESCI, ANIMALI, REPERTI, UFFICIO, nomeDi } from '../testi.js'
 import { REPARTI, testoBonus } from '../oggetti.js'
@@ -31,13 +33,7 @@ function mostraVetrina(ctx, rep, t) {
     pie: `hai ${ctx.fmt(ctx.pzk.saldo())} $pzk · tocca «compra» su un pezzo, o scrivi <code>compra canna 2</code> per più d’uno` })
 }
 
-// le casse: cosa può uscire (peso, cosa)
-const CASSE = {
-  'cassa-comune': [[30, { pzk: [50, 300] }], [20, { oggetto: 'caffe' }], [15, { oggetto: 'mortadella' }], [10, { oggetto: 'gratta' }], [8, { oggetto: 'esca' }], [12, { niente: 'segatura. Solo segatura.' }], [5, { oggetto: 'cornetto' }]],
-  'cassa-rara': [[30, { pzk: [400, 1500] }], [12, { oggetto: 'canna' }], [12, { oggetto: 'pala' }], [10, { oggetto: 'fionda' }], [10, { oggetto: 'lattina' }], [8, { oggetto: 'cornetto' }], [8, { oggetto: 'telefono' }], [5, { oggetto: 'cassa-comune', n: 2 }], [5, { niente: 'una lettera dei Gonzaga che dice «ritenta».' }]],
-  'cassa-gonzaga': [[30, { pzk: [2000, 6000] }], [15, { oggetto: 'fucile' }], [12, { oggetto: 'cornetto', n: 3 }], [10, { oggetto: 'anfora' }], [8, { oggetto: 'tesoro' }], [8, { oggetto: 'carpa-oro' }], [7, { oggetto: 'lattina', n: 3 }], [5, { pzk: [8000, 15000] }], [5, { niente: 'un biglietto: «la dinastia si è estinta nel 1708, e con lei i soldi».' }]],
-}
-const pesca = (lista, ctx) => { const tot = lista.reduce((a, [p]) => a + p, 0); let r = Math.random() * tot; for (const [p, x] of lista) { r -= p; if (r < 0) return x } return lista.at(-1)[1] }
+// (31.10) le casse e il gratta e vinci: cosa esce lo decide la banca (giochi/chat-negozio.mjs, CASSE e SIMBOLI)
 
 export const NEGOZIO_COMANDI = [
   {
@@ -65,12 +61,12 @@ export const NEGOZIO_COMANDI = [
       const n0 = Math.max(1, Math.min(50, parseInt(ctx.args.at(-1)) || 1))
       if (!x) return ctx.dì({ colore: 'rosso', d: `non lo vendo. Guarda il <code>negozio</code>.` })
       if (x.id === 'pager' && zaino.pagerRotto()) { // il nuovo al posto di quello scassato (23.10): torna tutto, il soprammobile resta un'altra cosa
-        const r = mercato.ricompraPager()
-        if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', t: ':pager: non bastano', d: `il cercapersone nuovo ${r.errore}: mancano ${ctx.pzkHtml(r.manca)}. Lavora.`, azioni: [['lavora', ':rider: lavora', 'oro']] })
+        const r = await mercato.ricompraPager()
+        if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', t: ':pager: non bastano', d: `il cercapersone nuovo costa ${ctx.pzkHtml(mercato.prezzoDi(PER_ID.pager))}: ${r.errore}.${r.manca ? ` Mancano ${ctx.pzkHtml(r.manca)}.` : ''} Lavora.`, azioni: [['lavora', ':rider: lavora', 'oro']] })
         return ctx.dì({ colore: 'oro', av: 'bot-ride', t: ':pager: cercapersone nuovo', d: `pagato ${ctx.pzkHtml(r.tot)}${r.sconto ? ` (offerta del giorno −${Math.round(r.sconto * 100)} %)` : ''}. Vetro nuovo, tutto funziona di nuovo.`, azioni: [['aiuto', 'i comandi']] })
       }
       if (x.unico && zaino.ha(x.id)) return ctx.dì({ colore: 'ambra', d: `:${x.id}: ${x.nome}: ce l’hai già.` })
-      const r = mercato.compra(x.id, n0)
+      const r = await mercato.compra(x.id, n0)
       if (!r.ok) return ctx.dì({ colore: 'rosso', av: 'bot-triste', d: `${r.errore}. Lavora.` })
       const { n, tot, sconto } = r
       ctx.dì({ t: `:${x.id}: comprat${n > 1 ? 'i' : 'o'}`, d: `<b>${x.nome}</b>${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(tot)}${sconto ? ` (offerta del giorno −${Math.round(sconto * 100)} %)` : ''}. ${x.cosa}`,
@@ -83,22 +79,22 @@ export const NEGOZIO_COMANDI = [
     async fai(ctx) {
       const che = ctx.args[0]?.toLowerCase()
       if (!che) return ctx.dì({ colore: 'rosso', d: 'cosa? «vendi tutto» o «vendi carpa».' })
-      const vendi = (id, n) => { const v = PER_ID[id]?.vale ?? 0; zaino.togli(id, n); return Math.round(v * n * (1 + zaino.bonus('vendita'))) } // il bonus «vendita»: zaino Eastpak, portafoglio, tombino…
+      // (31.10) vende la banca ('chat.vendi'): la roba la compra la cassa di pzk, col bonus «vendita» (zaino Eastpak, portafoglio, tombino…)
       if (['tutto', 'all', 'tutti'].includes(che)) {
-        const roba = zaino.oggetti().filter(([id]) => VENDIBILI.some((v) => v.id === id))
-        if (!roba.length) return ctx.dì({ colore: 'grigio', d: 'niente da vendere: pesca, caccia o scava.' })
-        let tot = 0
-        const righe = roba.map(([id, n]) => { const v = vendi(id, n); tot += v; return `:${id}: ${nomeDi(id)}${n > 1 ? ` × ${n}` : ''} → ${ctx.fmt(v)}` })
-        const dati = ctx.paga(tot, { puro: true, casa: true }) // (la roba la compra la cassa di pzk)
-        return ctx.dì({ colore: 'oro', av: 'bot-ricco', t: ':sacco: venduto tutto', d: righe.join('\n'), pie: `+${ctx.fmt(dati)} $pzk` })
+        if (!zaino.oggetti().some(([id]) => VENDIBILI.some((v) => v.id === id))) return ctx.dì({ colore: 'grigio', d: 'niente da vendere: pesca, caccia o scava.' })
+        const r = await ctx.fai('chat.vendi', { id: 'tutto' })
+        if (!r.ok) return ctx.no(r, 'vendi')
+        const righe = r.esito.righe.map(({ id, n, v }) => `:${id}: ${nomeDi(id)}${n > 1 ? ` × ${n}` : ''} → ${ctx.fmt(v)}`)
+        return ctx.dì({ colore: 'oro', av: 'bot-ricco', t: ':sacco: venduto tutto', d: righe.join('\n'), pie: `+${ctx.fmt(r.esito.tot)} $pzk` })
       }
       const x = VENDIBILI.find((v) => v.id === pezzo(che)?.id)
       if (!x) return ctx.dì({ colore: 'rosso', d: 'si vendono solo pesci, bestie e reperti (gli attrezzi no, sono tuoi).' })
       const ho = zaino.quanti(x.id)
       if (!ho) return ctx.dì({ colore: 'grigio', d: `non hai :${x.id}: ${nomeDi(x.id)}.` })
-      const n = Math.min(ho, parseInt(ctx.args[1]) || 1)
-      const v = ctx.paga(vendi(x.id, n), { puro: true, casa: true })
-      ctx.dì({ colore: 'oro', t: `:${x.id}: venduto`, d: `${nomeDi(x.id)}${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(v)}.` })
+      const n = Math.min(ho, Math.max(1, parseInt(ctx.args[1]) || 1))
+      const r = await ctx.fai('chat.vendi', { id: x.id, n })
+      if (!r.ok) return ctx.no(r, 'vendi')
+      ctx.dì({ colore: 'oro', t: `:${x.id}: venduto`, d: `${nomeDi(x.id)}${n > 1 ? ` × ${n}` : ''} per ${ctx.pzkHtml(r.esito.tot)}.` })
     },
   },
   {
@@ -113,9 +109,9 @@ export const NEGOZIO_COMANDI = [
       if (x.tipo === 'tieni' && x.id !== 'cornetto') return ctx.dì({ colore: 'ambra', t: `:${x.id}: ${x.nome}`, d: `non si usa: basta averlo nello zaino. ${x.cosa}`, campi: testoBonus(x.bonus) ? [['bonus attivo', testoBonus(x.bonus)]] : [] })
       if (x.id === 'cornetto') return ctx.dì({ colore: 'ambra', d: ':cornetto: il cornetto lavora da solo: quando muori, si rompe lui.' })
       if (x.id === 'esca') return ctx.dì({ colore: 'ambra', d: ':esca: l’esca si mette da sola sull’amo alla prossima pescata.' })
-      zaino.togli(x.id)
-      zaino.attiva(x.id, x.effetto)
-      ctx.dì({ t: `:${x.id}: ${x.nome}`, d: `${x.cosa} ${zaino.effetto(x.id) ? `Dura ancora ${ctx.durata(zaino.stato().effetti[x.id] - Date.now())}.` : ''}` })
+      const r = await ctx.fai('chat.usa', { id: x.id })
+      if (!r.ok) return ctx.no(r, 'usa')
+      ctx.dì({ t: `:${x.id}: ${x.nome}`, d: `${x.cosa} Dura ancora ${ctx.durata(Math.max(0, r.esito.fino - Date.now()))}.` })
     },
   },
   {
@@ -135,38 +131,31 @@ export const NEGOZIO_COMANDI = [
       const id = ['comune', 'rara', 'gonzaga'].find((k) => che.startsWith(k) || che === `cassa-${k}`)
       const cassa = id ? `cassa-${id}` : null
       if (!cassa) return ctx.dì({ colore: 'rosso', d: 'quale? <code>apri comune</code>, <code>apri rara</code>, <code>apri gonzaga</code>.' })
-      if (!zaino.togli(cassa)) return ctx.dì({ colore: 'grigio', d: `non hai una :${cassa}: ${nomeDi(cassa)}. Nel negozio costa ${ctx.fmt(PER_ID[cassa].prezzo)}.` })
+      if (!zaino.ha(cassa)) return ctx.dì({ colore: 'grigio', d: `non hai una :${cassa}: ${nomeDi(cassa)}. Nel negozio costa ${ctx.fmt(PER_ID[cassa].prezzo)}.` })
+      // (31.10) la apre la banca ('chat.apri'): quello che c'è dentro lo decide lei
+      const x = await ctx.fai('chat.apri', { cassa })
+      if (!x.ok) return ctx.no(x, 'apri')
+      const r = x.esito
       const s = ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: `:${cassa}: si apre…`, d: 'il lucchetto cigola.' })
       await ctx.inVista(s, 1400)
-      const r = pesca(CASSE[cassa], ctx)
-      zaino.conta('casse')
       if (r.niente) return ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', t: `:${cassa}: vuota`, d: `dentro: ${r.niente}` })
-      if (r.pzk) { const n = ctx.paga(ctx.tra(r.pzk[0], r.pzk[1]), { puro: true, casa: true }); return ctx.aggiorna(s, { colore: 'oro', av: 'bot-ricco', t: `:${cassa}: $pzk!`, d: `dentro: ${ctx.pzkHtml(n)}.` }) }
-      zaino.aggiungi(r.oggetto, r.n ?? 1)
-      ctx.aggiorna(s, { colore: PER_ID[r.oggetto]?.leggendario ? 'oro' : 'verde', av: 'bot-ride', t: `:${cassa}: :${r.oggetto}:`, d: `dentro: <b>${nomeDi(r.oggetto)}</b>${r.n > 1 ? ` × ${r.n}` : ''}.${PER_ID[r.oggetto]?.vale ? ` Vale ${ctx.fmt(PER_ID[r.oggetto].vale)}: «vendi ${r.oggetto}» quando vuoi.` : ''}` })
+      if (r.pzk) return ctx.aggiorna(s, { colore: 'oro', av: 'bot-ricco', t: `:${cassa}: $pzk!`, d: `dentro: ${ctx.pzkHtml(r.pzk)}.` })
+      ctx.aggiorna(s,{ colore: PER_ID[r.oggetto]?.leggendario ? 'oro' : 'verde', av: 'bot-ride', t: `:${cassa}: :${r.oggetto}:`, d: `dentro: <b>${nomeDi(r.oggetto)}</b>${r.n > 1 ? ` × ${r.n}` : ''}.${PER_ID[r.oggetto]?.vale ? ` Vale ${ctx.fmt(PER_ID[r.oggetto].vale)}: «vendi ${r.oggetto}» quando vuoi.` : ''}` })
     },
   },
   {
     nomi: ['gratta', 'scratch'], cat: 'negozio', icona: 'gratta', breve: 'gratta e vinci: 3×3, tre uguali e vinci', uso: 'gratta', senzaEventi: true,
     async fai(ctx) {
-      if (!zaino.togli('gratta')) return ctx.dì({ colore: 'grigio', d: `non hai un :gratta: gratta e vinci. Nel negozio costa ${ctx.fmt(PER_ID.gratta.prezzo)}: «compra gratta».` })
-      // nove caselle: un simbolo ne ha tre (o no), gli altri sparsi. Vince il 35 % delle volte.
-      const SIMBOLI = [['ciliegia', 150], ['limone', 200], ['campana', 400], ['trifoglio', 600], ['diamante', 1500], ['chiocciola-oro', 5000]]
-      const vince = Math.random() < 0.35
-      const [vinc] = vince ? SIMBOLI[Math.min(SIMBOLI.length - 1, Math.floor(-Math.log(Math.random()) * 1.4))] : [null]
-      let celle = []
-      if (vince) celle = [vinc, vinc, vinc]
-      while (celle.length < 9) { const s = ctx.caso(SIMBOLI)[0]; if (celle.filter((x) => x === s).length < 2 || (vince && s === vinc && celle.filter((x) => x === s).length < 3)) celle.push(s) }
-      celle.sort(() => Math.random() - 0.5)
+      if (!zaino.ha('gratta')) return ctx.dì({ colore: 'grigio', d: `non hai un :gratta: gratta e vinci. Nel negozio costa ${ctx.fmt(PER_ID.gratta.prezzo)}: «compra gratta».` })
+      // nove caselle: un simbolo ne ha tre (o no), gli altri sparsi. Vince il 35 % delle volte. (31.10) le gratta la banca
+      // ('chat.gratta', e paga subito): qui si scoprono una alla volta
+      const x = await ctx.fai('chat.gratta', {})
+      if (!x.ok) return ctx.no(x, 'gratta')
+      const { celle, tris, premio } = x.esito
       const s = ctx.dì({ colore: 'ambra', t: ':gratta: gratta e vinci', d: 'gratta le nove caselle (clicca): tre simboli uguali e vinci.' })
       let grattate = 0
       await ctx.scegli(s, celle.map((c, i) => ({ id: String(i), eti: '?', stile: 'nero' })), 0, { griglia: 'g3', onPremuto: (id, b) => { b.innerHTML = ctx.icona(celle[id]); b.classList.add('aperta'); b.disabled = true; return ++grattate >= 9 ? 'fine' : 'continua' } })
-      const conta = {}
-      for (const c of celle) conta[c] = (conta[c] ?? 0) + 1
-      const tris = Object.entries(conta).find(([, n]) => n >= 3)?.[0]
       if (!tris) return ctx.scheda({ colore: 'grigio', av: 'bot-triste', d: 'niente tris. Il prossimo, forse.' })
-      const premio = ctx.paga(SIMBOLI.find(([k]) => k === tris)[1], { puro: true, casa: true })
-      zaino.conta('vinti', premio)
       ctx.scheda({ colore: 'oro', av: 'bot-ricco', t: `:${tris}: tris!`, d: `tre :${tris}:: ${ctx.pzkHtml(premio)}.` })
     },
   },

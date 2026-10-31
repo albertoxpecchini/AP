@@ -3,24 +3,24 @@
 // cresce col numero di turni fatti (5 % a turno fino a +50 %); il minigioco sbagliato paga una briciola.
 // I MESTIERI RISCHIOSI (26.10: rischio, galera, multa in testi.js): pagano tanto, ma a ogni turno si può essere presi. Prima
 // di ogni turno il bot lo dice (la probabilità, le ore, la multa) e si può lasciar stare; presi = niente paga, la roba
-// sequestrata, la galera e la multa (pzk.arresto: sul conto, che serve). Lo spazzino gioca al nastro (minigiochi.js) e il
-// suo rischio cresce del 15 % per ogni chiavetta o wallet che si tiene; quelli si aprono col decifratore
-// (dal 29.10 si compra nel pzkstore del cercapersone, 1.500 puliti; o «installa decifratore», che passa dallo stesso pzkstore).
+// sequestrata, la galera e la multa (sul conto, che serve). Lo spazzino gioca al nastro (minigiochi.js) e il suo rischio
+// cresce del 15 % per ogni chiavetta o wallet che si tiene; quelli si aprono col decifratore (dal 29.10 si compra nel
+// pzkstore del cercapersone, 1.500 puliti; o «installa decifratore», che passa dallo stesso pzkstore).
+// (31.10) TUTTO SULLA BANCA (giochi/chat-lavoro.mjs): 'chat.assumi', 'chat.licenzia', 'chat.turno' (apre il turno col suo
+// minigioco, e poi lo chiude con la risposta), 'chat.nastro' (lo spazzino: i pezzi uno alla volta, tieni o butta). L'attesa, la paga, il dado della galera e
+// la roba che resta in tasca li decide lei; qui si mostra il minigioco e si racconta com'è andata.
 import * as zaino from '../zaino.js'
 import { MESTIERI } from '../testi.js'
 import { MINIGIOCHI } from '../minigiochi.js'
-import { UFFICIO } from '../testi.js'
 import * as pzk from '../../games/pzk.js'
 
 // l'articolo giusto davanti al mestiere: lo spazzino, l'imbianchino, il rider
 const il = (n) => (/^(s[^aeiou]|z|gn|ps|x|y)/i.test(n) ? 'lo' : /^[aeiou]/i.test(n) ? 'l’' : 'il')
 const pc = (x) => `${Math.round(x * 100)} %`
 const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
-const SOSPETTI = new Set(UFFICIO.filter((x) => x.sospetto).map((x) => x.id))
 
 export const ATTESA_TURNO = 20 * 60
 const mestiereDi = (s) => { s = (s ?? '').toLowerCase().trim(); return MESTIERI.find((m) => m.id === s || m.nome === s || m.nome.startsWith(s) || m.id.startsWith(s)) }
-const GIOCHI_TUTTI = ['riscrivi', 'anagramma', 'memoria', 'colori', 'icona', 'calcio', 'contrario', 'conti', 'ordine', 'strada', 'quiz']
 
 export const LAVORO = [
   {
@@ -38,17 +38,19 @@ export const LAVORO = [
         if (m.liv > zaino.livello()) return ctx.dì({ colore: 'ambra', av: 'bot-triste', t: `:${m.id}: ${m.nome}`, d: `serve il livello <b>${m.liv}</b>, sei al ${zaino.livello()}. Lavora, pesca, gioca: gli xp arrivano.` })
         if (zaino.mestiere() === m.id) return ctx.dì({ colore: 'ambra', d: `sei già ${m.nome}.` })
         if (m.rischio && !ctx.pzk.conto()) return ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: `:${m.id}: ${m.nome}`, d: 'i lavori rischiosi si fanno col conto: la galera si sconta lì. Crealo nell’app account.' })
-        zaino.assumi(m.id)
+        const r = await ctx.fai('chat.assumi', { mestiere: m.id })
+        if (!r.ok) return ctx.no(r, 'lavora')
         return ctx.dì({ av: m.rischio ? 'bot-pensa' : 'bot-ride', colore: m.rischio ? 'ambra' : undefined, t: `:${m.id}: assunto`, d: `da oggi fai ${il(m.nome)}${il(m.nome).endsWith('’') ? '' : ' '}<b>${m.nome}</b>: ${m.frase}. Paga ${ctx.pzkHtml(m.paga)} a turno.${m.rischio ? `
 <b>⚠ è un lavoro rischioso</b>: a ogni turno ${pc(m.rischio)} di essere presi${m.gioco === 'nastro' ? ' (+15 % per ogni chiavetta o wallet che ti tieni)' : ''}, e sono <b>${m.galera} ore di galera</b> e ${ctx.pzkHtml(m.multa)} di multa.` : ''} Scrivi <code>lavora</code> per il primo.` })
       }
       if (cosa === 'licenziati' || cosa === 'dimettiti' || cosa === 'quit') {
         if (!zaino.mestiere()) return ctx.dì({ colore: 'grigio', d: 'non hai un lavoro da cui licenziarti.' })
-        zaino.licenzia()
+        const r = await ctx.fai('chat.licenzia', {})
+        if (!r.ok) return ctx.no(r, 'lavora')
         return ctx.dì({ colore: 'grigio', av: 'bot-occhiolino', t: 'licenziato', d: 'libero. «lavora lista» per il prossimo.' })
       }
       if (cosa) return ctx.dì({ colore: 'rosso', d: '«lavora», «lavora lista», «lavora come rider», «lavora licenziati».' })
-      // il turno
+      // il turno (i controlli di qui sono per dirlo bene: quelli che contano li rifà la banca)
       const m = MESTIERI.find((x) => x.id === zaino.mestiere())
       if (!m) return ctx.dì({ colore: 'ambra', av: 'bot-pensa', t: 'disoccupato', d: 'prima un mestiere: <code>lavora lista</code>, poi <code>lavora come rider</code>.' }) && false
       const manca = zaino.manca('turno')
@@ -64,28 +66,23 @@ export const LAVORO = [
         const pronto = ctx.dì({ av: 'bot-occhiolino', t: `:${m.id}: turno da ${m.nome}`, d: `${m.frase}. Pronto?` })
         await ctx.inVista(pronto, 900)
       }
-      const gioco = m.gioco === 'nastro' ? 'nastro' : Math.random() < 0.6 ? m.gioco : ctx.caso(GIOCHI_TUTTI)
-      const r = await MINIGIOCHI[gioco](ctx)
-      zaino.aspetta('turno', ATTESA_TURNO * 1000)
-      zaino.turno()
-      // il dado del rischio (lo spazzino: +15 % per ogni cosa che scotta in tasca)
-      const tenuti = r.tenuti ?? [], scottano = tenuti.filter((id) => SOSPETTI.has(id)).length
-      if (m.rischio && Math.random() < m.rischio + 0.15 * scottano) {
-        const d = await pzk.arresto(m.galera, m.multa, m.nome)
-        const multa = d.fatto?.multa ?? 0
-        ctx.scheda({ colore: 'rosso', av: 'bot-triste', t: ':sirena: presi', d: `${r.nota ?? ''}
-Ti hanno preso${tenuti.length ? ' con la roba in tasca (sequestrata)' : ''}: <b>${m.galera} ore di galera</b>${multa ? `, ${ctx.pzkHtml(multa)} di multa` : ''}, niente paga.`, pie: d.ok ? `fuori alle ${ora(pzk.galera())} · o la cauzione nell’app rapina` : d.errore })
+      // la banca apre il turno e sceglie il minigioco (il turno si conta adesso: chi non risponde aspetta lo stesso)
+      const a = await ctx.fai('chat.turno', {})
+      if (!a.ok) return ctx.no(a, 'lavora')
+      const { gioco, prova } = a.esito
+      // (il nastro chiede i pezzi alla banca uno alla volta e chiude il turno da sé; gli altri rispondono una volta)
+      const r = gioco === 'nastro' ? await MINIGIOCHI.nastro(ctx, prova) : await ctx.fai('chat.turno', { risposta: await MINIGIOCHI[gioco](ctx, prova) })
+      if (!r.ok) return ctx.no(r, 'lavora')
+      const e = r.esito
+      if (e.preso) {
+        const multa = e.arresto?.multa ?? 0, fuori = e.arresto?.galera ?? pzk.galera()
+        ctx.scheda({ colore: 'rosso', av: 'bot-triste', t: ':sirena: presi', d: `Ti hanno preso${e.sequestrati?.length ? ' con la roba in tasca (sequestrata)' : ''}: <b>${e.galera} ore di galera</b>${multa ? `, ${ctx.pzkHtml(multa)} di multa` : ''}, niente paga.`, pie: fuori ? `fuori alle ${ora(fuori)} · o la cauzione nell’app rapina` : 'senza conto la galera non si sconta' })
         return false
       }
-      for (const id of tenuti) zaino.aggiungi(id)
-      if (scottano) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':chiavetta: roba che scotta', d: `hai ${scottano === 1 ? 'una cosa cifrata' : `${scottano} cose cifrate`} nello zaino. Si aprono con l’app <b>decifratore</b>: ${zaino.installata('decifratore') ? 'ce l’hai, è nella home del cercapersone (pagina dei soldi).' : 'si compra nel <b>pzkstore</b> del cercapersone, una volta sola, 1.500 $pzk puliti (o scrivi <code>installa decifratore</code>), poi lo apri dalla home, pagina dei soldi.'}` })
-      const turni = zaino.stato().turni
-      const bonus = 1 + 0.05 * Math.min(10, turni - 1)
-      const n = ctx.paga(r.ok ? Math.round(m.paga * bonus) : Math.round(m.paga * 0.1))
-      const liv = zaino.daiXp(r.ok ? 12 : 4)
-      ctx.scheda({ colore: r.ok ? 'oro' : 'grigio', av: r.ok ? 'bot-ricco' : 'bot-triste', t: r.ok ? ':pzk: paga' : 'turno storto', d: `${r.nota} ${r.ok ? `Turno ${turni}${turni > 1 ? ` (+${Math.round((bonus - 1) * 100)} %)` : ''}: ${ctx.pzkHtml(n)}.` : `Il capo ti dà ${ctx.pzkHtml(n)} e uno sguardo.`}`, pie: `il prossimo turno fra ${ctx.durata(zaino.manca('turno'))}` })
-      ctx.saleDiLivello(liv)
-      return false // l'attesa è quella del turno, segnata sopra
+      if (e.scottano) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':chiavetta: roba che scotta', d: `hai ${e.scottano === 1 ? 'una cosa cifrata' : `${e.scottano} cose cifrate`} nello zaino. Si aprono con l’app <b>decifratore</b>: ${zaino.installata('decifratore') ? 'ce l’hai, è nella home del cercapersone (pagina dei soldi).' : 'si compra nel <b>pzkstore</b> del cercapersone, una volta sola, 1.500 $pzk puliti (o scrivi <code>installa decifratore</code>), poi lo apri dalla home, pagina dei soldi.'}` })
+      ctx.scheda({ colore: e.ok ? 'oro' : 'grigio', av: e.ok ? 'bot-ricco' : 'bot-triste', t: e.ok ? ':pzk: paga' : 'turno storto', d: `${e.nota} ${e.ok ? `Turno ${e.turni}${e.bonus ? ` (+${e.bonus} %)` : ''}: ${ctx.pzkHtml(e.n)}.` : `Il capo ti dà ${ctx.pzkHtml(e.n)} e uno sguardo.`}`, pie: `il prossimo turno fra ${ctx.durata(e.prossimo)}` })
+      ctx.saleDiLivello(e.livello)
+      return false
     },
   },
 ]

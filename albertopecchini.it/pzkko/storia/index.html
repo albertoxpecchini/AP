@@ -29,6 +29,7 @@
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/art/insegna.svg" as="image">
+<link rel="stylesheet" href="/telefono/zero/zero.css" data-zero><!-- il cercapersone zero sul muro (telefono/zero/muro.js): le sue regole al primo disegno, 30.10 -->
 <link rel="stylesheet" href="/barra/barra.css"><!-- la barra in alto con le sezioni (barra/barra.js) -->
 <!-- Le scelte di chi guarda (window.pzkkoScelte), che la regia tiene nel browser. Dal 23.10 la pagina parte col muro di
      sempre, in 2D, sul computer e sul telefono; dal 29.10 con l'ora vera (la sera e la notte di Mantova), il meteo vero e
@@ -390,6 +391,7 @@ html.con-barra:not(.scena3d) .portale{padding-top:calc(var(--barra) + clamp(22px
 .chat-tasto{height:auto;aspect-ratio:336/194;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
+.chat-tasto.zero:not(.vestito) .ct-lcd,.chat-tasto.zero:not(.vestito) .ct-led{visibility:hidden} /* (30.10: lo zero, finché muro.js non li mette sul vetro) */
 .chat-tasto .ct-lcd{position:absolute;left:8.352%;top:24.677%;width:66.294%;height:56.202%;display:block;border-radius:1px;background:#a9bc96;box-shadow:inset 0 0 4px rgba(0,0,0,.6);overflow:hidden}
 .chat-tasto .ct-lcd canvas{display:block;width:100%;height:100%;image-rendering:pixelated} /* il tomodachi (chat/tomodachi.js) */
 /* il cercapersone scassato (23.10, dopo una morte): le crepe sul vetro dell'lcd (art/chat-pager-crepe/, chat.js le mette
@@ -820,7 +822,27 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:924;--y:1277;--w:90;--r:-8deg;--mx:310;--my:1558;--mw:70;--mr:-10deg;z-index:4">
       <!-- il wallet e il cercapersone, come nella home (26.10): pezzi vivi del muro (tools/pzkko/storia/disposizione.js) -->
       <button class="it pezzo vivo wallet-tasto" id="wallet-muro" type="button" style="--x:20;--y:0;--w:245;--r:-2deg;--mx:8;--my:0;--mw:182;--mr:-2deg;z-index:6" aria-label="wallet: i tuoi $pzk, il conto e la borsa"><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas><img class="attacco" src="/art/muro/viti.svg" alt="" width="792" height="214"></button>
-      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img src="/art/chat-pager-grande/pager-piccolo.webp?v=2" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" src="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
+      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img data-vecchio="/art/chat-pager-grande/pager-piccolo.webp?v=2" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" data-vecchio="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
+      <script>
+        // QUALE CERCAPERSONE (30.10, Alberto: «quando ricarico per qualche ms vedo il vecchio cercapersone e poi arriva il
+        // flipper: toglilo definitivamente, niente cache di quello vecchio»): si decide qui, mentre la pagina si legge e prima
+        // che si disegni. Le foto non hanno src nell'html: col cercapersone zero quella vecchia non si scarica neanche. Lo zero
+        // c'è in locale (come PROVA_ZERO di chat/zaino.js, ?vecchio per l'altro) o se è nello zaino (pzkko-chat col conto,
+        // pzkko-chat-sessione senza); muro.js lo veste subito, senza aspettare la chat
+        ;(() => {
+          const t = document.getElementById('cercapersone-muro')
+          if (!t) return
+          const leggi = (s, k) => { try { return JSON.parse(s.getItem(k) || 'null') } catch { return null } }
+          const locale = /^(localhost|127.0.0.1|d+.d+.d+.d+)$/.test(location.hostname) && !new URLSearchParams(location.search).has('vecchio')
+          const z = leggi(localStorage, 'pzkko-chat')?.zaino ?? leggi(sessionStorage, 'pzkko-chat-sessione')
+          const [foto, attacco] = t.querySelectorAll('img')
+          if (locale || (z?.oggetti?.zero ?? 0) > 0) {
+            t.classList.add('zero')
+            foto.width = 1344; foto.height = 776; foto.src = '/art/zero/zero-piccolo.webp'; attacco.src = '/art/zero/attacco.svg'
+            import('/telefono/zero/muro.js').then((m) => m.veste(t)).catch((e) => console.warn('zero non vestito', e))
+          } else { foto.src = foto.dataset.vecchio; attacco.src = attacco.dataset.vecchio }
+        })()
+      </script>
     </div>
   </main>
   <div class="buio" aria-hidden="true"></div>

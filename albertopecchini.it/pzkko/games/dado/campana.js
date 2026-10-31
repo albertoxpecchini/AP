@@ -4,7 +4,9 @@
 // piatto vibra su e giù, ondeggia e si inclina un poco, i dadi saltano,
 // sbattono sul vetro e fra loro e si fermano dove si fermano; la faccia in alto
 // è quella che esce. Se un dado resta storto (appoggiato al vetro o a un altro
-// dado) il colpo non vale e la campana si riscuote, come al tavolo.
+// dado) il colpo non vale e la campana si riscuote, come al tavolo. (31.10: le
+// facce le tira la banca, e il gioco fa arrivare i dadi lì: vedi dado.js, il
+// film del colpo; un colpo storto lo riprova prima, di nascosto.)
 //
 // Lo usa la finestra del gioco (dado.js, che ci disegna sopra la campana in 3D
 // con three.js) e lo usano le prove senza browser (tools/pzkko/dado/prova.mjs):
@@ -18,7 +20,7 @@ export const R_CAMPANA = 0.064 // il raggio interno della cupola, che poggia sul
 // Il valore della faccia che guarda +x, −x, +y, −y, +z, −z (l'ordine dei gruppi di BoxGeometry):
 // le facce opposte fanno 7 e 1, 2, 3 girano in senso antiorario attorno al loro spigolo, come nei dadi veri.
 export const FACCE = [1, 6, 2, 5, 3, 4]
-const ASSI = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
+export const ASSI = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
 
 export const FISICA = {
   dt: 1 / 480, // passo fisso (8 per fotogramma a 60 Hz)
@@ -226,6 +228,26 @@ export class Campana {
       if (Math.hypot(p.x, p.z) > R_CAMPANA || p.y < 0) { storti.push(i); perche = 'fuori' } // non deve succedere mai
     })
     return { valori, dritti: !storti.length, storti, perche }
+  }
+
+  /** Le pose dei dadi adesso (per rimetterli lì: rimetti). */
+  fotografia() { return this.dadi.map((b) => ({ p: { ...b.translation() }, q: { ...b.rotation() } })) }
+
+  /**
+   * (31.10) I dadi di nuovo fermi dove li ha fotografati `f`, il piatto a riposo: il gioco prova il colpo di nascosto
+   * (dado.js, il film del colpo) e, se un dado resta storto, lo riprova da capo prima di farlo vedere.
+   */
+  rimetti(f) {
+    this.dadi.forEach((b, i) => {
+      b.setTranslation(f[i].p, true)
+      b.setRotation(f[i].q, true)
+      b.setLinvel({ x: 0, y: 0, z: 0 }, true)
+      b.setAngvel({ x: 0, y: 0, z: 0 }, true)
+    })
+    this.piatto.setTranslation({ x: 0, y: 0, z: 0 }, true)
+    this.piatto.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true)
+    this.risultato = this.leggi().valori
+    this.stato = 'ferma'
   }
 
   /** Il colpo non vale: i dadi restano dove sono, si riscuote. */

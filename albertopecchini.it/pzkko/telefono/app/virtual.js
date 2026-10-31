@@ -2,14 +2,16 @@
 // partita del gioco grande (games/virtual/partita.js: il campionato a cicli di cinque minuti, deciso dall'orario) sullo
 // stesso schermino a pixel (games/virtual/schermo.js), col tabellone, il conto alla rovescia, le quote 1 X 2 e over/under,
 // le fiches, e la schedina. Le scommesse e i pagamenti passano dalla STESSA schedina della finestra grande
-// (games/virtual/schedina.js: localStorage pzkko-virtual, il tavolo di games/pzk.js): quello che si punta qui si vede là e
-// viceversa, nessun doppione di logica. Il tasto «apri il gioco grande» apre la finestra sopra il muro.
+// (games/virtual/schedina.js), che dal 31.10 è quella della banca (Alberto: «il browser non decide più niente»): le
+// giocate, il risultato, la cronaca e i pagamenti li fa C:\pzkko-server (giochi/virtual.mjs), qui si chiede e si
+// mostra. Quello che si punta qui si vede là, e da ogni telefono. Il tasto «apri il gioco grande» apre la finestra sopra
+// il muro.
 //
 // Lo stile è quello delle altre app: l'lcd nero, Fake Receipt, il palco di 760 punti (sul cellulare a tutta finestra, in
 // colonna). Lo schermino si disegna solo quando l'app è in primo piano (mostra / nascondi) e la pagina è visibile.
 
 import * as pzk from '../../games/pzk.js'
-import { PUNTATE, PER_PUNTATA, fase, partita, minuto, punteggioA, scriviRisultato } from '../../games/virtual/partita.js'
+import { PUNTATE, PER_PUNTATA, fase, aperte as giocateAperte, adesso, partita, minuto, punteggioA, scriviRisultato, CHIUDE } from '../../games/virtual/partita.js'
 import { stemmaSVG } from '../../games/virtual/squadre.js'
 import { Schermo } from '../../games/virtual/schermo.js'
 import * as SC from '../../games/virtual/schedina.js'
@@ -30,7 +32,7 @@ let el = {}
 function disegna() {
   corrente = fase()
   P = partita(corrente.indice)
-  const aperte = corrente.fase === 'scommesse'
+  const aperte = giocateAperte(corrente)
   const ordine = [...PUNTATE.filter((p) => p.id.length === 1), ...PUNTATE.filter((p) => p.id[0] === 'O'), ...PUNTATE.filter((p) => p.id[0] === 'U')]
   const fav = P.quote[1] < P.quote[2] ? '1' : '2'
   const quota = (p) => `<button type="button" class="t-vi-q${p.id.length === 1 ? ' esito' : ''}${p.id === fav ? ' fav' : ''}" data-q="${p.id}" ${aperte ? '' : 'disabled'} title="${esc(p.dice)}"><span>${esc(p.nome)}</span><b>${fmtQuota(P.quote[p.id])}</b><i class="t-vi-pila" hidden></i></button>`
@@ -57,7 +59,7 @@ function disegna() {
           <button class="c-b nero t-vi-togli" type="button" data-togli ${aperte ? '' : 'disabled'}>togli</button>
         </div>
         <ol class="t-vi-sched" aria-label="la schedina"></ol>
-        <p class="t-vi-nota">le quote copiano la Serie A vera, i risultati no. soldi finti.</p>
+        <p class="t-vi-nota">le quote copiano la Serie A vera, e anche i gol. soldi finti.</p>
       </section>
     </div>`
   const q = (s) => host.querySelector(s)
@@ -85,42 +87,48 @@ function banco() {
   const sul = SC.sulTavolo(corrente.indice)
   el.sul.textContent = sul ? `sulla partita: ${fmt(sul)}` : ''
   for (const b of host.querySelectorAll('[data-f]')) b.setAttribute('aria-pressed', String(Number(b.dataset.f) === SC.S.fiche))
-  const t = host.querySelector('[data-togli]'); if (t) t.disabled = corrente.fase !== 'scommesse' || !SC.diPartita(corrente.indice).some((b) => !b.pagata)
+  const t = host.querySelector('[data-togli]'); if (t) t.disabled = !giocateAperte(corrente) || !SC.diPartita(corrente.indice).some((b) => !b.pagata)
 }
 function schedina() {
   const mie = [...SC.S.schedina].reverse().slice(0, 10)
   if (!mie.length) { el.sched.innerHTML = `<li class="vuota">${icona('bot')}<span>la schedina è vuota: tocca una quota</span></li>`; return }
   el.sched.innerHTML = mie.map((b) => {
     const pu = PER_PUNTATA.get(b.id), diQuesta = b.indice === corrente.indice, vinc = SC.vincitaDi(b)
-    const esito = b.pagata ? (b.esito === 'vinta' ? `<b class="vinta">+${fmt(vinc)}</b>` : '<b class="persa">persa</b>') : diQuesta && corrente.fase === 'partita' ? '<b class="corso">in corso</b>' : `<b class="attesa">→ ${fmt(vinc)}</b>`
+    const esito = b.pagata ? (b.esito === 'vinta' ? `<b class="vinta">+${fmt(vinc)}</b>` : '<b class="persa">persa</b>') : diQuesta && corrente.fase === 'partita' ? '<b class="corso">in corso</b>' : !diQuesta ? '<b class="corso">in pagamento</b>' : `<b class="attesa">→ ${fmt(vinc)}</b>`
     return `<li class="${b.pagata ? b.esito : diQuesta ? 'aperta' : ''}"><small>${esc(b.casa)}–${esc(b.ospite)}${b.risultato ? ` <i>${esc(b.risultato)}</i>` : ''}</small><span>${esc(pu.nome)} @ ${fmtQuota(b.quota)} · <em>${fmt(b.puntata)}</em></span>${esito}</li>`
   }).join('')
 }
 
 // ── le mosse ──
-function allOra() { const f = fase(); if (f.indice !== corrente.indice || f.fase !== corrente.fase) aggiorna() }
-function punta(id) {
+const cambiata = (f) => f.indice !== corrente.indice || f.fase !== corrente.fase || giocateAperte(f) !== giocateAperte(corrente)
+function allOra() { if (cambiata(fase())) aggiorna() }
+// (31.10) la giocata la fa la banca: si aspetta la sua risposta (e lei dice di no se le giocate sono chiuse)
+async function punta(id) {
   allOra()
-  if (corrente.fase !== 'scommesse') return ctx.toast('la partita è in corso: si punta sulla prossima', { icona: 'bot-pensa' })
+  if (!giocateAperte(corrente)) return ctx.toast(corrente.fase === 'scommesse' ? 'le giocate sono chiuse: si punta sulla prossima' : 'la partita è in corso: si punta sulla prossima', { icona: 'bot-pensa' })
   const v = SC.S.fiche
-  const r = SC.punta(P, id, v)
+  const r = await SC.punta(P, id, v)
   if (r.ricaricato) ctx.toast(`altri <b class="pzk">${fmt(pzk.INIZIALE)} $pzk</b> finti: punta`, { icona: 'regalo' })
   if (!r.ok) {
+    if (r.motivo === 'ricarica') return banco()
     if (r.motivo === 'secco') ctx.toast(esc(pzk.perche()), { icona: 'bot-triste' })
-    else ctx.toast(r.motivo === 'nonbastano' ? `non ti bastano: hai <b class="pzk">${fmt(pzk.saldo())} $pzk</b>` : 'hai finito i $pzk', { icona: 'bot-triste' })
+    else if (r.motivo === 'chiuse') ctx.toast('le giocate sono chiuse: si punta sulla prossima', { icona: 'bot-pensa' })
+    else ctx.toast(r.motivo === 'banca' ? esc(r.errore) : r.motivo === 'nonbastano' ? `non ti bastano: hai <b class="pzk">${fmt(pzk.saldo())} $pzk</b>` : 'hai finito i $pzk', { icona: 'bot-triste' })
     return banco()
   }
   suona('virtual-fiche')
   const pu = PER_PUNTATA.get(id)
-  voce(`${pu.nome} a ${fmtQuota(r.quota)}: se va, ${fmt(Math.round(v * r.quota * 2) / 2)} $pzk`)
+  voce(`${pu.nome} a ${fmtQuota(r.quota)}: se va, ${fmt(Math.round(r.puntata * r.quota * 2) / 2)} $pzk`)
   pile(); schedina(); banco()
 }
-function togli() {
+let togliendo = false
+async function togli() {
   allOra()
-  if (corrente.fase !== 'scommesse') return
-  const t = SC.togli(corrente.indice)
-  if (!t) return
-  voce(`tolta la fiche da ${t.v}`)
+  if (!giocateAperte(corrente) || togliendo) return
+  togliendo = true
+  const t = await SC.togli(corrente.indice).finally(() => { togliendo = false })
+  if (!t.ok) return voce(t.errore)
+  voce(`tolta la fiche da ${fmt(t.v)}`)
   pile(); schedina(); banco()
 }
 function clic(e) {
@@ -132,25 +140,33 @@ function clic(e) {
 }
 
 // ── il ciclo: la fase, il pagamento, lo schermino ──
-function aggiorna() {
+// (31.10) le partite le paga la banca: qui si aspetta la sua risposta e si dice com'è andata
+function racconta({ casa, ospite, risultato, torna }) {
+  ctx.toast(torna > 0 ? `${esc(casa)}–${esc(ospite)} ${esc(risultato)}: <b class="pzk">+${fmt(torna)} $pzk</b>` : `${esc(casa)}–${esc(ospite)} ${esc(risultato)}: niente, stavolta`, { icona: torna > 0 ? 'bot-ricco' : 'bot-triste', ms: 4500 })
+  if (torna > 0) suona('virtual-vinta')
+  SC.viste()
+}
+function aggiorna(apertura = false) {
   const prima = corrente
   corrente = fase()
   if (prima.indice !== corrente.indice) {
-    const r = SC.paga(prima.indice)
-    if (r) {
-      const { p, torna, risultato } = r
-      ctx.toast(torna > 0 ? `${esc(p.casa.sigla)}–${esc(p.ospite.sigla)} ${scriviRisultato(risultato)}: <b class="pzk">+${fmt(torna)} $pzk</b>` : `${esc(p.casa.sigla)}–${esc(p.ospite.sigla)} ${scriviRisultato(risultato)}: niente, stavolta`, { icona: torna > 0 ? 'bot-ricco' : 'bot-triste', ms: 4500 })
-      if (torna > 0) suona('virtual-vinta')
-      SC.viste()
-    } else SC.pagaScadute()
+    SC.fine(prima.indice).then((r) => { if (r) racconta(r) })
     ultimaVoce = ''
   } else if (prima.fase !== corrente.fase && corrente.fase === 'partita') { suona('virtual-fischio'); ultimaVoce = '' }
+  if (apertura) SC.riscuoti().then((r) => { if (r.length) racconta(r.at(-1)) }) // (le finite ad app chiusa)
+  // (il palinsesto a ogni cambio: le quote della banca, e dal fischio la cronaca)
+  if (apertura || prima.indice !== corrente.indice || prima.fase !== corrente.fase) SC.palinsesto()
   disegna()
 }
 let ultimiPunti = '', ultimoMin = ''
 function vivo(t) {
   if (!el.punti) return
-  if (corrente.fase === 'partita') {
+  if (corrente.fase === 'partita' && !P.cronaca) {
+    // (31.10) il fischio è suonato, la cronaca della banca non è ancora arrivata
+    if (ultimiPunti !== '0 – 0') { el.punti.textContent = '0 – 0'; ultimiPunti = '0 – 0' }
+    if (ultimoMin !== 'via') { el.min.textContent = 'si comincia'; ultimoMin = 'via' }
+    el.conto.textContent = 'in diretta · aspetto la banca'
+  } else if (corrente.fase === 'partita') {
     const pt = punteggioA(P, Math.max(0, t)), sospesa = P.eventi.find((e) => e.tipo === 'sospesa' && e.t <= t)
     const punti = sospesa ? `${P.risultato.casa} – ${P.risultato.ospite}` : `${pt.casa} – ${pt.ospite}`, mn = sospesa ? 'sospesa' : minuto(t).scritta
     if (punti !== ultimiPunti) { el.punti.textContent = punti; ultimiPunti = punti }
@@ -159,18 +175,19 @@ function vivo(t) {
     const c = schermo.cartelliniA(P, t)
     for (const sq of ['casa', 'ospite']) host.querySelector(`[data-cart="${sq}"]`).innerHTML = '<i class="g"></i>'.repeat(c.gialli[sq]) + '<i class="r"></i>'.repeat(c.rossi[sq])
   } else {
-    const s = Math.ceil(corrente.manca / 1000)
-    el.conto.textContent = `si chiude tra ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+    const s = Math.ceil(Math.max(0, corrente.manca - CHIUDE) / 1000) // (le giocate chiudono CHIUDE prima del fischio)
+    el.conto.textContent = giocateAperte(corrente) ? `si chiude tra ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `chiuse · fischio tra ${Math.ceil(corrente.manca / 1000)}s`
   }
 }
 function ciclo(now) {
   raf = 0
   if (!aperta || host.hidden || document.hidden) return
   const f = fase()
-  if (f.indice !== corrente.indice || f.fase !== corrente.fase) aggiorna()
+  if (cambiata(f)) aggiorna()
   else corrente = f
   let t, fs
-  if (corrente.fase === 'partita') { t = (Date.now() - P.inizio) / 1000; fs = 'partita' } else { t = -(corrente.manca / 1000); fs = 'scommesse' }
+  // (in partita la cronaca è della banca: SC.cronaca la chiede finché non c'è; intanto lo schermino resta al «si comincia»)
+  if (corrente.fase === 'partita') { P = SC.cronaca(corrente.indice); t = P.cronaca ? (adesso() - P.inizio) / 1000 : 0; fs = P.cronaca ? 'partita' : 'scommesse' } else { t = -(corrente.manca / 1000); fs = 'scommesse' }
   schermo.disegna(P, { fase: fs, t, ridotto: RIDOTTO.matches, dt: (now - ultimoT) / 1000 })
   ultimoT = now
   vivo(t)
@@ -198,14 +215,14 @@ export function monta(h, c) {
   host = h; ctx = c
   SC.avvia()
   host.addEventListener('click', clic)
-  SC.ascolta(() => { if (!host.hidden && el.sched) { pile(); schedina(); banco() } })
+  SC.ascolta(() => { if (!host.hidden && el.sched) { P = partita(corrente.indice); pile(); schedina(); banco() } })
   pzk.ascolta(() => { if (!host.hidden) banco() })
   new ResizeObserver(() => { if (!host.hidden) misura() }).observe(host)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) sveglia() })
   disegna()
   tieni(host, 'virtual') // la schedina resta dov'era quando si ridisegna (telefono/ricordi.js)
   return {
-    mostra: () => { aperta = true; aggiorna(); SC.viste(); sveglia() }, // (prima si pagano le partite finite, poi gli esiti sono «visti»: il pallino si spegne)
+    mostra: () => { aperta = true; aggiorna(true); SC.viste(); sveglia() }, // (la banca paga le partite finite, e gli esiti sono «visti»: il pallino si spegne)
     nascondi: () => { aperta = false; cancelAnimationFrame(raf); raf = 0 },
   }
 }

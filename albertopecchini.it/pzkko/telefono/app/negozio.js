@@ -11,14 +11,15 @@ import * as mercato from '../../chat/mercato.js'
 import { icona } from '../../chat/icone.js'
 import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
 
-const CHIAVE_CARRELLO = 'pzkko-carrello'
-const CHIAVE_PREF = 'pzkko-preferiti'
+// (esportate: lo shop del cercapersone zero, telefono/zero/os/negozio.js, usa lo stesso carrello e gli stessi preferiti)
+export const CHIAVE_CARRELLO = 'pzkko-carrello'
+export const CHIAVE_PREF = 'pzkko-preferiti'
 const leggi = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d } catch { return d } }
 const scrivi = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }
 const fmt = (n) => pzk.fmt(n)
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
-const ORDINI = [['top', 'in evidenza'], ['prezzo-su', 'prezzo: dal più basso'], ['prezzo-giu', 'prezzo: dal più alto'], ['bonus', 'bonus più grossi']]
+export const ORDINI = [['top', 'in evidenza'], ['prezzo-su', 'prezzo: dal più basso'], ['prezzo-giu', 'prezzo: dal più alto'], ['bonus', 'bonus più grossi']]
 const peso = (x) => Object.values(x.bonus ?? {}).reduce((a, n) => a + Math.abs(n), 0)
 
 let host = null, ctx = null
@@ -41,7 +42,7 @@ function aMezzanotte() {
   const v = (t) => Number(p.find((x) => x.type === t).value)
   return 86400 - ((v('hour') % 24) * 3600 + v('minute') * 60 + v('second'))
 }
-const contoAllaRovescia = () => { const s = aMezzanotte(); return `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` }
+export const contoAllaRovescia = () => { const s = aMezzanotte(); return `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` }
 
 // ── pezzi di schermo ──
 function testata(titolo, destra = '') { return ctx.testata(titolo, destra) }
@@ -63,12 +64,18 @@ function cartaProdotto(x) {
   </article>`
 }
 
-function vetrina() {
-  const rep = S.rep, q = S.q.trim().toLowerCase()
+/** I prodotti di un reparto ('tutti', 'offerte' o un reparto), con la ricerca, l'ordine e «posso comprarli»: la vetrina di qui e
+ *  quella del cercapersone zero (telefono/zero/os/negozio.js). */
+export function prodotti({ rep = 'tutti', q = '', ordine = 'top', solo = false } = {}) {
+  q = q.trim().toLowerCase()
   let l = NEGOZIO.filter((x) => (rep === 'tutti' || (rep === 'offerte' ? mercato.scontoDi(x.id) : x.reparto === rep)) && (!q || x.nome.toLowerCase().includes(q) || x.cosa.toLowerCase().includes(q) || x.id.includes(q)))
-  if (S.solo) l = l.filter((x) => mercato.prezzoDi(x) <= pzk.saldo() && !(x.unico && zaino.ha(x.id)))
-  const o = S.ordine
-  l = [...l].sort(o === 'prezzo-su' ? (a, b) => mercato.prezzoDi(a) - mercato.prezzoDi(b) : o === 'prezzo-giu' ? (a, b) => mercato.prezzoDi(b) - mercato.prezzoDi(a) : o === 'bonus' ? (a, b) => peso(b) - peso(a) : (a, b) => (mercato.scontoDi(b.id) - mercato.scontoDi(a.id)) || (a.prezzo - b.prezzo))
+  if (solo) l = l.filter((x) => mercato.prezzoDi(x) <= pzk.saldo() && !(x.unico && zaino.ha(x.id)))
+  const o = ordine
+  return [...l].sort(o === 'prezzo-su' ? (a, b) => mercato.prezzoDi(a) - mercato.prezzoDi(b) : o === 'prezzo-giu' ? (a, b) => mercato.prezzoDi(b) - mercato.prezzoDi(a) : o === 'bonus' ? (a, b) => peso(b) - peso(a) : (a, b) => (mercato.scontoDi(b.id) - mercato.scontoDi(a.id)) || (a.prezzo - b.prezzo))
+}
+function vetrina() {
+  const rep = S.rep, q = S.q.trim().toLowerCase(), o = S.ordine
+  const l = prodotti({ rep, q, ordine: o, solo: S.solo })
   const offerte = mercato.offerte()
   return `${testata('Shop', cartaBtn())}
     <div class="t-corpo-app t-sh">
@@ -171,19 +178,27 @@ function aggiungi(id, n = 1) {
   disegna()
 }
 
-function paga(solo = null) {
-  const righe = solo ? [[solo.id, solo.n]] : nelCarrello()
+/** Compra le righe [[id, n], …] coi prezzi di oggi: → { manca } se non bastano, { errore } se la banca dice di no, se no lo
+ *  scontrino { t, righe: [{ id, n, tot }], tot, risparmio } (righe vuote: c'erano solo cose che hai già). tolto(id): una riga
+ *  comprata (per il carrello). Anche lo shop del cercapersone zero passa da qui.
+ *  (31.10) compra la banca, tutto il carrello in una volta ('chat.carrello': prezzi, offerte e soldi puliti sono i suoi;
+ *  se non bastano per tutto non compra niente). */
+export async function compraRighe(righe, tolto = () => {}) {
   const tot = righe.reduce((a, [id, n]) => a + mercato.prezzoDi(PER_ID[id]) * n, 0)
-  if (tot > pzk.saldo()) return ctx.toast(`ti mancano ${fmt(tot - pzk.saldo())} $pzk`, { icona: 'bot-triste' })
-  const fatte = []
-  let ris = 0
-  for (const [id, n] of righe) {
-    const r = mercato.compra(id, n)
-    if (r.ok) { fatte.push({ id, n: r.n, tot: r.tot }); ris += (PER_ID[id].prezzo - mercato.prezzoDi(PER_ID[id])) * r.n; delete carrello[id] }
-  }
+  if (tot > pzk.puliti()) return { manca: tot - pzk.puliti() }
+  const r = await pzk.fai('chat.carrello', { righe: righe.map(([id, n]) => [id, n]) })
+  if (!r.ok) return { errore: r.errore ?? 'non è andata: riprova' }
+  for (const x of r.esito.righe) tolto(x.id)
+  return { t: Date.now(), righe: r.esito.righe.map(({ id, n, tot }) => ({ id, n, tot })), tot: r.esito.tot, risparmio: r.esito.risparmio }
+}
+async function paga(solo = null) {
+  // (comprando subito dalla scheda il carrello resta com'è: si tolgono solo le righe comprate dal carrello)
+  const s = await compraRighe(solo ? [[solo.id, solo.n]] : nelCarrello(), solo ? undefined : (id) => { delete carrello[id] })
+  if (s.manca) return ctx.toast(`ti mancano ${fmt(s.manca)} $pzk puliti`, { icona: 'bot-triste' })
+  if (s.errore) return ctx.toast(esc(s.errore), { icona: 'bot-triste' })
   salvaCarrello()
-  if (!fatte.length) return ctx.toast('non è andata: riprova', { icona: 'bot-triste' })
-  vaiVista('scontrino', { scontrino: { t: Date.now(), righe: fatte, tot: fatte.reduce((a, r) => a + r.tot, 0), risparmio: ris } })
+  if (!s.righe.length) return ctx.toast('ce l’hai già tutto', { icona: 'bot-triste' })
+  vaiVista('scontrino', { scontrino: s })
 }
 
 function clic(e) {

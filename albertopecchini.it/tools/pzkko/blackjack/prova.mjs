@@ -176,7 +176,7 @@ function prova(nome, giri, caos) {
       // le mosse vietate dalle regole
       if (R.obbligo11 && tot <= 11) atteso(!az.stai, 'a venezia fino a 11 si chiama carta')
       if (m.carte.length !== 2) atteso(!az.raddoppia && !az.dividi && !az.resa, 'raddoppio/divisione/resa con più di due carte')
-      if (R.raddoppio === '9-11' && az.raddoppia) { const d = m.carte.reduce((s, c) => s + val(c.r), 0); atteso(d >= 9 && d <= 11, 'raddoppio fuori da 9-11', { carte: m.carte }) }
+      if (R.raddoppio === '9-11' && az.raddoppia) { const d = m.carte.reduce((s, c) => s + val(c.r), 0); atteso(!morbido(m.carte) && d >= 9 && d <= 11, 'raddoppio fuori da 9-11 duri', { carte: m.carte }) }
       if (m.divisa) atteso(!az.resa, 'resa dopo la divisione')
       if (m.divisa && !R.das) atteso(!az.raddoppia, 'raddoppio dopo la divisione')
       if (az.dividi) atteso(R.stessoRango ? m.carte[0].r === m.carte[1].r : val(m.carte[0].r) === val(m.carte[1].r), 'divisione di carte diverse', { carte: m.carte })
