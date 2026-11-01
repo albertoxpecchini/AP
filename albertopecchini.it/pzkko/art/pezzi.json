@@ -1002,12 +1002,6 @@
    "h": 198
   }
  },
- "chat-cercapersone": {
-  "cercapersone": {
-   "w": 670,
-   "h": 366
-  }
- },
  "chat-bot": {
   "bot": {
    "w": 171,
@@ -1290,12 +1284,6 @@
    "h": 138
   }
  },
- "chat-pager-grande": {
-  "pager-grande": {
-   "w": 1341,
-   "h": 774
-  }
- },
  "chat-app": {
   "app-chat": {
    "w": 204,
@@ -1344,22 +1332,6 @@
   "app-chiudi": {
    "w": 204,
    "h": 204
-  }
- },
- "chat-pager-cavo": {
-  "spina": {
-   "w": 132,
-   "h": 556
-  }
- },
- "chat-pager-simboli": {
-  "spegni": {
-   "w": 214,
-   "h": 232
-  },
-  "indietro": {
-   "w": 246,
-   "h": 164
   }
  },
  "chat-pager-crepe": {

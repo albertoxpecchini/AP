@@ -1,6 +1,6 @@
 // Il led rosso del cercapersone (23.10), come la spia del disco o del processore di un PC: sfarfalla a caso finché qualcosa
 // lavora, e si spegne quando il lavoro è finito. Lo accendono le richieste al server (ogni fetch della pagina: i salvataggi
-// dello zaino, il database dei giocatori, le notizie, il meteo, la borsa), il bot che pensa e scrive (chat.js), le app che
+// dello zaino, il database dei giocatori, le notizie, il meteo, la borsa), il bot che pensa e scrive (la chat di pzk os; chat.js, chiedi), le app che
 // si caricano (telefono.js). Vale per il led del tasto piccolo (.chat-tasto .ct-led) e per quello del cercapersone grande
 // (.t-led): chi ha un led lo collega con collega(el). La classe che si accende è «lavora».
 //

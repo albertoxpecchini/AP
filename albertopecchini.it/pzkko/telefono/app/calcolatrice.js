@@ -1,4 +1,6 @@
-// L'app Calcolatrice (26.10): la scientifica del geometra, con la topografia delle superiori. Quattro schede:
+// I conti della Calcolatrice (26.10): la scientifica del geometra, con la topografia delle superiori. (31.10) È la logica in
+// comune con la calcolatrice del cercapersone zero (telefono/zero/os/calcolatrice.js), che la disegna a 8 bit; l'interfaccia
+// HTML di qui se n'è andata col cercapersone vecchio. Quello che sa fare:
 // - CALCOLO: un'espressione scritta o col tastierino (+ − × ÷ ^ ! √, sin cos tan e inverse, log ln, π e, ANS), la virgola
 //   come decimale, la moltiplicazione sottintesa (2π, 3(4+1)); gli angoli in gradi centesimali (gon, quelli della
 //   topografia), sessagesimali o radianti; gli ultimi risultati da riprendere.
@@ -10,15 +12,11 @@
 //   topografia: x = Est, y = Nord.
 // - ANGOLI: un angolo e lo stesso in sessagesimali (° ' "), sessadecimali, centesimali e radianti.
 
-import { icona } from '../../chat/icone.js'
-import { tieni, dallAlto, ricordo, ricorda } from '../ricordi.js'
+import { ricordo, ricorda } from '../ricordi.js'
 
-const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-// (dal 29.10 i conti si esportano: li usa anche la calcolatrice di pzk os, telefono/zero/os/calcolatrice.js, con lo stesso stato)
+// (dal 29.10 i conti si esportano: li usa la calcolatrice di pzk os, telefono/zero/os/calcolatrice.js, con lo stesso stato)
 export const MODI = { gon: ['gon', 'centesimali', 200], deg: ['deg', 'sessagesimali', 180], rad: ['rad', 'radianti', Math.PI] }
-const SCHEDE = [['calcolo', 'calcolo', 'quiz'], ['triangoli', 'triangoli', 'livello'], ['coordinate', 'coordinate', 'pzkkonet'], ['angoli', 'angoli', 'clessidra']]
 
-let host = null, ctx = null
 export let S = ricordo('calcolatrice', { tab: 'calcolo', modo: 'gon', expr: '', ans: 0, storia: [], tri: {}, co: {}, ang: { v: '', da: 'deg' } })
 if (!Number.isFinite(S.ans)) S.ans = 0 // (un ∞ o un NaN salvati prima del 31.10: il JSON li aveva fatti null, «ans = −∞»)
 
@@ -181,122 +179,5 @@ export function registra() {
   return v
 }
 
-// ── le schede ──
-const campo = (gruppo, k, etichetta, v) => `<label class="t-ca-campo"><span>${etichetta.replace(/[αβγ]/g, '<i><label class="t-ca-campo"><span>${etichetta}</span></i>')}</span><input data-g="${gruppo}" data-k="${k}" inputmode="decimal" autocomplete="off" value="${esc(v ?? '')}"></label>`
-const modi = () => `<div class="t-za-filtri t-ca-modi">${Object.entries(MODI).map(([k, [s]]) => `<button type="button" data-modo="${k}" class="${S.modo === k ? 'on' : ''}">${s}</button>`).join('')}</div>`
-
+// il tastierino (lo disegna la calcolatrice dello zero)
 export const TASTI = [['sin', 'cos', 'tan', '^', '√'], ['asin', 'acos', 'atan', '(', ')'], ['log', 'ln', 'π', '!', 'ans'], ['7', '8', '9', '÷', 'del'], ['4', '5', '6', '×', 'ac'], ['1', '2', '3', '−', '+'], ['0', ',', 'e', '=']]
-function calcolo() {
-  return `${modi()}
-    <div class="t-ca-calc"><div>
-    <div class="t-ca-schermo"><input class="t-ca-expr" data-g="expr" autocomplete="off" spellcheck="false" placeholder="es. 2·sin(50)+√3" value="${esc(S.expr)}"><output class="t-ca-ris"></output></div>
-    ${S.storia.length ? `<h4 class="t-sh-sez">gli ultimi</h4><div class="t-ca-storia">${S.storia.map(([e, r], i) => `<button type="button" data-storia="${i}"><span>${esc(e)}</span><b>= ${esc(r)}</b></button>`).join('')}</div>` : ''}</div>
-    <div class="t-ca-tasti">${TASTI.flat().map((k) => `<button type="button" data-tasto="${k}" class="${/^[0-9,]$/.test(k) ? 'n' : k === '=' ? 'uguale' : /^(del|ac)$/.test(k) ? 'rosso' : ''}">${k === 'ans' ? 'ANS' : k === 'del' ? 'DEL' : k === 'ac' ? 'AC' : k}</button>`).join('')}</div></div>`
-}
-function triangoli() {
-  return `${modi()}
-    <div class="t-ca-tri">
-      <svg viewBox="0 0 200 130" aria-hidden="true"><path d="M20 115 L180 115 L120 18 Z" fill="rgba(70,255,125,.08)" stroke="#46ff7d" stroke-width="2.5"/>
-        <g fill="#cfdccb" font-family="monospace" font-size="15"><text x="96" y="128">c</text><text x="156" y="64">a</text><text x="58" y="62">b</text></g>
-        <g fill="#ffd400" font-family="monospace" font-size="14"><text x="30" y="108">α</text><text x="160" y="108">β</text><text x="114" y="40">γ</text></g></svg>
-      <div class="t-ca-dati">${LATI.map((k) => campo('tri', k, `lato ${k}`, S.tri[k])).join('')}${ANG.map((k) => campo('tri', k, `angolo ${k} (${MODI[S.modo][0]})`, S.tri[k])).join('')}</div>
-    </div>
-    <div class="t-ca-azioni"><button class="c-b nero" type="button" data-svuota="tri">svuota</button></div>
-    <div class="t-ca-out" data-out="tri"></div>`
-}
-function coordinate() {
-  const c = S.co
-  return `${modi()}
-    <section class="t-pf-sez"><h4>${icona('pzkkonet')}da A, distanza e azimut → B</h4><div class="t-ca-dati">${campo('co', 'xa', 'x A (Est)', c.xa)}${campo('co', 'ya', 'y A (Nord)', c.ya)}${campo('co', 'd', 'distanza', c.d)}${campo('co', 'az', `azimut (${MODI[S.modo][0]})`, c.az)}</div><div class="t-ca-out" data-out="polari"></div></section>
-    <section class="t-pf-sez"><h4>${icona('livello')}fra due punti: distanza e azimut</h4><div class="t-ca-dati">${campo('co', 'x1', 'x A', c.x1)}${campo('co', 'y1', 'y A', c.y1)}${campo('co', 'x2', 'x B', c.x2)}${campo('co', 'y2', 'y B', c.y2)}</div><div class="t-ca-out" data-out="punti"></div></section>
-    <section class="t-pf-sez"><h4>${icona('trofeo')}area con Gauss (un vertice per riga: x ; y)</h4><textarea class="t-ca-gauss" data-g="co" data-k="vertici" rows="5" placeholder="0 ; 0\n40 ; 0\n40 ; 25\n0 ; 30">${esc(c.vertici ?? '')}</textarea><div class="t-ca-out" data-out="gauss"></div></section>`
-}
-function angoli() {
-  return `<div class="t-ca-dati">${campo('ang', 'v', 'angolo (es. 35,5 · 35°30\'15" · 0,62)', S.ang.v)}</div>
-    <div class="t-za-filtri">${[['deg', 'sessagesimali'], ['gon', 'centesimali'], ['rad', 'radianti']].map(([k, n]) => `<button type="button" data-angda="${k}" class="${S.ang.da === k ? 'on' : ''}">da ${n}</button>`).join('')}</div>
-    <div class="t-ca-out" data-out="ang"></div>`
-}
-
-// ── i risultati (si rifanno a ogni tasto, senza ridisegnare i campi) ──
-const riga = (t, v) => `<div class="t-ca-r"><span>${t}</span><b>${v}</b></div>`
-function risultati() {
-  const out = (k) => host.querySelector(`[data-out="${k}"]`)
-  if (S.tab === 'calcolo') {
-    const o = host.querySelector('.t-ca-ris')
-    if (!o) return
-    if (!S.expr.trim()) { o.textContent = `ans = ${num(S.ans)}`; o.className = 't-ca-ris vuoto'; return }
-    try { o.textContent = `= ${num(calcola(S.expr))}`; o.className = 't-ca-ris' } catch (e) { o.textContent = e.message; o.className = 't-ca-ris err' }
-  } else if (S.tab === 'triangoli') {
-    const r = risolvi(S.tri), soluzione = (x, n) => `${n ? `<h4 class="t-sh-sez">seconda soluzione</h4>` : ''}<div class="t-ca-griglia">${LATI.map((k, i) => riga(`lato ${k}`, num(x.L[i], 4))).join('')}${ANG.map((k, i) => riga(`angolo ${k}`, angolo(x.G[i]))).join('')}${riga('area', num(x.area, 4))}${riga('perimetro', num(x.perimetro, 4))}${x.altezze.map((h, i) => riga(`altezza su ${LATI[i]}`, num(h, 4))).join('')}</div><ol class="t-ca-passi">${x.passi.map((p) => `<li>${p}</li>`).join('')}</ol>`
-    out('tri').innerHTML = r.errore ? `<p class="t-cv-err">${esc(r.errore)}</p>` : soluzione(r, 0) + (r.seconda ? soluzione(r.seconda, 1) : '')
-  } else if (S.tab === 'coordinate') {
-    const c = Object.fromEntries(Object.entries(S.co).map(([k, v]) => [k, leggiNum(v)]))
-    const p = polari(c), d = fraDue(c)
-    out('polari').innerHTML = p ? `<div class="t-ca-griglia">${riga('x B', num(p.xb, 4))}${riga('y B', num(p.yb, 4))}${riga('Δx = d·sin(θ)', num(p.dx, 4))}${riga('Δy = d·cos(θ)', num(p.dy, 4))}</div>` : ''
-    out('punti').innerHTML = d ? `<div class="t-ca-griglia">${riga('Δx', num(d.dx, 4))}${riga('Δy', num(d.dy, 4))}${riga('distanza AB = √(Δx² + Δy²)', num(d.dist, 4))}${riga('azimut (AB) = atan(Δx/Δy), nel quadrante giusto', angolo(d.az))}${riga('azimut reciproco (BA) = (AB) ± ' + num(daRad(Math.PI), 4), angolo(d.reciproco))}</div>` : ''
-    const g = S.co.vertici?.trim() ? gauss(S.co.vertici) : null
-    out('gauss').innerHTML = !g ? '' : g.errore ? `<p class="t-cv-err">${esc(g.errore)}</p>` : `<div class="t-ca-griglia">${riga('area', num(g.area, 4))}${riga('2A = Σ xᵢ·(yᵢ₊₁ − yᵢ₋₁)', num(g.doppia, 4))}${riga('perimetro', num(g.per, 4))}${riga('vertici', `${g.n}, in senso ${g.verso}`)}</div>`
-  } else {
-    const x = leggiAngolo(S.ang.v, S.ang.da)
-    if (!x) { out('ang').innerHTML = ''; return }
-    if (x.errore) { out('ang').innerHTML = `<p class="t-cv-err">${esc(x.errore)}</p>`; return }
-    const { gradi, rad: r } = x
-    out('ang').innerHTML = `<div class="t-ca-griglia">${riga('sessagesimali', dms(gradi))}${riga('sessadecimali', `${num(gradi, 8)}°`)}${riga('centesimali', `${num(daRad(r, 'gon'), 8)} gon`)}${riga('radianti', `${num(r, 10)} rad`)}</div>`
-  }
-}
-
-function disegna() {
-  ricorda('calcolatrice', S)
-  host.innerHTML = `${ctx.testata('Calcolatrice')}
-    <nav class="t-gi-tab" role="tablist">${SCHEDE.map(([id, n, i]) => `<button type="button" role="tab" aria-selected="${S.tab === id}" class="${S.tab === id ? 'on' : ''}" data-tab="${id}">${icona(i)}<span>${n}</span></button>`).join('')}</nav>
-    <div class="t-corpo-app t-ca">${{ calcolo, triangoli, coordinate, angoli }[S.tab]()}</div>`
-  risultati()
-}
-
-function uguale() {
-  if (!S.expr.trim()) return
-  try {
-    registra()
-    disegna()
-  } catch (e) { ctx.toast(esc(e.message), { icona: 'no' }) }
-}
-function tasto(k) {
-  const i = host.querySelector('.t-ca-expr')
-  if (k === '=') return uguale()
-  if (k === 'ac') S.expr = ''
-  else if (k === 'del') S.expr = S.expr.slice(0, -1)
-  else S.expr += /^(sin|cos|tan|asin|acos|atan|log|ln|√)$/.test(k) ? `${k}(` : k === 'ans' ? 'ans' : k
-  if (i) i.value = S.expr
-  ricorda('calcolatrice', S)
-  risultati()
-}
-
-function clic(e) {
-  const t = e.target.closest('[data-tab]'), m = e.target.closest('[data-modo]'), k = e.target.closest('[data-tasto]'), s = e.target.closest('[data-storia]')
-  if (t) { if (S.tab !== t.dataset.tab) { S.tab = t.dataset.tab; dallAlto(host); disegna() } return }
-  if (m) { S.modo = m.dataset.modo; return disegna() }
-  if (k) return tasto(k.dataset.tasto)
-  if (s) { S.expr = S.storia[Number(s.dataset.storia)][0]; return disegna() }
-  const v = e.target.closest('[data-svuota]')
-  if (v) { S[v.dataset.svuota] = {}; return disegna() }
-  const a = e.target.closest('[data-angda]')
-  if (a) { S.ang.da = a.dataset.angda; return disegna() }
-}
-function scrivi(e) {
-  const x = e.target
-  if (x.dataset.g === 'expr') S.expr = x.value
-  else if (x.dataset.g) S[x.dataset.g][x.dataset.k] = x.value
-  else return
-  ricorda('calcolatrice', S)
-  risultati()
-}
-
-export function monta(h, c) {
-  host = h; ctx = c
-  tieni(host, 'calcolatrice')
-  host.addEventListener('click', clic)
-  host.addEventListener('input', scrivi)
-  host.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('.t-ca-expr')) { e.preventDefault(); uguale() } })
-  disegna()
-  return { mostra: () => risultati() }
-}

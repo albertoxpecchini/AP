@@ -1,4 +1,4 @@
-// Il saluto quando la chat si apre e gli eventi casuali che capitano ogni tanto dopo un comando (chat.js, esegui).
+// Il saluto quando la chat si apre e gli eventi casuali che capitano ogni tanto dopo un comando (telefono/zero/os/chat.js, esegui).
 // (31.10) GLI EVENTI LI TIRA LA BANCA (giochi/chat-eventi.mjs): il 7 % lo tira dentro l'azione del comando e lo dice
 // nell'esito (evento: { tipo }); qui si apre ('chat.evento' senza risposta: da lì parte il tempo, e arrivano la parola, la
 // domanda o la cosa che la nutria si porta via), si mostra e si risponde. Paga la banca, e la nutria ruba davvero: la cosa

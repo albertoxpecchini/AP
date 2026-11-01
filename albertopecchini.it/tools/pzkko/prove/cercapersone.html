@@ -9,7 +9,8 @@
      cercapersone, quello vero di chat/chat.js e telefono/telefono.js, su un fondo scuro: senza il muro e il wallet. Il
      cercapersone piccolo (con la chiocciolina viva sull'lcd) si ingrandisce da solo all'apertura, lo schermo si accende e
      sotto ci sono le app; chiudendolo (tasto CHIUDI, Esc) saluta e si rimpicciolisce nel tasto, che si può ripremere.
-     #nome-app lo apre già su quell'app (es. #miniera). Il css del tasto è quello di index.html (.chat-tasto). Online non c'è. -->
+     #nome-app lo apre già su quell'app (es. #miniera). Il css del tasto è quello di index.html (.chat-tasto). Online non c'è.
+     (31.10: il cercapersone è lo zero per tutti; chat.prepara veste il tasto con telefono/zero/muro.js) -->
 <style>
 @font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Special Elite";src:url(/fonts/special-elite.woff2) format("woff2");font-weight:400;font-display:swap}
@@ -17,7 +18,7 @@
 @font-face{font-family:"Fake Receipt";src:url(/fonts/fake-receipt.woff2) format("woff2");font-weight:400;font-display:swap}
 html,body{margin:0;min-height:100%;background:#15130f;color:#e9e4d8;font:16px/1.4 "Special Elite",monospace}
 
-/* il tasto: un cercapersone nero con lo schermo lcd verde dove vive il tomodachi (chat/tomodachi.js); qui al centro */
+/* il tasto: il cercapersone zero col suo lcd (telefono/zero/muro.js lo veste); qui al centro */
 .chat-tasto{position:fixed;z-index:85;top:50%;left:50%;margin:-32px 0 0 -56px;width:112px;height:65px;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
@@ -37,7 +38,7 @@ html,body{margin:0;min-height:100%;background:#15130f;color:#e9e4d8;font:16px/1.
 </style>
 </head>
 <body>
-<button class="chat-tasto" type="button" aria-label="cercapersone dei $pzk" title="cercapersone" hidden><img src="/art/chat-pager-grande/pager-piccolo.webp?v=2" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
+<button class="chat-tasto" type="button" aria-label="cercapersone dei $pzk" title="cercapersone" hidden><img src="/art/zero/zero-piccolo.webp" alt="" width="1344" height="776"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span></button>
 
 <script type="module">
 const tasto = document.querySelector('.chat-tasto')

@@ -384,10 +384,10 @@ html.con-barra:not(.scena3d) .portale{padding-top:calc(var(--barra) + clamp(22px
 .wallet-tasto:focus-visible{outline:3px solid #ffd400;outline-offset:4px}
 @media (prefers-reduced-motion:reduce){.wallet-tasto{transition:none}.wallet-tasto .wt-piu.va{animation-duration:.01s}}
 
-/* ── il tasto della chat col bot (chat/), sotto il wallet: un cercapersone nero con lo
-   schermo lcd verde dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere.
-   Dal 26.10 è un pezzo della parete (#cercapersone-muro, in cima alla seconda pila), appeso al chiodo per la clip
-   (art/muro/chiodo.svg). Negli strumenti che fotografano la pagina resta spento (navigator.webdriver; ?chat lo accende) ── */
+/* ── il tasto della chat col bot (chat/), sotto il wallet: il cercapersone
+   zero (dal 31.10 per tutti) col suo lcd, dove vive il tomodachi, una chiocciolina a pixel (chat/tomodachi.js); il led rosso lampeggia quando c'è un premio da riscuotere.
+   Dal 26.10 è un pezzo della parete (#cercapersone-muro, in cima alla seconda pila); dal 31.10 per tutti lo zero, attaccato
+   col nastro (telefono/zero/muro.js lo veste: la foto, pzk os sul vetro, il led). Negli strumenti che fotografano la pagina resta spento (navigator.webdriver; ?chat lo accende) ── */
 .chat-tasto{height:auto;aspect-ratio:336/194;padding:0;border:0;background:none;cursor:pointer;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3));transition:transform .18s cubic-bezier(.2,1.4,.4,1);-webkit-tap-highlight-color:transparent}
 .chat-tasto img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none}
@@ -822,26 +822,11 @@ html.scena3d .live .live-foto{visibility:visible;opacity:0}
       <img class="it pezzo" src="/art/nastro/nastro-nero.webp" alt="" width="468" height="186" loading="lazy" style="--x:924;--y:1277;--w:90;--r:-8deg;--mx:310;--my:1558;--mw:70;--mr:-10deg;z-index:4">
       <!-- il wallet e il cercapersone, come nella home (26.10): pezzi vivi del muro (tools/pzkko/storia/disposizione.js) -->
       <button class="it pezzo vivo wallet-tasto" id="wallet-muro" type="button" style="--x:20;--y:0;--w:245;--r:-2deg;--mx:8;--my:0;--mw:182;--mr:-2deg;z-index:6" aria-label="wallet: i tuoi $pzk, il conto e la borsa"><img src="/art/wallet-banner/banner.webp" alt="" width="792" height="214"><canvas class="wt-led" aria-hidden="true"></canvas><img class="attacco" src="/art/muro/viti.svg" alt="" width="792" height="214"></button>
-      <button class="it pezzo vivo chat-tasto" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img data-vecchio="/art/chat-pager-grande/pager-piccolo.webp?v=2" alt="" width="336" height="194"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" data-vecchio="/art/muro/chiodo.svg" alt="" width="336" height="194"></button>
+      <button class="it pezzo vivo chat-tasto zero" id="cercapersone-muro" type="button" style="--x:297;--y:6;--w:185;--r:3deg;--mx:218;--my:4;--mw:150;--mr:3deg;z-index:6" aria-label="chat: parla col bot dei $pzk" title="chat col bot"><img src="/art/zero/zero-piccolo.webp" alt="" width="1344" height="776"><span class="ct-lcd" aria-hidden="true"></span><span class="ct-led" aria-hidden="true"></span><img class="attacco" src="/art/zero/attacco.svg" alt="" width="336" height="194"></button>
       <script>
-        // QUALE CERCAPERSONE (30.10, Alberto: «quando ricarico per qualche ms vedo il vecchio cercapersone e poi arriva il
-        // flipper: toglilo definitivamente, niente cache di quello vecchio»): si decide qui, mentre la pagina si legge e prima
-        // che si disegni. Le foto non hanno src nell'html: col cercapersone zero quella vecchia non si scarica neanche. Lo zero
-        // c'è in locale (come PROVA_ZERO di chat/zaino.js, ?vecchio per l'altro) o se è nello zaino (pzkko-chat col conto,
-        // pzkko-chat-sessione senza); muro.js lo veste subito, senza aspettare la chat
-        ;(() => {
-          const t = document.getElementById('cercapersone-muro')
-          if (!t) return
-          const leggi = (s, k) => { try { return JSON.parse(s.getItem(k) || 'null') } catch { return null } }
-          const locale = /^(localhost|127.0.0.1|d+.d+.d+.d+)$/.test(location.hostname) && !new URLSearchParams(location.search).has('vecchio')
-          const z = leggi(localStorage, 'pzkko-chat')?.zaino ?? leggi(sessionStorage, 'pzkko-chat-sessione')
-          const [foto, attacco] = t.querySelectorAll('img')
-          if (locale || (z?.oggetti?.zero ?? 0) > 0) {
-            t.classList.add('zero')
-            foto.width = 1344; foto.height = 776; foto.src = '/art/zero/zero-piccolo.webp'; attacco.src = '/art/zero/attacco.svg'
-            import('/telefono/zero/muro.js').then((m) => m.veste(t)).catch((e) => console.warn('zero non vestito', e))
-          } else { foto.src = foto.dataset.vecchio; attacco.src = attacco.dataset.vecchio }
-        })()
+        // IL CERCAPERSONE È LO ZERO, PER TUTTI (31.10, Alberto: «fai che cercapersone zero è predefinito e quello attuale si
+        // elimina per sempre»): il nero non c'è più. muro.js lo veste subito (pzk os sul vetro), senza aspettare la chat
+        import('/telefono/zero/muro.js').then((m) => m.veste(document.getElementById('cercapersone-muro'))).catch((e) => console.warn('zero non vestito', e))
       </script>
     </div>
   </main>

@@ -1,18 +1,34 @@
-/* Il cercapersone zero (29.10, telefono/zero/zero.js): il dialog del cercapersone (.tel, telefono.css) quando nello zaino
-   c'è «zero». La tela 3D (.z-tela) prende tutta la finestra e dentro c'è tutto: il modello, il vetro e, sotto il vetro,
-   l'lcd con pzk os (os/os.js). Niente HTML sopra: la cornice di plastica, lo schermo, i tasti e il cavo in HTML del
-   cercapersone vecchio non ci sono. */
+/* Il cercapersone zero (29.10, telefono/zero/zero.js; dal 31.10 l'unico): il dialog del cercapersone (.tel, telefono.js).
+   La tela 3D (.z-tela) prende tutta la finestra e dentro c'è tutto: il modello, il vetro e, sotto il vetro, l'lcd con pzk os
+   (os/os.js). Niente HTML sopra, tranne sul cellulare la barra dei due tasti. (Fino al 31.10 le regole del dialog stavano in
+   telefono/telefono.css, col cercapersone nero che non c'è più.) */
 
-.tel.zero{left:0;top:0;width:100vw;height:100dvh;--w:100vw}
-.tel.zero .t-corpo{position:static;width:auto;height:auto}
-.tel.zero .t-corpo::before,.tel.zero .t-cornice,.tel.zero .t-schermo,.tel.zero .t-tasto,.tel.zero .t-cavo-scatola,.tel.zero .t-led,.tel.zero .t-porta{display:none}
+.tel{position:fixed;inset:auto;left:0;top:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;padding:0;border:0;background:none;overflow:visible;color:#e9efe6;font-family:"Fake Receipt",ui-monospace,monospace}
+.tel::backdrop{background:radial-gradient(70% 60% at 50% 45%,rgba(255,150,40,.08),transparent 70%),rgba(10,9,8,.68);backdrop-filter:blur(3px);transition:opacity .5s}
+.tel[open]{animation:t-apre .4s cubic-bezier(.2,1.1,.3,1)}
+.tel.chiude{animation:t-chiude .2s ease-in forwards}
+@keyframes t-apre{from{opacity:0;transform:translateY(40px) scale(.95)}}
+@keyframes t-chiude{to{opacity:0;transform:translateY(30px) scale(.97)}}
+.tel *{box-sizing:border-box}
+.tel button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.tel :focus-visible{outline:3px solid #ffd400;outline-offset:2px}
+.tel .t-corpo:focus{outline:none}
+.tel .t-led{display:none} /* (lo guarda zero.js, che accende il led 3D) */
+/* il volo (telefono.js, ingrandisci/rimpicciolisci): l'animazione d'apertura del dialog spenta, lo sfondo che scurisce dopo */
+.tel.zoom,.tel.fermo{animation:none}
+.tel.zoom::backdrop{opacity:0}
+.tel.zoom.zoom-sfondo::backdrop{opacity:1}
+@media (prefers-reduced-motion:reduce){.tel[open],.tel.chiude{animation:none}}
+
 .z-tela{position:fixed;inset:0;z-index:0;display:block;width:100%;height:100%;touch-action:none}
 .z-tela.ombra{filter:drop-shadow(0 3px 4px rgba(0,0,0,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.3))} /* la stessa ombra del tasto sul muro, nella posa del muro */
-/* sul cellulare: la barra dei tasti del cercapersone vecchio (telefono.css, .tel.pieno .t-nav) sopra la tela, perché i
-   tasti 3D sono piccoli da toccare */
-.tel.zero.pieno .t-schermo{display:block;position:fixed;inset:auto 0 0 0;height:calc(48px + env(safe-area-inset-bottom,0px));background:none;box-shadow:none;overflow:visible}
-.tel.zero.pieno .t-schermo::after,.tel.zero.pieno .t-palco>:not(.t-nav){display:none}
-.tel.zero.pieno .t-palco{position:static;width:auto;height:auto;transform:none}
+
+/* sul cellulare: la barra dei due tasti sopra la tela, perché i tasti 3D sono piccoli da toccare. Rossi tutti e due (29.10,
+   Alberto: «tasto indietro rosso come chiudi così uno non lo preme perché verde ma legge prima») */
+.tel .t-nav{display:none}
+.tel.pieno .t-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;height:calc(48px + env(safe-area-inset-bottom,0px));padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-top:2px solid #000;background:#151816}
+.tel.pieno .t-nav button{border:2px solid #000;border-radius:7px;background:#c74337;color:#fff;font:400 15px/1 "Fake Receipt",ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:0 3px 0 #000;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.tel.pieno .t-nav button:active{translate:0 2px;box-shadow:0 1px 0 #000}
 
 /* ── il tasto sul muro vestito da zero (telefono/zero/muro.js, index.html .chat-tasto) ── */
 /* pzk os vivo sul vetro del tasto (muro.js, vivo): sopra la chiocciolina (nascosta, la disegna lui) e sotto le crepe (z 55) */

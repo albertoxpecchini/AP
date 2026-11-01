@@ -52,9 +52,7 @@ export function bonus(k) {
 export const bonusTutti = () => Object.fromEntries(['paga', 'xp', 'attese', 'vendita', 'morte', 'sfide'].map((k) => [k, bonus(k)]).filter(([, v]) => v))
 
 // ── gli oggetti ──
-// in locale (localhost), il cercapersone zero (telefono/zero/) si prova senza comprarlo; ?vecchio rimette quello nero
-const PROVA_ZERO = /^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(location.hostname) && !new URLSearchParams(location.search).has('vecchio')
-export const ha = (id) => (Z().oggetti?.[id] ?? 0) > 0 || (id === 'zero' && PROVA_ZERO)
+export const ha = (id) => (Z().oggetti?.[id] ?? 0) > 0
 export const quanti = (id) => Z().oggetti?.[id] ?? 0
 export const oggetti = () => Object.entries(Z().oggetti ?? {}).filter(([, n]) => n > 0)
 

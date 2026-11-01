@@ -1,8 +1,9 @@
-/* La chat col bot dei $pzk (22.10): si apre dal cercapersone sotto il wallet (index.html, .chat-tasto). Un palmare nero
-   di plastica dura, con lo schermo a fosfori verdi come il Pip-Boy del wallet: dentro i messaggi, il bot risponde con
-   «schede» (barra colorata a sinistra, titolo, testo, campi, piè, pulsanti) e in fondo la riga dove si scrive il
-   comando, coi suggerimenti. Il testo e i numeri sono in Fake Receipt (fonts/, CC0), il carattere a matrice di punti
-   degli scontrini, e da 23.10 è l'unico carattere (anche i titoli e quello che scrivi tu: Alberto lo vuole sempre). Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
+/* La chat col bot dei $pzk (22.10): le variabili e la tipografia della chat (.chat) e i pezzi di html che i comandi
+   (comandi/*.js, minigiochi.js) mettono dentro le schede: i tasti (.c-b), le griglie, i rulli, le carte, la vetrina, le
+   sfide, il nastro. Dal 31.10 il cercapersone è solo lo zero (telefono/zero/, la chat a 8 bit di pzk os, che le schede le
+   disegna a pixel): il pannello in HTML del cercapersone vecchio (lo schermo, i messaggi, le schede, la riga, i suggerimenti,
+   i tasti rapidi, il «giù», i puntini) non c'è più, e le sue regole sono andate con lui (31.10). Il carattere è Fake
+   Receipt (fonts/, CC0). Le icone sono le nostre (art/chat-*, chat/icone.js), mai emoji di sistema. */
 
 .chat{color:#dfe6d6;font:400 16px/1.4 "Fake Receipt","Courier New",monospace;--led:#46ff7d;--ambra:#ffb02e;--rosso:#ff5b4a;--blu:#5fb5ff;--lcd:#9fb48a;--vetro:#0b100c;--plastica:#1d201c;
   --mono:"Fake Receipt",ui-monospace,Consolas,monospace;--fa:"Fake Receipt",ui-monospace,monospace;--marker:"Fake Receipt",ui-monospace,monospace}
@@ -20,61 +21,6 @@
 .chat .emo{display:inline-block;height:1.35em;width:auto;vertical-align:-.3em;margin:0 .08em;image-rendering:auto}
 .chat .emo.grande{height:3.2em;vertical-align:middle}
 .chat .emo.manca{width:1.35em;border-radius:50%;background:#333;color:#999;text-align:center;line-height:1.35em;font-size:.8em}
-
-/* lo schermo: vetro scuro, fosfori verdi, righe di scansione */
-.c-schermo{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;border-radius:10px;background:var(--vetro);box-shadow:inset 0 0 18px rgba(0,0,0,.95),0 0 0 2px #090a08,0 0 0 3px rgba(255,255,255,.05);overflow:hidden}
-.c-schermo::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px),linear-gradient(118deg,rgba(255,255,255,.06),rgba(255,255,255,.015) 38%,transparent 40%)}
-
-/* la barra in alto: l'avatar del bot, il nome, il led */
-.c-testa{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(70,255,125,.18);background:rgba(70,255,125,.05)}
-.c-testa .emo{height:40px;filter:drop-shadow(0 0 4px rgba(70,255,125,.3))}
-.c-testa .c-nome{font:400 22px/1 var(--fa);letter-spacing:.03em;color:#fff}
-.c-testa .c-nome small{display:block;margin-top:3px;font:400 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--led);opacity:.8}
-.c-testa .c-nome small::before{content:"";display:inline-block;width:6px;height:6px;margin:0 6px 1px 0;border-radius:50%;background:var(--led);box-shadow:0 0 6px var(--led);animation:c-led 2.4s ease-in-out infinite}
-@keyframes c-led{50%{opacity:.35}}
-.c-testa .c-saldo{margin-left:auto;text-align:right;font:400 11px/1.3 var(--mono);color:var(--led);opacity:.9;text-shadow:0 0 6px rgba(70,255,125,.6)}
-.c-testa .c-saldo b{display:block;font-size:17px;color:var(--led)}
-.c-testa .c-saldo .eur{display:block;font-size:11px}
-
-/* i messaggi */
-.c-lista{flex:1;min-height:0;overflow:auto;padding:12px 12px 6px;scroll-behavior:smooth;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.3) transparent}
-.c-msg{display:flex;gap:8px;margin:0 0 10px;animation:c-msg .22s ease-out}
-@keyframes c-msg{from{opacity:0;transform:translateY(6px)}}
-.c-msg.tu{justify-content:flex-end}
-.c-msg.tu .c-bolla{max-width:80%;padding:6px 12px 7px;border-radius:10px 10px 2px 10px;background:#f1ead6;color:#161616;font:400 15px/1.3 var(--marker);box-shadow:0 2px 3px rgba(0,0,0,.5);transform:rotate(.4deg);word-break:break-word}
-.c-msg.tu .c-bolla::before{content:"› ";color:#a50d25}
-.c-msg .c-av{flex:none;width:34px;height:34px;margin-top:2px}
-.c-msg .c-av .emo{height:34px;width:34px;object-fit:contain;margin:0}
-.c-msg.sistema{justify-content:center;font:400 11px/1.3 var(--mono);letter-spacing:.06em;color:var(--led);opacity:.6;text-transform:uppercase}
-
-/* la scheda del bot */
-.c-scheda{position:relative;max-width:min(100%,520px);padding:8px 12px 9px 14px;border-radius:4px 8px 8px 4px;background:#141a15;border-left:4px solid var(--c,var(--led));box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.04);word-break:break-word}
-.c-scheda.verde{--c:var(--led)}.c-scheda.ambra{--c:var(--ambra)}.c-scheda.rosso{--c:var(--rosso)}.c-scheda.blu{--c:var(--blu)}.c-scheda.grigio{--c:#6b7067}.c-scheda.oro{--c:#ffd400}
-.c-scheda h4{margin:0 0 4px;font:400 19px/1.1 var(--fa);letter-spacing:.02em;color:#fff}
-.c-scheda h4 .emo{height:1.25em;vertical-align:-.25em}
-.c-scheda p{margin:0 0 4px}
-.c-scheda p:last-child{margin-bottom:0}
-.c-scheda .c-testo{white-space:pre-line}
-.c-scheda .c-campi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px 12px;margin:8px 0 2px;padding-top:6px;border-top:1px dashed rgba(255,255,255,.12)}
-.c-scheda .c-campi>div.largo{grid-column:1/-1}
-.c-scheda .c-campi dt{margin:0;font:400 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--led));opacity:.85}
-.c-scheda .c-campi dd{margin:1px 0 0;font-size:15px}
-.c-scheda .c-pie{margin-top:6px;font:400 10.5px/1.3 var(--mono);color:#8b9385;letter-spacing:.03em}
-.c-scheda .c-pie .emo{height:1.2em}
-.c-scheda .c-img{display:block;width:100%;max-height:210px;object-fit:cover;margin:6px 0 2px;border-radius:4px}
-.c-scheda .c-grande{display:flex;gap:12px;align-items:center}
-.c-scheda table{border-collapse:collapse;margin:6px 0 2px;font-size:13.5px}
-.c-scheda td,.c-scheda th{padding:2px 8px 2px 0;text-align:left;vertical-align:top;font-weight:400}
-.c-scheda th{font:400 10px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--led));opacity:.85}
-.c-scheda tr+tr td{border-top:1px dashed rgba(255,255,255,.08)}
-.c-scheda ul{margin:4px 0;padding-left:18px}
-.c-scheda li{margin:2px 0}
-
-/* la barra del tempo, nei minigiochi */
-.c-tempo{position:relative;height:5px;margin:8px 0 4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
-.c-tempo i{position:absolute;inset:0;transform-origin:left;background:var(--c,var(--led));box-shadow:0 0 6px var(--c,var(--led));animation:c-tempo var(--ms,10s) linear forwards}
-@keyframes c-tempo{to{transform:scaleX(0)}}
-.c-tempo.ferma i{animation-play-state:paused}
 
 /* i pulsanti sotto la scheda: tasti di gomma gialli/neri come quelli del wallet */
 .c-bottoni{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -101,7 +47,6 @@
 .c-griglia .c-b.bum{background:#7a1010;color:#fff}
 /* la parola da riscrivere: su tela, così non si copia */
 .c-parola{display:block;margin:6px 0 2px;height:44px;max-width:100%;border-radius:4px;background:#0a0d0a}
-.c-nascosto{user-select:none;-webkit-user-select:none;pointer-events:none}
 /* i rulli della slot */
 .c-rulli{display:flex;gap:8px;margin:8px 0 4px}
 .c-rulli div{width:62px;height:62px;display:grid;place-items:center;border-radius:6px;background:#f1ead6;box-shadow:inset 0 0 0 3px #161616,0 3px 4px rgba(0,0,0,.5)}
@@ -115,94 +60,7 @@
 .c-carta.coperta{background:repeating-linear-gradient(45deg,#1446a0 0 4px,#0d2f6e 4px 8px)}
 .c-carta small{font-size:12px;margin-top:-3px}
 
-/* dove si scrive */
-.c-riga{position:relative;display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.35)}
-.c-riga .c-prompt{font:400 20px/1 var(--mono);color:var(--led);text-shadow:0 0 6px var(--led)}
-.c-riga input{flex:1;min-width:0;padding:6px 8px;border:0;border-radius:4px;background:rgba(70,255,125,.06);color:#eaf5e4;font:400 16px/1.2 var(--mono);caret-color:var(--led)}
-.c-riga input::placeholder{color:#5f6b5c}
-.c-riga .c-invia{flex:none;padding:7px 12px 8px}
-/* il testo predittivo (29.10, predittivo.js): mentre scrivi, sopra la riga, i comandi che vanno bene con quello che hai
-   scritto, e dopo lo spazio i loro argomenti. Un pannello dello schermo: vetro scuro, bordo nero e filo di fosforo; la voce
-   evidenziata è in negativo (verde pieno, scritta scura) come il cursore di un menù a cristalli liquidi, la parte scritta è
-   bianca. Una riga per voce: icona, nome, l'alias se l'hai scritto così, cosa fa (tagliata), l'attesa in ambra. Sta sopra i
-   tasti rapidi e il «giù», e copre il meno possibile: alto al più cinque voci e mezza (predittivo.js lo stringe ancora se
-   sopra c'è poco). Niente animazioni. Le parole dei tasti in fondo solo dove c'è una tastiera vera */
-.c-pred{position:absolute;left:8px;right:8px;bottom:100%;z-index:6;margin-bottom:4px;border:2px solid #000;border-radius:6px;background:#0a120c;overflow:hidden;
-  box-shadow:inset 0 0 0 1px rgba(70,255,125,.32),0 3px 0 #000,0 -6px 18px rgba(0,0,0,.6)}
-.c-pred[hidden]{display:none}
-.c-sugg{position:relative;margin:0;padding:3px 0;list-style:none;max-height:165px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(70,255,125,.35) transparent}
-.c-sugg li{display:flex;align-items:center;gap:8px;min-height:30px;padding:3px 10px;cursor:pointer;font:400 14px/1.15 var(--mono);color:#cfe8cc;white-space:nowrap}
-.chat .c-sugg .emo{flex:none;width:20px;height:20px;margin:0;object-fit:contain;vertical-align:middle}
-.c-sugg li>b{flex:none;color:var(--led);text-shadow:0 0 6px rgba(70,255,125,.45)}
-.c-sugg mark{background:none;color:#fff}
-.c-sugg li>small{flex:none;padding:2px 5px 3px;border:1px solid rgba(124,138,120,.55);border-radius:3px;font:400 11px/1 var(--mono);color:#9aa795}
-.c-sugg li>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font:400 12px/1.2 var(--mono);color:#8b9385}
-.c-sugg li>em{flex:none;margin-left:auto;font:400 11px/1 var(--mono);font-style:normal;color:var(--ambra)}
-.c-sugg li.spento{opacity:.5}
-@media (hover:hover){.c-sugg li:hover{background:rgba(70,255,125,.1)}}
-.c-sugg li.scelta{background:var(--led);opacity:1}
-.c-sugg li.scelta>b,.c-sugg li.scelta mark,.c-sugg li.scelta>small,.c-sugg li.scelta>span,.c-sugg li.scelta>em{color:#062a12;text-shadow:none}
-.c-sugg li.scelta>small{border-color:rgba(6,42,18,.5)}
-.c-sugg li.scelta mark{text-decoration:underline;text-underline-offset:2px}
-.c-sugg li.scelta.spento>b{color:#2f5a3a}
-.c-pred-tasti{margin:0;padding:4px 10px 5px;border-top:1px dashed rgba(70,255,125,.2);font:400 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#6c7a68}
-@media (hover:none),(pointer:coarse){.c-pred-tasti{display:none}}
-
-/* ── i tasti rapidi: le ultime scelte, una fila che scorre di lato sopra la riga dove si scrive ── */
-.c-rapidi-box{position:relative;border-top:1px solid rgba(70,255,125,.18);background:rgba(0,0,0,.3)}
-.c-rapidi{display:flex;align-items:center;gap:6px;padding:7px 10px 3px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
-.c-rapidi::-webkit-scrollbar{display:none}
-.c-rapidi:empty{display:none}
-/* le freccette di lato: un tasto tondo che sfuma sopra la fila */
-.c-fr{position:absolute;top:0;bottom:0;z-index:2;width:34px;padding:0 0 3px;border:0;color:var(--led);font:400 26px/1 var(--fa);cursor:pointer;text-shadow:0 0 6px rgba(70,255,125,.7)}
-.c-fr[hidden]{display:none}
-.c-fr.sx{left:0;background:linear-gradient(90deg,#0b100c 40%,transparent);text-align:left;padding-left:9px}
-.c-fr.dx{right:0;background:linear-gradient(270deg,#0b100c 40%,transparent);text-align:right;padding-right:9px}
-@media (hover:hover){.c-fr:hover{color:#fff}}
-.c-fr:active{transform:scale(.9)}
-.c-r{flex:none;display:inline-flex;align-items:stretch;border-radius:999px;background:#1c241d;box-shadow:inset 0 0 0 1px rgba(70,255,125,.28);animation:c-msg .22s ease-out}
-.c-r-b{display:inline-flex;align-items:center;gap:5px;max-width:200px;padding:5px 8px 5px 11px;border:0;border-radius:999px 0 0 999px;background:none;color:#cfe8cc;font:400 13.5px/1 var(--mono);cursor:pointer;white-space:nowrap}
-.c-r-b span{overflow:hidden;text-overflow:ellipsis}
-.c-r-b .emo{height:1.3em;margin:0}
-.c-r-x{width:22px;padding:0 7px 1px 0;border:0;border-radius:0 999px 999px 0;background:none;color:#5f6b5c;font:400 15px/1 var(--mono);cursor:pointer;opacity:0;transition:opacity .15s}
-.c-r:hover .c-r-x,.c-r:focus-within .c-r-x{opacity:1}
-@media (hover:none){.c-r-x{opacity:.6}}
-@media (hover:hover){.c-r:hover{background:#26342a;box-shadow:inset 0 0 0 1px var(--led)}.c-r-x:hover{color:var(--rosso)}}
-.c-r:active{transform:scale(.95)}
-.c-r.attesa .c-r-b{color:#7c8a78}
-.c-r-eti{flex:none;font:400 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--led);opacity:.6}
-.c-rapidi.iniziali .c-r{background:transparent;box-shadow:inset 0 0 0 1px rgba(70,255,125,.18);border-style:dashed}
-
-/* tasto «vai agli ultimi messaggi» con i nuovi */
-/* il tasto «giù» (26.10, rifatto): un'etichetta del cercapersone, bordo di fosforo e fondo scuro, con la freccia a pixel (SVG:
-   il carattere del cercapersone la «↓» non ce l'ha) che ammicca in giù; coi messaggi nuovi il contatore giallo */
-.c-giu{position:absolute;right:14px;bottom:112px;z-index:5;display:flex;align-items:center;gap:7px;height:34px;padding:0 12px 0 10px;border:2px solid var(--led);border-radius:8px;background:rgba(5,16,9,.94);color:var(--led);font:400 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
-  box-shadow:0 0 12px rgba(70,255,125,.4),inset 0 0 8px rgba(70,255,125,.15),0 3px 0 #000;text-shadow:0 0 6px rgba(70,255,125,.7);animation:c-msg .2s ease-out}
-.c-giu-freccia{width:14px;height:14px;flex:none;filter:drop-shadow(0 0 3px rgba(70,255,125,.8));animation:c-giu-ammicca 1s steps(2,jump-none) infinite}
-@keyframes c-giu-ammicca{50%{transform:translateY(3px)}}
-@media (hover:hover){.c-giu:hover{background:var(--led);color:#062a12;text-shadow:none}}
-.c-giu:active{translate:0 2px;box-shadow:0 0 12px rgba(70,255,125,.4),0 1px 0 #000}
-@media (prefers-reduced-motion:reduce){.c-giu-freccia{animation:none}}
-.c-giu[hidden]{display:none}
-.c-giu .c-nuovi:not(:empty)::after{content:" nuovi"}
-.c-giu .c-nuovi{font:400 11px/1 var(--mono)}
-.c-giu .c-nuovi:not(:empty){padding:3px 6px;border-radius:4px;background:#ffd400;color:#111;text-shadow:none;letter-spacing:.04em}
-
-/* orari, giorni, ripeti */
-.c-ora{align-self:flex-end;flex:none;font:400 9.5px/1 var(--mono);letter-spacing:.04em;color:#6c7a68;margin-bottom:3px}
-.c-msg.tu .c-ora{order:0}
-.c-msg.tu .c-bolla{order:1}
-.c-msg.tu .c-rip{order:2}
-.c-giorno{align-self:center;margin:4px auto 12px;padding:3px 12px;border-radius:999px;background:rgba(70,255,125,.08);font:400 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--led);opacity:.75;width:max-content}
-.c-rip{flex:none;align-self:center;width:24px;height:24px;margin-left:-2px;padding:0 0 2px;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:#9aa795;font:400 15px/1 var(--mono);cursor:pointer;opacity:0;transition:opacity .15s,transform .3s}
-.c-msg.tu:hover .c-rip,.c-rip:focus-visible{opacity:1}
-@media (hover:none){.c-rip{opacity:.55}}
-.c-rip:hover{color:var(--led);transform:rotate(180deg)}
-
-/* i comandi dentro il testo si toccano; i tasti di seguito sotto la scheda */
-.chat code.cmd{cursor:pointer;box-shadow:inset 0 -2px 0 rgba(70,255,125,.45);transition:background .15s,transform .1s}
-.chat code.cmd:hover{background:rgba(70,255,125,.28);color:#fff}
-.chat code.cmd:active{transform:translateY(1px)}
+/* i tasti di seguito sotto la scheda */
 .c-azioni{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1)}
 .c-az{display:inline-flex;align-items:center;gap:5px;padding:5px 11px 5px 9px;border:0;border-radius:999px;background:rgba(70,255,125,.1);color:var(--led);font:400 13px/1 var(--mono);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(70,255,125,.35);transition:background .15s,transform .1s}
 .c-az .emo{height:1.25em;margin:0}
@@ -210,11 +68,6 @@
 .c-az:active{transform:scale(.95)}
 .c-az.oro{color:#ffd400;background:rgba(255,212,0,.1);box-shadow:inset 0 0 0 1px rgba(255,212,0,.4)}
 .c-az.oro:hover{background:#ffd400;color:#161200}
-
-/* le schede si sollevano appena quando le sfiori; la selezione si copia */
-.c-scheda{user-select:text;transition:transform .15s,box-shadow .15s}
-@media (hover:hover){.c-scheda:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.07)}}
-.c-msg.tu .c-bolla{cursor:text;user-select:text}
 
 /* la vetrina del negozio: una riga per pezzo, col tasto per comprare lì */
 .c-vetrina{margin:6px 0 2px}
@@ -257,17 +110,10 @@ tr.cliccabile,li.cliccabile{cursor:pointer}
 @media (hover:hover){tr.cliccabile:hover td,li.cliccabile:hover{background:rgba(70,255,125,.1)}}
 .c-az.spento{opacity:.5;background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:#9aa795}
 
-/* il messaggio nasce nascosto e si scrive da solo (chat.js: scheda, scriviAMano) */
-.c-msg.in-attesa{display:none}
+/* (le parti di una scheda che si scoprono dopo) */
 .nasc{display:none!important}
 
-/* il bot scrive… */
-.c-scrive{display:inline-flex;gap:3px;padding:8px 10px}
-.c-scrive i{width:6px;height:6px;border-radius:50%;background:var(--led);opacity:.4;animation:c-scrive 1s infinite}
-.c-scrive i:nth-child(2){animation-delay:.2s}.c-scrive i:nth-child(3){animation-delay:.4s}
-@keyframes c-scrive{30%{opacity:1;transform:translateY(-3px)}}
-
-@media (prefers-reduced-motion:reduce){.c-msg,.c-rulli.gira div .emo{animation:none}}
+@media (prefers-reduced-motion:reduce){.c-rulli.gira div .emo{animation:none}}
 
 /* ── il nastro dello spazzino (26.10, minigiochi.js: nastro) ── */
 .c-nastro{display:grid;gap:8px;margin-top:8px;outline:none;user-select:none;touch-action:none}

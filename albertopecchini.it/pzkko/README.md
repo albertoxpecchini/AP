@@ -1562,7 +1562,7 @@ sola alla volta, uguale per chiunque sia sul sito in quel momento; si gioca coi 
   ultime cinque. «come si gioca» apre le regole in un foglietto.
 - **La schedina in comune** (`schedina.js`, 23.10 sera): le puntate, il tavolo dei $pzk, il pagamento
   e l'unione fra schede stanno in un modulo solo, usato dalla finestra grande e dall'app del
-  cercapersone (`telefono/app/virtual.js`, vedi «Il cercapersone»): una copia per pagina, le due
+  cercapersone (`telefono/zero/os/virtual.js`, vedi «Il cercapersone zero»): una copia per pagina, le due
   interfacce si avvisano a vicenda (`ascolta`) e con le altre schede via `storage`. Chi apre per
   primo (`avvia`) rimette sul tavolo le puntate aperte e paga le partite finite nel frattempo.
 - **I suoni** (`suono/voci.js`, `suono/suono.js`): il fischietto, il boato del gol, l'«uuuh» del
@@ -2124,76 +2124,23 @@ Ogni strumento o gioco nuovo è una pagina in questa cartella (es.
 
 ## Il cercapersone e la chat col bot (chat/, telefono/, api/wallet.mjs azione «zaino», api/giocatori.mjs)
 
-Sotto il wallet c'è un **cercapersone** nero (`.chat-tasto`, `art/chat-pager-grande/pager-piccolo.webp`): sul suo schermo
-lcd vive il tomodachi (`chat/tomodachi.js`, la chiocciolina a pixel); il led rosso lampeggia piano quando c'è qualcosa da
-riscuotere e **sfarfalla come la spia del disco di un PC** quando il sistema lavora (`chat/led.js`: ogni richiesta al
-server, il bot che pensa e scrive, le app che si caricano). Al clic **il cercapersone si ingrandisce** e diventa lo stesso
-cercapersone in alta qualità (`art/chat-pager-grande/pager-grande.webp`, gpt-image-2, foglio `chat-pager-grande`): il tasto
-è la stessa foto rimpicciolita con l'lcd nelle stesse quote, così l'ingrandimento (420 ms) è puro e non si vede il cambio.
-Arrivando, l'lcd piccolo si spegne e **lo schermo grande si accende come un vecchio televisore** (29.10, Alberto: «appena
-premo il cercapers no caricamento ma solo animazione che lo accendo tipo 400ms»; `accendiSchermo` in telefono.js): un punto
-bianco che si allunga in una riga, la riga che si apre in tutto lo schermo e la luce che cala, in 400 ms; sotto c'è già pzk
-os (l'app chiesta da chi apre, se no l'ultima aperta, se no la home), preparato mentre il doppione vola. Dal 23.10 sera al
-29.10 c'era **la porta**: il tomodachi a tutto schermo, il tasto ACCEDI e tre secondi di baggianate («sveglio i criceti
-nella ruota del server», «soffio nella cartuccia»…); è rimasta solo per il saluto. Niente tasti con la
-«×»: si chiude col **tasto rosso CHIUDI**, toccando fuori o con Esc dalla home: lo schermo **si spegne come un tubo
-catodico** (si schiaccia in una riga bianca, poi in un punto, sul vetro nero), ricompare il tomodachi che **saluta**
-(«CIAO» e il cuore, `tomodachi.saluta`) e dopo un paio di secondi il cercapersone si rimpicciolisce da solo nel tasto; un
-secondo «chiudi» mentre saluta chiude subito. Il **tasto INDIETRO** torna indietro di una mossa (la pagina interna
-dell'app, poi l'app di prima, poi la home) e si può premere a raffica; nella home non fa niente. Dal 29.10 è **rosso come
-CHIUDI** (Alberto: «così uno non lo preme perché verde ma legge prima»; prima era verde): sulla foto la gomma l'ha
-ricolorata `tools/pzkko/tasto-indietro-rosso.mjs`, perché il PNG da cui `tasti-pager.mjs` colora i tasti non c'è più
-(`tasti-pager.mjs` ha già il rosso per tutti e due), e sul cellulare è rossa la barra. La freccia in alto
-nelle app fa lo stesso. Tutto il cercapersone, come il wallet, è scritto solo in Fake Receipt. Lo schermo è un **tubo
-catodico che sfarfalla** (`games/crt.js`, come gli schermi del wallet) già sulla porta, e lo è anche lo schermino del
-cercapersone piccolo: i tre tubi (tasto, doppione che vola, schermo grande) sono «insieme», agganciati all'orologio della
-pagina, così allo zoom la banda e lo sfarfallio non saltano. Se è in carica (dalle 19 alle 7), all'apertura **il cavo
-usb-c s'inserisce**: sale da sotto la finestra inclinato, trova la porta raddrizzandosi, spinge e scatta dentro
-(`inserisciCavo` in telefono.js; la scatola `.t-cavo-scatola` taglia la punta quando entra). È l'unica animazione che
-Alberto ha voluto oltre allo zoom: niente altro deve muoversi da solo.
+Sotto il wallet c'è il **cercapersone**: dal 31.10 per tutti lo **zero** in 3D (vedi «Il cercapersone zero»; Alberto: «fai
+che cercapersone zero è predefinito e quello attuale si elimina per sempre»). Il tasto sul muro (`.chat-tasto.zero`, la foto
+`art/zero/zero-piccolo.webp`, vestito da `telefono/zero/muro.js` appena la pagina lo legge) ha pzk os vivo sul vetro; il
+led rosso lampeggia piano quando c'è qualcosa da riscuotere e **sfarfalla come la spia del disco di un PC** quando il
+sistema lavora (`chat/led.js`: ogni richiesta al server, il bot che pensa e scrive). Al clic il cercapersone si apre
+(`telefono/telefono.js`: vola la telecamera dal tasto allo schermo, la retroilluminazione si accende in 400 ms, sotto c'è
+già pzk os con l'app chiesta, l'ultima aperta o il desktop); chiudendo la chiocciolina saluta (`tomodachi.saluta`) e il
+cercapersone torna nel tasto. La barra di stato è vera (29.10, Alberto: «metti dati veri tipo quelli del pc tipo wifi»: la
+rete di chi guarda col **ping vero**, una HEAD a `/favicon.png` all'apertura e ogni 30 secondi, e la **batteria vera**
+dove il browser la dice, se no quella del gioco come nel wallet).
 
-**Il cercapersone grande** (`telefono/telefono.js` + `telefono.css`; il nome è rimasto dalla prima versione, che era un
-telefono) è orizzontale come quello piccolo. Le quote sono misurate sul disegno (1341 × 774): lo schermo va da 8,35 % a
-74,65 % in larghezza e da 24,68 % a 80,88 % in altezza; i due tasti sono veri (sopra chiudi, sotto indietro, rossi tutti e
-due), il led è a 84,6 % / 25,6 %. Nello schermo, un palco di 760 punti ridimensionato allo schermo vero: barra di stato lcd,
-la home (ora, saldo, sfide, l'ultima notizia dei giocatori) e le **app**, una per modulo in `telefono/app/`, caricate al
-primo uso e poi tenute montate; le icone sono adesivi disegnati (foglio `chat-app`). Sul cellulare lo schermo prende tutta
-la finestra e i tasti diventano una barra in basso.
-
-- **La barra di stato è vera** (29.10, Alberto: «metti dati veri tipo quelli del pc tipo wifi»): la rete di chi guarda
-  (online o no, il tipo quando il browser lo dice, `navigator.connection`; il **ping vero**, una HEAD a `/favicon.png`
-  all'apertura e ogni 30 secondi; la banda, su Chrome ed Edge), col simbolo del wifi a tre tacche date dal ping; l'ora
-  vera in mezzo; la **batteria vera** (`navigator.getBattery`, Chrome ed Edge: anche il cavo usb-c entra quando il
-  computer è in carica). Dove il browser non dice la batteria (Safari, Firefox) resta quella del gioco, come nel wallet.
-- **La home a pagine** (29.10, Alberto: «fai nella home spazio per icone 3x3 poi deve scorrere quindi fai vedere come
-  l'iphone dei puntini sotto in mezzo»): a sinistra l'ora e i widget, a destra le app **nove per pagina**, divise per
-  genere (`PAGINE` in telefono.js: tu e il gioco, cioè chat, profilo, shop, pzkstore, sfide, quiz, quest, giocatori,
-  zaino; i soldi, cioè account, miniera, foto, virtual, banca, rapina e le app comprate nel pzkstore; gli attrezzi; dal
-  29.10 notte l'account sta accanto alla banca, per far posto al pzkstore accanto allo shop); le pagine si scorrono di lato
-  col dito (gli agganci si fermano sempre su una pagina intera), la rotella, il mouse trascinato o le frecce, e i
-  **puntini** sotto in mezzo, che si possono premere, dicono dove sei: il puntino **cerchiato di rosso** è la pagina dove
-  sei (29.10 notte, Alberto: «devono essere circondati da quel cerchietto rosso che indica in che pagina sono e non solo
-  home»), un puntino **rosso pieno** vuol dire che in quella pagina c'è un'app col pallino; la pagina si ricorda (riaprendo
-  si torna lì); un'app si carica appena il mouse ci passa
-  sopra o il dito la tocca, così al clic è pronta; i pallini di tutte le app si chiedono insieme, una volta sola per la
-  home e il led. Sul cellulare in verticale le pagine stanno sotto i widget.
-
-- **Chat**: il bot (sotto). **Shop**: un e-commerce: offerte del giorno (tre pezzi a −20/−30/−40 %, uguali per tutti,
-  col conto alla rovescia a mezzanotte), reparti, ricerca, ordine, preferiti, la scheda del prodotto, il carrello, la cassa
-  con lo scontrino. **Sfide**: le tre sfide di oggi. **Quiz**: i quiz retributivi. **Quest**: le side quest. **Giocatori**:
-  il database (classifiche col podio, notizie, cerca, il tuo profilo coi rivali, i numeri della banca). **Zaino**: quello
-  che hai, coi bonus in corso. **Foto**: le foto vere dei quiz. **Virtual** (23.10 sera, Alberto: «il gioco dovrebbe essere
-  anche dentro al cercapersone»; `telefono/app/virtual.js`): le scommesse sul calcio inventato, la **stessa partita** del
-  gioco grande sullo stesso schermino a pixel (`games/virtual/partita.js` e `schermo.js`), col tabellone, il conto alla
-  rovescia, le quote 1 X 2 e over/under, le fiches e la schedina; scommesse e pagamenti passano dalla **stessa schedina**
-  della finestra grande (`games/virtual/schedina.js`, `pzkko-virtual`, lo stesso tavolo dei $pzk), quindi quello che si
-  punta qui si vede là e viceversa; «gioco grande» apre la finestra sopra il muro; sullo schermo largo lo schermino sta a
-  sinistra e il banco a destra, sul cellulare tutto in colonna. Il pallino: le vincite non ancora viste, o le scommesse
-  aperte sulla partita che chiude entro un minuto. In chat `virtual` (anche `scommesse`, `calcio`) la apre. La piastrella
-  (`art/chat-app2/app-virtual.webp`) per ora è disegnata a mano in SVG da `tools/pzkko/virtual/icona.mjs` (il pallone
-  davanti alla porta col fischietto, sul verde): da rigenerare con gpt-image-2 come le altre, `node tools/pzkko/immagini.mjs
-  genera chat-app2` (il prompt è nel foglio `chat-app2` di `tools/pzkko/fogli-chat.js`). **Banca**: apre il wallet.
-  **pzkstore**: le app da comprare (la lavatrice, il decifratore; vedi «L'economia»).
+**Il cercapersone nero** (23.10–31.10) non c'è più: la foto (`art/chat-pager-grande/`, `chat-cercapersone`, la spina e
+i simboli dei tasti), `telefono.css`, la home a pagine, il tubo catodico e le app in HTML. Di `telefono/app/` restano solo
+le logiche che le app di pzk os (`telefono/zero/os/`) importano: le regole, i cataloghi, le chiamate alla banca.
+Le app sono quelle di pzk os (`APP` in telefono.js, `PRONTE` in os/os.js): chat, profilo, account, shop, pzkstore, sfide,
+quiz, quest, giocatori, zaino, miniera, foto, virtual, banca, rapina, le app veloci (bin·hex, calcoli, codice C, cucina) e
+quelle comprate nel pzkstore. La lavatrice e il decifratore non hanno ancora la loro app in pzk os: il menu dice «presto».
 
 **La miniera** (23.10; app `telefono/app/miniera.js`, regole `chat/miniera.js`, catalogo `chat/miniera-dati.mjs`, disegni
 `chat/miniera-pixel.js`): si minano $pzk col PC, ma prima bisogna comprare i pezzi e farsi la postazione. Dodici posti
@@ -2444,10 +2391,11 @@ ricarica nel posto giusto, è in 3d mi raccomando. NON ELIMINARE IL VECCHIO CERC
 e lo sostituirà per sempre nell'account». I colori di riferimento (la sua immagine): corpo bianco, croce, tasto e scritta
 arancioni, lo schermo arancione a pixel scuri, il puntino nero del led.
 
-**Nello shop** (`chat/oggetti.js`, reparto «cose di pzk», `zero`, 9.999 $pzk, da tenere: xp +10 %, attese −10 %; l'icona
-`art/chat-pzk/zero.webp` di rd-plus come le altre; il traguardo «il salto di qualità»). Comprato, è nello zaino, quindi nel
-conto: sul muro e aprendo c'è lui, per sempre (non si vende). Chi non ce l'ha vede il cercapersone nero di prima, che non
-cambia di una riga.
+**Di serie per tutti** (31.10, Alberto: «fai che cercapersone zero è predefinito e quello attuale si elimina per sempre»).
+Dal 29.10 al 31.10 si comprava nello shop (`zero`, 9.999 $pzk, da tenere: xp +10 %, attese −10 %) e chi non ce l'aveva
+vedeva il cercapersone nero. Adesso c'è solo lui: l'oggetto `zero` è `fuoriVendita` (nella banca,
+`C:pzkko-serverancadatioggetti.mjs`, e nella copia del browser, `chat/oggetti.js`: `NEGOZIO` lo salta, `PER_ID`
+lo tiene), chi l'aveva comprato lo tiene coi suoi bonus, e il traguardo «il salto di qualità» non c'è più.
 
 **Il modello** è l'OBJ di Rhino del mockup (34 MB, 169 000 vertici, in mm: Y l'asse lungo, X il corto col bordo di sopra a
 X−, Z lo spessore col fronte a Z+). `tools/pzkko/zero/modello.mjs <file.obj>` tiene solo quello che si vede (i due gusci, la
@@ -2629,11 +2577,6 @@ il bollino «↓» della chat, le righe del menu, le righe e le frecce delle imp
 tastiera, «OK menu» e «chat» della home. `prova.mjs --rider` fa un turno intero con due frecce e due clic e controlla che
 sia contato. Resta da fare: il nastro dei cestini dello spazzino costruisce pezzi HTML veri, che nello zero non si
 vedono.
-
-**In locale è il predefinito** (29.10 notte, Alberto: «fai che sia questo il predefinito senza comprare nulla»): su
-localhost e sugli indirizzi numerici del server di prova (anche dal telefono) il cercapersone zero c'è sempre, senza
-comprarlo (`PROVA_ZERO` in chat/zaino.js); `?vecchio` rimette il cercapersone nero. Su pzkko.it niente cambia: si compra
-nello shop a 9.999 $pzk.
 
 **Il cavo lungo** (29.10 notte, Alberto: «fai un cavo più lungo almeno il triplo che esca dalla pagina»): il filo della
 spina scende per 60 cm invece di 16 (la stessa curva, poi giù dritto), così la sua fine non si vede in nessuna finestra.

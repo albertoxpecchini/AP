@@ -20,8 +20,9 @@
 // resta vuota e il resto va; una lista che si rompe non rompe la chat). Le app di «installa» sono quelle del pzkstore
 // (telefono/app/pzkstore.js, CATALOGO), che arriva dopo, come lo carica comandi/app.js.
 //
-// collega(input, scatola, opzioni) → { tasto(e), apri(), chiudi() }: chat.js gli passa i tasti (tasto(e) → true se li ha
-// usati lui: se no le frecce restano quelle della storia), apri() dopo aver scritto lui nella riga, chiudi() all'invio.
+// collega(input, scatola, opzioni) → { tasto(e), apri(), chiudi() }: chi ha una riga html gli passa i tasti (tasto(e) → true
+// se li ha usati lui: se no le frecce restano quelle della storia), apri() dopo aver scritto lui nella riga, chiudi() all'invio.
+// (31.10) La chat in HTML che lo usava (chat.js) non c'è più: la chat di pzk os (telefono/zero/os/chat.js) prende solo calcola().
 
 import { COMANDI, PER_NOME } from './comandi/index.js'
 import * as testi from './testi.js'

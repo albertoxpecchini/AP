@@ -27,7 +27,7 @@ export const DESK = {
       { k: 'manifesti8/modena', w: 200, dx: 40, gap: 10, r: -1.5 },
     ] },
     { x: 262, items: [
-      // il cercapersone (26.10): appeso al chiodo, in cima alla seconda pila
+      // il cercapersone (26.10; dal 31.10 lo zero, attaccato col nastro): in cima alla seconda pila
       { k: '#cercapersone-muro', w: 185, dx: 35, gap: 6, r: 3 },
       { k: 'manifesti4/brat', w: 220, dx: 30, gap: 12, r: 4 },
       { k: V('better call pekko'), w: 280, gap: -35, r: 2 },

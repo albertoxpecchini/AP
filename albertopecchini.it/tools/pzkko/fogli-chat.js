@@ -128,37 +128,8 @@ export function fogliChat({ griglia, NIENTE_MAGENTA }) {
       prompt: `${griglia(`${pezzi.length} cartoon stickers,`, cols, rows)}\n${STICKER}\n${intro}\n${lista(pezzi, testi)}\n${NIENTE_MAGENTA}`,
     }
   }
-  out['chat-cercapersone'] = {
-    scala: 0.4, titolo: 'il cercapersone della chat: il tasto sotto il wallet', aspetto: '2048x1152', griglia: [1, 1], pezzi: ['cercapersone'],
-    prompt: `${griglia('One piece: a single 1990s pager (beeper),', 1, 1)}
-It is a classic black plastic pager seen from DIRECTLY IN FRONT (flat, orthographic), landscape, wide and short (about 2.4 times wider than tall), filling the cell: a rounded rectangular matte black plastic body with a slightly lighter bevelled edge and a few fine scuffs. On the body, a horizontal LCD screen window on the LEFT taking about 60 % of the width and 50 % of the height, inset in a thin dark bezel: the LCD is SWITCHED OFF, a plain pale grey-green (#9fb48a) blank panel with nothing on it. To the right of the screen, two small round grey rubber buttons one above the other, and above them a tiny round LED lens, dark red, off. A small black belt clip visible at the very top edge. Photorealistic product render, soft even light, no text, no logo, no brand. The outline of the pager is the edge of the piece: nothing outside it, no shadow on the magenta. ${NIENTE_MAGENTA}`,
-  }
-  // il cercapersone GRANDE (23.10): quello che esce ingrandendo il tasto, lo stesso disegno in alta qualità, con lo schermo
-  // lcd più grande dove stanno le app (telefono/telefono.js). Lo schermo è magenta pieno come il fondo: la chiave lo buca.
-  // Dopo `immagini.mjs usa chat-pager-grande <png>` va lanciato `node tools/pzkko/tasti-pager.mjs`: i tasti grigi diventano rosso (sopra) e verde (sotto), e rifà pager-piccolo.webp.
-  out['chat-pager-grande'] = {
-    scala: 0.75, titolo: 'il cercapersone grande: il dispositivo con le app', aspetto: '2048x1152', griglia: [1, 1], pezzi: ['pager-grande'],
-    prompt: `${griglia('One piece: a single 1990s pager (beeper),', 1, 1)}
-It is the SAME classic black plastic pager as a small 1990s beeper, now seen big and in high detail, from DIRECTLY IN FRONT (flat, orthographic, no perspective), landscape, about 1.75 times wider than tall, filling the cell almost edge to edge with only a thin margin. A rounded rectangular matte black plastic body with softly rounded corners, a slightly lighter bevelled edge all around, a faint moulding seam, fine scuffs and micro-scratches on the plastic, high-end product photo quality. On the LEFT part of the body, a LARGE horizontal LCD screen window taking about 70 % of the body width and about 68 % of the body height, vertically centred, inset in a thin dark grey bezel with a subtle inner shadow. The LCD window itself is filled with FLAT PURE MAGENTA (#FF00FF), exactly the same colour as the background: perfectly flat, no reflections, no pixels, no drawing on it, a crisp straight-edged rectangle with slightly rounded corners — it will be cut out. To the RIGHT of the screen, in the remaining strip of the body, two round grey rubber buttons one above the other, and above them a tiny round red LED lens (off). A black plastic belt clip visible at the very top edge of the body. Photorealistic product render, soft even studio light from the top, no text, no logo, no brand, no numbers. The outline of the pager is the edge of the piece: nothing outside it, no cast shadow on the background.`,
-  }
-  // la spina usb-c del cercapersone grande (23.10): in carica (come il wallet, dalle 19 alle 7) è infilata nella porta in
-  // mezzo al bordo di sotto. Vista di fianco, in piedi: la punta d'argento finisce dietro il cercapersone, sotto la spina
-  // continua il filo del wallet (art/wallet-cavo/filo.webp) fino in fondo allo schermo.
-  out['chat-pager-cavo'] = {
-    scala: 0.5, titolo: 'la spina usb-c del cercapersone grande, in carica: infilata dal basso, vista di fianco', aspetto: '1152x2048', griglia: [1, 1], pezzi: ['spina'],
-    prompt: `${griglia('One piece: a single USB-C charging plug with a short piece of its cable,', 1, 1)}
-The plug STANDS UPRIGHT, perfectly vertical, pointing straight UP, photographed from the side (flat, orthographic, no perspective), with the WIDE flat face of the plug towards the camera. From top to bottom: at the very top the short shiny silver metal USB-C connector shell (a thin rounded-end metal tongue seen from its wide face, about two thirds as wide as the housing); under it the matte dark grey anodised aluminium housing, SHORT and COMPACT: a rounded rectangle only about 1.1 times taller than wide (almost square), with softly rounded edges and a fine machined texture; under the housing a very short tapered black rubber strain relief (about a quarter of the housing height); out of the strain relief the black braided nylon cable, about 40 % as wide as the housing, going straight DOWN, perfectly vertical, for a length equal to about twice the height of the housing, then cut cleanly and squarely. The whole piece is centred horizontally and takes about 60 % of the cell height (the plug is small, the cable is long). Photorealistic product photo, soft diffuse studio light from the top left, crisp edges. Nothing else: no port, no device, no surface, no table, no cast shadow on the background. ${NIENTE_MAGENTA}`,
-  }
-  // i simboli sui tasti del cercapersone grande (23.10, Alberto: «per sicurezza»): l'accensione sul rosso (chiudi), la
-  // freccia indietro sul verde. Stampati sulla gomma come le scritte sotto: bianco sporco, piatti, appena consumati.
-  out['chat-pager-simboli'] = {
-    scala: 0.5, titolo: 'i simboli stampati sui tasti del cercapersone: spegni e indietro', aspetto: '2048x1152', griglia: [2, 1], pezzi: ['spegni', 'indietro'],
-    prompt: `${griglia('Two symbols,', 2, 1)}
-Each symbol is a bold, simple, flat graphic printed in OFF-WHITE paint (#f3f1ea) like the silk-screen print on the rubber buttons of a 1990s device: solid flat colour, crisp clean edges, a very faint worn texture inside the paint (a few tiny specks missing), no outline, no shadow, no 3D, no gradient, no button drawn around it. Each symbol is centred in its cell and about 55 % as tall as the cell.
-LEFT: the standard POWER symbol (IEC 5009): a thick circle open at the top, with a thick vertical bar coming down through the gap into the middle of the circle, rounded line ends, the stroke as thick as about one eighth of the symbol width.
-RIGHT: a BACK arrow pointing straight to the LEFT: a thick horizontal shaft with a wide arrowhead on the left end, rounded line ends, same stroke thickness as the power symbol, the whole arrow about as wide as the power symbol.
-Nothing else: no text, no letters, no frame. ${NIENTE_MAGENTA}`,
-  }
+  // (31.10) i fogli del cercapersone nero (chat-cercapersone, chat-pager-grande, chat-pager-cavo, chat-pager-simboli) non ci
+  // sono più: il cercapersone è lo zero in 3D per tutti (telefono/zero/, tools/pzkko/zero/foto.mjs per la foto sul muro)
   // le crepe del cercapersone scassato (23.10): quando muori ti resta quello rotto, col vetro dello schermo crepato, che
   // fa solo lavorare e ricomprare il nuovo. Le crepe stanno sopra lo schermo (telefono.css .t-crepe, il tasto piccolo
   // .ct-crepe): linee chiare su magenta, la chiave lascia solo loro.

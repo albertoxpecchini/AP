@@ -3,8 +3,8 @@
 // ricarica nel posto giusto, è in 3d mi raccomando»; poi: «non fare una finestra sopra il modello 3d… il modello ha
 // trasparenza quindi lo schermo lo metti esattamente dove è nel modello»): il gadget bianco coi tasti arancioni, dal mockup
 // di Rhino (tools/pzkko/zero/modello.mjs → art/zero/zero.glb), disegnato con three.js (lib/three.js) dentro il dialog del
-// cercapersone (telefono.js), che lo usa al posto della foto del cercapersone nero quando nello zaino c'è «zero» (lo
-// shop, 9.999 $pzk: chat/oggetti.js). Il vecchio cercapersone resta com'è.
+// cercapersone (telefono.js). Dal 31.10 è il cercapersone di tutti (Alberto: «fai che cercapersone zero è predefinito e
+// quello attuale si elimina per sempre»): fino ad allora si comprava nello shop e agli altri restava quello nero.
 //
 // LO SCHERMO È NEL 3D: pzk os (os/os.js) disegna su un lcd 256 × 128 a un bit la cui tela (768 × 384) è la trama di un
 // piano appoggiato dove nel modello sta il modulo lcd, SOTTO il vetro, che è trasparente e riflette la stanza: niente

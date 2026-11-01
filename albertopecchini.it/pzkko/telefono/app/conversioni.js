@@ -1,20 +1,14 @@
-// L'app Conversioni (26.10): un numero scritto in una base (decimale, binario, ottale, esadecimale) e subito lo stesso numero
-// nelle altre, con la parte dopo la virgola e i numeri grandi quanto si vuole (BigInt). Con i bit (8, 16, 32, 64) mostra
-// il complemento a 2 e legge i binari e gli esadecimali anche con il segno. Sotto, «come si fa»: il procedimento che si
-// scrive a scuola verso la base scelta (le divisioni successive e i resti letti dal basso, le moltiplicazioni per la parte
-// frazionaria, la somma delle potenze, i gruppi di 4 o 3 bit). Si tocca un risultato per copiarlo.
-
-import { icona } from '../../chat/icone.js'
-import { tieni, ricordo, ricorda } from '../ricordi.js'
+// I conti delle Conversioni (26.10): un numero scritto in una base (decimale, binario, ottale, esadecimale) e lo stesso
+// numero nelle altre, con la parte dopo la virgola e i numeri grandi quanto si vuole (BigInt); il complemento a 2 su 8, 16,
+// 32, 64 bit; «come si fa», il procedimento che si scrive a scuola verso la base scelta (le divisioni successive e i resti
+// letti dal basso, le moltiplicazioni per la parte frazionaria, la somma delle potenze, i gruppi di 4 o 3 bit).
+// (31.10) È la logica in comune con bin·hex del cercapersone zero (telefono/zero/os/conversioni.js), che la disegna a un
+// bit; l'interfaccia HTML di qui se n'è andata col cercapersone vecchio.
 
 export const BASI = [[10, 'dec', 'decimale'], [2, 'bin', 'binario'], [8, 'oct', 'ottale'], [16, 'hex', 'esadecimale']]
 export const NOME = Object.fromEntries(BASI.map(([b, , n]) => [b, n]))
 export const CIFRE = '0123456789ABCDEF'
 const MAX_FRAZ = 16 // cifre dopo la virgola, al più (poi «…»: la frazione non finisce)
-const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-
-let host = null, ctx = null
-let S = ricordo('conversioni', { testo: '42', da: 10, bit: 0, verso: 2 })
 
 /** Il testo nella base b → { neg, int, fn/fd (la parte dopo la virgola, frazione esatta: tutto BigInt), fraz, cifreFraz } o { errore }. Accetta 0b 0o 0x davanti (cambiano la base). */
 export function leggi(testo, b) {
@@ -66,27 +60,8 @@ export function c2(x, n) {
   return v < 0 ? (1n << BigInt(n)) + v : v
 }
 
-function risultati(x) {
-  if (x.errore) return `<p class="t-cv-err">${esc(x.errore)}</p>`
-  const righe = BASI.map(([b, sigla]) => {
-    const s = scritto(x, b)
-    return `<button type="button" class="t-cv-r${b === x.b ? ' da' : ''}" data-copia="${esc(s.testo)}"><small>${sigla}</small><b>${s.vista}</b>${icona('si')}</button>`
-  })
-  if (S.bit) {
-    const p = c2(x, S.bit)
-    if (p === null) righe.push(`<p class="t-cv-err">${x.fraz ? 'il complemento a 2 è per gli interi' : `non ci sta in ${S.bit} bit: con segno va da −${2n ** BigInt(S.bit - 1)} a ${2n ** BigInt(S.bit - 1) - 1n}`}</p>`)
-    else {
-      const bin = p.toString(2).padStart(S.bit, '0'), segno = bin[0] === '1' && !x.neg && (x.b === 2 || x.b === 16)
-      righe.push(`<button type="button" class="t-cv-r c2" data-copia="${bin}"><small>${S.bit} bit</small><b>${gruppi(bin, 4)}</b>${icona('si')}</button>`,
-        `<button type="button" class="t-cv-r c2" data-copia="${intIn(p, 16).padStart(S.bit / 4, '0')}"><small>hex ${S.bit}</small><b>${gruppi(intIn(p, 16).padStart(S.bit / 4, '0'), 4)}</b>${icona('si')}</button>`)
-      if (segno) righe.push(`<p class="t-cv-nota">letto con il segno (il primo bit è 1): <b>${p - (1n << BigInt(S.bit))}</b></p>`)
-    }
-  }
-  return righe.join('')
-}
-
-// ── come si fa ── (29.10: i passi sono dati, { p } { nota } { tab, testa } { fine }, così li usa anche bin·hex di pzk os,
-// telefono/zero/os/conversioni.js; qui diventano html. Nei testi ci sono solo <b> e <sup>)
+// ── come si fa ── (29.10: i passi sono dati, { p } { nota } { tab, testa } { fine }, che bin·hex di pzk os,
+// telefono/zero/os/conversioni.js, disegna a modo suo. Nei testi ci sono solo <b> e <sup>)
 /** I passi per scrivere x nella base a: [{ p } | { nota } | { tab: righe, testa? } | { fine }]. */
 export function passi(x, a) {
   if (x.errore) return []
@@ -128,54 +103,5 @@ export function passi(x, a) {
   out.push({ fine: `= <b>${scritto(x, a).vista}</b> in ${NOME[a]}` })
   return out
 }
-function procedimento(x) {
-  if (x.errore) return ''
-  if (x.b === S.verso) return '<p class="t-cv-nota">è già in questa base: scegline un’altra qui sopra.</p>'
-  return passi(x, S.verso).map((b) => (b.tab ? tabella(b.tab, b.testa) : b.nota ? `<p class="t-cv-nota">${b.nota}</p>` : b.fine ? `<p class="t-cv-fine">${b.fine}</p>` : `<p>${b.p}</p>`)).join('')
-}
 const fmtQ = (n, d) => fmt(Number(n) / Number(d))
 const fmt = (n) => Number(n.toFixed(10)).toLocaleString('it-IT', { maximumFractionDigits: 10 })
-const tabella = (righe, testa = null) => `<table class="t-cv-tab">${testa ? `<thead><tr>${testa.map((t) => `<th>${t}</th>`).join('')}</tr></thead>` : ''}<tbody>${righe.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`
-
-// ── la pagina: l'ingresso si disegna una volta (scrivendo non perde il fuoco), il resto a ogni tasto ──
-function telaio() {
-  host.innerHTML = `${ctx.testata('Conversioni')}
-    <div class="t-corpo-app t-cv">
-      <input class="t-cv-in" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="scrivi un numero" aria-label="il numero" value="${esc(S.testo)}">
-      <div class="t-cv-scelte"><span>da</span><div class="t-za-filtri" data-scelta="da">${BASI.map(([b, s]) => `<button type="button" data-v="${b}">${s}</button>`).join('')}</div>
-        <span>bit</span><div class="t-za-filtri" data-scelta="bit">${[0, 8, 16, 32, 64].map((b) => `<button type="button" data-v="${b}">${b || 'no'}</button>`).join('')}</div></div>
-      <div class="t-cv-ris"></div>
-      <h4 class="t-sh-sez">come si fa, verso</h4>
-      <div class="t-za-filtri" data-scelta="verso">${BASI.map(([b, s]) => `<button type="button" data-v="${b}">${s}</button>`).join('')}</div>
-      <div class="t-cv-passi"></div>
-    </div>`
-  aggiorna()
-}
-function aggiorna() {
-  ricorda('conversioni', S)
-  const x = leggi(S.testo, S.da)
-  for (const g of host.querySelectorAll('[data-scelta]')) for (const b of g.children) b.classList.toggle('on', Number(b.dataset.v) === (g.dataset.scelta === 'da' ? x.b ?? S.da : S[g.dataset.scelta]))
-  host.querySelector('.t-cv-ris').innerHTML = risultati(x)
-  host.querySelector('.t-cv-passi').innerHTML = procedimento(x)
-}
-
-function clic(e) {
-  const b = e.target.closest('[data-scelta] [data-v]'), c = e.target.closest('[data-copia]')
-  if (b) {
-    const k = b.parentElement.dataset.scelta, v = Number(b.dataset.v)
-    if (k === 'da' && v !== S.da) { const x = leggi(S.testo, S.da); if (!x.errore) S.testo = scritto(x, v).testo } // cambia base: il numero si riscrive nella nuova
-    S[k] = v
-    if (k === 'da') host.querySelector('.t-cv-in').value = S.testo
-    return aggiorna()
-  }
-  if (c) navigator.clipboard?.writeText(c.dataset.copia).then(() => ctx.toast(`copiato: ${esc(c.dataset.copia.slice(0, 40))}`, { icona: 'si' }), () => {})
-}
-
-export function monta(h, c) {
-  host = h; ctx = c
-  tieni(host, 'conversioni')
-  host.addEventListener('click', clic)
-  host.addEventListener('input', (e) => { if (e.target.matches('.t-cv-in')) { S.testo = e.target.value; aggiorna() } })
-  telaio()
-  return { mostra: () => { if (matchMedia('(hover:hover)').matches) host.querySelector('.t-cv-in')?.focus({ preventScroll: true }) } }
-}

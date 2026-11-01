@@ -1,5 +1,5 @@
 // Il cercapersone zero sul muro (29.10): il tasto sotto il wallet (index.html #cercapersone-muro, .chat-tasto) vestito da zero
-// quando nello zaino c'è «zero» (chat/chat.js, prepara, lo chiama; e lo richiama appena lo compri). La foto è la scena 3D
+// (dal 31.10 per tutti: l'html della pagina lo chiama appena letto il tasto, e chat/chat.js, prepara). La foto è la scena 3D
 // fotografata di tre quarti (art/zero/zero-piccolo.webp, tools/pzkko/zero/foto.mjs), col vetro vuoto: dentro il vetro ci va
 // PZK OS VIVO (os/os.js, l'lcd 256 × 128 a un bit col desktop: la chiocciolina a tutto schermo e la barra di stato), la
 // stessa tela che si vede aprendo. L'lcd prende una trasformazione prospettica (matrix3d) che porta il suo rettangolo sui

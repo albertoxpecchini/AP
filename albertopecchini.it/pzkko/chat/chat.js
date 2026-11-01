@@ -1,24 +1,21 @@
-// La chat col bot dei $pzk (22.10): si apre dal cercapersone sotto il wallet (index.html, .chat-tasto). Si parla col bot,
-// che si chiama pzk ed è la chiocciola della banca con gli occhiali da sole: si scrive un comando («pesca», «lavora»,
-// «roulette 50 rosso»; anche «pzk pesca» e «/pesca» vanno bene) e lui risponde con una scheda, come un bot di Discord
-// (è fatto sul modello di Dank Memer, tutto in italiano e con le cose di Mantova). I soldi sono i $pzk di games/pzk.js,
-// gli stessi dei giochi e del wallet; il resto (xp, livello, mestiere, oggetti, attese) è lo zaino (zaino.js).
-// I comandi stanno in comandi/ (una famiglia per file); le icone sono le nostre (icone.js, art/chat-*), mai emoji. Mentre si
-// scrive, il menù sopra la riga suggerisce i comandi e i loro argomenti (predittivo.js, 29.10).
+// Il cercapersone sul muro e quello che resta del motore della chat col bot dei $pzk (22.10; dal 31.10 il cercapersone è
+// uno solo, lo zero, per tutti). Il tasto sotto il wallet (index.html #cercapersone-muro, .chat-tasto) si veste sempre da
+// zero (telefono/zero/muro.js) e, toccato, apre il telefono (telefono/telefono.js), dove la chat è quella a 8 bit di pzk os
+// (telefono/zero/os/chat.js): si scrive un comando («pesca», «lavora», «roulette 50 rosso»; anche «pzk pesca» e «/pesca»)
+// e il bot pzk, la chiocciola della banca con gli occhiali da sole, risponde con una scheda, come un bot di Discord (sul
+// modello di Dank Memer, tutto in italiano e con le cose di Mantova). I soldi sono i $pzk di games/pzk.js; il resto (xp,
+// livello, mestiere, oggetti, attese) è lo zaino (zaino.js). I comandi stanno in comandi/ (una famiglia per file).
+// (31.10) La chat in HTML del cercapersone vecchio (il pannello, le schede scritte a mano, la storia, i tasti rapidi) non
+// c'è più: qui restano il tasto e i pezzi che la chat di pzk os prende da qui (gli importi, le durate, la banca, la morte).
 //
-// prepara(tasto): accende il cercapersone («1 msg» quando c'è un premio pronto). apri(comando): apre la chat e, se c'è,
-// scrive il comando. Un comando riceve un «ctx» con tutto quello che serve per parlare e aspettare risposte: dì(scheda),
-// aggiorna(el, scheda), scegli(el, bottoni, ms), scrivi(ms), tempo(el, ms), dormi(ms), inVista(el, ms), pensa(ms), paga(n), spendi(n)…
+// prepara(tasto): accende il cercapersone sul muro («1 msg» quando c'è un premio pronto). apri(comando): apre il telefono
+// e, se c'è, scrive il comando nella chat. chiudi(): lo richiude.
 
 import * as pzk from '../games/pzk.js'
 import * as zaino from './zaino.js'
-import { conIcone, icona } from './icone.js'
-import { COMANDI, PER_NOME, CATEGORIE } from './comandi/index.js'
-import { eventoCasuale, salutoIniziale } from './comandi/eventi.js'
-import { NEGOZIO as NEGOZIO_OGGETTI, PER_ID } from './testi.js'
+import { PER_ID } from './testi.js'
 import { prezzoDi } from './mercato.js'
 import * as led from './led.js'
-import { collega as collegaPredittivo } from './predittivo.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const mezzi = (n) => Math.round(n * 2) / 2
@@ -29,116 +26,34 @@ export const eurHtml = (n) => `<span class="eur">EUR€ ${pzk.fmtEur(n)}</span>`
 // il vetro rotto del cercapersone scassato, nel tasto piccolo: la versione ridotta col massimo (tools/pzkko/crepe-piccole.mjs),
 // perché ridotta con la media ai 74 px dell'lcd sparirebbe. Lo schermo grande (telefono.js) usa crepe.webp
 const CREPE = '/art/chat-pager-crepe/crepe-piccola.webp'
-let tasto = null, dlg = null, lista = null, input = null, pred = null, saldoEl = null, giuEl = null, rapidiEl = null
-let nuovi = 0, ultimoGiorno = '', incollata = true, rapidiFrecce = () => {}
-let aspettaTesto = null // { risolvi, nascosto } quando un minigioco aspetta che si scriva qualcosa
-const storia = [] // i comandi scritti, per le frecce
-let iStoria = -1
-const inCorso = new Set() // i comandi che stanno girando (un minigioco alla volta per comando)
-let salutato = false
+let tasto = null
 
 // ── il tasto ──
 export function prepara(b) {
+  if (tasto === b) return // (una volta sola per tasto)
   tasto = b
+  // (31.10) lo zero per tutti: il tasto si veste sempre da zero (muro.js, che lo fa una volta sola: lo chiama anche l'html
+  // della pagina, appena letto il tasto), e niente più tubo catodico sull'lcd
+  import('../telefono/zero/muro.js').then((m) => m.veste(b)).catch((e) => console.warn('zero non vestito', e))
   led.collega(b.querySelector('.ct-led')) // il led sfarfalla quando il sistema lavora (led.js)
   // le crepe del cercapersone scassato: l'immagine si carica da subito (nascosta), così quando muori non arriva dopo; nell'lcd
-  // entra dopo la chiocciolina (avvia() riscrive l'lcd) e prima del vetro del tubo catodico, che crt.js mette in fondo
+  // entra dopo la chiocciolina (avvia() riscrive l'lcd)
   const crepe = new Image()
   Object.assign(crepe, { className: 'ct-crepe', src: CREPE, alt: '', draggable: false })
   aggiornaTasto()
   import('./tomodachi.js').then((m) => m.avvia(b)).catch((e) => console.warn('tomodachi non partito', e)) // la chiocciolina sullo schermo lcd
     .then(() => b.querySelector('.ct-lcd')?.append(crepe))
-    // e sopra il tubo catodico, lo stesso dello schermo grande e allo stesso ritmo (games/crt.js, «insieme»): l'ingrandimento resta puro
-    // (lo zero è un lcd, senza tubo: telefono/zero/muro.js toglie il tubo se arriva dopo)
-    .then(() => import('../games/crt.js')).then((c) => { if (!zaino.ha('zero')) c.tubo(b.querySelector('.ct-lcd'), { insieme: true }) }).catch(() => {})
   zaino.ascolta(aggiornaTasto)
-  pzk.osserva(() => { aggiornaTasto(); aggiornaSaldo() })
+  pzk.osserva(aggiornaTasto)
   setInterval(aggiornaTasto, 30_000)
 }
 /** Il cercapersone dice «1 msg» quando c'è un premio da riscuotere (il giornaliero, o qualcosa in sospeso). */
 function aggiornaTasto() {
   if (!tasto) return
-  // il cercapersone zero (29.10): comprato nello shop (9.999 $pzk), sul muro c'è lui, per sempre (telefono/zero/muro.js)
-  if (zaino.ha('zero') && !tasto.classList.contains('zero')) import('../telefono/zero/muro.js').then((m) => m.veste(tasto)).catch((e) => console.warn('zero non vestito', e))
   tasto.classList.toggle('msg', zaino.manca('giornaliero') === 0 && !zaino.pagerRotto())
   tasto.classList.toggle('scassato', zaino.pagerRotto()) // le crepe sul vetro (.ct-crepe): ci sono da morto, fino al nuovo
 }
 
-// ── il pannello: dal 23.10 la chat è un'app del telefono (telefono/telefono.js), si monta dentro il suo schermo ──
-/** Monta la chat dentro `host` (la fa il telefono una volta sola); poi `mostra()` ogni volta che l'app torna in primo piano. */
-export function monta(host) {
-  if (dlg) return dlg
-  dlg = document.createElement('div')
-  dlg.className = 'chat-app'
-  dlg.innerHTML = `<div class="c-schermo">
-      <div class="c-testa"><button class="c-indietro" type="button" aria-label="indietro">‹</button>${icona('bot')}<div class="c-nome">pzk<small>bot · online</small></div><div class="c-saldo" aria-live="off"></div></div>
-      <div class="c-lista" role="log" aria-live="polite"></div>
-      <button class="c-giu" type="button" aria-label="vai agli ultimi messaggi" hidden><svg class="c-giu-freccia" viewBox="0 0 9 9" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 0h3v4h3v1h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h3z" fill="currentColor"/></svg><span class="c-giu-testo">giù</span><b class="c-nuovi"></b></button>
-      <div class="c-rapidi-box">
-        <button class="c-fr sx" type="button" aria-label="scorri i tasti a sinistra" hidden>‹</button>
-        <div class="c-rapidi" role="toolbar" aria-label="le ultime scelte"></div>
-        <button class="c-fr dx" type="button" aria-label="scorri i tasti a destra" hidden>›</button>
-      </div>
-      <form class="c-riga" autocomplete="off">
-        <div class="c-pred" hidden><ul class="c-sugg" id="c-sugg" role="listbox" aria-label="comandi suggeriti"></ul><p class="c-pred-tasti" aria-hidden="true">tab completa · frecce su e giù · esc chiude</p></div>
-        <span class="c-prompt" aria-hidden="true">›</span>
-        <input type="text" name="c" placeholder="scrivi un comando: aiuto" aria-label="il comando" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" maxlength="120">
-        <button class="c-b c-invia" type="submit">invia</button>
-      </form>
-    </div>`
-  host.appendChild(dlg)
-  lista = dlg.querySelector('.c-lista')
-  input = dlg.querySelector('input')
-  saldoEl = dlg.querySelector('.c-saldo')
-  giuEl = dlg.querySelector('.c-giu')
-  rapidiEl = dlg.querySelector('.c-rapidi')
-  // la storia: quella di chi c'è; si salva poco dopo ogni cambio e subito quando la pagina si nasconde o si chiude
-  caricaStoria()
-  new MutationObserver(salvaPoi).observe(lista, { childList: true, subtree: true, characterData: true })
-  addEventListener('pagehide', () => salvaStoria())
-  document.addEventListener('visibilitychange', () => { if (document.hidden) salvaStoria() })
-  pzk.osserva(() => { const d = doveStoria(); if (d.k !== storiaDove?.k) { salvaStoria(); caricaStoria(); vaiGiu() } }) // entrando o uscendo dal conto
-  lista.addEventListener('scroll', () => { incollata = visteAlFondo(); if (incollata) azzeraNuovi(); else giuEl.hidden = false }, { passive: true })
-  lista.addEventListener('load', () => { if (incollata) vaiGiu() }, true) // un'icona che arriva allunga la lista: si resta in fondo
-  giuEl.addEventListener('click', () => { azzeraNuovi(); vaiGiu(true) })
-  lista.addEventListener('click', clicLista)
-  lista.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.cmd')) { e.preventDefault(); clicLista(e) } })
-  rapidiEl.addEventListener('click', clicRapidi)
-  // le freccette: la fila scorre a passi, e ogni freccia c'è solo se da quel lato c'è altro
-  const frecce = () => {
-    const sx = dlg.querySelector('.c-fr.sx'), dx = dlg.querySelector('.c-fr.dx')
-    sx.hidden = rapidiEl.scrollLeft < 8
-    dx.hidden = rapidiEl.scrollLeft + rapidiEl.clientWidth > rapidiEl.scrollWidth - 8
-  }
-  rapidiFrecce = () => requestAnimationFrame(frecce)
-  for (const f of dlg.querySelectorAll('.c-fr')) f.addEventListener('click', () => rapidiEl.scrollBy({ left: (f.classList.contains('sx') ? -1 : 1) * rapidiEl.clientWidth * 0.7, behavior: RIDOTTO.matches ? 'instant' : 'smooth' }))
-  rapidiEl.addEventListener('scroll', frecce, { passive: true })
-  new ResizeObserver(frecce).observe(rapidiEl)
-  disegnaRapidi()
-  zaino.ascolta(disegnaRapidi)
-  dlg.querySelector('.c-indietro').addEventListener('click', () => import('../telefono/telefono.js').then((t) => t.indietro({ daFreccia: true }))) // come il tasto verde: una mossa indietro
-  dlg.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); invia() })
-  // il testo predittivo (29.10): sopra la riga i comandi che vanno bene con quello che scrivi, poi i loro argomenti (predittivo.js);
-  // non mentre un minigioco aspetta una risposta, e da scassato solo quello che passa. Non copre più di metà dei messaggi
-  pred = collegaPredittivo(input, dlg.querySelector('.c-pred'), { spento: () => !!aspettaTesto, passa: passaPredittivo, durata, spazio: () => lista.clientHeight + rapidiEl.parentElement.offsetHeight })
-  input.addEventListener('keydown', tasti)
-  aggiornaSaldo()
-  return dlg
-}
-function aggiornaSaldo() {
-  if (!saldoEl) return
-  const e = pzk.euro()
-  saldoEl.innerHTML = `<b>${pzk.fmt(pzk.saldo())} $pzk</b>${e >= 0.01 ? `<span class="eur">EUR€ ${pzk.fmtEur(e)}</span>` : ''}liv. ${zaino.livello()}`
-}
-/** L'app torna in primo piano: il saluto la prima volta, poi (se c'è) un comando da scrivere. */
-export function mostra(comando = null) {
-  // il saluto una volta al giorno: ricaricando la pagina lo stesso giorno la storia c'è già, e non si ripete
-  if (!salutato) { salutato = true; if (ultimoGiorno !== new Date().toDateString()) salutoIniziale(ctxDi([], '')) }
-  aggiornaSaldo()
-  if (typeof comando === 'string' && comando.trim()) { input.value = comando; invia() }
-  else if (matchMedia('(hover:hover)').matches) requestAnimationFrame(() => input.focus()) // sul telefono vero la tastiera non salta fuori da sola
-  vaiGiu()
-}
 /** Apre il telefono: il cercapersone e l'evento «pzkko-chat» arrivano qui. Col clic si apre la home (lo schermo del
  *  cercapersone si zooma fino al telefono); con un comando, o con #chat nell'indirizzo, si apre direttamente la chat. */
 export function apri(comando = null) {
@@ -148,277 +63,17 @@ export function apri(comando = null) {
 }
 export function chiudi() { return import('../telefono/telefono.js').then((t) => t.chiudi()) }
 
-// ── i messaggi ──
-const visteAlFondo = () => lista.scrollHeight - lista.scrollTop - lista.clientHeight < 60
-function vaiGiu(liscio = false) { incollata = true; lista.scrollTo({ top: lista.scrollHeight, behavior: liscio && !RIDOTTO.matches ? 'smooth' : 'instant' }) }
-function azzeraNuovi() { nuovi = 0; giuEl.hidden = true; giuEl.querySelector('.c-nuovi').textContent = '' }
-/** Dopo un cambio: se si stava guardando in fondo si resta in fondo, se no si segna «n nuovi» sul tasto ↓.
- *  `incollata`: la lista segue il fondo finché chi legge non scorre in su (così anche le icone che arrivano dopo non la staccano). */
-function scorri(nuovoMsg = false, mio = false) {
-  if (mio || incollata) { vaiGiu(); return }
-  if (nuovoMsg) { nuovi++; giuEl.querySelector('.c-nuovi').textContent = nuovi }
-  giuEl.hidden = false
-}
-const ora = (d = new Date()) => d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
-/** Il nome di un giorno (una data di toDateString) visto da oggi: «oggi», «ieri», «lun 12 ott». */
-function nomeGiorno(g) {
-  const ieri = new Date(); ieri.setDate(ieri.getDate() - 1)
-  return g === new Date().toDateString() ? 'oggi' : g === ieri.toDateString() ? 'ieri' : new Date(g).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })
-}
-/** Il separatore del giorno quando cambia (col giorno scritto dentro: la storia ricaricata domani lo ribattezza). */
-function separatore() {
-  const g = new Date().toDateString()
-  if (g === ultimoGiorno) return
-  ultimoGiorno = g
-  const s = document.createElement('div')
-  s.className = 'c-giorno'
-  s.dataset.g = g
-  s.textContent = nomeGiorno(g)
-  lista.appendChild(s)
-}
-
-// ── la storia (23.10, Alberto: «memorizza sempre le azioni»): i messaggi restano anche ricaricando la pagina ──
-// Si salva l'html degli ultimi messaggi finiti (non quelli in coda, a metà scrittura o «sta scrivendo…»): nella sessione in
-// sessionStorage, come i $pzk e lo zaino; col conto in localStorage, per quel conto (entrando o uscendo la chat cambia
-// storia). Torna fermo quello che si muoveva: i tasti dei minigiochi spenti, niente barre del tempo; i comandi cliccabili
-// e i tasti delle schede restano vivi (li prende clicLista). I separatori si ribattezzano col giorno di adesso.
-const STORIA_MSG = 120, STORIA_BYTE = 400_000
-let storiaDove = null, storiaAttesa = 0
-const doveStoria = () => { const c = pzk.conto(); return c ? { dep: localStorage, k: `pzkko-chat-storia:${c.ind}` } : { dep: sessionStorage, k: 'pzkko-chat-storia' } }
-const finito = (m) => !m.classList.contains('in-attesa') && !m.querySelector('.c-scrive') && !m.querySelector('.c-scheda')?.__finisci
-function salvaStoria(dove = storiaDove) {
-  clearTimeout(storiaAttesa)
-  if (!lista || !dove) return
-  const t = document.createElement('template')
-  t.innerHTML = [...lista.children].filter(finito).slice(-STORIA_MSG).map((m) => m.outerHTML).join('')
-  for (const b of t.content.querySelectorAll('.c-bottoni button, .c-griglia button')) b.disabled = true
-  for (const x of t.content.querySelectorAll('.c-tempo')) x.remove()
-  let html = t.innerHTML
-  while (html.length > STORIA_BYTE && t.content.firstElementChild) { t.content.firstElementChild.remove(); html = t.innerHTML }
-  try { dove.dep.setItem(dove.k, html) } catch {}
-}
-const salvaPoi = () => { clearTimeout(storiaAttesa); storiaAttesa = setTimeout(salvaStoria, 800) }
-/** Rimette nella lista la storia di chi c'è adesso (al montaggio, e quando si entra o si esce dal conto). */
-function caricaStoria() {
-  storiaDove = doveStoria()
-  let html = ''
-  try { html = storiaDove.dep.getItem(storiaDove.k) ?? '' } catch {}
-  lista.innerHTML = html
-  for (const s of lista.querySelectorAll('.c-giorno')) if (s.dataset.g) s.textContent = nomeGiorno(s.dataset.g)
-  ultimoGiorno = [...lista.querySelectorAll('.c-giorno')].pop()?.dataset.g ?? ''
-}
-function aggiungi(el, mio = false) {
-  separatore()
-  lista.appendChild(el)
-  while (lista.children.length > 160) lista.firstElementChild.remove()
-  scorri(true, mio)
-  lista.dataset.letto = '1'
-  return el
-}
-export function utente(testo, { rifai = false } = {}) {
-  const m = document.createElement('div')
-  m.className = 'c-msg tu'
-  m.innerHTML = `<time class="c-ora">${ora()}</time><div class="c-bolla"></div>${rifai ? '<button class="c-rip" type="button" title="rifallo" aria-label="rifai questo comando">↻</button>' : ''}`
-  m.querySelector('.c-bolla').textContent = testo
-  const rip = m.querySelector('.c-rip')
-  if (rip) rip.dataset.cmd = testo
-  return aggiungi(m, true)
-}
-export function sistema(testo) {
-  const m = document.createElement('div')
-  m.className = 'c-msg sistema'
-  m.innerHTML = conIcone(testo)
-  return aggiungi(m)
-}
-/** Il contenuto di una scheda: { t: titolo, d: testo (con :icone: e <b>), html, campi: [[nome, valore, largo?]], img, pie, colore, av } */
-const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
-/** I <code>comando</code> dentro il testo diventano tasti: si clicca e il comando parte (se ha parti da riempire, <…> o […], si scrive nella riga). */
-function cliccabili(html) {
-  return html.replace(/<code>([^<]{1,60})<\/code>/g, (m, t) => {
-    const vero = t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
-    const primo = vero.trim().replace(/^\/+/, '').replace(/^pzk\s+/i, '').split(/\s+/)[0]?.toLowerCase()
-    if (!primo || !PER_NOME.has(primo)) return m
-    return `<code class="cmd" role="button" tabindex="0" data-cmd="${esc(vero)}" title="${/[<[]/.test(vero) ? 'scrivilo nella riga' : 'toccalo per farlo'}">${t}</code>`
-  })
-}
-/** Il contenuto di una scheda: { t, d, html, campi, img, pie, colore, av, azioni: [[comando, etichetta, stile?]] (tasti di seguito) } */
-function riempi(s, e) {
-  s.className = `c-scheda ${e.colore ?? 'verde'}`
-  const campi = e.campi?.length ? `<dl class="c-campi">${e.campi.map(([n, v, largo]) => `<div${largo ? ' class="largo"' : ''}><dt>${conIcone(n)}</dt><dd>${conIcone(v)}</dd></div>`).join('')}</dl>` : ''
-  const azioni = e.azioni?.length ? `<div class="c-azioni">${e.azioni.map(([cmd, eti, stile]) => `<button type="button" class="c-az ${stile ?? ''}" data-cmd="${esc(cmd)}">${conIcone(eti ?? cmd)}</button>`).join('')}</div>` : ''
-  s.innerHTML = cliccabili(`${e.t ? `<h4>${conIcone(e.t)}</h4>` : ''}${e.d ? `<p class="c-testo">${conIcone(e.d)}</p>` : ''}${e.html ? conIcone(e.html) : ''}${campi}` +
-    `${e.img ? `<img class="c-img" src="${esc(e.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}${e.pie ? `<div class="c-pie">${conIcone(e.pie)}</div>` : ''}`) + azioni
-}
-// I messaggi del bot non spuntano di colpo (23.10): prima «sta scrivendo…» per 500 ms, poi il testo si scrive da solo, tutto,
-// in 1000 ms (qualunque sia la lunghezza). La scheda però esiste subito, nascosta (.in-attesa), perché i comandi la usano
-// appena creata (ci aggiungono i bottoni, la barra del tempo, la aggiornano): una CODA la mostra a turno, una alla volta,
-// nell'ordine in cui sono nate. `scheda.__pronta` è la promessa del momento in cui la scrittura è finita: i bottoni
-// (scegli) e il timer dei quiz partono solo allora. Con «riduci animazioni» il messaggio appare subito.
+// ── i pezzi che la chat di pzk os prende da qui (telefono/zero/os/chat.js) ──
+/** I tempi dei messaggi del bot (23.10): «sta scrivendo…» per RITARDO_MS, poi il testo si scrive da solo in SCRITTURA_MS.
+ *  Con «riduci animazioni» dormi() taglia corto. */
 export const RITARDO_MS = 500, SCRITTURA_MS = 1000
-let coda = Promise.resolve()
-const DA_NASCONDERE = 'img,button,svg,canvas,.c-barra,.c-tempo,.c-azioni,.c-campi,table,ul'
-
-export function scheda(e) {
-  const m = document.createElement('div')
-  m.className = 'c-msg'
-  m.innerHTML = `<div class="c-av">${icona(e.av ?? 'bot')}</div><div class="c-scheda"></div><time class="c-ora">${ora()}</time>`
-  const card = m.querySelector('.c-scheda')
-  riempi(card, e)
-  m.querySelector('.c-img')?.addEventListener('load', () => scorri(), { once: true })
-  if (RIDOTTO.matches) { aggiungi(m); card.__pronta = Promise.resolve(); return card }
-  m.classList.add('in-attesa')
-  aggiungi(m)
-  card.__avatar = e.av ?? 'bot'
-  card.__pronta = coda = coda.then(() => mostraScrivendo(m, card)).catch((err) => console.warn('scrittura:', err))
-  return card
-}
-
-/** Il momento del messaggio: puntini per 500 ms, poi la scrittura. */
-async function mostraScrivendo(m, card) {
-  if (card.__fatto) return
-  led.inizia() // il bot «ragiona»: il led lavora finché il messaggio non è scritto
-  try { await scriviConPuntini(m, card) } finally { led.finisci() }
-}
-async function scriviConPuntini(m, card) {
-  const ind = document.createElement('div')
-  ind.className = 'c-msg'
-  ind.innerHTML = `<div class="c-av">${icona('bot-pensa')}</div><div class="c-scrive"><i></i><i></i><i></i></div>`
-  lista.insertBefore(ind, m)
-  scorri()
-  await new Promise((r) => { card.__salta = r; setTimeout(r, RITARDO_MS) })
-  ind.remove()
-  if (card.__fatto) return
-  m.classList.remove('in-attesa')
-  await scriviAMano(m, card)
-}
-
-/** Fa comparire il testo di una scheda un pezzetto alla volta, in SCRITTURA_MS in tutto; icone, tasti e barre quando arriva il loro turno. */
-function scriviAMano(m, card) {
-  return new Promise((risolvi) => {
-    const nodi = [], blocchi = []
-    let totale = 0
-    const giro = document.createTreeWalker(card, NodeFilter.SHOW_ALL)
-    for (let n = giro.nextNode(); n; n = giro.nextNode()) {
-      if (n.nodeType === 3) { if (n.nodeValue) { nodi.push({ n, s: n.nodeValue, da: totale }); totale += n.nodeValue.length } }
-      else if (n.nodeType === 1 && n.matches(DA_NASCONDERE) && !n.parentElement.closest(DA_NASCONDERE)) blocchi.push({ n, da: totale })
-    }
-    if (!totale) return risolvi()
-    for (const { n } of nodi) n.nodeValue = ''
-    for (const { n } of blocchi) n.classList.add('nasc')
-    const inizio = performance.now()
-    let finito = false
-    const fine = () => {
-      if (finito) return
-      finito = true
-      clearInterval(giroTimer)
-      for (const { n, s } of nodi) n.nodeValue = s
-      for (const { n } of blocchi) n.classList.remove('nasc')
-      card.__fatto = true
-      card.__finisci = null
-      scorri()
-      risolvi()
-    }
-    card.__finisci = fine
-    const passo = () => {
-      const k = Math.min(1, (performance.now() - inizio) / SCRITTURA_MS)
-      const fino = Math.round(totale * k)
-      for (const { n, s, da } of nodi) { const v = s.slice(0, Math.max(0, fino - da)); if (n.nodeValue !== v) n.nodeValue = v }
-      for (const { n, da } of blocchi) if (da < fino || k >= 1) n.classList.remove('nasc')
-      scorri()
-      if (k >= 1) fine()
-    }
-    const giroTimer = setInterval(passo, 30)
-    passo()
-  })
-}
-
-export function aggiorna(s, e) {
-  // un aggiornamento mentre la scheda si sta ancora scrivendo la completa di colpo (e salta la coda)
-  if (s.__finisci) s.__finisci()
-  if (!s.__fatto && s.__salta) { s.__fatto = true; s.__salta(); s.parentElement.classList.remove('in-attesa') }
-  if (e.av) s.parentElement.firstElementChild.innerHTML = icona(e.av)
-  riempi(s, e)
-  s.parentElement.querySelector('.c-ora')?.replaceChildren(ora())
-  scorri()
-  return s
-}
-/** La barra del tempo in fondo alla scheda (parte quando la scheda è scritta tutta); → ferma() */
-export function tempo(s, ms) {
-  const b = document.createElement('div')
-  b.className = 'c-tempo'
-  b.style.setProperty('--ms', `${ms}ms`)
-  b.innerHTML = '<i></i>'
-  s.appendChild(b)
-  return () => b.classList.add('ferma')
-}
-/** I pulsanti sotto la scheda (compaiono a scrittura finita): → Promise dell'id premuto, o null allo scadere. { griglia: 'g5'|'g3', resta: true tiene i pulsanti attivi (li gestisce chi chiama) } */
-export async function scegli(s, bottoni, ms = 0, { griglia = null, onPremuto = null } = {}) {
-  await s.__pronta
-  const riga = document.createElement('div')
-  riga.className = griglia ? `c-griglia ${griglia}` : 'c-bottoni'
-  for (const b of bottoni) {
-    const el = document.createElement('button')
-    el.type = 'button'
-    el.className = `c-b ${b.stile ?? ''}`
-    el.dataset.id = b.id
-    el.innerHTML = conIcone(b.eti ?? b.id)
-    if (b.title) el.title = b.title
-    riga.appendChild(el)
-  }
-  s.appendChild(riga)
-  scorri()
-  return new Promise((risolvi) => {
-    let timer = 0
-    const fine = (id, premuto) => {
-      clearTimeout(timer)
-      for (const b of riga.querySelectorAll('button')) { b.disabled = true; if (b === premuto) b.classList.add('premuto') }
-      risolvi(id)
-    }
-    riga.addEventListener('click', (e) => {
-      const b = e.target.closest('button')
-      if (!b || b.disabled) return
-      if (onPremuto) { const r = onPremuto(b.dataset.id, b, riga); if (r === 'continua') return; if (r !== undefined) return fine(r, b) }
-      fine(b.dataset.id, b)
-    })
-    if (ms > 0) { timer = setTimeout(() => fine(null, null), ms) }
-    riga.querySelector('button')?.focus({ preventScroll: true })
-  })
-}
-/** Aspetta che si scriva qualcosa nella riga: → Promise del testo (o null allo scadere). */
-export function scrivi(ms = 0, { segnaposto = 'scrivi qui…' } = {}) {
-  return new Promise((risolvi) => {
-    const prima = input.placeholder
-    input.placeholder = segnaposto
-    input.focus()
-    let timer = 0
-    aspettaTesto = { risolvi: (t) => { clearTimeout(timer); aspettaTesto = null; input.placeholder = prima; risolvi(t) } }
-    if (ms > 0) timer = setTimeout(() => aspettaTesto?.risolvi(null), ms)
-  })
-}
 export const dormi = (ms) => new Promise((r) => setTimeout(r, RIDOTTO.matches ? Math.min(ms, 150) : ms))
-/** Lascia la scheda sotto gli occhi per ms, contati da quando è scritta tutta (prima ci sono la coda, i puntini e la
- *  scrittura: un dormi() subito dopo dì() se li mangia, e le svolte del rider sparivano prima di vederle). inVista(s) e basta
- *  aspetta solo che sia scritta: da lì partono i tempi per rispondere. */
-export async function inVista(s, ms = 0) {
-  await s.__pronta
-  if (ms) await dormi(ms)
-}
-/** Il bot «scrive…» per un po'. */
-export async function pensa(ms = 700) {
-  led.colpo(ms)
-  const m = document.createElement('div')
-  m.className = 'c-msg'
-  m.innerHTML = `<div class="c-av">${icona('bot-pensa')}</div><div class="c-scrive"><i></i><i></i><i></i></div>`
-  aggiungi(m)
-  await dormi(ms)
-  m.remove()
-}
 
 // ── i soldi, visti dalla chat ──
 // (31.10) DAL 31.10 LA CHAT NON PAGA E NON TOGLIE PIÙ NIENTE: ogni comando chiede alla banca (ctx.fai → pzk.fai,
 // 'chat.pesca', 'chat.slot'…), che tira i dadi, paga, toglie, segna le attese e restituisce l'esito e il conto nuovo.
 /** Chiede alla banca un'azione della chat. L'evento casuale e la morte che arrivano con l'esito restano al comando
- *  (ctx.__evento, ctx.__morte): esegui li mostra alla fine. → la risposta di pzk.fai ({ ok, esito } o { ok: false, errore }) */
+ *  (ctx.__evento, ctx.__morte): li mostra alla fine l'esegui di pzk os (telefono/zero/os/chat.js). → la risposta di pzk.fai ({ ok, esito } o { ok: false, errore }) */
 export async function chiedi(ctx, cosa, args = {}) {
   led.inizia()
   let r
@@ -470,128 +125,16 @@ export function durata(ms) {
   return `${g} g ${h % 24} h`
 }
 
-function ctxDi(args, testo) {
-  const ctx = {
-    args, testo, zaino, pzk, dì: scheda, scheda, aggiorna, scegli, scrivi, tempo, dormi, inVista, pensa, sistema, utente,
-    nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
-    esegui, apriWallet: (sez) => pzk.apriWallet(sez), apriApp: (app, opz) => import('../telefono/telefono.js').then((t) => t.apri(app, opz)), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
-    // (31.10) la banca: fai chiede, no dice il suo no, morte mostra la morte che la banca ha deciso (esito.morte)
-    fai: (cosa, a) => chiedi(ctx, cosa, a), no: (r, cmd) => rifiuto(ctx, r, cmd),
-    morte: (m) => { ctx.__morteVista = true; mostraMorte(scheda, m) },
-    saleDiLivello: (l) => l && scheda({ colore: 'oro', av: 'bot-ride', t: ':livello: livello ' + l + '!', d: `sei salito di livello: adesso le paghe valgono ×${zaino.moltiplicatore().toLocaleString('it-IT')}.` }),
-  }
-  return ctx
-}
-
 /** La morte (Dank Memer docet): si perde il 20 % dei $pzk liberi (al più 5.000), a meno di avere il cornetto, che si consuma.
  *  Dal 31.10 la decide la banca (giochi/chat-comune.mjs, muori) dentro l'azione che fa morire, e la manda nell'esito
  *  (morte: { motivo, cornetto, restano } o { motivo, persi, max }): qui la si racconta e basta. `dì`: chi scrive la scheda
- *  (questa chat, o quella di pzk os). */
+ *  (la chat di pzk os, col suo ctx). */
 export const MORTE = { quota: 0.2, max: 5000 }
 export function mostraMorte(dì, m) {
   if (m.cornetto) return dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':cornetto: il cornetto ha fatto il suo', d: `${m.motivo}\nSaresti morto, ma il cornetto rosso si è crepato al posto tuo: i $pzk sono salvi. Ne hai ancora ${m.restano}.` })
   dì({ colore: 'rosso', av: 'bot-morto', t: ':teschio: sei morto', d: `${m.motivo}\nHai perso ${pzkHtml(m.persi)} (il ${MORTE.quota * 100} % dei $pzk liberi${m.max ? ', il massimo' : ''}). Gli EUR€ nel wallet non si toccano.\nE il :pager: cercapersone si è <b>scassato</b>: adesso fa solo <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, pie: 'un :cornetto: dal negozio ti avrebbe salvato', azioni: AZIONI_SCASSATO })
 }
-// ── il cercapersone scassato: due cose sole, lavorare e ricomprare il nuovo ──
-const RICOMPRA = /^(cercapersone|pager)$/i
+// ── il cercapersone scassato: due cose sole, lavorare e ricomprare il nuovo (i tasti sotto la scheda della morte; cosa
+// passa da scassato lo decide la chat di pzk os) ──
 const prezzoPager = () => prezzoDi(PER_ID.pager)
 const AZIONI_SCASSATO = [['lavora', ':rider: lavora', 'oro'], ['compra cercapersone', ':pager: compra il nuovo']]
-/** Da scassato passano solo «lavora» (con lista, come, licenziati) e «compra cercapersone». */
-const passaDaRotto = (c, testo) => c?.nomi[0] === 'lavora' || (c?.nomi[0] === 'compra' && RICOMPRA.test(testo.trim()))
-/** Per il testo predittivo: da scassato si suggerisce solo quello che passa (`testo` null: il comando, prima degli argomenti). */
-const passaPredittivo = (c, testo) => !zaino.pagerRotto() || (testo == null ? AZIONI_SCASSATO.some(([r]) => PER_NOME.get(analizza(r).nome) === c) : passaDaRotto(c, testo))
-function soloScassato() {
-  scheda({ colore: 'rosso', av: 'bot-triste', t: ':pager: cercapersone scassato', d: `col vetro rotto funzionano solo due cose: <code>lavora</code> e <code>compra cercapersone</code> (${pzkHtml(prezzoPager())}).`, azioni: AZIONI_SCASSATO })
-}
-
-function invia() {
-  const riga = input.value.trim()
-  if (!riga) return
-  input.value = ''
-  pred.chiudi()
-  if (aspettaTesto) { utente(riga); aspettaTesto.risolvi(riga); return }
-  storia.push(riga); if (storia.length > 50) storia.shift(); iStoria = storia.length
-  esegui(riga)
-}
-/** Esegue una riga come se fosse stata scritta (la mostra nella chat). */
-export async function esegui(riga, { muto = false } = {}) {
-  const { nome, args, testo } = analizza(riga)
-  if (!nome) return
-  if (!muto) utente(riga.replace(/^\/+/, ''), { rifai: true })
-  const c = PER_NOME.get(nome)
-  led.colpo(160)
-  if (zaino.pagerRotto() && !passaDaRotto(c, testo)) return soloScassato()
-  if (!c) {
-    // non è un comando, ma magari è una cosa del negozio o dello zaino: si propone cosa farne
-    const x = NEGOZIO_OGGETTI.find((o) => o.id === nome || o.nome.toLowerCase() === nome)
-    if (x) { scheda({ colore: 'ambra', av: 'bot-pensa', t: `:${x.id}: «${nome}» non è un comando`, d: `ma <b>${x.nome}</b> è nel negozio (${pzkHtml(x.prezzo)}). Cosa ne vuoi fare?`, azioni: [[`compra ${x.id}`, 'compra', 'oro'], [`usa ${x.id}`, 'usa'], [`info ${x.id}`, 'info']] }); return }
-    scheda({ colore: 'rosso', av: 'bot-pensa', t: 'eh?', d: `«${nome}» non lo conosco. Scrivi <code>aiuto</code> per l'elenco dei comandi.` }); return
-  }
-  const chiave = c.nomi[0]
-  if (!muto) zaino.ricorda(riga)
-  if (c.attesa) {
-    const m = zaino.manca(chiave)
-    if (m > 0) { const s = scheda({ colore: 'ambra', av: 'bot-pensa', t: ':clessidra: calma', d: `«${chiave}» lo puoi rifare fra <b>${durata(m)}</b>.${zaino.effetto('caffe') ? '' : ' Un :caffe: dal negozio dimezza le attese.'}` }); tempo(s, Math.min(m, 60_000)); return }
-  }
-  if (inCorso.has(chiave)) { scheda({ colore: 'ambra', av: 'bot-arrabbiato', d: `stai già facendo «${chiave}»: finisci quello.` }); return }
-  inCorso.add(chiave)
-  const ctx = ctxDi(args, testo)
-  try {
-    // (31.10) l'attesa, il conto dei comandi e il dado degli eventi li fa la banca dentro l'azione del comando: qui si
-    // mostrano la morte che è arrivata con un'altra azione (la bestia a cui non si è risposto) e l'evento, se c'è
-    await c.fai(ctx)
-    if (ctx.__morte && !ctx.__morteVista) ctx.morte(ctx.__morte)
-    if (ctx.__evento) await eventoCasuale(ctx, ctx.__evento)
-  } catch (e) {
-    console.error('chat:', e)
-    scheda({ colore: 'rosso', av: 'bot-arrabbiato', t: 'qualcosa si è rotto', d: `${e.message ?? e}` })
-  } finally {
-    inCorso.delete(chiave)
-    disegnaRapidi()
-    aggiornaSaldo()
-    aggiornaTasto()
-  }
-}
-
-// ── i tasti rapidi: le ultime scelte, sempre sotto il pollice ──
-const RAPIDI_INIZIALI = ['giornaliero', 'lavora', 'pesca', 'saldo', 'aiuto']
-/** Un tasto per ognuna delle ultime scelte (la più recente a sinistra); se non ce ne sono ancora, i comandi per cominciare. */
-function disegnaRapidi() {
-  if (!rapidiEl) return
-  const rotto = zaino.pagerRotto() // da scassato i tasti sono solo i due che funzionano
-  const fatti = rotto ? [] : zaino.rapidi()
-  const righe = rotto ? AZIONI_SCASSATO.map(([r]) => r) : fatti.length ? fatti : RAPIDI_INIZIALI
-  rapidiEl.classList.toggle('iniziali', !fatti.length)
-  rapidiEl.innerHTML = (fatti.length ? '' : `<span class="c-r-eti">${rotto ? 'scassato' : 'per cominciare'}</span>`) + righe.map((r) => {
-    const c = PER_NOME.get(analizza(r).nome)
-    const attesa = c?.attesa ? zaino.manca(c.nomi[0]) : 0
-    return `<span class="c-r${attesa ? ' attesa' : ''}"><button type="button" class="c-r-b" data-cmd="${esc(r)}" title="${attesa ? `fra ${durata(attesa)}` : 'rifallo'}">${c?.icona ? icona(c.icona) : ''}<span>${esc(r)}</span></button>${fatti.length ? `<button type="button" class="c-r-x" data-via="${esc(r)}" aria-label="togli ${esc(r)}">×</button>` : ''}</span>`
-  }).join('')
-  rapidiFrecce()
-}
-function clicRapidi(e) {
-  const via = e.target.closest('[data-via]')
-  if (via) { zaino.scorda(via.dataset.via); return }
-  const b = e.target.closest('[data-cmd]')
-  if (b && !aspettaTesto) esegui(b.dataset.cmd)
-  else if (b) { input.value = b.dataset.cmd; input.focus() }
-}
-/** Un comando toccato dentro la lista: un <code> di un messaggio, un tasto di seguito, il ↻ dei messaggi tuoi. */
-function clicLista(e) {
-  const b = e.target.closest('[data-cmd]')
-  if (!b || b.disabled) return
-  const cmd = b.dataset.cmd
-  if (aspettaTesto) { input.focus(); return }
-  if (b.classList.contains('cmd') && /[<[]/.test(cmd)) { input.value = cmd.replace(/\s*[<[].*$/, ' '); input.focus(); pred.apri(); return } // ha parti da riempire (e il menù le suggerisce)
-  esegui(cmd)
-}
-
-// ── le frecce: col menù aperto lo scorrono (predittivo.js), se no ripescano gli ultimi comandi scritti ──
-function tasti(e) {
-  if (pred.tasto(e)) return
-  if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !aspettaTesto && storia.length) {
-    e.preventDefault()
-    iStoria = Math.max(0, Math.min(storia.length, iStoria + (e.key === 'ArrowUp' ? -1 : 1)))
-    input.value = storia[iStoria] ?? ''
-  }
-}

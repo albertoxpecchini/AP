@@ -62,8 +62,6 @@ const LISTA = [
   ['quest13', 'cervello', 'chiave-vecchia', 'ogni bivio è mio', 'completa tutte le side quest', () => [s('missioniFatte'), 13]],
   ['facce20', 'profilo', 'app-profilo', 'camerino dei travestimenti', 'abbi 20 facce del profilo', () => [5 + (zaino.profilo().avs ?? []).length, 20]],
   ['motto', 'profilo', 'telefono', 'filosofo', 'scrivi il tuo motto nel profilo', () => [zaino.profilo().mot ? 1 : 0, 1]],
-  // (29.10) il cercapersone zero, 9.999 $pzk nello shop: quello in 3D, bianco coi tasti arancioni (telefono/zero/)
-  ['zero', 'banca', 'zero', 'il salto di qualità', 'compra il cercapersone zero (9.999 $pzk nello shop)', () => [zaino.ha('zero') ? 1 : 0, 1]],
 ]
 export const GRUPPI = { banca: 'la banca', esperienza: 'l’esperienza', chat: 'la chat col bot', giochi: 'i giochi', cervello: 'testa e costanza', cucina: 'la cucina', profilo: 'il profilo' }
 

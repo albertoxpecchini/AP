@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// La prova del cercapersone zero (29.10): apre la home in Chromium con uno zaino finto che ha «zero» (e un conto finto, così
+// La prova del cercapersone zero (29.10): apre la home in Chromium con uno zaino finto (e un conto finto, così
 // pzk os mostra la home e non la porta del conto), tocca il tasto sul muro e fotografa il volo, lo schermo acceso, il cavo
 // che entra, i tasti e la chiusura. Le foto finiscono in tools/pzkko/lavoro/zero/prova-*.png: si guardano.
 //
@@ -126,9 +126,9 @@ try {
   page.on('response', (r) => { if (r.status() === 404) console.log('  [404]', r.url()) })
   await page.goto('about:blank')
   console.log('webgl:', await page.evaluate(() => { const gl = document.createElement('canvas').getContext('webgl2'); if (!gl) return 'niente'; const d = gl.getExtension('WEBGL_debug_renderer_info'); return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) }))
-  // lo zaino con «zero» e il conto finto, prima che la pagina parta
+  // lo zaino (senza «zero»: dal 31.10 lo zero c'è per tutti) e il conto finto, prima che la pagina parta
   await page.evaluateOnNewDocument((suoniAccesi, peggiori, senzaConto) => {
-    const zaino = { v: 1, t: 0, xp: peggiori ? 987654 : 300, ...(peggiori && { profilo: { av: 'av-gonzaga', avs: ['av-gonzaga'], col: 'blu', cor: 'pixel', mot: 'chi va piano va sano e va lontano, ma chi va forte arriva prima' } }), mestiere: null, turni: 0, oggetti: { zero: 1, canna: 1 }, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] }
+    const zaino = { v: 1, t: 0, xp: peggiori ? 987654 : 300, ...(peggiori && { profilo: { av: 'av-gonzaga', avs: ['av-gonzaga'], col: 'blu', cor: 'pixel', mot: 'chi va piano va sano e va lontano, ma chi va forte arriva prima' } }), mestiere: null, turni: 0, oggetti: { canna: 1 }, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] }
     sessionStorage.setItem('pzkko-chat-sessione', JSON.stringify(zaino))
     localStorage.setItem('pzkko-chat', JSON.stringify({ ind: 'pzk000001', zaino, visto: 0 }))
     if (!senzaConto) localStorage.setItem('pzkko-wallet', JSON.stringify({ token: 'prova.prova', conto: { ind: 'pzk000001', nome: peggiori ? 'Bartolomeo Pecchinix' : 'prova', pzk: peggiori ? 987654321 : 52340, ...(peggiori && { creato: Date.UTC(2026, 9, 1), sporchi: 123456 }), eur: 0, mosse: [], t: Date.now() }, tasso: 1, t: Date.now() }))

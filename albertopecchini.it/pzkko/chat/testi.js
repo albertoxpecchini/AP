@@ -187,12 +187,13 @@ const VECCHI = [
   { id: 'cassa-rara', nome: 'cassa rara', prezzo: 1200, cosa: 'dentro: più $pzk, attrezzi, qualcosa di raro (apri).', tipo: 'cassa' },
   { id: 'cassa-gonzaga', nome: 'cassa dei Gonzaga', prezzo: 4000, cosa: 'dentro: il tesoro di una dinastia. O una delusione da 4.000 $pzk (apri).', tipo: 'cassa' },
 ]
-/** Tutto quello che si compra: i vecchi (reparto e bonus da oggetti.js; gli attrezzi si hanno una volta sola) e le cose nuove dello shop. */
+/** Tutto quello che si compra: i vecchi (reparto e bonus da oggetti.js; gli attrezzi si hanno una volta sola) e le cose nuove
+ *  dello shop, tranne quelle fuori vendita (31.10: lo zero, di serie per tutti), che restano in PER_ID per chi le ha. */
 export const NEGOZIO = [
   ...VECCHI.map((x) => ({ ...x, reparto: REPARTO_VECCHI[x.id] ?? 'fortuna', ...(BONUS_VECCHI[x.id] && { bonus: BONUS_VECCHI[x.id] }), ...(x.tipo === 'attrezzo' && { unico: true }) })),
-  ...NUOVI,
+  ...NUOVI.filter((x) => !x.fuoriVendita),
 ]
-export const PER_ID = Object.fromEntries([...NEGOZIO, ...PESCI, ...ANIMALI, ...REPERTI, ...UFFICIO].map((x) => [x.id, x]))
+export const PER_ID = Object.fromEntries([...NEGOZIO, ...NUOVI, ...PESCI, ...ANIMALI, ...REPERTI, ...UFFICIO].map((x) => [x.id, x]))
 /** Il nome di un oggetto, come si scrive nello zaino. */
 export const nomeDi = (id) => PER_ID[id]?.nome?.replace(/^(un’|un |una |uno |il |la |l’)/i, '') ?? id
 

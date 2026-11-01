@@ -9,34 +9,34 @@
 // Dalla 3.0.1 (23.10) c'è anche «come si accende il 3D»: il tasto giallo della regia non c'è più, quindi lo scontrino
 // dice come aprirla, e il suo tasto «apri la regia adesso» la apre sulla scheda «grafica» (in cima c'è «come parte»).
 
-export const VERSIONE = '3.0.1'
-export const NOME = 'lumaca catodica'
+// La 4.0.0 (1.11): il cercapersone zero per tutti, la banca sul server, virtual, la miniera e le app di pzk os.
+export const VERSIONE = '4.0.0'
+export const NOME = 'chiocciola zero'
 const CHIAVE = 'pzkko-novita' // l'ultima versione di cui si è letto lo scontrino
 
 // [cosa, prezzo]: le novità di questa versione
 const NOVITA = [
-  ['il muro parte in 2D, sempre di giorno e col sole, sul telefono e sul computer', 'nuovo'],
-  ['la strada in 3D, la notte e il meteo veri: li accendi tu in regia (come, qui sotto)', 'nuovo'],
-  ['più leggero: 5,5 MB invece di 17, e da fermo il muro lavora 6 volte meno', 'nuovo'],
-  ['il cercapersone: il tomodachi ti aspetta, premi ACCEDI e carica', 'nuovo'],
-  ['CHIUDI, il tasto rosso: lo schermo si spegne come un vecchio tubo', 'nuovo'],
-  ['INDIETRO, il tasto verde: una mossa alla volta, anche a raffica', 'nuovo'],
-  ['schermi a tubo catodico che sfarfallano, nel cercapersone e nel wallet', 'nuovo'],
-  ['in carica, il cavo usb-c si infila con lo scatto', 'nuovo'],
-  ['la salute della lumachina: ogni giorno decide lei, coi tuoi $pzk (Giocatori > io)', 'nuovo'],
-  ['quiz con la foto intera a sinistra e le risposte a destra', 'nuovo'],
-  ['il wallet in alto è un banner col led che scorre', 'nuovo'],
-  ['nel wallet le pagine dei tasti stanno nello schermo, e la borsa sembra una crypto', 'nuovo'],
-  ['muori senza cornetto? ti resta un cercapersone scassato', 'nuovo'],
+  ['il cercapersone zero, per tutti: bianco, in 3D, coi tasti arancioni', 'nuovo'],
+  ['dentro c’è pzk os a 8 bit, con la chiocciolina e 19 app', 'nuovo'],
+  ['la croce e OK muovono, INDIETRO torna, tenuto 3 secondi spegne', 'nuovo'],
+  ['virtual: le scommesse sul campionato inventato, ogni cinque minuti', 'nuovo'],
+  ['la miniera: la postazione che mina $pzk da sola', 'nuovo'],
+  ['bin·hex, calcoli da geometra, codice C e la cucina del Mincio', 'nuovo'],
+  ['la banca sta sul server: saldo, zaino e vincite non si perdono più', 'nuovo'],
+  ['lo stesso conto e lo stesso zaino su tutti i tuoi telefoni', 'nuovo'],
+  ['giochi più giusti: le vincite grosse arrivano tutte, ricaricare non salva la puntata', 'nuovo'],
+  ['le musichette a 16 bit, e la musica non si ferma cambiando pagina', 'nuovo'],
+  ['i traguardi, e la barra in alto per girare il sito', 'nuovo'],
+  ['il cercapersone nero è andato in pensione', 'addio'],
 ]
 // [cosa, prezzo]: quello che c'è sul sito
 const C_E_ANCHE = [
   ['il muro: i siti, i social, gli annunci, gli adesivi degli amici', 'incluso'],
-  ['cinque giochi coi $pzk: roulette, blackjack, mine, dado, testa o croce', 'incluso'],
+  ['sei giochi coi $pzk: roulette, blackjack, mine, dado, testa o croce, virtual', 'incluso'],
   ['il wallet: conto con nome e PIN, indirizzo pzk, invii agli amici', 'incluso'],
   ['la borsa PZK/EUR€ e gli euroshit da parcheggiare', 'incluso'],
   ['le banconote per terra, il sussidio, il regalo di Instagram', 'incluso'],
-  ['il cercapersone: chat col bot, shop, sfide, quiz, quest, giocatori, zaino, foto', 'incluso'],
+  ['il cercapersone zero: chat col bot, shop, sfide, quiz, quest, giocatori, zaino, foto e le altre app', 'incluso'],
   ['la petizione: «pzkko.it è un bel sito?», con la penna', 'incluso'],
   ['la regia (scrivi «regia»): grafica, ora, meteo, strada, suoni', 'incluso'],
   ['i suoni della strada, sintetizzati dal vivo', 'incluso'],
