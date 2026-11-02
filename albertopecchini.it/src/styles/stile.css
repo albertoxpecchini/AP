@@ -1181,8 +1181,8 @@ body.page--stile {
   font-family: var(--font-serif);
   font-size: 180px;
   font-style: italic;
-  font-weight: 400;
-  font-stretch: 100%;
+  font-weight: 340;
+  font-variation-settings: 'opsz' 144;
   letter-spacing: -0.01em;
   line-height: 0.84;
 }
@@ -1196,7 +1196,8 @@ body.page--stile {
   line-height: 1;
 }
 
-/* Il carattere variabile respira: peso e larghezza cambiano insieme. È
+/* Il carattere variabile respira: il peso cambia (Hanken Grotesk non ha la
+   larghezza; prima, con Archivo, cambiavano insieme). È
    l'unica animazione a ciclo che la GPU non può fare da sola (ogni passo
    rifà il layout del testo) e, finché gira, il browser ricalcola sul thread
    principale anche tutte le altre: perciò respira solo sulla tavola
@@ -1212,9 +1213,9 @@ body.page--stile {
 }
 
 @keyframes bd-breathe {
-  0%, 100% { font-weight: 560; font-stretch: 94%; }
-  36% { font-weight: 200; font-stretch: 64%; }
-  70% { font-weight: 820; font-stretch: 118%; }
+  0%, 100% { font-weight: 520; }
+  36% { font-weight: 200; }
+  70% { font-weight: 820; }
 }
 
 .bd-type__alpha {
@@ -1253,10 +1254,12 @@ body.page--stile {
   margin-top: 20px;
 }
 
+/* le quattro misure ottiche di Fraunces (dal 2.11.2026, prima le larghezze di Archivo) */
 .bd-width__sample {
+  font-family: var(--font-serif);
   font-size: 76px;
   font-weight: var(--wght);
-  font-stretch: var(--wdth);
+  font-variation-settings: 'opsz' var(--opsz);
   letter-spacing: var(--track);
   line-height: 0.9;
 }

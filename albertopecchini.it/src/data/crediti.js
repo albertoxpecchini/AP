@@ -55,7 +55,7 @@ export const crediti = {
     },
     {
       title: 'Caratteri',
-      body: '<p>Archivo, Cascadia Code e Instrument Serif, tutti con licenza <a href="https://openfontlicense.org" target="_blank" rel="noopener">SIL Open Font License<span class="sr-only"> (nuova scheda)</span></a>, serviti da questo dominio tramite i pacchetti Fontsource.</p>',
+      body: '<p>Hanken Grotesk, Fraunces e Geist Mono, tutti con licenza <a href="https://openfontlicense.org" target="_blank" rel="noopener">SIL Open Font License<span class="sr-only"> (nuova scheda)</span></a>, serviti da questo dominio tramite i pacchetti Fontsource.</p>',
     },
   ],
 }

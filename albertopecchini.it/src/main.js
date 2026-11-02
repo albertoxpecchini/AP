@@ -11,6 +11,7 @@ import { initDialer } from './client/phone.js'
 import { initPebbles } from './client/pebble.js'
 import { initMascots } from './client/mascot.js'
 import { initPuppets } from './client/puppet.js'
+import { initLume, initSpot } from './client/lume.js'
 
 // I moduli delle pagine speciali si caricano in pezzi a parte, solo dove servono,
 // così le altre pagine non ne pagano il peso: il piano di /stile/, il visualizzatore
@@ -70,6 +71,8 @@ const modules = [
   initWrapped,
   initLive,
   initParallax,
+  initLume,
+  initSpot,
   initMagnetic,
   initCursor,
   initHoverPreview,

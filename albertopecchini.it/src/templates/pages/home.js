@@ -1,12 +1,17 @@
+// La home, nell'ordine di reflection.ai (2.11.2026): hero centrato con l'invito e
+// il terminale · l'idea in una frase · le quattro aree in schede · i siti web in
+// vetrina col carosello · la fila dei siti online che scorre · il manifesto a
+// tutta larghezza · le tre convinzioni · il metodo · i numeri · lo studio ·
+// l'indice degli ultimi lavori. L'invito finale sta nel piè di pagina.
+
 import { html, esc } from '../html.js'
 import { site, stats, cta } from '../../data/site.js'
-import { projects, byArea, bySlug, areas } from '../../data/projects.js'
+import { projects, byArea } from '../../data/projects.js'
 import { serviceAreas } from '../../data/services.js'
 import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
 import { button, textLink, sectionHead, media, picture, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
 import { siteCard, indexRow } from '../components/project.js'
-import { COORDS } from '../layout.js'
 
 // I siti mostrati nel carosello: prima quelli in evidenza, poi gli altri.
 const webSites = () => [...byArea('web')].filter((p) => p.web).sort((a, b) => Number(b.featured) - Number(a.featured))
@@ -63,7 +68,7 @@ function heroTerminal() {
   const commands = heroCommands()
   const total = String(commands.length).padStart(2, '0')
   return html`
-    <div class="hero__stage" data-hero data-reveal="up" style="--d:230ms">
+    <div class="hero__stage" data-hero data-reveal="soft" style="--d:640ms">
       <div class="hero__stage-in" data-tilt>
         <div class="term">
           <div class="term__bar">
@@ -96,122 +101,90 @@ function heroTerminal() {
   `
 }
 
+// ── Hero: tutto centrato, come il primo schermo di reflection ────────────────
+
 function hero() {
-  const sites = heroSites()
-  const tilts = [-1.3, 0.9, -0.7, 1.2]
   return html`
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
-      <div class="hero__glow" aria-hidden="true"></div>
-      <div class="container hero__wrap" data-ink>
-        <div class="hero__hello" data-reveal="up" style="--d:30ms">
-          <p class="hero__hi">
-            <span class="hero__avatar"><span class="hero__avatar-ph"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="2.75rem" alt="" decoding="async" fetchpriority="high"></span>${site.availability.open ? '<span class="hero__avatar-dot" aria-hidden="true"></span>' : ''}</span>
-            <span class="hero__hi-text">Ciao, sono</span>
-          </p>
-          <p class="hero__place label">${esc(site.location.city)} — Italia<span class="hero__coords"> · ${COORDS}</span></p>
-          <p class="hero__avail label" data-ink-bed><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</p>
+      <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="container hero__wrap">
+        <div class="hero__eyebrow" data-reveal="up" style="--d:40ms">
+          <span class="pill"><span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="1.5rem" alt="" decoding="async" fetchpriority="high"></span>${esc(site.name)} · ${esc(site.location.city)}</span>
+          <span class="pill"><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</span>
         </div>
-
-        <h1 class="hero__title" id="hero-title">
-          <span class="hero__name" aria-hidden="true"><span class="hero__word"><span>Alberto</span></span> <span class="hero__word hero__word--2"><span data-ink-word>Pecchini</span></span></span>
-          <span class="sr-only">${esc(site.name)} — ${site.roles.map((r) => esc(r.label)).join(', ')} a ${esc(site.location.city)}</span>
-        </h1>
-
-        <div class="hero__body">
-          <div class="hero__pitch">
-            <p class="hero__kicker" data-reveal="up" style="--d:120ms"><span class="hero__slashes" aria-hidden="true">//</span><span class="hero__pill">casa · sito · marchio</span><span>un solo referente</span></p>
-            <p class="hero__myth" data-reveal="up" style="--d:160ms">
-              <s><span class="hero__strike">“Servono tre</span> <span class="hero__strike hero__strike--2">professionisti.”</span></s>
-              <strong class="hero__stamp">Falso</strong>
-            </p>
-            <p class="hero__claim" data-reveal="up" style="--d:200ms">Ne basta <em class="serif-i">uno.</em></p>
-            <p class="hero__lead" data-reveal="up" style="--d:240ms">Diplomato geometra a ${esc(site.location.city)}: rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi. Con lo stesso metodo e la stessa cura.</p>
-            <div class="hero__actions" data-reveal="up" style="--d:280ms">
-              ${button({ href: cta.href, label: cta.label, size: 'lg', magnetic: true })}
-              <button class="hero__copy" type="button" data-hero-copy="${esc(site.contact.email)}">
-                <span class="hero__copy-ask"><span class="hero__copy-fine">Premi <kbd>C</kbd> per copiare la mia email</span><span class="hero__copy-touch">Tocca per copiare la mia email</span></span>
-                <span class="hero__copy-done" aria-hidden="true"><span class="hero__copy-tick">✓</span> Copiata: ${esc(site.contact.email)}</span>
-                ${figurina('hero-email', { className: 'hero__copy-fig', lazy: false, sizes: '3rem' })}
-              </button>
-            </div>
-            <ul class="hero__trust label" data-reveal="up" style="--d:320ms">
-              <li>Primo colloquio gratuito</li>
-              <li>Preventivo scritto</li>
-              <li>${esc(site.contact.reply.replace(/\.$/, ''))}</li>
-            </ul>
-          </div>
-
-          ${heroTerminal()}
-
-          <div class="hero__live" data-reveal="up" style="--d:380ms">
-            <p class="hero__live-label label">${figurina('hero-online', { className: 'hero__live-fig', sizes: '2rem' }) || '<span class="dot dot--live" aria-hidden="true"></span>'}<span>Online adesso</span><span class="hero__live-note">${sitesPhrase(sites.length)} veri: aprili</span></p>
-            <ul class="hero__sites" style="--n:${sites.length}">
-              ${sites.map(
-                ({ p, here, href }, i) => html`
-                  <li>
-                    <a class="hsite" href="${href}"${here ? '' : ' target="_blank" rel="noopener"'} style="--r:${tilts[i % tilts.length]}deg">
-                      <span class="hsite__shot">${picture({ ...p.web.desktop, alt: '' }, { sizes: '(min-width: 1100px) 6rem, (min-width: 768px) 23vw, 45vw' })}</span>
-                      <span class="hsite__text">
-                        <span class="hsite__name">${esc(p.title)}</span>
-                        <span class="hsite__domain">${esc(p.web.domain)}</span>
-                      </span>
-                      <span class="hsite__badge${here ? ' hsite__badge--here' : ''}">${here ? 'Sei qui' : 'Online'}</span>
-                      <span class="hsite__arrow" aria-hidden="true">${icon(here ? 'arrow' : 'arrowUpRight')}</span>
-                      ${here ? '' : '<span class="sr-only"> (si apre in una nuova scheda)</span>'}
-                    </a>
-                  </li>
-                `,
-              )}
-            </ul>
-          </div>
+        <h1 class="hero__title" id="hero-title" data-reveal="words" style="--d:140ms">${splitWords('Casa, sito, marchio. Un solo referente.', { accent: ['referente.'] })}</h1>
+        <p class="hero__lead" data-reveal="up" style="--d:460ms">Diplomato geometra a ${esc(site.location.city)}: rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi. Lo stesso metodo, la stessa cura.</p>
+        <div class="hero__actions" data-reveal="up" style="--d:540ms">
+          ${button({ href: cta.href, label: cta.label, size: 'lg', magnetic: true })}
+          ${button({ href: '/portfolio/', label: 'Guarda i lavori', variant: 'ghost', size: 'lg' })}
         </div>
+        <button class="hero__copy" type="button" data-hero-copy="${esc(site.contact.email)}" data-reveal="fade" style="--d:700ms">
+          ${figurina('hero-email', { className: 'hero__copy-fig', lazy: false, sizes: '2.25rem' })}
+          <span class="hero__copy-ask"><span class="hero__copy-fine">Premi <kbd>C</kbd> per copiare la mia email</span><span class="hero__copy-touch">Tocca per copiare la mia email</span></span>
+          <span class="hero__copy-done" aria-hidden="true"><span class="hero__copy-tick">✓</span> Copiata: ${esc(site.contact.email)}</span>
+        </button>
       </div>
+      <div class="container hero__stage-wrap">${heroTerminal()}</div>
+      <div class="container hero__beam" aria-hidden="true"><i></i></div>
     </section>
   `
 }
 
-function disciplines() {
-  const cards = [
-    // niente disegni tecnici in vista: l'area si presenta con l'illustrazione di un suo progetto
-    { area: serviceAreas[0], count: byArea('tecnico').length, href: '/portfolio/tecnico/', image: { ...bySlug('layout-cantiere').cover, alt: 'Illustrazione in assonometria di un cantiere con l’autogru in minio' } },
-    // Il sito in vetrina è questo: il primo schermo della home, quotato (src/art/sitespec.js);
-    // `variant`: schermi · rilievo · scala · sistema.
-    { area: serviceAreas[1], count: byArea('web').length, href: '/portfolio/web/', image: { art: 'sitespec', variant: 'schermi', alt: 'Il primo schermo della home di Alberto Pecchini a tre larghezze, desktop, tablet e telefono, con le misure' } },
-    // La grafica resta una delle tre discipline anche senza progetti pubblicati:
-    // finché l'area è nascosta la scheda rimanda ai servizi invece che al portfolio.
-    // L'immagine è l'identità di questo sito, quotata (src/art/identity.js);
-    // `variant`: fogli · tavola · notte · sistema.
-    { area: serviceAreas[2], count: byArea('grafica').length, href: areas.grafica ? '/portfolio/grafica/' : '/servizi/#grafica', image: { art: 'identity', variant: 'fogli', alt: 'Tre tavole di costruzione dell’identità di Alberto Pecchini: marchio, icona e logotipo' } },
-  ]
+// ── 01 · L'idea, in una frase ────────────────────────────────────────────────
+
+function mission() {
   return html`
-    <section class="section intro" id="discipline" data-section="Discipline">
-      <div class="container">
-        <div class="intro__statement">
-          <p class="label" data-reveal="fade"><span class="sec-head__index">01</span>Tre discipline</p>
-          <p class="intro__text" data-reveal="words">
-            ${splitWords('Rilevo un edificio al millimetro, scrivo l’interfaccia che lo racconta, disegno il marchio di chi lo abita. Tre discipline, un solo metodo: misurare, ordinare, rendere leggibile.', { accent: ['misurare', 'ordinare', 'leggibile'] })}
+    <section class="section mission" id="idea" data-section="Idea">
+      <div class="container mission__grid">
+        <p class="label mission__label" data-reveal="fade"><span class="sec-head__index">01</span>L’idea</p>
+        <div class="mission__body">
+          <p class="mission__text" data-reveal="words">
+            ${splitWords('Rilevo un edificio al millimetro, scrivo l’interfaccia che lo racconta, disegno il marchio di chi lo abita. Tre mestieri, un solo metodo: misurare, ordinare, rendere leggibile.', { accent: ['misurare,', 'ordinare,', 'leggibile.'] })}
           </p>
-        </div>
-        <div class="disc">
-          ${cards.map(
-            (c, i) => html`
-              <a class="disc__card" href="${c.href}" data-reveal="up" style="--d:${i * 65}ms" data-cursor="Vedi">
-                <div class="disc__top label"><span>${c.area.letter} — ${esc(c.area.title)}</span>${c.count ? `<span>${String(c.count).padStart(2, '0')} progetti</span>` : ''}</div>
-                ${media(c.image, { ratio: '4/3', reveal: null, caption: null, className: 'disc__media' })}
-                <h2 class="disc__title h3">${esc(c.area.lead)}</h2>
-                <p class="disc__list">${c.area.services.slice(0, 5).map((s) => esc(s.title)).join(' · ')}</p>
-                <span class="link disc__link"><span class="link__label">${esc(c.count ? (c.area.title === 'Digitale' ? 'Progetti web' : c.area.title === 'Grafica' ? 'Progetti grafici' : 'Progetti tecnici') : 'Come lavoro')}</span>${icon('arrow')}</span>
-              </a>
-            `,
-          )}
+          <div data-reveal="up">${textLink({ href: '/studio/', label: 'Chi sono' })}</div>
         </div>
       </div>
     </section>
   `
 }
 
-// Carosello dei siti: su desktop una griglia ferma, su telefono e tablet
-// una fila che scorre col dito (scroll-snap nativo, vedi initCarousel).
+// ── 02 · Le quattro aree, in schede ──────────────────────────────────────────
+
+const AREA_FIG = { tecnico: 'tecnico-rilievi', digitale: 'digitale-siti-web', grafica: 'grafica-logo', informatica: 'informatica-pulizia-da-virus' }
+const AREA_COUNT = { tecnico: () => byArea('tecnico').length, digitale: () => byArea('web').length, grafica: () => byArea('grafica').length }
+
+function aree() {
+  const total = serviceAreas.reduce((n, a) => n + a.services.length, 0)
+  return html`
+    <section class="section aree" id="aree" data-section="Aree">
+      <div class="container">
+        ${sectionHead({ index: '02', label: 'Quattro aree', title: 'Un solo interlocutore, dallo stato di fatto alla messa online.', meta: `${total} servizi`, link: { href: '/servizi/', label: 'Tutti i servizi' } })}
+        <ul class="aree__grid" data-spot-group>
+          ${serviceAreas.map((a, i) => {
+            const count = AREA_COUNT[a.key]?.() || 0
+            const href = a.portfolio && count ? a.portfolio : `/servizi/#${a.key}`
+            return html`
+              <li class="acard spot" data-spot data-reveal="up" style="--d:${i * 70}ms">
+                <a class="acard__link" href="${href}" data-cursor="Vedi">
+                  <p class="acard__top label"><span>${a.letter} — ${esc(a.title)}</span>${count ? `<span>${String(count).padStart(2, '0')} progetti</span>` : ''}</p>
+                  ${figurina(AREA_FIG[a.key] || figName(a.key, a.services[0].title), { className: 'acard__fig' })}
+                  <h3 class="acard__title h3">${esc(a.lead)}</h3>
+                  <p class="acard__list">${(a.footer || a.services.slice(0, 3).map((s) => s.title)).map((t) => esc(t)).join(' · ')}</p>
+                  <span class="link acard__more"><span class="link__label">${count ? 'I progetti' : 'Il servizio'}</span>${icon('arrow')}</span>
+                </a>
+              </li>
+            `
+          })}
+        </ul>
+      </div>
+    </section>
+  `
+}
+
+// ── 03 · I siti web in vetrina, col carosello ────────────────────────────────
+// Desktop: griglia ferma; telefono e tablet: fila che scorre col dito
+// (scroll-snap nativo, vedi initCarousel).
+
 function selected() {
   const list = webSites()
   const allOnline = list.every((p) => p.web.url)
@@ -219,12 +192,16 @@ function selected() {
   return html`
     <section class="section wsel" id="siti" data-carousel data-section="Siti web" aria-labelledby="sel-title">
       <div class="container wsel__head">
-        <p class="label" data-reveal="fade"><span class="sec-head__index">02</span>Siti web</p>
-        <h2 class="h2 wsel__title" id="sel-title" data-reveal="up">${sitesPhrase(list.length)}${allOnline ? ', <em class="serif-i">tutti online</em>' : ''}</h2>
+        <div class="wsel__copy">
+          <p class="label" data-reveal="fade"><span class="sec-head__index">03</span>Siti web</p>
+          <h2 class="h2 wsel__title" id="sel-title" data-reveal="words">${splitWords(`${sitesPhrase(list.length)}${allOnline ? ', tutti online.' : '.'}`, { accent: ['online.'] })}</h2>
+        </div>
         <div class="wsel__aside">
-          ${figurina('computer-siti', { className: 'wsel__fig' })}
-          <p class="wsel__lead" data-reveal="up">Progettati e scritti a mano, dal primo schizzo alla messa online. Sono tutti pubblicati: puoi aprirli e provarli davvero.</p>
-          <div class="wsel__tools" data-reveal="fade">${textLink({ href: '/portfolio/web/', label: 'Tutti i progetti web' })}</div>
+          <p class="wsel__lead lead" data-reveal="up">Progettati e scritti a mano, dal primo schizzo alla messa online. Niente temi, niente page builder: struttura prima dell’estetica, contenuti veri prima dei layout, prestazioni misurate.</p>
+          <div class="wsel__tools" data-reveal="up" style="--d:80ms">
+            ${button({ href: '/portfolio/web/', label: 'I progetti web', variant: 'dark' })}
+            ${button({ href: '/servizi/#digitale', label: 'I servizi web', variant: 'ghost' })}
+          </div>
         </div>
       </div>
       <div class="wsel__viewport" data-carousel-viewport tabindex="-1" role="region" aria-label="Siti web">
@@ -249,87 +226,104 @@ function selected() {
   `
 }
 
-// Come si lavora sul web: solo testo. I siti veri sono già nel carosello qui sopra.
-function webTeaser() {
+// ── La fila dei siti online: scorre da sola, si ferma col mouse ──────────────
+// (il posto dei loghi dei partner in reflection: qui i partner sono i siti veri)
+
+function strip() {
+  const sites = heroSites()
+  if (!sites.length) return ''
+  const list = (hidden) => html`
+    <ul class="hero__sites strip__list"${hidden ? ' aria-hidden="true"' : ''}>
+      ${sites.map(
+        ({ p, here, href }) => html`
+          <li>
+            <a class="hsite" href="${href}"${here ? '' : ' target="_blank" rel="noopener"'}${hidden ? ' tabindex="-1"' : ''}>
+              <span class="hsite__shot">${picture({ ...p.web.desktop, alt: '' }, { sizes: '10rem' })}</span>
+              <span class="hsite__text">
+                <span class="hsite__name">${esc(p.title)}</span>
+                <span class="hsite__domain">${esc(p.web.domain)}</span>
+              </span>
+              <span class="hsite__badge${here ? ' hsite__badge--here' : ''}">${here ? 'Sei qui' : 'Online'}</span>
+              <span class="hsite__arrow" aria-hidden="true">${icon(here ? 'arrow' : 'arrowUpRight')}</span>
+              ${here ? '' : '<span class="sr-only"> (si apre in una nuova scheda)</span>'}
+            </a>
+          </li>
+        `,
+      )}
+    </ul>
+  `
   return html`
-    <section class="section webt" id="web" data-theme="ink" data-section="Web">
-      <div class="container webt__grid">
-        <div class="webt__copy">
-          <p class="label" data-reveal="fade"><span class="sec-head__index">03</span>Web design e sviluppo</p>
-          <h2 class="h1 webt__title" data-reveal="words">${splitWords('Anche un sito si progetta in scala.', { accent: ['scala.'] })}</h2>
-          ${figurina('computer-postazione', { className: 'webt__desk' })}
-        </div>
-        <div class="webt__side">
-          <p class="lead" data-reveal="up">Struttura prima dell’estetica, contenuti veri prima dei layout, prestazioni misurate. Scrivo il codice a mano: niente temi, niente page builder.</p>
-          <ul class="webt__points" data-reveal="up">
-            <li><span class="label">01</span><span>Mobile progettato a parte, non ridotto</span>${figurina('computer-mobile', { className: 'webt__fig' })}</li>
-            <li><span class="label">02</span><span>HTML semantico, accessibile da tastiera</span>${figurina('computer-tastiera', { className: 'webt__fig' })}</li>
-            <li><span class="label">03</span><span>Dominio, hosting e sorgenti intestati a te</span>${figurina('computer-dominio', { className: 'webt__fig' })}</li>
-          </ul>
-          <div data-reveal="up">${textLink({ href: '/servizi/#digitale', label: 'I servizi web' })}</div>
+    <section class="strip" data-section="Online" aria-label="Siti online">
+      <div class="container strip__head">
+        <p class="label strip__label">${figurina('hero-online', { className: 'strip__fig', sizes: '2rem' }) || '<span class="dot dot--live" aria-hidden="true"></span>'}<span>Online adesso</span><span class="strip__note">${sitesPhrase(sites.length)} veri: aprili</span></p>
+      </div>
+      <div class="marquee" data-reveal="fade">
+        <div class="marquee__track">${list(false)}${list(true)}</div>
+      </div>
+    </section>
+  `
+}
+
+// ── Il manifesto a tutta larghezza ───────────────────────────────────────────
+// La frase a sinistra, Alberto scontornato a destra (la foto «curioso» dello studio) (come il «The most
+// important technology…» di reflection).
+
+function banner() {
+  const photo = photos.curious
+  return html`
+    <section class="section banner-wrap" data-section="Web">
+      <div class="container--wide">
+        <div class="banner" data-theme="ink" data-reveal="soft">
+          <img class="banner__img" src="${photo.src}" srcset="${photo.small} 900w, ${photo.src} 1600w" sizes="(min-width: 1100px) 44rem, 90vw" width="${photo.width}" height="${photo.height}" alt="${esc(photo.alt)}" loading="lazy" decoding="async">
+          <div class="banner__shade" aria-hidden="true"></div>
+          <div class="banner__body">
+            <p class="label banner__label" data-reveal="fade">Web design e sviluppo</p>
+            <h2 class="banner__title" data-reveal="words">${splitWords('Anche un sito si progetta in scala.', { accent: ['scala.'] })}</h2>
+            <p class="banner__lead" data-reveal="up">Mobile progettato a parte, HTML semantico accessibile da tastiera, dominio e sorgenti intestati a te.</p>
+            <div data-reveal="up" style="--d:80ms">${button({ href: '/servizi/#digitale', label: 'Come lavoro sul web', variant: 'light' })}</div>
+          </div>
         </div>
       </div>
     </section>
   `
 }
 
-// Le voci in vetrina nella home: cinque per area, di lunghezza simile, così
-// le righe pesano uguale. L'elenco completo sta in /servizi/.
-const HOME_ITEMS = {
-  informatica: ['Pulizia da virus', 'Backup e recupero dati', 'Stampanti e scanner', 'Windows', 'Rete e Wi-Fi'],
-}
-const homeItems = (a) => HOME_ITEMS[a.key] || a.services.slice(0, 5).map((s) => s.title)
+// ── 04 · Le tre convinzioni ──────────────────────────────────────────────────
 
-function services() {
+const CONVICTIONS = [
+  { title: 'Misurare', text: 'Prima di disegnare si misura: un rilievo al millimetro, un contenuto letto davvero, un marchio provato in piccolo. Si progetta bene solo ciò che si è misurato bene.' },
+  { title: 'Ordinare', text: 'Layer, griglie, cartelle, nomi. Quello che è in ordine si trova, si aggiorna e si consegna: a chi costruisce, a chi stampa, a chi verrà dopo di me.' },
+  { title: 'Rendere leggibile', text: 'Una tavola, una pagina, un logo devono capirsi al primo sguardo, da chi li usa e da chi li paga. Meno effetti, più regole; e le regole scritte.' },
+]
+
+function convictions() {
   return html`
-    <section class="section svc" data-section="Servizi">
+    <section class="section conv" id="convinzioni" data-theme="tint" data-section="Convinzioni">
       <div class="container">
-        ${sectionHead({ index: '04', label: 'Servizi', title: 'Quattro aree, un interlocutore', meta: `${serviceAreas.reduce((n, a) => n + a.services.length, 0)} servizi`, link: { href: '/servizi/', label: 'Tutti i servizi' } })}
-        <ul class="svc__rows">
-          ${serviceAreas.map(
-            (a, i) => html`
-              <li class="svc__row" data-reveal="up" style="--d:${i * 50}ms">
-                <a class="svc__link" href="/servizi/#${a.key}">
-                  <span class="svc__letter label">${a.letter}</span>
-                  <span class="svc__name">${esc(a.title)}</span>
-                  <span class="svc__items">${homeItems(a).map((t) => `<span>${esc(t)}</span>`).join('')}</span>
-                  <span class="svc__arrow" aria-hidden="true">${icon('arrowUpRight')}</span>
-                </a>
+        ${sectionHead({ index: '04', label: 'Convinzioni', title: 'Tre regole, per un rilievo come per un sito.', link: { href: '/metodo/', label: 'Il metodo nel dettaglio' } })}
+        <ol class="conv__grid">
+          ${CONVICTIONS.map(
+            (c, i) => html`
+              <li class="conv__item" data-reveal="up" style="--d:${i * 90}ms">
+                <span class="conv__n label">0${i + 1}</span>
+                <h3 class="conv__title">${esc(c.title)}</h3>
+                <p class="conv__text">${esc(c.text)}</p>
               </li>
             `,
           )}
-        </ul>
+        </ol>
       </div>
     </section>
   `
 }
 
-function numbers() {
-  const computed = {
-    projects: projects.length,
-    sites: byArea('web').filter((p) => p.web?.url).length,
-    years: new Date().getFullYear() - site.activeSince,
-  }
-  const list = stats.map((s) => ({ ...s, value: s.value ?? computed[s.key] }))
-  return html`
-    <section class="section nums" data-theme="tint" data-section="Numeri" aria-labelledby="nums-title">
-      <div class="container">
-        <div class="nums__head">
-          <p class="label"><span class="sec-head__index">05</span>Numeri e dati</p>
-          <h2 class="sr-only" id="nums-title">Numeri dello studio</h2>
-          <p class="label nums__note">Aggiornati al ${new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}</p>
-        </div>
-        <div class="nums__grid">${list.map((s, i) => stat(s, i))}</div>
-      </div>
-    </section>
-  `
-}
+// ── 05 · Il metodo, in sintesi ───────────────────────────────────────────────
 
 function method() {
   return html`
     <section class="section mth" id="metodo" data-section="Metodo">
       <div class="container">
-        ${sectionHead({ index: '06', label: 'Metodo di lavoro', title: 'Sette fasi, sempre le stesse', lead: 'Dal primo incontro all’assistenza dopo la consegna: sai sempre a che punto siamo e cosa succede dopo.', link: { href: '/metodo/', label: 'Il metodo nel dettaglio' } })}
+        ${sectionHead({ index: '05', label: 'Metodo di lavoro', title: 'Sette fasi, sempre le stesse.', lead: 'Dal primo incontro all’assistenza dopo la consegna: sai sempre a che punto siamo e cosa succede dopo.', link: { href: '/metodo/', label: 'Il metodo nel dettaglio' } })}
         <div class="mth__scroll" role="region" aria-label="Le sette fasi del metodo" data-scroll-region data-reveal="fade">
           <ol class="mth__track">
             ${steps.map(
@@ -350,10 +344,35 @@ function method() {
   `
 }
 
+// ── 06 · I numeri ────────────────────────────────────────────────────────────
+
+function numbers() {
+  const computed = {
+    projects: projects.length,
+    sites: byArea('web').filter((p) => p.web?.url).length,
+    years: new Date().getFullYear() - site.activeSince,
+  }
+  const list = stats.map((s) => ({ ...s, value: s.value ?? computed[s.key] }))
+  return html`
+    <section class="section nums" data-theme="ink" data-section="Numeri" aria-labelledby="nums-title">
+      <div class="container">
+        <div class="nums__head">
+          <p class="label"><span class="sec-head__index">06</span>Numeri e dati</p>
+          <h2 class="sr-only" id="nums-title">Numeri dello studio</h2>
+          <p class="label nums__note">Aggiornati al ${new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}</p>
+        </div>
+        <div class="nums__grid">${list.map((s, i) => stat(s, i))}</div>
+      </div>
+    </section>
+  `
+}
+
+// ── 07 · Lo studio ───────────────────────────────────────────────────────────
+
 function studio() {
   return html`
     <section class="section std" id="studio" data-section="Studio">
-      <div class="container std__grid">
+      <div class="container std__card">
         <div class="std__photo">${media(photos.portrait, { ratio: '4/5', parallax: true })}</div>
         <div class="std__copy">
           <p class="label" data-reveal="fade"><span class="sec-head__index">07</span>Studio</p>
@@ -381,12 +400,14 @@ export const signature = () => html`
   </div>
 `
 
+// ── 08 · L'indice degli ultimi lavori ────────────────────────────────────────
+
 function index() {
   const list = [...projects].sort((a, b) => b.year - a.year).slice(0, 10)
   return html`
     <section class="section idx" data-section="Indice">
       <div class="container">
-        ${sectionHead({ index: '08', label: 'Indice dei progetti', title: 'Ultimi lavori', meta: `${String(list.length).padStart(2, '0')} di ${projects.length}`, link: { href: '/portfolio/', label: 'Portfolio completo con filtri' } })}
+        ${sectionHead({ index: '08', label: 'Indice dei progetti', title: 'Ultimi lavori.', meta: `${String(list.length).padStart(2, '0')} di ${projects.length}`, link: { href: '/portfolio/', label: 'Portfolio completo con filtri' } })}
         <ul class="irows" data-preview-list>
           ${list.map((p, i) => indexRow(p, i))}
         </ul>
@@ -405,5 +426,5 @@ const sectionIndicator = () => html`
 `
 
 export function homePage() {
-  return [hero(), disciplines(), selected(), webTeaser(), services(), numbers(), method(), studio(), index(), sectionIndicator()].join('\n')
+  return [hero(), mission(), aree(), selected(), strip(), banner(), convictions(), method(), numbers(), studio(), index(), sectionIndicator()].join('\n')
 }

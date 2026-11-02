@@ -81,33 +81,33 @@ export const colorNotes = {
 export const typefaces = [
   {
     key: 'sans',
-    name: 'Archivo Variable',
-    axis: 'wght 100–900 · wdth 62–125%',
+    name: 'Hanken Grotesk',
+    axis: 'wght 100–900',
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 àèéìòù',
-    note: 'Titoli, testo, navigazione. Una sola famiglia per quasi tutto, modulata con peso e larghezza.',
+    note: 'Testo, navigazione, titoli piccoli (h3, h4) a peso 520. Un grottesco pulito che non chiede attenzione.',
   },
   {
     key: 'serif',
-    name: 'Instrument Serif',
-    axis: 'Corsivo 400',
+    name: 'Fraunces',
+    axis: 'wght 100–900 · opsz 9–144',
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789',
-    note: 'Solo accento: una parola per titolo, ingrandita a 1,07em perché accanto al grottesco non sembri più piccola.',
+    note: 'Titoli grandi, numeri grandi e corsivi d’accento: leggero (330–380) con la misura ottica al massimo, così le grazie si allungano e le curve si ammorbidiscono.',
   },
   {
     key: 'mono',
-    name: 'Cascadia Code',
-    axis: 'wght 200–700',
+    name: 'Geist Mono',
+    axis: 'wght 100–900',
     alphabet: 'abcdefghijklmnopqrstuvwxyz 0123456789 · — / 45°14′N',
-    note: 'Etichette, bottoni, coordinate, cartigli e il terminale della home: il carattere dei terminali, a 14 px, tutto minuscolo come il resto del sito.',
+    note: 'Etichette, pillole, coordinate, cartigli e il terminale della home: il carattere dei terminali, a 13 px, tutto minuscolo come il resto del sito.',
   },
 ]
 
-// Asse della larghezza di Archivo: le quattro larghezze usate nel sito.
+// Asse della misura ottica di Fraunces: le quattro misure usate nel sito.
 export const widths = [
-  { pct: '78%', weight: 540, track: '-0.05em', use: 'numeri e statistiche' },
-  { pct: '86%', weight: 600, track: '-0.055em', use: 'nome in copertina, invito' },
-  { pct: '94%', weight: 560, track: '-0.035em', use: 'titoli h1–h3' },
-  { pct: '100%', weight: 540, track: '-0.015em', use: 'h4, testo corrente' },
+  { pct: '144', weight: 330, track: '-0.028em', use: 'hero, invito finale' },
+  { pct: '144', weight: 340, track: '-0.025em', use: 'titoli di pagina, h1' },
+  { pct: '144', weight: 380, track: '-0.02em', use: 'h2, indice dei lavori' },
+  { pct: '72', weight: 400, track: '-0.01em', use: 'corsivo nel testo' },
 ]
 
 // Scala fluida: valore a 1440 px e intervallo minimo → massimo.

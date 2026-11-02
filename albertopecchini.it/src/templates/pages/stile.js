@@ -156,8 +156,8 @@ function tipografiaBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Archivo · Instrument Serif · Cascadia Code', 'Ospitati in locale, nessuna richiesta a terzi')}
-        ${intro(`Un grottesco che si ${em('stringe')}, un corsivo per l’accento.`, 'Archivo è variabile su peso e larghezza: i titoli stanno a 560 e al 94%, il nome in copertina all’86%. Il corsivo graziato entra una parola per titolo. Il carattere dei terminali misura: etichette, bottoni, dati. Tutto minuscolo.')}
+        ${head(b, 'Hanken Grotesk · Fraunces · Geist Mono', 'Ospitati in locale, nessuna richiesta a terzi')}
+        ${intro(`Un grottesco che tace, un graziato che si ${em('allunga')}.`, 'Dal 2 novembre 2026: Hanken Grotesk per i testi, Fraunces per i titoli grandi — leggero, con la misura ottica a 144, mai grassetto — e per il corsivo d’accento, una parola per titolo. Il carattere dei terminali misura: etichette, pillole, dati. Tutto minuscolo.')}
         <div class="bd-types">
           ${S.typefaces.map(
             (t) => html`
@@ -170,9 +170,9 @@ function tipografiaBoard(b) {
             `,
           )}
         </div>
-        ${sub('Asse della larghezza · wdth', 'Archivo 540–600', { top: true, muted: true })}
+        ${sub('Misura ottica · opsz', 'Fraunces 330–400', { top: true, muted: true })}
         <div class="bd-widths">
-          ${S.widths.map((w) => `<div><p class="bd-width__sample" style="--wght:${w.weight};--wdth:${w.pct};--track:${w.track}">Metodo</p><p class="bd-width__cap label"><b>${w.pct}</b> · ${esc(w.use)}</p></div>`)}
+          ${S.widths.map((w) => `<div><p class="bd-width__sample" style="--wght:${w.weight};--opsz:${w.pct};--track:${w.track}">Metodo</p><p class="bd-width__cap label"><b>opsz ${w.pct} · ${w.weight}</b> · ${esc(w.use)}</p></div>`)}
         </div>
         ${sub('Scala fluida · clamp()', 'Valori a 1440 px · minimo → massimo', { top: true, muted: true })}
         <div class="bd-scale">

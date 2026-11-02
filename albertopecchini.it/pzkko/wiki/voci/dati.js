@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 705 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>d9cf027</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 706 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>aa35060</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 188
 |-
 | 2026-11
-| 6
+| 7
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/aa35060 aa35060] chore(pzkko): pzkkopedia allineata a d9cf027
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/d9cf027 d9cf027] feat(pzkko): i consigliati nella chat dello zero e il quiz che va avanti da solo
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/247cc84 247cc84] chore(pzkko): pzkkopedia allineata a 2ac0343
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/2ac0343 2ac0343] feat(pzkko): pzkkopedia piena, la wiki di tutto, aggiornata a ogni push
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/af3c1a3 af3c1a3] feat(albertopecchini.it): unimore a blocchi, uno per lezione, con gli esercizi numerati da 1 in ogni blocco
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/670b93e 670b93e] feat(pzkko): le musichette a 16 bit, la musica al 70% e la strada al 20%
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/03ef8a6 03ef8a6] fix(pzkko): dopo l'uscita dal conto il messaggio dice che per il cercapersone serve di nuovo il conto
-* 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/70f5b08 70f5b08] Catture aggiornate: pzkko
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

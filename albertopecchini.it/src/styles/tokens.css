@@ -3,6 +3,11 @@
    I breakpoint non possono vivere in custom properties: sono documentati qui e
    usati con gli stessi valori in tutti i fogli.
 
+   Dal 2.11.2026 l'impaginazione segue reflection.ai (per quattro quinti: carta
+   calda, bordi sottili, angoli morbidi, sezioni scure come «rotte») e
+   anthropic.com (per un quinto: l'avorio, i titoli graziati, le schede tonde).
+   L'accento resta il minio di Alberto.
+
    Breakpoint (mobile-first, min-width):
      sm  480px   telefoni larghi
      md  768px   tablet
@@ -12,55 +17,56 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Colore — carta, inchiostro, minio */
-  --c-paper: #f3f1ec;
-  --c-paper-2: #eae7e0;
-  --c-paper-3: #dedad1;
-  --c-ink: #10110f;
-  --c-ink-2: #1b1c19;
-  --c-ink-3: #2b2c28;
-  --c-graphite: #5a5b55;
+  /* Colore — carta calda, inchiostro, minio */
+  --c-paper: #f8f6f0;
+  --c-paper-2: #f1ede1;
+  --c-paper-3: #e8e3d6;
+  --c-ivory: #faf9f5;
+  --c-ink: #0a0a0a;
+  --c-ink-2: #171717;
+  --c-ink-3: #262626;
+  --c-graphite: #525252;
   --c-minio: #e5481f;
   --c-minio-deep: #b5360f;
   --c-minio-bright: #ff6a3d;
+  --c-minio-soft: #ffd9cc;
 
   /* Ruoli semantici (tema chiaro) */
   --bg: var(--c-paper);
   --bg-2: var(--c-paper-2);
   --bg-3: var(--c-paper-3);
-  --fg: var(--c-ink);
+  --card: var(--c-ivory);
+  --fg: #1a1b1a;
   --muted: var(--c-graphite);
-  --line: rgb(16 17 15 / 0.16);
-  --line-strong: rgb(16 17 15 / 0.42);
+  --line: rgb(26 27 26 / 0.12);
+  --line-strong: rgb(26 27 26 / 0.3);
   --accent: var(--c-minio);
   --accent-text: var(--c-minio-deep);
   --on-accent: var(--c-ink); /* inchiostro su minio: 4,8:1 (chiaro) · 6,6:1 (scuro) — il bianco non arriva ad AA */
   --focus: var(--c-minio-deep);
+  --glow: rgb(229 72 31 / 0.22);
 
   /* Tipografia */
-  --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* Cascadia Code per etichette, tasti, dati e terminale (dal 2.10.2026, prima IBM Plex Mono) */
-  --font-mono: 'Cascadia Code Variable', 'Cascadia Code', 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
-  --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Times New Roman', serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --font-serif: 'Fraunces Variable', 'Fraunces', 'Iowan Old Style', Georgia, serif;
 
-  /* scala ridotta del 15 % circa il 18.10.2026 («troppo big»): i titoli di pagina
-     stanno sotto i 100 px a 1440 e sotto i 105 a 1920 */
   --fs-mega: clamp(3rem, 1rem + 8.4vw, 10rem);
-  --fs-display: clamp(2.5rem, 1.2rem + 5.2vw, 6.5rem);
-  --fs-h1: clamp(2.25rem, 1.4rem + 3.4vw, 4.75rem);
-  --fs-h2: clamp(1.75rem, 1.25rem + 2.1vw, 3.25rem);
+  --fs-display: clamp(2.75rem, 1.2rem + 5.6vw, 7rem);
+  --fs-h1: clamp(2.5rem, 1.4rem + 3.6vw, 5rem);
+  --fs-h2: clamp(1.875rem, 1.25rem + 2.3vw, 3.5rem);
   --fs-h3: clamp(1.3125rem, 1.1rem + 0.85vw, 1.875rem);
   --fs-h4: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
   --fs-lead: clamp(1.0625rem, 0.95rem + 0.5vw, 1.375rem);
   --fs-body: 1.0625rem;
   --fs-small: 0.9375rem;
-  --fs-label: 0.875rem;
+  --fs-label: 0.8125rem;
 
-  --lh-tight: 0.94;
-  --lh-snug: 1.12;
+  --lh-tight: 0.98;
+  --lh-snug: 1.1;
   --lh-body: 1.6;
-  --track-label: 0;
-  --track-display: -0.035em;
+  --track-label: 0.02em;
+  --track-display: -0.02em;
 
   /* Spazi (base 4px) */
   --sp-1: 0.25rem;
@@ -73,30 +79,31 @@
   --sp-8: 4rem;
   --sp-9: 6rem;
   --sp-10: 8rem;
-  --section: clamp(4rem, 2.5rem + 6vw, 9rem);
-  /* grondaie larghe e colonna di lettura a 76rem (1216 px): il sito non si
-     allarga più fino al bordo degli schermi grandi (18.10.2026) */
+  --section: clamp(4.5rem, 2.5rem + 7vw, 10rem);
   --gutter: clamp(1.25rem, 0.5rem + 4vw, 5rem);
   --col-gap: clamp(0.75rem, 0.4rem + 1.4vw, 2rem);
   --max: 76rem;
   --header-h: 4.5rem;
 
-  /* Raggi: il linguaggio è ortogonale, i raggi sono minimi */
+  /* Raggi: morbidi, come le schede dei due modelli (0,75–1,5 rem) */
   --r-0: 0;
-  --r-1: 2px;
-  --r-2: 6px;
-  --r-3: 12px;
+  --r-1: 0.375rem;
+  --r-2: 0.75rem;
+  --r-3: 1.25rem;
+  --r-4: 1.75rem;
   --r-device: 2.25rem;
   --r-full: 999px;
 
-  /* Movimento */
+  /* Movimento: lento e setoso, mai scattoso */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
-  --t-1: 0.15s;
-  --t-2: 0.3s;
-  --t-3: 0.55s;
-  --t-4: 0.8s;
+  --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-1: 0.18s;
+  --t-2: 0.36s;
+  --t-3: 0.7s;
+  --t-4: 1.1s;
+  --t-5: 1.6s;
 
   /* Livelli */
   --z-header: 50;
@@ -119,13 +126,15 @@
   --bg: var(--c-ink);
   --bg-2: var(--c-ink-2);
   --bg-3: var(--c-ink-3);
+  --card: var(--c-ink-2);
   --fg: var(--c-paper);
-  --muted: #a5a59c;
-  --line: rgb(243 241 236 / 0.17);
-  --line-strong: rgb(243 241 236 / 0.45);
+  --muted: #a3a3a3;
+  --line: rgb(248 246 240 / 0.14);
+  --line-strong: rgb(248 246 240 / 0.4);
   --accent: var(--c-minio-bright);
   --accent-text: var(--c-minio-bright);
   --focus: var(--c-minio-bright);
+  --glow: rgb(255 106 61 / 0.28);
   color-scheme: dark;
 }
 
@@ -133,17 +142,21 @@
   --bg: var(--c-paper);
   --bg-2: var(--c-paper-2);
   --bg-3: var(--c-paper-3);
-  --fg: var(--c-ink);
+  --card: var(--c-ivory);
+  --fg: #1a1b1a;
   --muted: var(--c-graphite);
-  --line: rgb(16 17 15 / 0.16);
-  --line-strong: rgb(16 17 15 / 0.42);
+  --line: rgb(26 27 26 / 0.12);
+  --line-strong: rgb(26 27 26 / 0.3);
   --accent: var(--c-minio);
   --accent-text: var(--c-minio-deep);
   --focus: var(--c-minio-deep);
+  --glow: rgb(229 72 31 / 0.22);
   color-scheme: light;
 }
 
+/* l'avorio di Anthropic: un gradino più caldo della carta */
 [data-theme='tint'] {
   --bg: var(--c-paper-2);
   --bg-2: var(--c-paper-3);
+  --card: var(--c-ivory);
 }

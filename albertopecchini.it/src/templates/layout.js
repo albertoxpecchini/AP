@@ -1,18 +1,18 @@
 // Guscio di ogni pagina: <head>, header, menu mobile, footer (con l'invito finale),
 // e gli elementi globali (barra di avanzamento, tendina di transizione,
-// cursore, lightbox, anteprima flottante).
+// cursore, luce, lightbox, anteprima flottante).
 //
-// Testata e piè di pagina sono i due custodi del sito: composizioni centrate e
-// simmetriche, con il marchio in mezzo, i tasti «sasso» (pebble) disegnati
-// dall'IA e resi premibili dal codice, e i burattini — la chiocciola gigante
-// africana (in testata arriva senza guscio, che poi le cade addosso), la
-// nutria golosa e gli altri animali — che seguono il puntatore con gli
-// occhi (puppet(), src/client/puppet.js).
+// Dal 2.11.2026 l'impaginazione segue reflection.ai (e per un quinto
+// anthropic.com): testata sottile con il marchio a sinistra, le voci in mezzo e
+// l'invito a pillola a destra; piè di pagina scuro a colonne, con l'invito
+// grande in cima e la firma custodita dai burattini — la chiocciola gigante
+// africana, la nutria golosa e gli altri animali, che seguono il puntatore con
+// gli occhi (puppet(), src/client/puppet.js) — in fondo.
 
 import { html, esc, jsonLd, cx } from './html.js'
 import { site, nav, cta, closing } from '../data/site.js'
 import { serviceAreas } from '../data/services.js'
-import { logo, monogram, signature, splitWords, icon, pebble, puppet, figurina } from './components/ui.js'
+import { logo, monogram, signature, splitWords, icon, button, puppet } from './components/ui.js'
 
 const abs = (path) => site.url + path
 
@@ -41,7 +41,7 @@ export function layout({ route, title, description, body, assets, jsonld = [], h
 ${noindex ? '<meta name="robots" content="noindex, follow">' : `<link rel="canonical" href="${esc(url)}">`}
 <meta name="author" content="${esc(site.name)}">
 <link rel="author" href="${esc(site.url)}">
-<meta name="theme-color" content="#f3f1ec">
+<meta name="theme-color" content="#f8f6f0">
 <meta name="format-detection" content="telephone=no">
 <meta name="google-adsense-account" content="ca-pub-6444827793145583">
 <meta property="og:type" content="${route.ogType || 'website'}">
@@ -90,17 +90,24 @@ ${assets.scripts.map((s) => `<script type="module" src="${s}"></script>`)}
 }
 
 // ── Header ───────────────────────────────────────────────────────────────────
-// Simmetrico: tre voci a sinistra, il marchio con la chiocciola al centro, le
-// altre voci e l'invito a destra. Sotto i 1100 px restano il marchio in mezzo,
-// il tasto del menu a sinistra e quello dei contatti a destra.
+// Una riga sottile: il marchio a sinistra, le voci di testo al centro, l'invito
+// a pillola a destra. Sotto i 1100 px restano il marchio e, a destra, i due
+// tasti tondi dei contatti e del menu.
 
 const isCurrent = (route, href) => (href === '/' ? route.path === '/' : route.path.startsWith(href))
 
-const NAV_SPLIT = 3
+const roundButton = ({ href, label, iconName, className, attrs = {}, current = false }) => {
+  const inner = `${icon(iconName)}<span class="sr-only">${esc(label)}</span>`
+  const a = Object.entries(attrs)
+    .map(([k, v]) => (v === true ? ` ${k}` : v === false || v == null ? '' : ` ${k}="${esc(String(v))}"`))
+    .join('')
+  if (href) return `<a class="${cx('hbtn', className)}" href="${href}"${current ? ' aria-current="page"' : ''}${a}>${inner}</a>`
+  return `<button class="${cx('hbtn', className)}" type="button"${a}>${inner}</button>`
+}
 
 function navItem(route, item, i) {
   const current = isCurrent(route, item.href)
-  const link = pebble({ href: item.href, label: item.label, tone: 'carta', size: 'sm', shape: i, current, className: 'site-nav__link' })
+  const link = `<a class="site-nav__link" href="${item.href}"${current ? ' aria-current="page"' : ''}><span>${esc(item.label)}</span></a>`
   if (!item.children) return `<li class="site-nav__item">${link}</li>`
   return html`
     <li class="site-nav__item site-nav__item--sub" data-subnav>
@@ -121,19 +128,15 @@ function header(route) {
   return html`
     <header class="site-header" data-header>
       <div class="site-header__inner container--wide">
+        ${logo()}
         <nav class="site-nav" aria-label="Navigazione principale">
-          <ul class="site-nav__list site-nav__list--l">${nav.slice(0, NAV_SPLIT).map((it, i) => navItem(route, it, i))}</ul>
-          <div class="site-header__brand">
-            ${puppet('lumaca', { className: 'site-header__masc', skip: ['stazione'], lazy: false, sizes: '4.5rem' })}
-            ${logo()}
-          </div>
-          <ul class="site-nav__list site-nav__list--r">
-            ${nav.slice(NAV_SPLIT).map((it, i) => navItem(route, it, i + NAV_SPLIT))}
-            <li class="site-nav__item site-nav__item--cta">${pebble({ href: cta.href, label: cta.label, tone: 'minio', size: 'sm', shape: 0, iconName: 'arrow', className: 'site-header__cta' })}</li>
-          </ul>
+          <ul class="site-nav__list">${nav.map((it, i) => navItem(route, it, i))}</ul>
         </nav>
-        ${pebble({ label: 'Menu', srLabel: 'Apri il menu', tone: 'carta', round: true, iconName: 'menu', className: 'menu-toggle', attrs: { 'data-menu-open': true, 'aria-expanded': 'false', 'aria-controls': 'menu' } })}
-        ${pebble({ href: cta.href, label: 'Contatti', srLabel: 'Contatti', tone: 'carta', round: true, iconName: 'mail', className: 'site-header__mail', current: isCurrent(route, cta.href) })}
+        <div class="site-header__side">
+          ${button({ href: cta.href, label: cta.label, size: 'sm', className: 'site-header__cta', iconName: null })}
+          ${roundButton({ href: cta.href, label: 'Contatti', iconName: 'mail', className: 'site-header__mail', current: isCurrent(route, cta.href) })}
+          ${roundButton({ label: 'Apri il menu', iconName: 'menu', className: 'menu-toggle', attrs: { 'data-menu-open': true, 'aria-expanded': 'false', 'aria-controls': 'menu' } })}
+        </div>
       </div>
     </header>
   `
@@ -146,7 +149,7 @@ function mobileMenu(route) {
     <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu di navigazione" data-theme="ink" hidden>
       <div class="menu__top container--wide">
         ${logo()}
-        ${pebble({ label: 'Chiudi', srLabel: 'Chiudi il menu', tone: 'carta', round: true, iconName: 'close', className: 'menu-toggle menu-toggle--close', attrs: { 'data-menu-close': true } })}
+        ${roundButton({ label: 'Chiudi il menu', iconName: 'close', className: 'menu-toggle menu-toggle--close', attrs: { 'data-menu-close': true } })}
       </div>
       <div class="menu__body container--wide">
         <nav aria-label="Menu principale">
@@ -156,7 +159,7 @@ function mobileMenu(route) {
               (item, i) => html`
                 <li class="menu__item" style="--i:${i + 1}">
                   <a class="menu__link" href="${item.href}"${isCurrent(route, item.href) ? ' aria-current="page"' : ''}><span class="label">${String(i + 1).padStart(2, '0')}</span><span class="menu__text">${esc(item.label)}</span></a>
-                  ${item.children && `<ul class="menu__sub">${item.children.slice(1).map((c, k) => `<li>${pebble({ href: c.href, label: c.label.replace('Progetti ', ''), tone: 'carta', size: 'sm', shape: k, current: route.path === c.href })}</li>`).join('')}</ul>`}
+                  ${item.children && `<ul class="menu__sub">${item.children.slice(1).map((c) => `<li><a class="pill menu__pill" href="${c.href}"${route.path === c.href ? ' aria-current="page"' : ''}>${esc(c.label.replace('Progetti ', ''))}</a></li>`).join('')}</ul>`}
                 </li>
               `,
             )}
@@ -171,10 +174,10 @@ function mobileMenu(route) {
           </div>
           <div class="menu__block" style="--i:7">
             <p class="label">Social</p>
-            <ul class="menu__social">${site.social.map((s, k) => `<li>${pebble({ href: s.url, label: s.label, tone: 'carta', size: 'sm', shape: k + 2, fig: `chrome-${s.key}`, iconBefore: true, external: true })}</li>`)}</ul>
+            <ul class="menu__social">${site.social.map((s) => `<li><a class="pill menu__pill" href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}<span class="sr-only"> (nuova scheda)</span></a></li>`)}</ul>
           </div>
           <div class="menu__block menu__block--cta" style="--i:8">
-            ${pebble({ href: cta.href, label: cta.label, tone: 'minio', size: 'lg', shape: 1, iconName: 'arrow' })}
+            ${button({ href: cta.href, label: cta.label, size: 'lg' })}
           </div>
         </div>
       </div>
@@ -187,10 +190,10 @@ function mobileMenu(route) {
 }
 
 // ── Footer ───────────────────────────────────────────────────────────────────
-// Tutto centrato, dall'alto in basso: l'invito con i due tasti (contatti e
-// posta), la fila delle pagine, il marchio custodito dalle due mascotte, i
-// recapiti con le mini immagini (email, telefono, sede, social), le note legali
-// con i tasti piccoli e il credito, «torna su».
+// Scuro, a colonne, dall'alto in basso: l'invito grande con i due tasti, le
+// quattro colonne (marchio e disponibilità · pagine · contatti · social e note),
+// la firma custodita dalle mascotte e dai burattini, la riga legale con il
+// credito e «torna su».
 //
 // `compact`: nelle pagine che sono già la chiamata all'azione (contatti, note
 // legali, 404) l'invito rimanda alla posta invece che a sé stesso.
@@ -204,31 +207,55 @@ function footer({ route, compact = false }) {
   const label = compact ? closing.labelCompact : closing.label
   const availability = `${site.availability.label}${site.availability.from ? ` — da ${site.availability.from}` : ''}`
   const notes = [
-    { label: 'Privacy', href: '/privacy/', fig: 'chrome-privacy' },
-    { label: 'Cookie', href: '/cookie/', fig: 'chrome-cookie' },
-    { label: 'Crediti immagini', href: '/crediti/', fig: 'chrome-crediti' },
-    { label: 'Stile', href: '/stile/', fig: 'chrome-stile' },
+    { label: 'Privacy', href: '/privacy/' },
+    { label: 'Cookie', href: '/cookie/' },
+    { label: 'Crediti immagini', href: '/crediti/' },
+    { label: 'Stile', href: '/stile/' },
   ]
+  const flink = (p) => `<a class="foot-link" href="${p.href}"${isCurrent(route, p.href) && p.href !== '/' ? ' aria-current="page"' : ''}>${esc(p.label)}</a>`
 
   return html`
     <footer class="site-footer" data-theme="ink">
       <div class="container--wide site-footer__inner">
 
         <section class="foot-cta" aria-labelledby="foot-title">
-          <p class="foot-cta__eyebrow label" data-reveal="fade"><span class="dot dot--accent" aria-hidden="true"></span>${esc(availability)}</p>
+          <p class="foot-cta__eyebrow pill" data-reveal="fade"><span class="dot dot--live" aria-hidden="true"></span>${esc(availability)}</p>
           <h2 class="foot-cta__title" id="foot-title" data-reveal="words">${splitWords(closing.title, { accent: closing.accent })}</h2>
           <p class="foot-cta__note" data-reveal="up">${esc(closing.note)}</p>
           <div class="foot-cta__row" data-reveal="up" style="--d:120ms">
-            ${pebble({ href: compact ? mail : cta.href, label, tone: 'minio', size: 'lg', shape: 1, iconName: 'arrow' })}
-            ${!compact && pebble({ href: mail, label: closing.labelCompact, tone: 'carta', size: 'lg', shape: 2, iconName: 'mail' })}
+            ${button({ href: compact ? mail : cta.href, label, size: 'lg', magnetic: true })}
+            ${!compact && button({ href: mail, label: closing.labelCompact, variant: 'ghost', size: 'lg', iconName: 'mail' })}
           </div>
         </section>
 
-        <nav class="foot-nav" aria-label="Pagine del sito" data-reveal="up">
-          <ul>
-            ${pages.map((p, i) => `<li>${pebble({ href: p.href, label: p.label, tone: 'carta', size: 'md', shape: i, current: isCurrent(route, p.href) })}</li>`)}
-          </ul>
-        </nav>
+        <div class="foot-grid" data-reveal="up">
+          <div class="foot-col foot-col--brand">
+            ${logo()}
+            <p class="foot-col__tag">${esc(site.tagline)}</p>
+            <p class="foot-col__place label">${esc(site.location.city)} (${esc(site.location.province)}) · ${COORDS}</p>
+          </div>
+          <nav class="foot-col" aria-label="Pagine del sito">
+            <p class="foot-col__head label">Pagine</p>
+            <ul class="foot-col__list">${pages.map((p) => `<li>${flink(p)}</li>`)}</ul>
+          </nav>
+          <div class="foot-col">
+            <p class="foot-col__head label">Contatti</p>
+            <ul class="foot-col__list">
+              <li><a class="foot-link" href="${mail}">${esc(site.contact.email)}</a></li>
+              <li><a class="foot-link" href="${tel}">${esc(site.contact.phone)}</a></li>
+              <li class="foot-col__note">${esc(site.contact.hours)} · ${esc(site.contact.reply)}</li>
+              <li class="foot-col__note">${esc(site.location.area)}</li>
+            </ul>
+          </div>
+          <div class="foot-col">
+            <p class="foot-col__head label">Social</p>
+            <ul class="foot-col__list">
+              ${site.social.map((s) => `<li><a class="foot-link" href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}<span class="foot-link__ext" aria-hidden="true">${icon('arrowUpRight')}</span><span class="sr-only"> (nuova scheda)</span></a></li>`)}
+            </ul>
+            <p class="foot-col__head label">Note</p>
+            <ul class="foot-col__list">${notes.map((n) => `<li>${flink(n)}</li>`)}</ul>
+          </div>
+        </div>
 
         <div class="foot-sign" data-reveal="draw">
           ${puppet('airone', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--airone' })}
@@ -245,48 +272,13 @@ function footer({ route, compact = false }) {
           <p class="foot-sign__tag">${esc(site.title)} · ${esc(site.tagline)}</p>
         </div>
 
-        <ul class="foot-data" data-reveal="up">
-          <li class="foot-data__cell">
-            ${figurina('chrome-email', { className: 'foot-data__fig' })}
-            <p class="label">Scrivimi</p>
-            <a class="foot-data__main uline" href="${mail}">${esc(site.contact.email)}</a>
-            <p class="foot-data__sub">${esc(site.contact.reply)}</p>
-          </li>
-          <li class="foot-data__cell">
-            ${figurina('chrome-telefono', { className: 'foot-data__fig' })}
-            <p class="label">Chiamami</p>
-            <a class="foot-data__main uline" href="${tel}">${esc(site.contact.phone)}</a>
-            <p class="foot-data__sub">${esc(site.contact.hours)}</p>
-          </li>
-          <li class="foot-data__cell">
-            ${figurina('chrome-sede', { className: 'foot-data__fig' })}
-            <p class="label">Sede</p>
-            <p class="foot-data__main">${esc(site.location.city)} (${esc(site.location.province)})</p>
-            <p class="foot-data__sub">${esc(site.location.cap)} · Italia<br>${esc(site.location.area)}</p>
-          </li>
-          <li class="foot-data__cell">
-            ${figurina('chrome-github', { className: 'foot-data__fig' })}
-            <p class="label">Social</p>
-            <ul class="foot-data__social">
-              ${site.social.map((s, k) => `<li>${pebble({ href: s.url, label: s.label, tone: 'inchiostro', size: 'sm', shape: k, iconName: 'arrowUpRight', external: true })}</li>`)}
-            </ul>
-            <p class="foot-data__sub">${site.social.map((s) => esc(s.handle)).join(' · ')}</p>
-          </li>
-        </ul>
-
         <div class="foot-legal" data-reveal="fade">
-          <ul class="foot-legal__links">
-            ${notes.map((n, k) => `<li>${pebble({ href: n.href, label: n.label, tone: 'inchiostro', size: 'sm', shape: k, fig: n.fig, iconBefore: true, current: route.path === n.href })}</li>`)}
-          </ul>
           <p class="foot-legal__id label">© ${year} ${esc(site.name)} · ${esc(legal)} · ${esc(site.location.city)} (${esc(site.location.province)}), Italia</p>
           <p class="foot-legal__credit label"><a class="uline" href="${esc(site.url)}" rel="author">Sito di ${esc(site.name)}</a> · ${esc(site.edition)}</p>
           <!-- Distintivo FrogDR col Domain Rating del dominio: è l'unica immagine
                caricata da un server esterno (vedi «Risorse di terze parti» in /cookie/). -->
           <a class="foot-legal__badge" href="https://frogdr.com/albertopecchini.it?utm_source=albertopecchini.it" target="_blank" rel="noopener"><img src="https://frogdr.com/albertopecchini.it/badge-dark-tiny.svg?round=1" alt="Domain Rating di albertopecchini.it misurato da FrogDR" width="224" height="20" loading="lazy" decoding="async"><span class="sr-only"> (nuova scheda)</span></a>
-        </div>
-
-        <div class="foot-top">
-          ${pebble({ href: '#main', label: 'Torna su', tone: 'carta', size: 'md', shape: 3, fig: 'chrome-su', iconBefore: true, attrs: { 'data-top': true } })}
+          <a class="foot-top link" href="#main" data-top><span class="link__label">Torna su</span>${icon('arrowUp')}</a>
         </div>
 
       </div>
@@ -302,6 +294,7 @@ function globals() {
       <div class="curtain__panel"></div>
       <div class="curtain__mark">${monogram({ className: 'monogram--draw' })}<span class="label" data-curtain-label>${esc(site.name)}</span></div>
     </div>
+    <div class="lume" aria-hidden="true" data-lume></div>
     <div class="cursor" aria-hidden="true" data-cursor-el><span class="cursor__label"></span></div>
     <div class="preview" aria-hidden="true" data-preview-el></div>
     <div class="lightbox" role="dialog" aria-modal="true" aria-label="Galleria immagini" data-theme="ink" data-lightbox-el hidden>

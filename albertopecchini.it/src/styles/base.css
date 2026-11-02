@@ -193,10 +193,28 @@ footer.site-footer {
 .label {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  font-weight: 400;
+  font-weight: 450;
   line-height: 1.4;
   letter-spacing: var(--track-label);
   color: var(--muted);
+}
+
+/* etichetta a pillola: bordo sottile, come le «eyebrow» di reflection */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 /* parole lunghe (nomi di dominio, termini tecnici) non devono mai allargare la pagina */
@@ -204,23 +222,34 @@ h1, h2, h3, h4, p, dd, li, a, figcaption {
   overflow-wrap: break-word;
 }
 
-.h1, .h2, .h3, .h4 {
-  font-weight: 560;
-  font-stretch: 94%;
+/* I titoli grandi sono in Fraunces, leggero e con la misura ottica al massimo:
+   le grazie si allungano e le curve si ammorbidiscono. I titoli piccoli
+   restano nel grottesco, a peso medio. */
+.h1, .h2 {
+  font-family: var(--font-serif);
+  font-weight: 380;
+  font-variation-settings: 'opsz' 144;
   letter-spacing: var(--track-display);
   line-height: var(--lh-tight);
   text-wrap: balance;
 }
 
+.h3, .h4 {
+  font-weight: 520;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
 .h1 { font-size: var(--fs-h1); }
-.h2 { font-size: var(--fs-h2); line-height: 1; }
-.h3 { font-size: var(--fs-h3); line-height: 1.08; letter-spacing: -0.025em; }
-.h4 { font-size: var(--fs-h4); line-height: 1.2; letter-spacing: -0.015em; font-stretch: 100%; }
+.h2 { font-size: var(--fs-h2); line-height: 1.02; }
+.h3 { font-size: var(--fs-h3); line-height: 1.12; }
+.h4 { font-size: var(--fs-h4); line-height: 1.2; letter-spacing: -0.012em; }
 
 .lead {
   font-size: var(--fs-lead);
-  line-height: 1.42;
-  letter-spacing: -0.012em;
+  line-height: 1.45;
+  letter-spacing: -0.008em;
   color: var(--fg);
   text-wrap: pretty;
   max-width: 42ch;
@@ -229,15 +258,19 @@ h1, h2, h3, h4, p, dd, li, a, figcaption {
 .serif-i {
   font-family: var(--font-serif);
   font-style: italic;
-  font-weight: 400;
-  font-stretch: 100%;
+  font-weight: 360;
+  font-variation-settings: 'opsz' 144;
   letter-spacing: -0.01em;
 }
 
-/* il corsivo graziato appare più piccolo del grottesco: lo compensiamo nei titoli */
-.h1 .serif-i, .h2 .serif-i, .w__i.serif-i, .hero__claim .serif-i {
-  font-size: 1.07em;
-  line-height: 0.9;
+/* dentro un titolo già graziato il corsivo prende il colore dell'accento */
+.h1 .serif-i, .h2 .serif-i, .w__i.serif-i {
+  color: var(--accent-text);
+}
+
+/* nel grottesco il corsivo graziato appare più piccolo: lo compensiamo */
+.h3 .serif-i, .h4 .serif-i, .lead .serif-i, p .serif-i {
+  font-size: 1.06em;
 }
 
 p {
@@ -249,6 +282,49 @@ p {
 .rule {
   height: 1px;
   background: var(--line-strong);
+}
+
+/* ── La luce che segue il puntatore (.lume) e l'aurora dell'hero ──────────── */
+/* Una macchia calda di minio, grande e sfocata, che insegue il mouse con un
+   ritardo setoso (motion.js, initLume): sulla carta scalda, sull'inchiostro
+   accende. Solo puntatori fini; via con prefers-reduced-motion. */
+
+.lume {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 44rem;
+  height: 44rem;
+  margin: -22rem 0 0 -22rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--glow), transparent 70%);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 1.2s ease;
+}
+
+.lume.is-visible {
+  opacity: 1;
+}
+
+/* le linee sottili si stendono quando entrano nello schermo */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .js .line-draw {
+      transform-origin: left;
+      animation: line-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+@keyframes line-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .dot {
@@ -342,15 +418,25 @@ p {
   --d: 0ms;
 }
 
+/* «up»: sale di poco e mette a fuoco (la sfocatura è il tocco morbido del 2.11.2026) */
 .js [data-reveal='up'] {
   opacity: 0;
-  transform: translate3d(0, 1.25rem, 0);
-  transition: opacity var(--t-3) var(--ease-out) var(--d), transform var(--t-3) var(--ease-out) var(--d);
+  transform: translate3d(0, 1.5rem, 0);
+  filter: blur(6px);
+  transition: opacity var(--t-4) var(--ease-silk) var(--d), transform var(--t-4) var(--ease-silk) var(--d), filter var(--t-4) var(--ease-silk) var(--d);
 }
 
 .js [data-reveal='fade'] {
   opacity: 0;
-  transition: opacity var(--t-3) ease var(--d);
+  transition: opacity var(--t-4) ease var(--d);
+}
+
+/* «soft»: appena più grande e sfocato, si posa come un velo */
+.js [data-reveal='soft'] {
+  opacity: 0;
+  transform: scale(1.025);
+  filter: blur(10px);
+  transition: opacity var(--t-5) var(--ease-silk) var(--d), transform var(--t-5) var(--ease-silk) var(--d), filter var(--t-5) var(--ease-silk) var(--d);
 }
 
 .js [data-reveal='scale'] {
@@ -388,14 +474,17 @@ p {
 /* "draw": il tratto si disegna (regole sui path in layout.css, sezione footer) */
 
 .js [data-reveal='words'] .w__i {
-  transform: translate3d(0, 108%, 0);
-  transition: transform 0.7s var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 22ms + var(--d, 0ms));
+  opacity: 0;
+  transform: translate3d(0, 60%, 0);
+  filter: blur(8px);
+  transition: transform 1s var(--ease-silk), opacity 0.8s ease, filter 1s var(--ease-silk);
+  transition-delay: calc(var(--i, 0) * 34ms + var(--d, 0ms));
 }
 
 .js [data-reveal].is-in {
   opacity: 1;
   transform: none;
+  filter: none;
 }
 
 .js [data-reveal='clip'].is-in [data-clip],
@@ -407,6 +496,8 @@ p {
 .js [data-reveal='clip'].is-in .cover__inner,
 .js [data-reveal='words'].is-in .w__i {
   transform: none;
+  opacity: 1;
+  filter: none;
 }
 
 .js [data-reveal='clip'].is-in .media__caption,
@@ -430,11 +521,12 @@ p {
   --enter: 240ms;
 }
 
-.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) :is([data-reveal='up'], [data-reveal='fade']) {
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) :is([data-reveal='up'], [data-reveal='fade'], [data-reveal='soft']) {
   opacity: 1;
   transform: none;
+  filter: none;
   transition: none;
-  animation: reveal-up var(--t-3) var(--ease-out) calc(var(--d) + var(--enter)) both;
+  animation: reveal-up var(--t-4) var(--ease-silk) calc(var(--d) + var(--enter)) both;
 }
 
 .js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='fade'] {
@@ -442,10 +534,17 @@ p {
   animation-timing-function: ease;
 }
 
+.js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='soft'] {
+  animation-name: reveal-soft;
+  animation-duration: var(--t-5);
+}
+
 .js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) [data-reveal='words'] .w__i {
   transform: none;
+  opacity: 1;
+  filter: none;
   transition: none;
-  animation: reveal-word 0.7s var(--ease-out) calc(var(--i, 0) * 22ms + var(--d) + var(--enter)) both;
+  animation: reveal-word 1s var(--ease-silk) calc(var(--i, 0) * 34ms + var(--d) + var(--enter)) both;
 }
 
 .js :is(.hero, .phead, .cs-hero, .shero__grid, .cnt__intro, .nf) :is([data-reveal='clip'] [data-clip], [data-reveal='clip'][data-clip]) {
@@ -470,15 +569,19 @@ p {
 }
 
 @keyframes reveal-up {
-  from { opacity: 0; transform: translate3d(0, 1.25rem, 0); }
+  from { opacity: 0; transform: translate3d(0, 1.5rem, 0); filter: blur(6px); }
 }
 
 @keyframes reveal-fade {
   from { opacity: 0; }
 }
 
+@keyframes reveal-soft {
+  from { opacity: 0; transform: scale(1.025); filter: blur(10px); }
+}
+
 @keyframes reveal-word {
-  from { transform: translate3d(0, 108%, 0); }
+  from { opacity: 0; transform: translate3d(0, 60%, 0); filter: blur(8px); }
 }
 
 @keyframes reveal-clip {
@@ -493,9 +596,10 @@ p {
   display: inline;
 }
 
+/* le parole non sono più ritagliate: salgono sfocate e si mettono a fuoco,
+   quindi il contenitore non deve tagliare l'alone */
 .w {
   display: inline-block;
-  overflow: hidden;
   vertical-align: top;
   padding: 0.08em 0.06em 0.14em;
   margin: -0.08em -0.06em -0.14em;
@@ -533,6 +637,12 @@ p {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
+    filter: none !important;
+  }
+
+  .lume,
+  .aurora {
+    display: none !important;
   }
 
   .js [data-reveal='draw'] .sig__mark path {

@@ -1,540 +1,211 @@
-/* Home: hero e sezioni. Composizione mobile progettata a parte, poi estesa. */
+/* La home (dal 2.11.2026, impaginata come reflection.ai con un quinto di
+   anthropic.com): hero centrato con l'aurora, l'idea, le quattro aree in schede,
+   i siti in vetrina, la fila che scorre, il manifesto, le convinzioni, il
+   metodo, i numeri, lo studio, l'indice. Il terminale e il carosello sono
+   quelli di prima. */
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 
 .hero {
   position: relative;
-  padding-top: var(--header-h);
   overflow: hidden;
+  padding-top: calc(var(--header-h) + clamp(3rem, 9vh, 7.5rem));
+  padding-bottom: clamp(1rem, 3vw, 2rem);
+  text-align: center;
 }
 
-/* Luce calda che sale dal basso, a cavallo della piega: metà nell'hero e metà
-   nella sezione che segue (.hero + .intro::before), stessa ellisse centrata sul
-   confine, così il passaggio non si vede. Respira piano: c'è qualcosa, qui sotto. */
-.hero,
-.hero + .intro {
-  --glow-rx: 120vw;
-  --glow-ry: min(34svh, 18rem);
-  --glow: rgb(229 72 31 / 0.26), rgb(255 138 76 / 0.12) 42%, rgb(255 184 128 / 0.04) 72%, transparent 100%;
-}
-
-.hero__glow {
+/* l'aurora: tre macchie sfocate di minio, pesca e avorio che vagano lente
+   dietro il titolo; tutte sulla GPU (solo transform), filtrate una volta sola */
+.aurora {
   position: absolute;
-  inset: 0;
+  inset: -10% -10% 30%;
+  z-index: 0;
+  filter: blur(64px);
+  opacity: 0.85;
   pointer-events: none;
-  background: radial-gradient(var(--glow-rx) var(--glow-ry) at 50% 100%, var(--glow));
 }
 
-.hero + .intro {
-  position: relative;
-  isolation: isolate;
-}
-
-.hero + .intro::before {
-  content: '';
+.aurora i {
   position: absolute;
-  inset: 0 0 auto;
-  z-index: -1;
-  height: var(--glow-ry);
-  pointer-events: none;
-  background: radial-gradient(var(--glow-rx) var(--glow-ry) at 50% 0%, var(--glow));
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.aurora i:nth-child(1) {
+  left: 6%;
+  top: 8%;
+  width: 46rem;
+  height: 30rem;
+  background: radial-gradient(closest-side, var(--glow), transparent);
+}
+
+.aurora i:nth-child(2) {
+  right: -4%;
+  top: -2%;
+  width: 38rem;
+  height: 38rem;
+  background: radial-gradient(closest-side, rgb(255 184 150 / 0.5), transparent);
+}
+
+.aurora i:nth-child(3) {
+  left: 38%;
+  bottom: -5%;
+  width: 34rem;
+  height: 24rem;
+  background: radial-gradient(closest-side, rgb(255 255 250 / 0.9), transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero__glow,
-  .hero + .intro::before {
-    animation: glow 6s ease-in-out infinite alternate;
-  }
+  .aurora i:nth-child(1) { animation: aurora-1 24s ease-in-out infinite alternate; }
+  .aurora i:nth-child(2) { animation: aurora-2 29s ease-in-out infinite alternate; }
+  .aurora i:nth-child(3) { animation: aurora-3 21s ease-in-out infinite alternate; }
 }
 
-@keyframes glow {
-  from { opacity: 0.7; }
-  to { opacity: 1; }
+@keyframes aurora-1 {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(12%, 8%, 0) scale(1.18); }
+}
+
+@keyframes aurora-2 {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-14%, 10%, 0) scale(0.92); }
+}
+
+@keyframes aurora-3 {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-10%, -12%, 0) scale(1.25); }
 }
 
 .hero__wrap {
   position: relative;
-  container-type: inline-size;
+  z-index: 1;
   display: grid;
-  min-height: calc(100svh - var(--header-h));
-  padding-block: 1rem 1.25rem;
-  align-content: start;
+  justify-items: center;
+  gap: 1.5rem;
+  max-width: 58rem;
 }
 
-/* prima riga: il saluto (volto, «Ciao, sono» in corsivo graziato), il luogo, la disponibilità */
-.hero__hello {
+.hero__eyebrow {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.hero__place {
-  display: none;
-}
-
-.hero__hi {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
+.hero__eyebrow .dot {
+  margin-right: 0;
 }
 
 .hero__avatar {
-  position: relative;
-  flex: none;
-  width: 2.75rem;
-  height: 2.75rem;
-}
-
-.hero__avatar-ph {
   display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: -0.3rem;
   overflow: hidden;
-  /* la fototessera è scontornata: il disco di carta le fa da fondo */
-  background: var(--bg-3);
-  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent);
+  border-radius: 50%;
+  background: var(--bg-2);
 }
 
-/* la testa sta bassa nella fototessera: ingrandita dal basso, sale nel disco */
 .hero__avatar img {
-  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.12);
-  transform-origin: 50% 100%;
-}
-
-.hero__avatar-dot {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 50%;
-  background: #2f9e5b;
-  box-shadow: 0 0 0 2px var(--bg);
-}
-
-.hero__hi-text {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(1.75rem, 1.2rem + 1.7vw, 2.75rem);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-/* anche sul telefono: ci dorme sopra l'aragosta (client/ink.js); stretta, va a capo */
-.hero__avail {
-  max-width: 9.75rem;
-  color: var(--fg);
-  text-align: right;
-}
-
-@media (min-width: 600px) {
-  .hero__avail {
-    max-width: none;
-    text-align: left;
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero__hello {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  }
-
-  .hero__place {
-    display: block;
-  }
-
-  .hero__avail {
-    justify-self: end;
-  }
 }
 
 .hero__title {
-  margin: 0;
-}
-
-.hero__name {
-  display: block;
-  /* il cognome, la parola più lunga, occupa tutta la larghezza */
-  font-size: 32.8cqw;
-  font-weight: 600;
-  font-stretch: 86%;
-  letter-spacing: -0.055em;
-  line-height: 0.82;
-}
-
-.hero__word {
-  display: block;
-  overflow: hidden;
-  padding-block: 0.04em 0.02em;
-  /* il crenaggio negativo accorcia l'ultima lettera: spazio in più a destra
-     perché l'overflow non la tagli, compensato dal margine */
-  padding-right: 0.06em;
-  margin-right: -0.06em;
-}
-
-/* sotto il cognome, il posto per la coda della p minuscola */
-.hero__word--2 {
-  padding-bottom: 0.19em;
-}
-
-.hero__word > span {
-  display: inline-block;
-}
-
-.js .hero__word > span {
-  animation: rise 0.85s var(--ease-out) 0.05s both;
-}
-
-.js .hero__word--2 > span {
-  animation-delay: 0.13s;
-}
-
-.hero__word--2 {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--fg);
-}
-
-@keyframes rise {
-  from { transform: translate3d(0, 104%, 0); }
-}
-
-/* L'inchiostro di PECCHINI e l'aragosta che lo versa (client/ink.js). Il nome
-   resta testo HTML; sopra, un SVG ridisegna il contorno con lo stesso carattere
-   e dei canvas ci mettono il liquido (ritagliato dalla stessa parola), il getto,
-   le gocce e l'aragosta. Finché lo script non l'ha misurato si vede il
-   contorno dell'HTML, poi il suo sparisce e resta quello dell'SVG. */
-.ink {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  overflow: visible;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
-}
-
-.is-inked > .ink {
-  opacity: 1;
-}
-
-.is-inked [data-ink-word] {
-  -webkit-text-stroke-color: transparent;
-}
-
-.ink__outline {
-  fill: none;
-  stroke: var(--fg);
-  stroke-width: 1.5px;
-}
-
-/* toccare l'aragosta che dorme la sveglia */
-.ink__hit {
-  position: absolute;
-  z-index: 3;
-  display: none;
-  cursor: pointer;
-}
-
-[data-ink='dorme'] .ink__hit {
-  display: block;
-}
-
-/* il respiro nel sonno: il guscio si gonfia appena, poggiato sull'etichetta
-   (--ox e --oy, da ink.js: il centro in basso dell'aragosta che dorme) */
-.ink__cray {
-  transform-origin: var(--ox, 50%) var(--oy, 100%);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  [data-ink='dorme'] .ink__cray {
-    animation: ink-breathe 3.8s ease-in-out infinite;
-  }
-}
-
-@keyframes ink-breathe {
-  50% { transform: scale(1.012, 1.035); }
-}
-
-/* le z e il «!»: testo HTML sopra la testa, che ink.js sposta con lei */
-.ink__marks {
-  will-change: transform;
-}
-
-.ink__zzz {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: scale(var(--s, 1));
-  transform-origin: 0 0;
-}
-
-.ink__zzz span,
-.ink__bang {
-  position: absolute;
-  top: -0.8em; /* con line-height 1, la linea di base cade circa sul punto dato */
-  left: 0;
+  max-width: 14ch;
   font-family: var(--font-serif);
-  font-style: italic;
-  line-height: 1;
-  opacity: 0;
+  font-size: var(--fs-display);
+  font-weight: 330;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.028em;
+  line-height: 0.98;
+  text-wrap: balance;
 }
 
-.ink__zzz span {
-  font-size: calc(17px + var(--i) * 5px);
-  color: var(--muted);
-}
-
-[data-ink='dorme'] .ink__zzz span {
-  animation: ink-z 3.3s ease-in infinite;
-  animation-delay: calc(var(--i) * 1.1s);
-}
-
-@keyframes ink-z {
-  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
-  18% { opacity: 0.85; }
-  100% { opacity: 0; transform: translate(30px, -52px) scale(1.2); }
-}
-
-.ink__bang {
-  color: var(--accent);
-}
-
-.ink__bang.is-on {
-  animation: ink-bang 0.95s var(--ease-out);
-}
-
-@keyframes ink-bang {
-  0% { opacity: 0; transform: translateY(8px) scale(0.3); }
-  18% { opacity: 1; transform: translateY(0) scale(1.2); }
-  32% { transform: scale(1); }
-  72% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-10px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-ink='dorme'] .ink__zzz span {
-    animation: none;
-    opacity: 0.7;
-    transform: translate(calc(var(--i) * 12px), calc(var(--i) * -16px));
-  }
-}
-
-@media print {
-  .ink {
-    display: none;
-  }
-
-  .is-inked [data-ink-word] {
-    -webkit-text-stroke-color: var(--fg);
-  }
-}
-
-/* ── Hero, sotto il nome ──────────────────────────────────────────────────────
-   A sinistra il luogo comune sbarrato col pennarello, il timbro e la risposta,
-   poi l'invito; a destra il terminale, un comando per mestiere, col suo adesivo;
-   in fondo i siti online. Sotto, la carta nuda. */
-
-.hero__body {
-  position: relative;
-  display: grid;
-  gap: 2.5rem;
-  padding-top: 1.5rem;
-}
-
-.hero__pitch {
-  container-type: inline-size;
-  display: grid;
-  justify-items: start;
-  align-content: start;
-}
-
-/* la riga di commento: // [casa · sito · marchio] un solo interlocutore */
-.hero__kicker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.hero__slashes {
-  color: var(--accent-text);
-  font-weight: 600;
-}
-
-.hero__pill {
-  padding: 0.2rem 0.6rem 0.25rem;
-  border-radius: var(--r-2);
-  background: var(--fg);
-  color: var(--bg);
-}
-
-/* il luogo comune e la risposta: lo stesso corpo, uno sopra l'altra */
-.hero__myth,
-.hero__claim {
-  font-size: min(11.4cqw, 4.5rem);
-  font-weight: 800;
-  font-stretch: 88%;
-  letter-spacing: -0.05em;
-  line-height: 0.94;
-}
-
-.hero__myth {
-  position: relative;
-  margin-top: 0.8rem;
-}
-
-.hero__myth s {
-  display: grid;
-  justify-items: start;
-  text-decoration: none;
-}
-
-/* una riga, un colpo di pennarello: si stende da sinistra dopo che il testo è arrivato */
-.hero__strike {
-  position: relative;
-  white-space: nowrap;
-}
-
-.hero__strike::after {
-  content: '';
-  position: absolute;
-  top: 47%;
-  right: -0.14em;
-  left: -0.12em;
-  height: 0.13em;
-  border-radius: var(--r-full);
-  background: var(--accent);
-  clip-path: inset(0 0 0 0 round 1em);
-  transform: rotate(-1.7deg);
-  animation: hero-strike 0.42s var(--ease-in-out) calc(var(--enter, 0ms) + 700ms) both;
-}
-
-.hero__strike--2::after {
-  top: 51%;
-  transform: rotate(1.1deg);
-  animation-delay: calc(var(--enter, 0ms) + 980ms);
-}
-
-@keyframes hero-strike {
-  from { clip-path: inset(0 100% 0 0 round 1em); }
-}
-
-/* il timbro cade sul vuoto a destra della prima riga, più corta della seconda */
-.hero__stamp {
-  position: absolute;
-  top: -0.1em;
-  left: 85%;
-  padding: 0.34em 0.6em 0.28em;
-  border: 0.16em solid currentColor;
-  border-radius: 0.5em;
-  outline: 0.07em solid currentColor;
-  outline-offset: -0.34em;
-  color: var(--accent);
-  font-size: max(0.34em, 1.3125rem);
-  font-stretch: 100%;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  transform: rotate(8deg);
-  animation: hero-stamp 0.34s cubic-bezier(0.2, 1.5, 0.4, 1) calc(var(--enter, 0ms) + 1420ms) both;
-}
-
-@keyframes hero-stamp {
-  from { opacity: 0; transform: rotate(-6deg) scale(2.4); }
-}
-
-.hero__claim {
-  margin-top: 0.05em;
+.hero__title .serif-i {
+  font-weight: 320;
 }
 
 .hero__lead {
-  max-width: 66ch;
-  margin-top: 0.9rem;
+  max-width: 46ch;
+  font-size: var(--fs-lead);
+  line-height: 1.45;
   color: var(--muted);
+  text-wrap: pretty;
 }
 
 .hero__actions {
-  display: grid;
-  gap: 0.6rem;
-  width: 100%;
-  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
-/* «Premi C per copiare la mia email»: un tasto a sé, in monospaziato */
+/* «Premi C per copiare la mia email»: una riga discreta sotto i tasti */
 .hero__copy {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 3.75rem;
-  padding: 0.5rem 0.9rem;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-1);
-  background: rgb(255 255 255 / 0.55);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  line-height: 1.3;
-  transition: border-color var(--t-2) ease, background-color var(--t-2) ease;
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  color: var(--muted);
+  transition: color var(--t-2) ease;
 }
 
-.hero__copy-ask,
+.hero__copy-fig {
+  width: 2.25rem;
+  height: 2.25rem;
+  object-fit: contain;
+  transition: transform var(--t-3) var(--ease-silk);
+}
+
 .hero__copy-done {
-  grid-area: 1 / 1;
-  transition: opacity var(--t-1) ease, transform var(--t-2) var(--ease-out);
-}
-
-.hero__copy-done {
-  opacity: 0;
-  transform: translate3d(0, 0.5rem, 0);
-}
-
-.hero__copy.is-done {
-  border-color: #1d7a46;
-  background: rgb(47 158 91 / 0.12);
-}
-
-.hero__copy.is-done .hero__copy-ask {
-  opacity: 0;
-  transform: translate3d(0, -0.5rem, 0);
-}
-
-.hero__copy.is-done .hero__copy-done {
-  opacity: 1;
-  transform: none;
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent-text);
 }
 
 .hero__copy-tick {
-  color: #1d7a46;
-  font-weight: 700;
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.75rem;
+}
+
+.hero__copy.is-done .hero__copy-ask {
+  display: none;
+}
+
+.hero__copy.is-done .hero__copy-done {
+  display: inline-flex;
+}
+
+.hero__copy.is-done .hero__copy-fig {
+  transform: rotate(-8deg) scale(1.15);
 }
 
 .hero__copy kbd {
   display: inline-grid;
   place-items: center;
-  min-width: 1.6rem;
-  height: 1.6rem;
-  margin-inline: 0.25rem;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding-inline: 0.3rem;
+  margin-inline: 0.15rem;
   border: 1px solid var(--line-strong);
-  border-bottom-width: 3px;
-  border-radius: 5px;
-  background: var(--bg);
+  border-bottom-width: 2px;
+  border-radius: 0.3rem;
   font: inherit;
-  font-weight: 600;
+  color: var(--fg);
 }
 
-/* senza tastiera la C non c'è: si tocca */
 .hero__copy-fine {
   display: none;
 }
@@ -549,53 +220,435 @@
   }
 
   .hero__copy:hover {
-    border-color: var(--fg);
-    background: #fff;
+    color: var(--fg);
   }
 }
 
-/* la cassetta delle lettere affacciata sull'angolo del tasto: sobbalza quando l'indirizzo è copiato */
-.hero__copy-fig {
+/* il terminale, dritto e centrato, in un alone di minio */
+.hero__stage-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 62rem;
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+}
+
+/* il fascio: una linea sottile sotto il terminale, con una luce di minio che
+   la percorre (il «beam» di reflection, in piccolo) */
+.hero__beam {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  overflow: hidden;
+  background: linear-gradient(90deg, transparent, var(--line-strong) 25%, var(--line-strong) 75%, transparent);
+}
+
+.hero__beam i {
   position: absolute;
-  top: -1.55rem;
-  right: -0.9rem;
-  width: 2.9rem;
-  transform: rotate(9deg);
-  transform-origin: 50% 100%;
-  filter: drop-shadow(0.12rem 0.16rem 0 rgb(16 17 15 / 0.22));
+  inset: 0 auto 0 0;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translateX(-100%);
 }
 
-.hero__copy.is-done .hero__copy-fig {
-  animation: hero-hop 0.6s var(--ease-out);
+@media (prefers-reduced-motion: no-preference) {
+  .hero__beam i {
+    animation: beam 5.5s cubic-bezier(0.45, 0, 0.3, 1) 1.5s infinite;
+  }
 }
 
-@keyframes hero-hop {
-  30% { transform: translate3d(0, -0.7rem, 0) rotate(-6deg) scale(1.12); }
-  60% { transform: translate3d(0, 0, 0) rotate(12deg) scale(0.96); }
+@keyframes beam {
+  to { transform: translateX(455%); }
 }
 
-.hero__trust {
+/* ── 01 · L'idea ──────────────────────────────────────────────────────────── */
+
+.mission__grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.mission__body {
+  display: grid;
+  gap: 2rem;
+  justify-items: start;
+}
+
+.mission__text {
+  max-width: 24ch;
+  font-family: var(--font-serif);
+  font-size: var(--fs-h1);
+  font-weight: 340;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.022em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.mission__text .w__i.serif-i {
+  font-style: italic;
+}
+
+@media (min-width: 900px) {
+  .mission__grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--col-gap);
+  }
+
+  .mission__label {
+    padding-top: 0.6rem;
+  }
+}
+
+/* ── 02 · Le quattro aree ─────────────────────────────────────────────────── */
+
+.aree__grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.acard {
+  border-radius: var(--r-3);
+  background: var(--card);
+  border: 1px solid var(--line);
+  transition: transform var(--t-3) var(--ease-silk), border-color var(--t-3) ease, box-shadow var(--t-3) var(--ease-silk);
+}
+
+.acard__link {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  height: 100%;
+  min-height: 22rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.acard__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.acard__fig {
+  width: auto;
+  height: clamp(5rem, 4rem + 3vw, 7rem);
+  margin-block: 0.75rem 0.5rem;
+  object-fit: contain;
+  object-position: 0 100%;
+  transition: transform var(--t-4) var(--ease-silk);
+}
+
+.acard__list {
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.acard__more {
+  align-self: end;
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
+@media (hover: hover) {
+  .acard:hover {
+    transform: translateY(-4px);
+    border-color: var(--line-strong);
+    box-shadow: 0 2rem 3rem -2rem rgb(0 0 0 / 0.25);
+  }
+
+  .acard:hover .acard__fig {
+    transform: translateY(-4px) rotate(-3deg) scale(1.04);
+  }
+}
+
+@media (min-width: 600px) {
+  .aree__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .aree__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* il bordo che si accende dove passa il mouse (.spot, --mx/--my da lume.js) */
+.spot {
+  position: relative;
+  isolation: isolate;
+}
+
+.spot::before,
+.spot::after {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+
+/* l'alone sul bordo: un anello di 1px ritagliato con la maschera */
+.spot::before {
+  inset: -1px;
+  z-index: 1;
+  padding: 1px;
+  background: radial-gradient(16rem circle at var(--mx, 50%) var(--my, 50%), var(--accent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* il velo sul fondo */
+.spot::after {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), var(--glow), transparent 70%);
+}
+
+.is-lit .spot::before,
+.is-lit .spot::after,
+.spot:hover::before,
+.spot:hover::after {
+  opacity: 1;
+}
+
+/* ── 03 · Siti web: la testata (il carosello è più sotto) ────────────────── */
+
+.wsel__copy {
+  display: grid;
+  gap: 1rem;
+}
+
+/* ── La fila dei siti online ──────────────────────────────────────────────── */
+
+.strip {
+  padding-block: clamp(1rem, 2vw, 2rem) var(--section);
+}
+
+.strip__head {
+  margin-bottom: 1.25rem;
+}
+
+.strip__label {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem 1rem;
-  margin-top: 1rem;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
   color: var(--fg);
 }
 
-.hero__trust li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+.strip__fig {
+  width: 1.7rem;
+  margin-block: -0.9rem -0.35rem;
 }
 
-.hero__trust li::before {
-  content: '✓' / '';
-  color: #1d7a46;
-  font-size: 0.8125rem;
-  font-weight: 700;
+.strip__note {
+  color: var(--muted);
 }
 
-/* ── Il terminale ── */
+.marquee {
+  overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  padding-block: 0.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee__track {
+    animation: marquee 48s linear infinite;
+  }
+
+  .marquee:hover .marquee__track,
+  .marquee:focus-within .marquee__track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  to { transform: translateX(calc(-50% - 0.5rem)); }
+}
+
+.strip__list {
+  display: flex;
+  gap: 1rem;
+}
+
+.strip__list > li {
+  width: 17rem;
+  flex: none;
+}
+
+/* ── Il manifesto ─────────────────────────────────────────────────────────── */
+
+.banner-wrap {
+  padding-block: 0 var(--section);
+}
+
+.banner {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  min-height: clamp(30rem, 72vh, 46rem);
+  border-radius: var(--r-4);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* dietro, un'aurora scura di minio */
+.banner::before {
+  content: '';
+  position: absolute;
+  right: -10%;
+  top: -30%;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--glow), transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.banner__img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  width: min(80%, 44rem);
+  height: auto;
+  object-fit: contain;
+  object-position: 100% 100%;
+  filter: drop-shadow(0 2rem 3rem rgb(0 0 0 / 0.5));
+}
+
+.banner__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(10 10 10 / 0) 40%, rgb(10 10 10 / 0.75) 100%), linear-gradient(90deg, rgb(10 10 10 / 0.85) 0%, rgb(10 10 10 / 0.3) 55%, rgb(10 10 10 / 0) 100%);
+  pointer-events: none;
+}
+
+.banner__body {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+  align-content: end;
+  max-width: 34rem;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.banner__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h1);
+  font-weight: 330;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.banner__lead {
+  max-width: 36ch;
+  color: var(--muted);
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+}
+
+/* la foto si avvicina mentre si scorre (solo con animation-timeline) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .js .banner__img {
+      animation: banner-zoom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 70%;
+    }
+  }
+}
+
+@keyframes banner-zoom {
+  from { transform: translate3d(4%, 6%, 0) scale(1.06); }
+  to { transform: none; }
+}
+
+@media (max-width: 767px) {
+  .banner {
+    min-height: 0;
+  }
+
+  .banner__img {
+    position: relative;
+    width: 100%;
+    max-width: 30rem;
+    margin: 1.5rem auto 0;
+    order: -1;
+  }
+
+  .banner__shade {
+    background: linear-gradient(180deg, rgb(10 10 10 / 0) 50%, rgb(10 10 10 / 0.9) 100%);
+  }
+
+  .banner__body {
+    margin-top: -5rem;
+  }
+}
+
+/* ── 04 · Le convinzioni ──────────────────────────────────────────────────── */
+
+.conv__grid {
+  display: grid;
+  gap: 0.75rem;
+  counter-reset: conv;
+}
+
+.conv__item {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--r-3);
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.conv__n {
+  color: var(--accent-text);
+}
+
+.conv__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h2);
+  font-weight: 360;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+.conv__text {
+  color: var(--muted);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+@media (min-width: 800px) {
+  .conv__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+/* ── Il terminale (com'era) ── */
 
 .hero__stage {
   --sticker: min(38%, 17rem);
@@ -879,7 +932,8 @@
   to { transform: translate3d(0, 0.2rem, 0) rotate(1.2deg); }
 }
 
-/* ── I siti online ── */
+
+/* ── I siti online: le schede (com'erano) ── */
 
 .hero__live {
   display: grid;
@@ -1023,148 +1077,6 @@
   }
 }
 
-@media (min-width: 600px) {
-  .hero__kicker {
-    font-size: 0.9375rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .hero,
-  .hero + .intro {
-    --glow-rx: min(96vw, 76rem);
-    --glow-ry: min(52svh, 32rem);
-  }
-
-  /* da tablet in su il nome sta su una riga, a tutta larghezza */
-  .hero__name {
-    font-size: 17.65cqw;
-    line-height: 0.8;
-    white-space: nowrap;
-  }
-
-  .hero__word {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  /* tutti i siti in una riga: --n è quanti sono (home.js) */
-  .hero__sites {
-    grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
-  }
-
-  .hero__sites > li:last-child:nth-child(odd) {
-    grid-column: auto;
-  }
-
-  .hero__sites > li:last-child:nth-child(odd) .hsite {
-    grid-template-columns: none;
-    align-items: normal;
-  }
-}
-
-@media (min-width: 900px) {
-  .hero__wrap {
-    grid-template-rows: auto auto auto minmax(0, 1fr);
-  }
-
-  /* due colonne: l'invito e il terminale; i siti affacciano sul bordo della prima schermata */
-  .hero__body {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 6fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 1.5rem clamp(2rem, 4.5vw, 5rem);
-    padding-top: clamp(1.25rem, 2.6vh, 2rem);
-  }
-
-  .hero__stage {
-    --sticker: min(40%, 17rem);
-    --landing: 4.6rem;
-    align-self: center;
-  }
-
-  .hero__live {
-    grid-column: 1 / -1;
-    align-self: end;
-  }
-}
-
-@media (min-width: 1100px) {
-  /* in alto resta il posto per l'aragosta, che dorme sopra la disponibilità e
-     cresce col nome: a scaglioni fino a 1680 px, così non finisce sotto i tasti
-     della testata (19.10.2026) */
-  .hero__wrap {
-    padding-block: 4rem 1.5rem;
-  }
-
-  /* con cinque siti in riga la card resta in piedi (stesa, miniatura-nome-stato,
-     non ci stava): la freccia in basso a destra, accanto al dominio */
-  .hsite__text {
-    padding-right: 1.3rem;
-  }
-
-  .hsite__arrow {
-    position: absolute;
-    right: 0.7rem;
-    bottom: 0.75rem;
-    display: block;
-    font-size: 0.95rem;
-    transition: color var(--t-2) ease;
-  }
-}
-
-@media (min-width: 1280px) {
-  .hero__wrap {
-    padding-top: 4.5rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .hero__wrap {
-    padding-top: 5.75rem;
-  }
-}
-
-@media (min-width: 1680px) {
-  .hero__wrap {
-    padding-top: 7rem;
-  }
-}
-
-/* schermi alti: il titolo può prendersi più spazio senza spingere i siti sotto la piega */
-@media (min-width: 1100px) and (min-height: 960px) {
-  .hero__myth,
-  .hero__claim {
-    font-size: min(11.4cqw, 5.25rem);
-  }
-}
-
-/* schermi larghi ma bassi (1280×720, 1366×768): tutto un filo più piccolo,
-   così i siti online affacciano sul bordo della prima schermata */
-@media (min-width: 1100px) and (max-height: 820px) {
-  .hero__hi-text {
-    font-size: 2rem;
-  }
-
-  .hero__avatar {
-    width: 2.375rem;
-    height: 2.375rem;
-  }
-
-  .hero__myth,
-  .hero__claim {
-    font-size: min(11.4cqw, 3.5rem);
-  }
-
-  .hero__lead {
-    margin-top: 0.75rem;
-    font-size: var(--fs-small);
-  }
-
-  .hero__actions {
-    margin-top: 1.1rem;
-  }
-}
-
 /* ── Indicatore di posizione (solo schermi larghi) ────────────────────────── */
 
 .secind {
@@ -1212,87 +1124,6 @@
   }
 }
 
-/* ── 01 · Discipline ──────────────────────────────────────────────────────── */
-
-.intro__statement {
-  display: grid;
-  gap: 1.5rem;
-  margin-bottom: clamp(3rem, 7vw, 7rem);
-}
-
-.intro__text {
-  font-size: clamp(1.625rem, 1rem + 2.7vw, 3.5rem);
-  font-weight: 520;
-  font-stretch: 94%;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-
-.disc {
-  display: grid;
-  gap: 2.5rem;
-}
-
-.disc__card {
-  display: grid;
-  gap: 1rem;
-  align-content: start;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--line-strong);
-}
-
-.disc__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  color: var(--fg);
-}
-
-.disc__title {
-  margin-top: 0.5rem;
-  max-width: 16ch;
-}
-
-.disc__list {
-  font-size: var(--fs-small);
-  color: var(--muted);
-}
-
-.disc__link {
-  justify-self: start;
-}
-
-@media (hover: hover) {
-  .disc__card:hover .link__label {
-    background-size: 0 1px;
-    background-position: 100% 100%;
-  }
-
-  .disc__card:hover .disc__link .icon {
-    transform: translateX(0.3rem);
-  }
-}
-
-@media (min-width: 768px) {
-  .intro__statement {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
-    gap: var(--col-gap);
-  }
-
-  .disc {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--col-gap);
-  }
-
-  .disc__card:nth-child(2) {
-    margin-top: clamp(2rem, 5vw, 5rem);
-  }
-
-  .disc__card:nth-child(3) {
-    margin-top: clamp(4rem, 10vw, 10rem);
-  }
-}
 
 /* ── 02 · Siti web ────────────────────────────────────────────────────────── */
 /* Telefono e tablet: una fila che scorre col dito (scroll-snap nativo).
@@ -1628,143 +1459,6 @@
   }
 }
 
-/* ── 03 · Web ─────────────────────────────────────────────────────────────── */
-/* Solo testo: il titolo a sinistra, metodo e tre punti a destra. */
-
-.webt__grid {
-  display: grid;
-  gap: 2rem;
-}
-
-.webt__copy {
-  display: grid;
-  gap: 1.5rem;
-  align-content: start;
-}
-
-.webt__title {
-  max-width: 11ch;
-}
-
-.webt__side {
-  display: grid;
-  gap: 1.5rem;
-  justify-items: start;
-  align-content: end;
-}
-
-.webt__points {
-  width: 100%;
-  border-top: 1px solid var(--line);
-}
-
-.webt__points li {
-  display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  padding-block: 0.85rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.webt__points .label {
-  padding-top: 0.25rem;
-  color: var(--accent);
-}
-
-@media (min-width: 1024px) {
-  .webt__grid {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    gap: clamp(2rem, 6vw, 7rem);
-    align-items: end;
-  }
-}
-
-/* ── 04 · Servizi ─────────────────────────────────────────────────────────── */
-
-.svc__rows {
-  border-top: 1px solid var(--line-strong);
-}
-
-.svc__row {
-  border-bottom: 1px solid var(--line-strong);
-}
-
-.svc__link {
-  position: relative;
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
-  gap: 0.5rem 1rem;
-  align-items: baseline;
-  padding-block: clamp(1.25rem, 3vw, 2.75rem);
-  transition: padding var(--t-3) var(--ease-out), color var(--t-2) ease;
-}
-
-.svc__letter {
-  color: var(--accent-text);
-}
-
-.svc__name {
-  font-size: clamp(2.25rem, 1.25rem + 3.4vw, 4.75rem);
-  font-weight: 540;
-  font-stretch: 88%;
-  letter-spacing: -0.045em;
-  line-height: 0.9;
-}
-
-.svc__items {
-  grid-column: 2 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 0;
-  font-size: var(--fs-small);
-  color: var(--muted);
-}
-
-.svc__items span:not(:last-child)::after {
-  content: '·';
-  margin-inline: 0.5rem;
-}
-
-.svc__arrow {
-  grid-column: 3;
-  grid-row: 1;
-  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-  transition: transform var(--t-3) var(--ease-out), color var(--t-2) ease;
-}
-
-@media (hover: hover) {
-  .svc__link:hover {
-    padding-left: clamp(0.5rem, 2vw, 2rem);
-  }
-
-  .svc__link:hover .svc__name {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 400;
-    font-stretch: 100%;
-    letter-spacing: -0.03em;
-  }
-
-  .svc__link:hover .svc__arrow {
-    color: var(--accent);
-    transform: translate(0.4rem, -0.4rem);
-  }
-}
-
-@media (min-width: 1024px) {
-  .svc__link {
-    grid-template-columns: 3rem minmax(0, 5fr) minmax(0, 5fr) auto;
-    align-items: center;
-  }
-
-  .svc__items {
-    grid-column: 3;
-    grid-row: 1;
-  }
-
-  .svc__arrow {
-    grid-column: 4;
-  }
-}
 
 /* ── 05 · Numeri ──────────────────────────────────────────────────────────── */
 
@@ -2065,34 +1759,184 @@
   opacity: 0.5;
 }
 
-/* ── 02 e 03 · Figurine del computer ──────────────────────────────────────── */
-/* Stesso riquadro fisso delle altre figurine (vedi pages.css): alte o larghe,
-   occupano lo stesso spazio. */
-.webt__desk,
-.webt__fig,
-.wsel__fig {
-  width: var(--box);
-  height: var(--box);
-  object-fit: contain;
+/* ── Ritocchi ai blocchi riusati (dal 2.11.2026) ─────────────────────────── */
+
+/* il terminale è dritto e tondo, con un bordo chiaro e l'alone di minio */
+.term {
+  border-radius: var(--r-3);
+  transform: none;
+  box-shadow: 0 0 0 1px rgb(248 246 240 / 0.09), 0 3rem 5rem -2.5rem rgb(0 0 0 / 0.55), 0 0 7rem -1rem var(--glow);
 }
 
-.webt__desk {
-  --box: clamp(9rem, 5rem + 12vw, 17rem);
-  margin-top: clamp(0.5rem, 2vw, 2rem);
-  object-position: 0 100%;
+.term__count {
+  border-radius: var(--r-full);
 }
 
-.webt__points li {
-  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
-  align-items: center;
+/* i siti nella fila: schede piatte, dritte, col bordo che si scurisce */
+.hsite {
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--card);
+  box-shadow: none;
+  transform: none;
+  transition: transform var(--t-3) var(--ease-silk), border-color var(--t-2) ease, box-shadow var(--t-3) var(--ease-silk);
 }
 
-.webt__fig {
-  --box: clamp(3.25rem, 2.5rem + 2vw, 4.5rem);
-  margin-left: 1rem;
+@media (hover: hover) {
+  .hsite:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 1.5rem 2.5rem -1.5rem rgb(0 0 0 / 0.3);
+    transform: translate3d(0, -0.3rem, 0);
+  }
 }
 
-.wsel__fig {
-  --box: clamp(6rem, 4rem + 4vw, 8.5rem);
-  object-position: 0 100%;
+.hsite:active {
+  box-shadow: none;
+  transform: translate3d(0, 0.1rem, 0);
+}
+
+.hsite__shot {
+  border-radius: calc(var(--r-2) - 0.3rem);
+}
+
+.hsite__badge {
+  top: 0.9rem;
+  right: 0.9rem;
+}
+
+/* la vetrina dei siti: testata a due colonne, tasti a pillola */
+.wsel__head {
+  gap: 1.5rem;
+}
+
+.wsel__title {
+  max-width: 16ch;
+}
+
+.wsel__tools {
+  justify-content: start;
+}
+
+@media (min-width: 900px) {
+  .wsel__head {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: var(--col-gap);
+    align-items: end;
+  }
+}
+
+.wcard__all {
+  border-radius: var(--r-3);
+}
+
+.wsel__btn {
+  border-radius: 50%;
+}
+
+/* il metodo: i numeri delle fasi in Fraunces */
+.mth__n {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.03em;
+}
+
+.mth__title {
+  font-weight: 540;
+}
+
+/* i numeri su fondo scuro, dentro una griglia di linee sottili */
+.nums__grid {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.nums__grid .stat {
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(0.5rem, 1.5vw, 1.5rem) clamp(1.5rem, 3vw, 2.5rem) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 1024px) {
+  .nums__grid .stat + .stat {
+    padding-left: clamp(0.5rem, 1.5vw, 1.5rem);
+    border-left: 1px solid var(--line);
+  }
+}
+
+/* lo studio: una scheda avorio tonda col ritratto a sinistra */
+.std__card {
+  display: grid;
+  gap: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border-radius: var(--r-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.std__photo {
+  max-width: 26rem;
+}
+
+.std__photo .media__frame,
+.std__photo .media__box {
+  border-radius: var(--r-3);
+  overflow: hidden;
+}
+
+.std__copy {
+  display: grid;
+  gap: 1.5rem;
+  align-content: center;
+  justify-items: start;
+}
+
+@media (min-width: 900px) {
+  .std__card {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+}
+
+/* l'indice: i titoli in Fraunces, leggeri */
+.irow__title {
+  font-family: var(--font-serif);
+  font-weight: 360;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.02em;
+}
+
+@media (hover: hover) {
+  .irows .irow__link:hover .irow__title {
+    font-style: italic;
+    color: var(--accent-text);
+  }
+}
+
+/* la fila dei siti online resta una fila (vince sulla griglia di .hero__sites) */
+.marquee .strip__list {
+  display: flex;
+  gap: 1rem;
+}
+
+.marquee .strip__list > li {
+  grid-column: auto;
+  width: 17rem;
+  flex: none;
+}
+
+.marquee .strip__list .hsite {
+  grid-template-columns: none;
+  align-items: start;
+}
+
+/* sul telefono le cinque schede del terminale stanno su una riga */
+@media (max-width: 479px) {
+  .term__tab {
+    min-height: 1.8rem;
+    padding-inline: 0.55rem;
+    font-size: 0.82em;
+  }
 }

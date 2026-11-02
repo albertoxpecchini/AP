@@ -124,9 +124,9 @@ export default function sitePages() {
         dev: false,
         scripts: ['/' + js.file],
         styles: [...new Set([css?.file, ...(js.css || [])].filter(Boolean))].map((f) => '/' + f),
-        // il font principale viene precaricato: evita il flash sui titoli
+        // i due caratteri principali (testi e titoli) vengono precaricati: evita il flash sui titoli
         preloadFonts: (await fs.readdir(path.join(outDir, 'assets')))
-          .filter((f) => /^archivo-latin-wdth-normal.*\.woff2$/.test(f))
+          .filter((f) => /^(hanken-grotesk-latin-wght-normal|fraunces-latin-opsz-normal).*\.woff2$/.test(f))
           .map((f) => '/assets/' + f),
       }
 

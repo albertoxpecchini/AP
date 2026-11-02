@@ -2546,3 +2546,38 @@
   line-height: 1.6;
   tab-size: 2;
 }
+
+/* ── Titoli e numeri grandi delle pagine interne (dal 2.11.2026) ─────────── */
+/* Erano nel grottesco stretto (Archivo); ora i titoli di testata, le citazioni
+   e i numeri grandi sono in Fraunces leggero, come nella home. Sta in fondo a
+   questo foglio perché vinca sulle regole di portfolio.css e di sopra. */
+
+.phead__title,
+.shero__title,
+.cnt__title,
+.nf__title,
+.cs-hero__title,
+.cs-next__title,
+.cs-big,
+.spop__quote,
+.gproj__title,
+.cv__name {
+  font-family: var(--font-serif);
+  font-weight: 340;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.025em;
+}
+
+.dial__n,
+.mstep__n,
+.sapp__n,
+.nf__num,
+.gproj__n,
+.cs-sec__n,
+.cs-metrics__v,
+.stl__year {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  letter-spacing: -0.03em;
+}
