@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <style>
-    .bg { fill: #10110f } .ink { stroke: #f3f1ec } .dot { fill: #e5481f }
+    .bg { fill: #10110f } .ink { stroke: #f3f1ec } .dot { fill: #007acc }
     @media (prefers-color-scheme: dark) { .bg { fill: #f3f1ec } .ink { stroke: #10110f } }
   </style>
   <rect class="bg" width="64" height="64" rx="10"/>

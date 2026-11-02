@@ -226,7 +226,7 @@
   }
 
   /* voce di testo: una pillola che si riempie al passaggio; la pagina corrente
-     ha un punto di minio sotto */
+     ha un punto di blu sotto */
   .site-nav__link {
     position: relative;
     display: inline-flex;
@@ -540,7 +540,7 @@ footer.site-footer {
   overflow: hidden;
 }
 
-/* un alone di minio in alto, dietro l'invito: il fondo non è piatto */
+/* un alone di blu in alto, dietro l'invito: il fondo non è piatto */
 footer.site-footer::before {
   content: '';
   position: absolute;

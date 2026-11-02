@@ -20,7 +20,7 @@
 .hv + .intro {
   --glow-rx: 120vw;
   --glow-ry: min(34svh, 18rem);
-  --glow: rgb(229 72 31 / 0.26), rgb(255 138 76 / 0.12) 42%, rgb(255 184 128 / 0.04) 72%, transparent 100%;
+  --glow: rgb(0 122 204 / 0.26), rgb(92 170 235 / 0.12) 42%, rgb(255 184 128 / 0.04) 72%, transparent 100%;
 }
 
 .hv__glow {
@@ -492,8 +492,8 @@
   --muted: #5a5b55;
   --line: rgb(16 17 15 / 0.16);
   --line-strong: rgb(16 17 15 / 0.42);
-  --accent: #e5481f;
-  --accent-text: #b5360f;
+  --accent: #007acc;
+  --accent-text: #005c9e;
   --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Cascadia Code Variable', 'Cascadia Code', ui-monospace, Consolas, monospace;
   --font-serif: 'Instrument Serif', 'Iowan Old Style', 'Times New Roman', serif;
@@ -564,7 +564,7 @@
   width: auto;
 }
 
-/* i tasti com'erano: squadrati, in mono, col minio che entra da sinistra */
+/* i tasti com'erano: squadrati, in mono, col blu che entra da sinistra */
 .tav .btn {
   --btn-bg: var(--fg);
   --btn-fg: var(--bg);

@@ -6,7 +6,7 @@
    Dal 2.11.2026 l'impaginazione segue reflection.ai (per quattro quinti: carta
    calda, bordi sottili, angoli morbidi, sezioni scure come «rotte») e
    anthropic.com (per un quinto: l'avorio, i titoli graziati, le schede tonde).
-   L'accento resta il minio di Alberto.
+   L'accento resta il blu di Alberto.
 
    Breakpoint (mobile-first, min-width):
      sm  480px   telefoni larghi
@@ -17,7 +17,8 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Colore — carta calda, inchiostro, minio */
+  /* Colore — carta calda, inchiostro, blu (dal 3.11.2026 il blu #007acc di Alberto al posto del
+     minio #e5481f: i token tengono il nome --c-minio per non rinominare mezzo sito) */
   --c-paper: #f8f6f0;
   --c-paper-2: #f1ede1;
   --c-paper-3: #e8e3d6;
@@ -26,10 +27,10 @@
   --c-ink-2: #171717;
   --c-ink-3: #262626;
   --c-graphite: #525252;
-  --c-minio: #e5481f;
-  --c-minio-deep: #b5360f;
-  --c-minio-bright: #ff6a3d;
-  --c-minio-soft: #ffd9cc;
+  --c-minio: #007acc;
+  --c-minio-deep: #005c9e;
+  --c-minio-bright: #3b9ee8;
+  --c-minio-soft: #cfe6f8;
 
   /* Ruoli semantici (tema chiaro) */
   --bg: var(--c-paper);
@@ -42,9 +43,9 @@
   --line-strong: rgb(26 27 26 / 0.3);
   --accent: var(--c-minio);
   --accent-text: var(--c-minio-deep);
-  --on-accent: var(--c-ink); /* inchiostro su minio: 4,8:1 (chiaro) · 6,6:1 (scuro) — il bianco non arriva ad AA */
+  --on-accent: #fff; /* bianco su blu #007acc: 4,5:1, AA; sul blu acceso del tema scuro va l'inchiostro */
   --focus: var(--c-minio-deep);
-  --glow: rgb(229 72 31 / 0.22);
+  --glow: rgb(0 122 204 / 0.22);
 
   /* Tipografia */
   --font-sans: 'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -133,8 +134,9 @@
   --line-strong: rgb(248 246 240 / 0.4);
   --accent: var(--c-minio-bright);
   --accent-text: var(--c-minio-bright);
+  --on-accent: var(--c-ink);
   --focus: var(--c-minio-bright);
-  --glow: rgb(255 106 61 / 0.28);
+  --glow: rgb(59 158 232 / 0.28);
   color-scheme: dark;
 }
 
@@ -150,7 +152,7 @@
   --accent: var(--c-minio);
   --accent-text: var(--c-minio-deep);
   --focus: var(--c-minio-deep);
-  --glow: rgb(229 72 31 / 0.22);
+  --glow: rgb(0 122 204 / 0.22);
   color-scheme: light;
 }
 

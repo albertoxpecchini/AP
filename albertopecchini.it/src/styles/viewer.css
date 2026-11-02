@@ -5,7 +5,7 @@
      · .is-full: schermo intero, sopra tutto il resto
    È una finestra di programma, parente del terminale della home: barra del
    titolo a inchiostro con le tre luci e il nome del file, angoli tondi, lo
-   spessore di minio sotto. Sul piano (carta 3 con la griglia di punti) stanno
+   spessore di blu sotto. Sul piano (carta 3 con la griglia di punti) stanno
    il foglio, gli strumenti a pillola, la barra di scala e la mappa. */
 
 .viewer {
@@ -92,7 +92,7 @@
   white-space: nowrap;
 }
 
-/* disegna la scheda grafica: una spia di minio */
+/* disegna la scheda grafica: una spia di blu */
 .viewer__chip--gpu {
   border-color: var(--c-minio);
   background: var(--c-minio);
@@ -144,7 +144,7 @@
   touch-action: none;
 }
 
-/* mentre il file si apre: un filo di minio che scorre in cima al piano */
+/* mentre il file si apre: un filo di blu che scorre in cima al piano */
 .viewer.is-loading .viewer__stage::after {
   content: '';
   position: absolute;
@@ -420,7 +420,7 @@
 .viewer__map span {
   position: absolute;
   border: 1.5px solid var(--c-minio);
-  background: rgb(229 72 31 / 0.14);
+  background: rgb(0 122 204 / 0.14);
   /* il resto della tavola, fuori dal riquadro, si vela */
   box-shadow: 0 0 0 100vmax rgb(243 241 236 / 0.6);
   pointer-events: none;

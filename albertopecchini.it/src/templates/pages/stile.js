@@ -94,8 +94,8 @@ function coloreBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Carta calda · Avorio · Inchiostro · Minio', '10 token + ruoli semantici')}
-        ${intro(`Carta, avorio, inchiostro, ${em('minio')}.`, 'Dal 2 novembre 2026 la carta è quella calda di reflection.ai e l’avorio delle schede quello di anthropic.com; l’inchiostro è quasi nero. Un solo colore, il minio: segna ciò che si muove o è attivo — il tasto primario, l’alone sulle schede, l’avanzamento — e non decora.')}
+        ${head(b, 'Carta calda · Avorio · Inchiostro · Blu', '10 token + ruoli semantici')}
+        ${intro(`Carta, avorio, inchiostro, ${em('blu')}.`, 'Dal 2 novembre 2026 la carta è quella calda di reflection.ai e l’avorio delle schede quello di anthropic.com; l’inchiostro è quasi nero. Un solo colore, il blu: segna ciò che si muove o è attivo — il tasto primario, l’alone sulle schede, l’avanzamento — e non decora.')}
         <div class="bd-swatches">
           ${S.palette.map(
             (c, i) => html`
@@ -125,7 +125,7 @@ function coloreBoard(b) {
                   )}
                 </div>
                 <div class="bd-theme__demo">
-                  <span class="btn" style="--btn-bg:${t.accent};--btn-fg:var(--c-ink)"><span class="btn__label">Inchiostro su minio</span><span class="btn__icon">${icon('arrow')}</span></span>
+                  <span class="btn" style="--btn-bg:${t.accent};--btn-fg:var(--c-ink)"><span class="btn__label">Inchiostro su blu</span><span class="btn__icon">${icon('arrow')}</span></span>
                   <span class="label">${esc(t.contrast)}</span>
                 </div>
               </div>
@@ -266,7 +266,7 @@ function componentiBoard(b) {
     html`
       <div class="bd">
         ${head(b, 'Riposo · passaggio · attivo', 'Bersagli ≥ 44 px')}
-        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Tasti a pillola: il primario in minio con l’inchiostro sopra, il secondario col solo bordo; al passaggio un velo di luce li attraversa e si sollevano di due pixel. Link sottolineati che si ritirano; chip a pillola per i filtri, tag per le etichette.')}
+        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Tasti a pillola: il primario in blu con l’inchiostro sopra, il secondario col solo bordo; al passaggio un velo di luce li attraversa e si sollevano di due pixel. Link sottolineati che si ritirano; chip a pillola per i filtri, tag per le etichette.')}
         <div class="bd-comp">
           <div class="bd-col">
             <section>
@@ -288,7 +288,7 @@ function componentiBoard(b) {
                 ${demoLink({ href: '/portfolio/', label: `Tutti i progetti (${counts.all})` })}
                 <span class="bd-cap">riposo → passaggio: il filo si ritira verso destra</span>
               </div>
-              <p class="bd-text">Nel testo corrente il link è sottolineato con un filo leggero: scrivimi dalla <a href="/contatti/">pagina contatti</a>, al passaggio diventa <a class="is-hover" href="/contatti/">minio profondo</a>.</p>
+              <p class="bd-text">Nel testo corrente il link è sottolineato con un filo leggero: scrivimi dalla <a href="/contatti/">pagina contatti</a>, al passaggio diventa <a class="is-hover" href="/contatti/">blu profondo</a>.</p>
             </section>
             <section>
               ${sub('Chip e tag', 'Filtri a pillola · etichette squadrate')}
@@ -320,7 +320,7 @@ function componentiBoard(b) {
             <section>
               ${sub('<span class="bd-idx">02</span>Progetti selezionati', '01 / 03')}
               <div class="bd-sechead"><h4 class="bd-h2">Lavori scelti</h4>${textLink({ href: '/portfolio/', label: `Tutti (${counts.all})` })}</div>
-              <p class="bd-cap bd-sechead__cap">Testata di sezione: indice in minio, contatore a destra</p>
+              <p class="bd-cap bd-sechead__cap">Testata di sezione: indice in blu, contatore a destra</p>
             </section>
             <section>
               ${sub('Indice dei progetti', `${pad(rows.length)} di ${counts.all}`, { plain: true })}
@@ -352,7 +352,7 @@ function componentiBoard(b) {
           </div>
         </div>
         <section class="bd-foot" data-theme="ink">
-          <div class="bd-foot__eyebrow label"><span><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</span><span>Piè di pagina · tema inchiostro, alone di minio in alto</span></div>
+          <div class="bd-foot__eyebrow label"><span><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</span><span>Piè di pagina · tema inchiostro, alone di blu in alto</span></div>
           <p class="bd-foot__title">${accented(closing.title, closing.accent)}</p>
           <div class="bd-foot__row">
             <p class="bd-note bd-foot__note">${esc(closing.note)}</p>

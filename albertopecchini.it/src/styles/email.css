@@ -2,7 +2,7 @@
    COMPOSITORE EMAIL (/email/) — strumento privato.
    Sei blocchi impilati; il blocco «come si scrive» è a due colonne da 1024 px.
    Numeri e misure nelle statistiche usano testo (mai colore da solo); l'unico
-   colore «vivo» è il minio degli avanzamenti e delle segnalazioni, sempre
+   colore «vivo» è il blu degli avanzamenti e delle segnalazioni, sempre
    accompagnato da un'etichetta.
    ───────────────────────────────────────────────────────────────────────────── */
 
@@ -118,7 +118,7 @@
 
 .em-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgb(229 72 31 / 0.35);
+  box-shadow: 0 0 0 3px rgb(0 122 204 / 0.35);
 }
 
 .em-chip[disabled],
@@ -231,7 +231,7 @@
 }
 
 .em-sender:has(.em-sender__input:focus-visible) {
-  box-shadow: 0 0 0 3px rgb(229 72 31 / 0.35);
+  box-shadow: 0 0 0 3px rgb(0 122 204 / 0.35);
 }
 
 .em-sender-detail {
@@ -487,7 +487,7 @@
 
 .em-switch input:checked + .em-switch__box { background: var(--fg); border-color: var(--fg); }
 .em-switch input:checked + .em-switch__box::after { background: var(--bg); transform: translateX(1.1rem); }
-.em-switch input:focus-visible + .em-switch__box { box-shadow: 0 0 0 3px rgb(229 72 31 / 0.35); }
+.em-switch input:focus-visible + .em-switch__box { box-shadow: 0 0 0 3px rgb(0 122 204 / 0.35); }
 
 /* ── 03 · Output ──────────────────────────────────────────────────────────── */
 
@@ -608,7 +608,7 @@
 .em-ai__btn:hover .em-ai__btn-note,
 .em-ai__btn:focus-visible .em-ai__btn-note { color: var(--bg); opacity: 0.8; }
 
-.em-ai__btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(229 72 31 / 0.35); }
+.em-ai__btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(0 122 204 / 0.35); }
 
 .em-ai__btn.is-busy { border-color: var(--accent); background: var(--bg-2); color: var(--fg); }
 
@@ -654,7 +654,7 @@
 }
 
 .em-seg input:checked + span { background: var(--fg); border-color: var(--fg); color: var(--bg); }
-.em-seg input:focus-visible + span { box-shadow: 0 0 0 3px rgb(229 72 31 / 0.35); }
+.em-seg input:focus-visible + span { box-shadow: 0 0 0 3px rgb(0 122 204 / 0.35); }
 
 .em-ai__result {
   margin-top: var(--sp-5);
@@ -847,7 +847,7 @@
   white-space: nowrap;
 }
 
-.em-check--warn { border-color: rgb(229 72 31 / 0.5); }
+.em-check--warn { border-color: rgb(0 122 204 / 0.5); }
 .em-check--warn .em-check__tag { color: var(--accent-text); }
 .em-check--ok { border-color: rgb(47 158 91 / 0.5); }
 .em-check--ok .em-check__tag { color: #2f7d4f; }
@@ -1122,7 +1122,7 @@
 
 .em-checks--validation:empty { display: none; }
 
-.em-check--error { border-color: var(--accent); background: rgb(229 72 31 / 0.06); }
+.em-check--error { border-color: var(--accent); background: rgb(0 122 204 / 0.06); }
 .em-check--error .em-check__tag { color: var(--accent-text); }
 .em-check--info { border-color: var(--line-strong); }
 

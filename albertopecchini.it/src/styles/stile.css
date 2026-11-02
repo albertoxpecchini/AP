@@ -137,7 +137,7 @@ body.page--stile {
   color: var(--c-ink);
 }
 
-/* anello minio della tavola corrente: un rettangolo pieno dietro la cornice
+/* anello blu della tavola corrente: un rettangolo pieno dietro la cornice
    che sporge di 1,5 px di schermo per lato, qualunque sia lo zoom */
 .board__ring {
   position: absolute;
@@ -570,7 +570,7 @@ body.page--stile {
 .board .field__input.is-focus {
   border-color: var(--fg);
   background: var(--bg);
-  box-shadow: 0 0 0 3px rgb(229 72 31 / 0.28);
+  box-shadow: 0 0 0 3px rgb(0 122 204 / 0.28);
 }
 
 /* ── Elementi comuni alle tavole del sistema ──────────────────────────────── */
@@ -709,7 +709,7 @@ body.page--stile {
   top: 0;
   width: 520px;
   height: 520px;
-  background: radial-gradient(closest-side, rgb(255 184 150 / 0.5), transparent);
+  background: radial-gradient(closest-side, rgb(150 200 245 / 0.5), transparent);
 }
 
 .bd-hero__bar {
@@ -1362,7 +1362,7 @@ body.page--stile {
 }
 
 .bd-grid12 span {
-  background: rgb(229 72 31 / 0.1);
+  background: rgb(0 122 204 / 0.1);
 }
 
 .js .board .bd-grid12 span {
@@ -1988,7 +1988,7 @@ body.page--stile {
   -webkit-user-drag: none;
 }
 
-/* il perno: un crocino minio sul fermacampioni */
+/* il perno: un crocino blu sul fermacampioni */
 .bd-part__pin {
   position: absolute;
   width: 26px;

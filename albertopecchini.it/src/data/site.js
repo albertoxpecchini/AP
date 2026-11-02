@@ -70,7 +70,7 @@ export const site = {
 
   social: [
     { key: 'instagram', label: 'Instagram', handle: '@albertoxpecchini', url: 'https://www.instagram.com/albertoxpecchini/' },
-    { key: 'github', label: 'GitHub', handle: 'albertoxpecchini', url: 'https://github.com/albertoxpecchini' },
+    { key: 'github', label: 'GitHub', handle: 'ygpzk', url: 'https://github.com/ygpzk' },
   ],
 
   // `from` indica da quando si è liberi: lasciarlo vuoto se la disponibilità

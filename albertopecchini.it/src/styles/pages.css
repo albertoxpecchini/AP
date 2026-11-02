@@ -871,7 +871,7 @@
   inset: auto 0 0;
   height: 62%;
   background:
-    radial-gradient(ellipse 58% 90% at 46% 100%, rgb(229 72 31 / 0.5), rgb(255 138 76 / 0.16) 48%, transparent 78%),
+    radial-gradient(ellipse 58% 90% at 46% 100%, rgb(0 122 204 / 0.5), rgb(92 170 235 / 0.16) 48%, transparent 78%),
     var(--c-ink);
 }
 
@@ -934,7 +934,7 @@
   .spop__panel {
     height: 64%;
     background:
-      radial-gradient(ellipse 42% 95% at 66% 100%, rgb(229 72 31 / 0.5), rgb(255 138 76 / 0.16) 48%, transparent 78%),
+      radial-gradient(ellipse 42% 95% at 66% 100%, rgb(0 122 204 / 0.5), rgb(92 170 235 / 0.16) 48%, transparent 78%),
       var(--c-ink);
   }
 
@@ -2135,7 +2135,7 @@
 .nf__page-tav {
   font-size: 9.5px;
   font-weight: 500;
-  fill: #e5481f !important;
+  fill: #007acc !important;
 }
 
 .nf__page-path {
@@ -2161,13 +2161,13 @@
 
 .nf__page-c {
   fill: none;
-  stroke: #e5481f;
+  stroke: #007acc;
   stroke-width: 1.1;
   stroke-dasharray: 3 3;
 }
 
 .nf__page-dot {
-  fill: #e5481f;
+  fill: #007acc;
 }
 
 .nf__num {

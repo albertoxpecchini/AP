@@ -20,7 +20,7 @@ export const BRANDS = {
       { name: 'Abete', hex: '#C9A36B' },
       { name: 'Segatura', hex: '#EDE6D8' },
       { name: 'Muschio', hex: '#6F8168' },
-      { name: 'Minio', hex: '#D9582B' },
+      { name: 'Blu', hex: '#D9582B' },
     ],
   },
   cortebassa: {
@@ -454,7 +454,7 @@ export function slides({ w = 1200, h = 900, brand = 'quadra', label } = {}) {
 export function titleblock({ w = 1200, h = 900, label } = {}) {
   const ink = '#10110F'
   const paper = '#FBFAF6'
-  const acc = '#E5481F'
+  const acc = '#007acc'
   let o = Rc(0, 0, w, h, '#CFCABD')
   const sx = 70
   const sy = 60

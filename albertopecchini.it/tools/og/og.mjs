@@ -70,13 +70,13 @@ body::before{content:'';position:absolute;inset:0;
   repeating-linear-gradient(90deg,rgb(16 17 15/.16) 0 1px,transparent 1px 8px) 0 0/100% 5px no-repeat}
 .row{display:flex;justify-content:space-between;gap:24px;margin-top:16px;font-family:Cascadia,monospace;font-size:15px;color:#5a5b55}
 .row ol{display:flex;gap:30px;list-style:none;padding:0}
-.row b{font-weight:500;color:#b5360f;margin-right:8px}
+.row b{font-weight:500;color:#005c9e;margin-right:8px}
 .row .r{color:#10110f}
 </style></head><body>
 <header class="top">
   <svg class="mark" viewBox="0 0 48 48" fill="none" stroke="#10110f" stroke-width="2.6" stroke-linejoin="miter" aria-hidden="true">
     <path d="M7 43 23.5 5"/><path d="M23.5 5v38"/><path d="M13.5 28h10m0-23h8.5a11.5 11.5 0 0 1 0 23h-8.5"/>
-    <circle cx="23.5" cy="5" r="1.9" fill="#e5481f" stroke="none"/>
+    <circle cx="23.5" cy="5" r="1.9" fill="#007acc" stroke="none"/>
   </svg>
   <span>${esc(site.edition)}</span>
   <span class="r">${esc(site.location.city)} (${esc(site.location.province)}) · ${esc(coords)}</span>

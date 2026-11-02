@@ -31,9 +31,9 @@ export const palette = [
   { name: 'Grafite', hex: '#525252', token: '--c-graphite', use: 'Testo secondario ed etichette.' },
   { name: 'Inchiostro', hex: '#0A0A0A', token: '--c-ink', use: 'Piè di pagina, numeri, manifesto, terminale, tasto «serio».' },
   { name: 'Inchiostro 2', hex: '#171717', token: '--c-ink-2', use: 'Riquadri su fondo scuro.' },
-  { name: 'Minio', hex: '#E5481F', token: '--c-minio', use: 'Accento: il tasto primario, l’alone sulle schede, l’avanzamento, la selezione.' },
-  { name: 'Minio profondo', hex: '#B5360F', token: '--c-minio-deep', use: 'Accento come testo (i corsivi dei titoli) e anello di fuoco su carta.' },
-  { name: 'Minio acceso', hex: '#FF6A3D', token: '--c-minio-bright', use: 'Accento su fondo inchiostro.' },
+  { name: 'Blu', hex: '#007acc', token: '--c-minio', use: 'Accento: il tasto primario, l’alone sulle schede, l’avanzamento, la selezione.' },
+  { name: 'Blu profondo', hex: '#005c9e', token: '--c-minio-deep', use: 'Accento come testo (i corsivi dei titoli) e anello di fuoco su carta.' },
+  { name: 'Blu acceso', hex: '#3b9ee8', token: '--c-minio-bright', use: 'Accento su fondo inchiostro.' },
 ]
 
 // Ruoli semantici nei due temi. `line` = coppia filo / filo forte.
@@ -50,8 +50,8 @@ export const themes = [
       { color: '#1a1b1a', token: '--fg', name: 'Quasi nero' },
       { color: '#525252', token: '--muted', name: 'Grafite' },
       { line: ['rgb(26 27 26 / 0.12)', 'rgb(26 27 26 / 0.3)'], token: '--line / --line-strong', name: 'Inchiostro al 12% / 30%' },
-      { color: '#e5481f', token: '--accent', name: 'Minio' },
-      { color: '#b5360f', token: '--accent-text', name: 'Minio profondo' },
+      { color: '#007acc', token: '--accent', name: 'Blu' },
+      { color: '#005c9e', token: '--accent-text', name: 'Blu profondo' },
     ],
   },
   {
@@ -66,14 +66,14 @@ export const themes = [
       { color: '#f8f6f0', token: '--fg', name: 'Carta' },
       { color: '#a3a3a3', token: '--muted', name: '#A3A3A3' },
       { line: ['rgb(248 246 240 / 0.14)', 'rgb(248 246 240 / 0.4)'], token: '--line / --line-strong', name: 'Carta al 14% / 40%' },
-      { color: '#ff6a3d', token: '--accent', name: 'Minio acceso' },
-      { color: '#ff6a3d', token: '--accent-text', name: 'Minio acceso' },
+      { color: '#3b9ee8', token: '--accent', name: 'Blu acceso' },
+      { color: '#3b9ee8', token: '--accent-text', name: 'Blu acceso' },
     ],
   },
 ]
 
 export const colorNotes = {
-  foot: 'Sopra il minio si scrive sempre in inchiostro: il bianco non raggiunge il livello AA. L’unico altro colore è il verde #2F9E5B del punto «disponibile per nuovi incarichi».',
+  foot: 'Sopra il blu #007ACC si scrive in bianco (4,5:1, AA); sopra il blu acceso del tema scuro in inchiostro. L’unico altro colore è il verde #2F9E5B del punto «disponibile per nuovi incarichi».',
   status: '#2F9E5B · solo stato',
 }
 
@@ -206,7 +206,7 @@ export const exploded = { key: 'gazza', scale: 0.46 }
 export const puppetRules = [
   { name: 'Occhi', text: 'Il modello li disegna bianchi e tondi; sopra ci sono quelli del sito: pupilla al 46%, palpebra del colore della pelle, ognuno per conto suo.' },
   { name: 'Bordo adesivo', text: 'Carta #F3F1EC intorno alla sagoma, come le figurine: sul fondo inchiostro del piè di pagina gli animali restano staccati.' },
-  { name: 'Un solo minio', text: 'Un dettaglio per animale: l’apice del guscio, i denti della nutria, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
+  { name: 'Un solo blu', text: 'Un dettaglio per animale: l’apice del guscio, i denti della nutria, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
   { name: 'Fermacampioni', text: 'Dischi dorati sui perni: lo script li trova da solo, il pezzo ci gira intorno e torna a riposo su una molla.' },
   { name: 'Movimento ridotto', text: 'Con prefers-reduced-motion restano gli sguardi: niente battiti di palpebre, salti né ritiri animati.' },
 ]

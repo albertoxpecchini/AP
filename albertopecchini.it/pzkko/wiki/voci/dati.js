@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 710 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>40c5862</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 711 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>45df816</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 9
+| 10
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/45df816 45df816] feat(albertopecchini.it): il nome gigante torna in home (più piccolo), l'aragosta su una tavola CAD, /stile/ col vestito nuovo
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/40c5862 40c5862] Merge remote-tracking branch 'origin/albertopecchini.it' into albertopecchini.it
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/93a5eaf 93a5eaf] feat(albertopecchini.it): il vestito nuovo, impaginato come reflection.ai con un quinto di anthropic
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/aa35060 aa35060] chore(pzkko): pzkkopedia allineata a d9cf027
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/31202bc 31202bc] Catture aggiornate: Alberto Pecchini, pzkko
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/77d823e 77d823e] fix(pzkko): la musica al 30%
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/edbcbc0 edbcbc0] feat(email): l'informativa privacy e l'avviso di riservatezza in fondo a ogni email
-* 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/af3c1a3 af3c1a3] feat(albertopecchini.it): unimore a blocchi, uno per lezione, con gli esercizi numerati da 1 in ogni blocco
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

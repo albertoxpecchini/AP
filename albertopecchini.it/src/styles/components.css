@@ -2,7 +2,7 @@
 
 /* ── Bottoni ──────────────────────────────────────────────────────────────── */
 
-/* Pillole (dal 2.11.2026): il primario è il minio con l'inchiostro sopra, il
+/* Pillole (dal 2.11.2026): il primario è il blu con l'inchiostro sopra, il
    secondario un bordo sottile. Al passaggio un velo di luce attraversa il tasto
    da sinistra a destra e il tasto si solleva di un soffio. */
 .btn {
@@ -1214,7 +1214,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   width: 3.5rem;
   height: 3.5rem;
   margin: -1.75rem 0 0 -1.75rem;
-  background: rgb(229 72 31 / 0.12);
+  background: rgb(0 122 204 / 0.12);
 }
 
 .cursor.is-label {
@@ -1358,7 +1358,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
   outline: none;
   border-color: var(--fg);
   background: var(--bg);
-  box-shadow: 0 0 0 3px rgb(229 72 31 / 0.28);
+  box-shadow: 0 0 0 3px rgb(0 122 204 / 0.28);
 }
 
 .field__select {
@@ -1401,7 +1401,7 @@ p a:not([class]), dd a:not([class]), .legal__body li a, address a, .field a {
 
 .field.is-invalid .field__input {
   border-color: var(--accent-text);
-  background: rgb(229 72 31 / 0.05);
+  background: rgb(0 122 204 / 0.05);
 }
 
 .field.is-valid .field__input {

@@ -183,7 +183,7 @@
 
 .fselect:focus-within {
   border-color: var(--fg);
-  box-shadow: 0 0 0 3px rgb(229 72 31 / 0.28);
+  box-shadow: 0 0 0 3px rgb(0 122 204 / 0.28);
 }
 
 .fselect.is-set {
@@ -1203,7 +1203,7 @@
   }
 }
 
-/* la finestra delle tavole ha lo spessore di minio sotto: la nota gli lascia posto */
+/* la finestra delle tavole ha lo spessore di blu sotto: la nota gli lascia posto */
 .cs-sec--sheets .viewer + .cs-gallery__hint {
   margin-top: 1.75rem;
 }

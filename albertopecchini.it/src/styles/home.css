@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-/* l'aurora: tre macchie sfocate di minio, pesca e avorio che vagano lente
+/* l'aurora: tre macchie sfocate di blu, pesca e avorio che vagano lente
    dietro il titolo; tutte sulla GPU (solo transform), filtrate una volta sola */
 .aurora {
   position: absolute;
@@ -44,7 +44,7 @@
   top: -2%;
   width: 38rem;
   height: 38rem;
-  background: radial-gradient(closest-side, rgb(255 184 150 / 0.5), transparent);
+  background: radial-gradient(closest-side, rgb(150 200 245 / 0.5), transparent);
 }
 
 .aurora i:nth-child(3) {
@@ -224,7 +224,7 @@
   }
 }
 
-/* il terminale, dritto e centrato, in un alone di minio */
+/* il terminale, dritto e centrato, in un alone di blu */
 .hero__stage-wrap {
   position: relative;
   z-index: 1;
@@ -232,7 +232,7 @@
   margin-top: clamp(2.5rem, 6vw, 5rem);
 }
 
-/* il fascio: una linea sottile sotto il terminale, con una luce di minio che
+/* il fascio: una linea sottile sotto il terminale, con una luce di blu che
    la percorre (il «beam» di reflection, in piccolo) */
 .hero__beam {
   position: relative;
@@ -504,7 +504,7 @@
   color: var(--fg);
 }
 
-/* dietro, un'aurora scura di minio */
+/* dietro, un'aurora scura di blu */
 .banner::before {
   content: '';
   position: absolute;
@@ -1249,7 +1249,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(ellipse 62% 58% at 46% 56%, rgb(229 72 31 / 0.16), rgb(255 138 76 / 0.06) 55%, transparent 100%);
+  background: radial-gradient(ellipse 62% 58% at 46% 56%, rgb(0 122 204 / 0.16), rgb(92 170 235 / 0.06) 55%, transparent 100%);
   opacity: 0.55;
   transition: opacity var(--t-3) ease;
 }
@@ -1761,7 +1761,7 @@
 
 /* ── Ritocchi ai blocchi riusati (dal 2.11.2026) ─────────────────────────── */
 
-/* il terminale è dritto e tondo, con un bordo chiaro e l'alone di minio */
+/* il terminale è dritto e tondo, con un bordo chiaro e l'alone di blu */
 .term {
   border-radius: var(--r-3);
   transform: none;

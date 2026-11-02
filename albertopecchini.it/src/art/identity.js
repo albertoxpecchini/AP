@@ -22,9 +22,9 @@ const C = {
   ink: '#10110f',
   ink2: '#1b1c19',
   graphite: '#5a5b55',
-  minio: '#e5481f',
-  deep: '#b5360f',
-  bright: '#ff6a3d',
+  blu: '#007acc',
+  deep: '#005c9e',
+  bright: '#3b9ee8',
 }
 
 // ── Geometria ────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ function lattice(x, y, s, units, { step = 1, major = 4, c = C.ink, o1 = 0.07, o2
  * `colors` sceglie il colore di ogni pezzo (null = non disegnarlo); `axis`
  * aggiunge l'asse del tratto, cioè la linea che le quote misurano.
  */
-function apMark(x, y, s, { ink = C.ink, node = C.minio, stroke = M.stroke, colors = {}, axis, opacity } = {}) {
+function apMark(x, y, s, { ink = C.ink, node = C.blu, stroke = M.stroke, colors = {}, axis, opacity } = {}) {
   const k = s / 48
   const col = { stem: ink, a: ink, bar: ink, bowl: ink, node, ...colors }
   let o = `<g transform="translate(${n(x)} ${n(y)}) scale(${k4(k)})" fill="none" stroke-linejoin="miter"${opacity ? ` opacity="${opacity}"` : ''}>`
@@ -131,7 +131,7 @@ function apMark(x, y, s, { ink = C.ink, node = C.minio, stroke = M.stroke, color
  * prolungata; cerchio intero dell'occhiello col suo centro. `over` è di quanto
  * le linee escono dal quadrato; con `bleed` arrivano ai bordi del riquadro dato.
  */
-function guides(x, y, s, { c = C.minio, sw = 1, over = 14, bleed, edges = false, o = 1 } = {}) {
+function guides(x, y, s, { c = C.blu, sw = 1, over = 14, bleed, edges = false, o = 1 } = {}) {
   const k = s / 48
   const X = (u) => x + u * k
   const Y = (u) => y + u * k
@@ -194,8 +194,8 @@ const STEPS = [
   { name: 'nodo', note: 'ø 3,8 sull’apice', show: ['stem', 'a', 'bar', 'bowl', 'node'] },
 ]
 
-/** Un passo della costruzione: i pezzi già tracciati in grigio, quello nuovo in minio. */
-function step(x, y, s, i, { ink = C.ink, acc = C.minio, old = 0.26 } = {}) {
+/** Un passo della costruzione: i pezzi già tracciati in grigio, quello nuovo in blu. */
+function step(x, y, s, i, { ink = C.ink, acc = C.blu, old = 0.26 } = {}) {
   const { show } = STEPS[i]
   const last = show[show.length - 1]
   let o = lattice(x, y, s, 48, { step: 8, major: 8, c: ink, o2: i === 0 ? 0.28 : 0.1, frame: i === 0 ? 1 : 0.3 })
@@ -209,7 +209,7 @@ function step(x, y, s, i, { ink = C.ink, acc = C.minio, old = 0.26 } = {}) {
 
 function tavola({ w = 1200, h = 900, label } = {}) {
   const ink = C.ink
-  const acc = C.minio
+  const acc = C.blu
   const deep = C.deep
   const m = 26
   let o = Rc(0, 0, w, h, C.paper2)
@@ -294,7 +294,7 @@ function tavola({ w = 1200, h = 900, label } = {}) {
     ['altezza', '38'],
     ['larghezza', '36,5'],
     ['tratto', '2,6'],
-    ['nodo (minio al passaggio)', 'ø 3,8'],
+    ['nodo (blu al passaggio)', 'ø 3,8'],
     ['inclinazione', `${it(ANGLE, 2)}°`],
     ['occhiello', 'r 11,5'],
     ['traversa', '10 a quota 28'],
@@ -338,7 +338,7 @@ function icon(x, y, s, { dark = false } = {}) {
     `<g transform="translate(${n(x)} ${n(y)}) scale(${k4(k)})">` +
     `<rect width="64" height="64" rx="${ICON.r}" fill="${bg}"/>` +
     `<path transform="translate(${ICON.dx} ${ICON.dy})" d="M7 43 23.5 5v38M13.5 28h10m0-23h8.5a11.5 11.5 0 0 1 0 23h-8.5" fill="none" stroke="${fg}" stroke-width="${ICON.stroke}" stroke-linejoin="miter"/>` +
-    `<circle cx="${ICON.dot.cx}" cy="${ICON.dot.cy}" r="${ICON.dot.r}" fill="${C.minio}"/>` +
+    `<circle cx="${ICON.dot.cx}" cy="${ICON.dot.cy}" r="${ICON.dot.r}" fill="${C.blu}"/>` +
     '</g>'
   )
 }
@@ -419,7 +419,7 @@ function fogli({ w = 1200, h = 900, label } = {}) {
     const Y = (u) => by + u * k
     o += shadow(x, y, pw, ph) + Rc(x, y, pw, ph, C.sheet) + sheetHead(x, y, pw, 1, C.ink)
     o += lattice(bx, by, s, 48, { step: 2, major: 8, c: C.ink, o1: 0.08, o2: 0.18 })
-    o += guides(bx, by, s, { c: C.minio, over: 10 })
+    o += guides(bx, by, s, { c: C.blu, over: 10 })
     o += apMark(bx, by, s, { axis: C.sheet })
     o += angleArc(bx, by, s, { size: 10 }) + radius(bx, by, s, { size: 10 })
     const qx = bx - 28
@@ -438,7 +438,7 @@ function fogli({ w = 1200, h = 900, label } = {}) {
     o += sheetFoot(x, y, pw, ph, 'marchio', 'a e p sulla stessa asta', `u = 1/48 · tratto 2,6 · nodo ø 3,8 · ${it(ANGLE)}°`, C.ink)
   }
 
-  // 02 · icona (versione per i temi scuri: carta, segno inchiostro, nodo minio)
+  // 02 · icona (versione per i temi scuri: carta, segno inchiostro, nodo blu)
   x += pw + gap
   {
     const s = 244
@@ -482,7 +482,7 @@ function fogli({ w = 1200, h = 900, label } = {}) {
     const lx = x + 28
     const ly = y + 100
     const fg = C.ink
-    o += shadow(x, y, pw, ph) + Rc(x, y, pw, ph, C.minio) + sheetHead(x, y, pw, 3, fg)
+    o += shadow(x, y, pw, ph) + Rc(x, y, pw, ph, C.blu) + sheetHead(x, y, pw, 3, fg)
     o += lockup(lx, ly, f, { ink: fg, muted: fg }) + lockupDims(lx, ly, f, { c: fg })
     // dettaglio 5:1 del blocco di testo: le linee su cui poggiano nome e mestiere
     const z = 5
@@ -496,7 +496,7 @@ function fogli({ w = 1200, h = 900, label } = {}) {
     o += T(wx, wy - 9, `dettaglio ${z} : 1`, { fill: fg, size: 10 }) + T(wx + ww, wy - 9, 'linee del carattere', { fill: fg, size: 10, anchor: 'end' })
     o += Rc(wx, wy, ww, wh, C.sheet) + `<clipPath id="${id}"><rect x="${n(wx)}" y="${n(wy)}" width="${n(ww)}" height="${n(wh)}"/></clipPath><g clip-path="url(#${id})">`
     const lines = [nb - LOGO.name.asc * z, nb - LOGO.name.x * z, nb, rb - LOGO.role.x * z, rb]
-    o += `<path d="${lines.map((ly2) => `M${n(wx)} ${n(ly2)}H${n(wx + ww)}`).join('')}" stroke="${C.minio}" stroke-width="1" fill="none"/>`
+    o += `<path d="${lines.map((ly2) => `M${n(wx)} ${n(ly2)}H${n(wx + ww)}`).join('')}" stroke="${C.blu}" stroke-width="1" fill="none"/>`
     o += T(wx + 12, nb, 'alberto pecchini', { fill: C.ink, size: LOGO.name.size * z, family: SANS, weight: LOGO.name.weight, spacing: LOGO.name.track })
     o += T(wx + 12, rb, 'diplomato geometra', { fill: C.graphite, size: LOGO.role.size * z, spacing: LOGO.role.track })
     o += '</g>'
@@ -586,7 +586,7 @@ function notte({ w = 1200, h = 900, label } = {}) {
     o += T(rx, ry, name, { fill: acc, size: 12, weight: 500 }) + T(rx + 20, ry, desc, dim) + T(rx + rw, ry, `${it(ux)} ; ${it(uy)}`, { fill: fg, size: 11.5, anchor: 'end' })
   })
   o += T(rx, Y(28) + 40, 'occhiello', { fill: fg, size: 11.5, weight: 500 }) + T(rx, Y(28) + 60, 'asse r 11,5', dim) + T(rx, Y(28) + 78, 'bordi r 12,8 e r 10,2', dim)
-  o += T(rx, Y(28) + 122, 'nodo', { fill: fg, size: 11.5, weight: 500 }) + T(rx, Y(28) + 142, 'ø 3,8 in b', dim) + T(rx, Y(28) + 160, 'minio acceso', dim)
+  o += T(rx, Y(28) + 122, 'nodo', { fill: fg, size: 11.5, weight: 500 }) + T(rx, Y(28) + 142, 'ø 3,8 in b', dim) + T(rx, Y(28) + 160, 'blu acceso', dim)
   o += T(rx + rw, h - 40, 'u = 1/48 · 1 u = 14 px', { ...dim, anchor: 'end' })
 
   return out(w, h, label || 'Monogramma AP su fondo inchiostro con le linee di costruzione a tutta tavola, i punti notevoli e le loro coordinate', o)
@@ -631,7 +631,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const Y = (u) => byy + u * k
     o += cell(x, y, lw, topH, C.sheet, 'a', 'marchio', 'u = 1/48 del lato')
     o += lattice(bx, byy, s, 48, { step: 2, major: 8, c: ink, o1: 0.07, o2: 0.16 })
-    o += guides(bx, byy, s, { c: C.minio, over: 12 })
+    o += guides(bx, byy, s, { c: C.blu, over: 12 })
     o += apMark(bx, byy, s, { axis: C.sheet })
     o += angleArc(bx, byy, s, { size: 11.5 }) + radius(bx, byy, s, { size: 11.5 })
     const q1 = bx - 30
@@ -650,11 +650,11 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const x = rx
     const y = m
     const ch = 242
-    o += cell(x, y, rw, ch, C.sheet, 'b', 'colori', 'carta · inchiostro · minio')
+    o += cell(x, y, rw, ch, C.sheet, 'b', 'colori', 'carta · inchiostro · blu')
     const main = [
       { name: 'carta', hex: C.paper, token: '--c-paper', fg: ink, on: ink },
       { name: 'inchiostro', hex: C.ink, token: '--c-ink', fg: C.paper, on: C.paper },
-      { name: 'minio', hex: C.minio, token: '--c-minio', fg: ink, on: ink },
+      { name: 'blu', hex: C.blu, token: '--c-minio', fg: ink, on: ink },
     ]
     const sw = (rw - 36 - 2 * 10) / 3
     main.forEach((c, i) => {
@@ -670,8 +670,8 @@ function sistema({ w = 1200, h = 900, label } = {}) {
       ['carta 2', C.paper2],
       ['carta 3', C.paper3],
       ['grafite', C.graphite],
-      ['minio profondo', C.deep],
-      ['minio acceso', C.bright],
+      ['blu profondo', C.deep],
+      ['blu acceso', C.bright],
     ]
     const mw = (rw - 36) / minor.length
     minor.forEach(([name, hex], i) => {
@@ -679,7 +679,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
       const sy = y + 178
       o += Rc(sx, sy, 26, 26, hex, ` stroke="${ink}" stroke-opacity=".2"`) + T(sx + 34, sy + 11, name, { fill: ink, size: 10 }) + T(sx + 34, sy + 24, hexOf(hex), { fill: ink, size: 9, opacity: 0.65 })
     })
-    o += T(x + 18, y + ch - 12, 'il numero è il contrasto del testo sul colore: sul minio si scrive in inchiostro, mai in bianco', { fill: ink, size: 9, opacity: 0.6 })
+    o += T(x + 18, y + ch - 12, 'il numero è il contrasto del testo sul colore: sul blu si scrive in inchiostro, mai in bianco', { fill: ink, size: 9, opacity: 0.6 })
   }
 
   // c · caratteri
@@ -694,7 +694,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const tx = x + 62
     const lines = [[0.73, 'asc.'], [0.53, 'x'], [0, 'base'], [-0.18, 'disc.']]
     for (const [em, name] of lines) {
-      o += Ln(x + 18, base - em * fs, x + 372, base - em * fs, C.minio, 1) + T(x + 18, base - em * fs - 4, name, { fill: C.deep, size: 9 })
+      o += Ln(x + 18, base - em * fs, x + 372, base - em * fs, C.blu, 1) + T(x + 18, base - em * fs - 4, name, { fill: C.deep, size: 9 })
     }
     o += T(tx, base, 'alberto', { fill: ink, size: fs, family: SANS, weight: 640, stretch: 86, spacing: '-0.055em' })
     o += T(x + 18, y + ch - 44, 'archivo variable', { fill: ink, size: 11.5, weight: 500 }) + T(x + 18, y + ch - 28, 'peso 100–900 · larghezza 62–125 %', { fill: ink, size: 10, opacity: 0.7 }) + T(x + 18, y + ch - 14, 'x 0,53 · asc. 0,73 · disc. 0,18 em', { fill: ink, size: 10, opacity: 0.7 })
@@ -721,7 +721,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const tx = lx + (LOGO.mark + LOGO.gap) * f
     const ex = tx + LOGO.text * f
     for (const [yy, name] of [[LOGO.name.base, 'base del nome 19,1'], [LOGO.role.base, 'base del mestiere 33,55']]) {
-      o += Ln(tx, ly + yy * f, ex + 10, ly + yy * f, C.minio, 1)
+      o += Ln(tx, ly + yy * f, ex + 10, ly + yy * f, C.blu, 1)
     }
     o += T(x + 18, y + bh - 44, 'nome', { fill: ink, size: 11.5, weight: 500 }) + T(x + 18, y + bh - 28, 'archivo 640 · 17 px · −0,02 em', { fill: ink, size: 10, opacity: 0.7 }) + T(x + 18, y + bh - 14, 'base a 19,1 px dall’alto', { fill: ink, size: 10, opacity: 0.7 })
     o += T(x + lw / 2 + 10, y + bh - 44, 'mestiere', { fill: ink, size: 11.5, weight: 500 }) + T(x + lw / 2 + 10, y + bh - 28, 'cascadia code · 12 px · +0,02 em', { fill: ink, size: 10, opacity: 0.7 }) + T(x + lw / 2 + 10, y + bh - 14, 'base a 33,55 px · distanza 9,6 px', { fill: ink, size: 10, opacity: 0.7 })
@@ -752,7 +752,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
       o += icon(sx, y + bh - 16 - px, px, { dark: true }) + T(sx + px + 5, y + bh - 18, name, { fill: fg, size: 9, opacity: 0.75 })
       sx += px + 30
     }
-    o += T(x + ew - 18, y + bh - 30, 'raggio 10 · tratto 4', { fill: fg, size: 9.5, anchor: 'end', opacity: 0.75 }) + T(x + ew - 18, y + bh - 16, 'nodo ø 6,8 minio', { fill: fg, size: 9.5, anchor: 'end', opacity: 0.75 })
+    o += T(x + ew - 18, y + bh - 30, 'raggio 10 · tratto 4', { fill: fg, size: 9.5, anchor: 'end', opacity: 0.75 }) + T(x + ew - 18, y + bh - 16, 'nodo ø 6,8 blu', { fill: fg, size: 9.5, anchor: 'end', opacity: 0.75 })
   }
 
   // f · spazi, raggi, griglia
@@ -765,7 +765,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const scale = (ew - 36 - 34) / 128
     steps.forEach((px, i) => {
       const yy = y + 50 + i * 15
-      o += T(sx, yy + 8, String(px), { fill: ink, size: 9.5, opacity: 0.75 }) + Rc(sx + 34, yy, px * scale, 9, i % 2 ? ink : C.minio)
+      o += T(sx, yy + 8, String(px), { fill: ink, size: 9.5, opacity: 0.75 }) + Rc(sx + 34, yy, px * scale, 9, i % 2 ? ink : C.blu)
     })
     const ry = y + 216
     o += Ln(sx, ry - 10, x + ew - 18, ry - 10, ink, 1, ' opacity=".2"') + T(sx, ry + 6, 'raggi', { fill: ink, size: 10, weight: 500 })
@@ -776,7 +776,7 @@ function sistema({ w = 1200, h = 900, label } = {}) {
     const gy = y + bh - 58
     o += Ln(sx, gy - 12, x + ew - 18, gy - 12, ink, 1, ' opacity=".2"')
     const cw = (ew - 36 - 11 * 5) / 12
-    for (let i = 0; i < 12; i++) o += Rc(sx + i * (cw + 5), gy, cw, 26, C.minio, ' opacity=".34"')
+    for (let i = 0; i < 12; i++) o += Rc(sx + i * (cw + 5), gy, cw, 26, C.blu, ' opacity=".34"')
     o += T(sx, gy + 42, '12 colonne · distanza da 12 a 32 px', { fill: ink, size: 9.5, opacity: 0.75 })
   }
 
