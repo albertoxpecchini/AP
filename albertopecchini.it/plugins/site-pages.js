@@ -22,6 +22,7 @@ const ENTRY_CSS = 'src/style.css'
 // il compositore email). Vengono dopo il foglio comune, come prima gli @import.
 const PAGE_CSS = [
   { entry: 'src/styles/stile.css', marker: 'data-canvas' },
+  { entry: 'src/styles/aragosta.css', marker: 'data-aragosta' },
   { entry: 'src/styles/viewer.css', marker: 'data-viewer' },
   { entry: 'src/styles/email.css', marker: 'data-email' },
   { entry: 'src/styles/wrapped5bt.css', marker: 'data-wrapped' },

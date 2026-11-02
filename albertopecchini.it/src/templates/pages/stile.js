@@ -47,47 +47,39 @@ const board = (b, content) => html`
 
 // ── 00 · Home: l'hero a 1440 px ──────────────────────────────────────────────
 
+// Dal 2.11.2026 è l'hero del vestito nuovo (reflection.ai per quattro quinti,
+// anthropic.com per uno): testata sottile, tutto centrato, il nome com'era ma
+// più piccolo, il titolo in Fraunces, le pillole, il terminale.
 function heroBoard(b) {
+  const rows = [['casa', 'rilievo, CAD, 3D'], ['sito', 'scritto a mano'], ['marchio', 'disegnato su griglia'], ['computer', 'virus, backup, Wi-Fi']]
   return board(
     b,
     html`
       <div class="bd-hero">
+        <div class="bd-hero__aurora" aria-hidden="true"><i></i><i></i></div>
         <header class="bd-hero__bar">
           ${logo()}
           <nav class="bd-nav" aria-label="Navigazione principale (esempio)">
-            <ul>
-              ${nav.map((item, i) => `<li><a href="${item.href}"><span class="bd-nav__n">${pad(i + 1)}</span>${esc(item.label)}</a>${item.children ? `<span class="bd-nav__plus" aria-hidden="true">${icon('plus')}</span>` : ''}</li>`)}
-            </ul>
+            <ul>${nav.map((item, i) => `<li><a href="${item.href}"${i === 0 ? ' class="is-current"' : i === 1 ? ' class="is-hover"' : ''}>${esc(item.label)}</a></li>`)}</ul>
           </nav>
-          ${button({ href: cta.href, label: cta.label, size: 'sm' })}
+          ${button({ href: cta.href, label: cta.label, size: 'sm', iconName: null })}
         </header>
         <div class="bd-hero__main">
-          <div class="bd-hero__meta label" data-bd="fade"><span>${esc(site.edition)}</span><span>${esc(site.location.city)} — Italia</span><span>${COORDS}</span></div>
-          <p class="bd-hero__name" aria-hidden="true"><span class="bd-hero__word"><span>${esc(site.firstName)}</span></span> <span class="bd-hero__word bd-hero__word--2"><span>${esc(site.lastName)}</span></span></p>
+          <div class="bd-hero__pills" data-bd="up"><span class="pill">${esc(site.location.city)} · ${COORDS}</span><span class="pill"><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</span></div>
+          <p class="bd-hero__name" aria-hidden="true"><span>${esc(site.firstName)}</span> <span>${esc(site.lastName)}</span></p>
           <p class="sr-only">${esc(site.name)}</p>
-          <div class="bd-hero__body">
-            <div class="bd-hero__roles" data-bd="up" style="--d:250ms">
-              <p class="label">Discipline</p>
-              <ul>
-                ${site.roles.map((r, i) => `<li><button class="bd-hero__role${i === 0 ? ' is-active' : ''}" type="button" aria-pressed="${i === 0}"><span class="label">0${i + 1}</span><span class="bd-hero__role-name">${esc(r.label)}</span><span class="label">${esc(r.note)}</span></button></li>`)}
-              </ul>
+          <p class="bd-hero__title" data-bd="up" style="--d:120ms">Casa, sito, marchio. Un solo ${em('referente.')}</p>
+          <p class="bd-hero__lead" data-bd="up" style="--d:220ms">Diplomato geometra a ${esc(site.location.city)}: rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi. Lo stesso metodo, la stessa cura.</p>
+          <div class="bd-hero__actions" data-bd="up" style="--d:320ms">${button({ href: cta.href, label: cta.label, size: 'lg' })}${button({ href: '/portfolio/', label: 'Guarda i lavori', variant: 'ghost', size: 'lg' })}</div>
+          <p class="bd-hero__copy" data-bd="fade" style="--d:420ms">Premi <kbd>C</kbd> per copiare la mia email</p>
+          <div class="bd-term" data-bd="up" style="--d:520ms" aria-hidden="true">
+            <div class="bd-term__bar"><span class="bd-term__lights"><i></i><i></i><i></i></span><span class="bd-term__file">alberto.sh</span><span class="bd-term__count">01/05</span></div>
+            <div class="bd-term__tabs">${['tutto', 'casa', 'sito', 'marchio', 'pc'].map((k, i) => `<span class="bd-term__tab${i === 0 ? ' is-active' : ''}">--${k}</span>`)}</div>
+            <div class="bd-term__screen">
+              <p class="bd-term__cmd"><span>$</span>alberto --tutto</p>
+              <ul class="bd-term__rows">${rows.map(([k, v]) => `<li><span class="ok">✓</span><span>${esc(k)}</span><b>${esc(v)}</b></li>`)}</ul>
+              <p class="bd-term__out">→ tutti i servizi</p>
             </div>
-            <figure class="bd-hero__figure" data-bd="clip" style="--d:150ms">
-              <div class="bd-hero__stage">
-                <div class="bd-hero__frame" data-clip>${picture({ art: 'floorplan', variant: 'casa', code: 'AP-26-004', alt: 'Pianta architettonica quotata di un’abitazione, scala 1:100' }, { lazy: false })}</div>
-              </div>
-              <figcaption class="bd-hero__caption label"><span>Fig. 01 — Pianta piano terra · scala 1:100</span><span class="bd-hero__ticks" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></figcaption>
-            </figure>
-            <div class="bd-hero__pitch">
-              <p class="bd-hero__claim" data-bd="up" style="--d:300ms">Progetto ${em('spazi,')} strumenti e ${em('identità')} digitali.</p>
-              <p class="bd-hero__lead" data-bd="up" style="--d:380ms">Diplomato geometra, in provincia di Mantova. Rilevo e disegno edifici, sviluppo siti web, costruisco marchi: con lo stesso metodo e la stessa tolleranza.</p>
-              <div class="bd-hero__actions" data-bd="up" style="--d:460ms">${button({ href: '/portfolio/', label: 'Guarda i progetti' })}${button({ href: cta.href, label: cta.label, variant: 'ghost' })}</div>
-            </div>
-          </div>
-          <div class="bd-hero__foot label" data-bd="fade" style="--d:600ms">
-            <span class="bd-hero__avail"><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</span>
-            <span class="bd-hero__cue"><span class="bd-hero__cue-line" aria-hidden="true"></span>Scorri</span>
-            <span>Attivo dal ${site.activeSince}</span>
           </div>
         </div>
       </div>
@@ -102,8 +94,8 @@ function coloreBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Carta · Inchiostro · Minio', '10 token + ruoli semantici')}
-        ${intro(`Carta, inchiostro, ${em('minio')}.`, 'Due neutri caldi, da tavolo da disegno, e un solo colore. Il minio segna ciò che si muove o è attivo — riempimento al passaggio, avanzamento, selezione — e non decora.')}
+        ${head(b, 'Carta calda · Avorio · Inchiostro · Minio', '10 token + ruoli semantici')}
+        ${intro(`Carta, avorio, inchiostro, ${em('minio')}.`, 'Dal 2 novembre 2026 la carta è quella calda di reflection.ai e l’avorio delle schede quello di anthropic.com; l’inchiostro è quasi nero. Un solo colore, il minio: segna ciò che si muove o è attivo — il tasto primario, l’alone sulle schede, l’avanzamento — e non decora.')}
         <div class="bd-swatches">
           ${S.palette.map(
             (c, i) => html`
@@ -200,8 +192,8 @@ function formaBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Base 4 px · raggi minimi · ingressi lenti', 'Mobile-first · 480 / 768 / 1024 / 1280 / 1600')}
-        ${intro(`Un linguaggio ${em('ortogonale')}, preso dal tavolo da disegno.`, 'Griglia a 12 colonne, margini che crescono con lo schermo, raggi da 2 px. Fili, righelli e crocini di registro fanno parte del sistema, non della decorazione.')}
+        ${head(b, 'Base 4 px · angoli morbidi · ingressi lenti e sfocati', 'Mobile-first · 480 / 768 / 1024 / 1280 / 1600')}
+        ${intro(`Un linguaggio ${em('morbido')}, con le linee del tavolo da disegno.`, 'Griglia a 12 colonne, margini che crescono con lo schermo, angoli da 6 a 28 px e tasti a pillola. I fili sottili restano; le rivelazioni arrivano sfocate e si mettono a fuoco, in un secondo abbondante.')}
         <div class="bd-forma__grid">
           <div>
             ${sub('Spazi', '--sp-1 … --sp-10')}
@@ -274,16 +266,17 @@ function componentiBoard(b) {
     html`
       <div class="bd">
         ${head(b, 'Riposo · passaggio · attivo', 'Bersagli ≥ 44 px')}
-        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Bottoni in mono, mai tutto maiuscolo, che al passaggio si riempiono di minio da sinistra; link sottolineati che si ritirano; chip a pillola per i filtri, tag squadrati per le etichette.')}
+        ${intro(`Pochi pezzi, ${em('sempre')} gli stessi.`, 'Tasti a pillola: il primario in minio con l’inchiostro sopra, il secondario col solo bordo; al passaggio un velo di luce li attraversa e si sollevano di due pixel. Link sottolineati che si ritirano; chip a pillola per i filtri, tag per le etichette.')}
         <div class="bd-comp">
           <div class="bd-col">
             <section>
               ${sub('Bottoni', '.btn · --ghost · --sm · --lg')}
               <div class="bd-btns">
                 <div>${button({ href: '/portfolio/', label: 'Guarda i progetti' })}<p class="bd-cap">Pieno · riposo</p></div>
-                <div>${button({ href: '/portfolio/', label: 'Guarda i progetti', className: 'is-hover', attrs: { 'data-demo': 'hover' } })}<p class="bd-cap">Pieno · passaggio: il minio entra da sinistra, la freccia avanza di 5 px</p></div>
+                <div>${button({ href: '/portfolio/', label: 'Guarda i progetti', className: 'is-hover', attrs: { 'data-demo': 'hover' } })}<p class="bd-cap">Pieno · passaggio: si solleva, un velo di luce lo attraversa, la freccia avanza di 4 px</p></div>
                 <div>${button({ href: cta.href, label: cta.label, variant: 'ghost' })}<p class="bd-cap">Contorno · riposo</p></div>
-                <div>${button({ href: cta.href, label: cta.label, variant: 'ghost', className: 'is-hover', attrs: { 'data-demo': 'hover' } })}<p class="bd-cap">Contorno · passaggio: si riempie d’inchiostro</p></div>
+                <div>${button({ href: cta.href, label: cta.label, variant: 'ghost', className: 'is-hover', attrs: { 'data-demo': 'hover' } })}<p class="bd-cap">Contorno · passaggio: il bordo si scurisce, un velo d’inchiostro al 6%</p></div>
+                <div>${button({ href: '/portfolio/web/', label: 'I progetti web', variant: 'dark' })}<p class="bd-cap">Inchiostro · il tasto «serio» (--dark)</p></div>
                 <div class="bd-btns__sm">${button({ href: cta.href, label: cta.label, size: 'sm' })}<p class="bd-cap">Piccolo · 44 px · intestazione</p></div>
                 <div>${button({ href: cta.href, label: closing.label, size: 'lg' })}<p class="bd-cap">Grande · 60 px</p></div>
               </div>
@@ -359,14 +352,11 @@ function componentiBoard(b) {
           </div>
         </div>
         <section class="bd-foot" data-theme="ink">
-          <div class="bd-foot__eyebrow label"><span><span class="dot dot--accent" aria-hidden="true"></span>${esc(site.availability.label)}</span><span>Footer · palette propria su fondo #0D0D0C</span></div>
+          <div class="bd-foot__eyebrow label"><span><span class="dot dot--live" aria-hidden="true"></span>${esc(site.availability.label)}</span><span>Piè di pagina · tema inchiostro, alone di minio in alto</span></div>
           <p class="bd-foot__title">${accented(closing.title, closing.accent)}</p>
           <div class="bd-foot__row">
             <p class="bd-note bd-foot__note">${esc(closing.note)}</p>
-            <a class="cta is-hover" href="${cta.href}" data-demo="hover">
-              <span class="cta__label"><span class="cta__roll" data-text="${esc(closing.label)}"><span>${esc(closing.label)}</span></span></span>
-              <span class="cta__arrow" aria-hidden="true">${icon('arrow')}</span>
-            </a>
+            <div class="bd-hero__actions">${button({ href: cta.href, label: closing.label, size: 'lg' })}${button({ href: `mailto:${site.contact.email}`, label: closing.labelCompact, variant: 'ghost', size: 'lg', iconName: 'mail' })}</div>
           </div>
         </section>
       </div>
@@ -403,7 +393,7 @@ function mascotteBoard(b) {
             `,
           )}
         </div>
-        ${sub('Il sesto animale · in home, sopra la disponibilità', 'src/data/aragosta.js · src/client/ink.js', { top: true, muted: true })}
+        ${sub('Il sesto animale · in home, sopra la disponibilità (e in /aragosta/, la tavola com’era)', 'src/data/aragosta.js · src/client/ink.js', { top: true, muted: true })}
         <div class="bd-ink">
           <div class="bd-ink__text" data-bd="up">
             <p class="bd-name bd-animal__name">${esc(A.name)}</p>

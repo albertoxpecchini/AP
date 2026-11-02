@@ -12,6 +12,7 @@ import { serviziPage, metodoPage, studioPage, profiloPage } from './pages/info.j
 import { contattiPage } from './pages/contact.js'
 import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/legal.js'
 import { stilePage } from './pages/stile.js'
+import { aragostaPage } from './pages/aragosta.js'
 import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
 import { wrapped5btPage } from './pages/wrapped5bt.js'
@@ -172,6 +173,18 @@ export const routes = [
     pageClass: 'page--stile',
     noFooter: true, // la pagina è il piano a tutto schermo: niente chiusura sotto
     jsonld: () => [crumbs({ label: 'Stile', href: '/stile/' })],
+  },
+  {
+    // L'hero com'era (fino al 2.11.2026), con l'aragosta e l'inchiostro, su una
+    // tavola del piano navigabile: lo stesso foglio di /stile/, una tavola sola.
+    path: '/aragosta/',
+    priority: 0.3,
+    title: 'L’aragosta e l’inchiostro — la tavola',
+    description: 'L’hero della home di Alberto Pecchini com’era fino al 2 novembre 2026, su un foglio da disegno navigabile: il nome a tutta larghezza e l’aragosta di fiume che lo riempie d’inchiostro.',
+    render: aragostaPage,
+    pageClass: 'page--stile',
+    noFooter: true,
+    jsonld: () => [crumbs({ label: 'L’aragosta', href: '/aragosta/' })],
   },
   {
     // Strumento privato: non è nei menu, nel footer, nella sitemap né nei motori

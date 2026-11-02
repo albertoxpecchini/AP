@@ -12,6 +12,7 @@ import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
 import { button, textLink, sectionHead, media, picture, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
 import { siteCard, indexRow } from '../components/project.js'
+import { COORDS } from '../layout.js'
 
 // I siti mostrati nel carosello: prima quelli in evidenza, poi gli altri.
 const webSites = () => [...byArea('web')].filter((p) => p.web).sort((a, b) => Number(b.featured) - Number(a.featured))
@@ -107,12 +108,15 @@ function hero() {
   return html`
     <section class="hero" data-section="Intro" aria-labelledby="hero-title">
       <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="container hero__wrap">
+      <div class="container hero__wrap" data-ink>
         <div class="hero__eyebrow" data-reveal="up" style="--d:40ms">
-          <span class="pill"><span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="1.5rem" alt="" decoding="async" fetchpriority="high"></span>${esc(site.name)} · ${esc(site.location.city)}</span>
-          <span class="pill"><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</span>
+          <span class="pill"><span class="hero__avatar"><img src="${photos.avatar.src}" width="${photos.avatar.width}" height="${photos.avatar.height}" sizes="1.5rem" alt="" decoding="async" fetchpriority="high"></span>${esc(site.location.city)}<span class="hero__coords"> · ${COORDS}</span></span>
+          <span class="pill" data-ink-bed><span class="dot${site.availability.open ? ' dot--live' : ''}" aria-hidden="true"></span>${esc(site.availability.label)}</span>
         </div>
-        <h1 class="hero__title" id="hero-title" data-reveal="words" style="--d:140ms">${splitWords('Casa, sito, marchio. Un solo referente.', { accent: ['referente.'] })}</h1>
+        <!-- il nome gigante com'era (Archivo stretto, il cognome in contorno che
+             l'aragosta riempie d'inchiostro: client/ink.js), più piccolo di prima -->
+        <p class="hero__name" aria-hidden="true"><span class="hero__word"><span>${esc(site.firstName)}</span></span> <span class="hero__word hero__word--2"><span data-ink-word>${esc(site.lastName)}</span></span></p>
+        <h1 class="hero__title" id="hero-title" data-reveal="words" style="--d:140ms"><span class="sr-only">${esc(site.name)} — ${site.roles.map((r) => esc(r.label)).join(', ')} a ${esc(site.location.city)}. </span>${splitWords('Casa, sito, marchio. Un solo referente.', { accent: ['referente.'] })}</h1>
         <p class="hero__lead" data-reveal="up" style="--d:460ms">Diplomato geometra a ${esc(site.location.city)}: rilevo e disegno edifici, scrivo siti web a mano, costruisco marchi. Lo stesso metodo, la stessa cura.</p>
         <div class="hero__actions" data-reveal="up" style="--d:540ms">
           ${button({ href: cta.href, label: cta.label, size: 'lg', magnetic: true })}
