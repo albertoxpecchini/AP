@@ -10,6 +10,7 @@
 //                                                  salvato a ogni passo, angoli, margini, glifi, errori; vedi REGOLE.md)
 //   … --suoni                                      coi suoni accesi: il collaudo vuole anche il bip a ogni tasto
 //   … --server-finto --economia [--lavaggio=gira|pronto]   sporchi, lavatrice e decifratore installati, wallet nello zaino
+//   … --tasti=ok,aspetta@3000,…                    aspetta@<ms>: fermo senza tasti (il quiz che va avanti da solo)
 // Serve puppeteer-core in tools/catture e un browser (tools/pzkko/browser.mjs). Niente server vero: il wallet e lo zaino
 // restano nel browser (le richieste alle api falliscono, e il sito sta in piedi lo stesso).
 import { createServer } from 'node:http'
@@ -52,7 +53,7 @@ if (economia) {
   contoFinto.decifrati = 0
 }
 if (lavaggio) contoFinto.lavaggio = { n: 50000, fino: lavaggio === 'pronto' ? ORA - 6e4 : ORA + 7 * 6e4 }
-let stati = 0, tavoloFinto = null
+let stati = 0, tavoloFinto = null, quizFinto = null
 // i giochini finti del decifratore: la risposta giusta è sempre la prima delle scelte (così OK la dà, → e OK sbagliano)
 const PROVE = [{ k: 'cesare', codice: 'NJODJP', giusta: 'MINCIO', scelte: ['MINCIO', 'MANTOVA', 'ZUCCA', 'SARACINESCA'] }, { k: 'binario', codice: '1011', giusta: '11', scelte: ['11', '12', '10', '13'] }, { k: 'sequenza', codice: '3 · 7 · 11 · 15', giusta: '19', scelte: ['19', '20', '17', '23'] }, { k: 'specchio', codice: 'ACCUZ', giusta: 'ZUCCA', scelte: ['ZUCCA', 'NUTRIA', 'LUCCIO', 'GONZAGA'] }]
 const vedeFinto = (t) => ({ tipo: t.tipo, i: t.i, errori: t.errori, prova: t.prove[t.i] && { k: t.prove[t.i].k, codice: t.prove[t.i].codice, scelte: t.prove[t.i].scelte } })
@@ -65,6 +66,18 @@ function walletFinto(body) {
     const n = Math.min(contoFinto.sporchi ?? 0, 50000, Number(body.quanto) > 0 ? Number(body.quanto) : Infinity)
     contoFinto.pzk -= 2000; contoFinto.lavaggio = { n, fino: Date.now() + 10 * 6e4 }; contoFinto.mosse.push({ t: Date.now(), tipo: 'lavatrice', n: 2000 })
     return ok({ fatto: { lavaggio: contoFinto.lavaggio } })
+  }
+  // (2.11) il quiz finto: tre domande, la giusta è sempre la prima (OK la dà, ↓ OK sbaglia)
+  if (a === 'fai' && body.cosa === 'quiz.nuova') { quizFinto = { arg: body.args?.arg ?? null, n: 3, i: 0, giuste: 0, serie: 0, guadagnato: 0, xp: 0, pagate: 0, d: null }; return ok({ esito: { partita: quizFinto } }) }
+  if (a === 'fai' && body.cosa === 'quiz.prossima') {
+    if (!quizFinto) return { ok: false, errore: 'nessuna partita' }
+    quizFinto.d = { q: ['qual è il fiume di Mantova?', 'quanto fa 7 per 8?', 'di che colore è il cercapersone zero, coi tasti arancioni e il corpo chiaro?'][quizFinto.i], risposte: [['il Mincio', 'il Po', "l'Oglio", 'il Tevere'], ['56', '54', '64', '48'], ['bianco', 'nero', 'verde', 'rosso']][quizFinto.i], diff: quizFinto.i + 1 }
+    return ok({ esito: { partita: quizFinto } })
+  }
+  if (a === 'fai' && body.cosa === 'quiz.rispondi') {
+    const q = quizFinto, giusta = body.args?.i === 0, premio = [25, 50, 100][q.i]
+    q.i++; if (giusta) { q.giuste++; q.serie++; q.guadagnato += premio; q.xp += 5; q.pagate++ } else q.serie = 0
+    return ok({ esito: { giusta, indiceGiusto: 0, premio, xp: giusta ? 5 : 1, pagato: giusta, serie: q.serie, nota: giusta ? null : `era ${q.d.risposte[0]}.`, partita: q, finita: q.i >= q.n } })
   }
   if (a === 'fai' && body.cosa === 'decifratore.apri') {
     const ogg = body.args?.tipo === 'chiavetta' ? 'chiavetta' : 'wallet-pzk'
@@ -120,6 +133,7 @@ function walletFinto(body) {
   if (a === 'cauzione') { if (!(contoFinto.galera > Date.now())) return { ok: false, errore: 'non sei in galera' }; contoFinto.pzk -= 3000; delete contoFinto.galera; contoFinto.mosse.push({ t: Date.now(), tipo: 'cauzione', n: 3000 }); return ok({ fatto: { cauzione: 3000 } }) }
   if (a === 'pin') return body.vecchio === '1234' ? ok() : { ok: false, errore: 'il PIN di adesso è sbagliato' }
   if (a === 'indirizzo') { contoFinto.mosse.push({ t: Date.now(), tipo: 'indirizzo', da: contoFinto.ind, a: 'pzk' + body.nuovo }); contoFinto.ind = 'pzk' + body.nuovo; contoFinto.indCambiato = true; return ok() }
+  if (a === 'fai') return { ok: false, errore: `«${body.cosa}» il server finto non lo fa` } // (2.11: prima un ok senza esito, e i comandi della chat si rompevano)
   return ok()
 }
 // il database dei giocatori finto (api/giocatori.mjs): dodici giocatori, le notizie di ogni tipo, il mio profilo coi rivali
@@ -315,8 +329,8 @@ try {
     const TASTI = { su: 'ArrowUp', giu: 'ArrowDown', sx: 'ArrowLeft', dx: 'ArrowRight', ok: 'Enter', indietro: 'Escape', okvero: 'Control+Enter' } // (okvero: il tasto OK anche dove Invio va a capo, l'editor di «codice C»)
     // (e clic@80x121: un clic del mouse sul pixel 80, 121 dell'lcd, attraverso il 3D vero; scrivi@caf: testo dalla tastiera vera, + per lo spazio;
     // conta@pescati@5: lo zaino conta come dopo cinque pescate, per far avanzare sfide e quest; prendi@caffe@3: tre caffè nello zaino)
-    const scelti = (process.argv.find((a) => a.startsWith('--tasti=')) ?? '').slice(8).split(',').filter((k) => TASTI[k] || /^clic@\d+x\d+$/.test(k) || /^scrivi@[\w+]+$/.test(k) || /^(conta|prendi)@[\w-]+@\d+$/.test(k))
-    const passo = (k) => (TASTI[k] ? [k, TASTI[k]] : k.startsWith('scrivi@') ? [k.replace('@', '-'), { scrivi: k.slice(7) }] : k.startsWith('conta@') ? [k.split('@').join('-'), { conta: [k.split('@')[1], Number(k.split('@')[2])] }] : k.startsWith('prendi@') ? [k.split('@').join('-'), { prendi: [k.split('@')[1], Number(k.split('@')[2])] }] : [k.replace('@', '-'), { clic: k.slice(5).split('x').map(Number) }])
+    const scelti = (process.argv.find((a) => a.startsWith('--tasti=')) ?? '').slice(8).split(',').filter((k) => TASTI[k] || /^clic@\d+x\d+$/.test(k) || /^scrivi@[\w+]+$/.test(k) || /^(conta|prendi)@[\w-]+@\d+$/.test(k) || /^aspetta@\d+$/.test(k))
+    const passo = (k) => (TASTI[k] ? [k, TASTI[k]] : k.startsWith('aspetta@') ? [k.replace('@', '-'), { aspetta: Number(k.slice(8)) }] : k.startsWith('scrivi@') ? [k.replace('@', '-'), { scrivi: k.slice(7) }] : k.startsWith('conta@') ? [k.split('@').join('-'), { conta: [k.split('@')[1], Number(k.split('@')[2])] }] : k.startsWith('prendi@') ? [k.split('@').join('-'), { prendi: [k.split('@')[1], Number(k.split('@')[2])] }] : [k.replace('@', '-'), { clic: k.slice(5).split('x').map(Number) }])
     const passi = scelti.length ? [['apri', null], ...scelti.map(passo)] : [['apri', null], ['giu', 'ArrowDown'], ['giu', 'ArrowDown'], ['su', 'ArrowUp'], ['dx', 'ArrowRight'], ['sx', 'ArrowLeft'], ['ok', 'Enter'], ['ok', 'Enter'], ['indietro', 'Escape'], ['indietro', 'Escape'], ['indietro', 'Escape']]
     const errori = []
     page.on('pageerror', (e) => errori.push('errore nella pagina: ' + e.message))
@@ -357,7 +371,8 @@ try {
       const prima = await page.evaluate(() => window.__oscillatori ?? 0)
       const accesiPrima = await page.evaluate(() => localStorage.getItem('pzkko-suono') === 'si')
       const giaAperta = !k && (await page.evaluate((a) => import('/telefono/zero/os/os.js').then((os) => os.corrente()?.app === a), app)) // (già aperta da sola, come l'account senza conto: la sigla è già suonata) // (se il collaudo li ha appena spenti dalle impostazioni, il silenzio è giusto)
-      if (k?.conta) await page.evaluate(([s, n]) => import('/chat/zaino.js').then((z) => z.conta(s, n)), k.conta)
+      if (k?.aspetta) await dorm(k.aspetta) // (aspetta@3000: tre secondi senza toccare niente, per le cose che vanno da sole)
+      else if (k?.conta) await page.evaluate(([s, n]) => import('/chat/zaino.js').then((z) => z.conta(s, n)), k.conta)
       else if (k?.prendi) await page.evaluate(([s, n]) => import('/chat/zaino.js').then((z) => z.aggiungi(s, n)), k.prendi)
       else if (k?.scrivi) await page.keyboard.type(k.scrivi.replaceAll('+', ' '), { delay: 40 }) // (scrivi@mine+50: il + è lo spazio)
       else if (k?.clic) { const p = await page.evaluate((x, y) => window.pzkkoZero.puntoLcd(x, y), ...k.clic); await page.mouse.click(p.x, p.y) }
@@ -373,7 +388,9 @@ try {
       if (r.nulle) errori.push(`${i} ${nome}: ${r.nulle} icone che non ci sono (icone.bitmap → null: manca il nome in os/icone.js)`)
       if (r.fuori.angoli) errori.push(`${i} ${nome}: ${r.fuori.angoli} pixel negli angoli stondati (${r.fuori.dove.join(' ')})`)
       if (r.fuori.margine) errori.push(`${i} ${nome}: ${r.fuori.margine} pixel fuori dal margine (${r.fuori.dove.join(' ')})`)
-      if (suoni && accesiPrima && !suono && !giaAperta && !k?.scrivi && !k?.conta && !k?.prendi) // (le lettere della tastiera vera e i conti dello zaino non suonano) errori.push(`${i} ${nome}: nessun suono`)
+      // (le lettere della tastiera vera, i conti dello zaino e le attese non suonano; 2.11: il push era finito dentro il
+      // commento, così il controllo del suono non c'era più e il suo if prendeva la riga dopo)
+      if (suoni && accesiPrima && !suono && !giaAperta && !k?.scrivi && !k?.conta && !k?.prendi && !k?.aspetta) errori.push(`${i} ${nome}: nessun suono`)
       if (i === 0 && r.app !== app && r.vista !== 'presto') errori.push(`l'app ${app} non si è aperta (c'è ${r.vista})`)
     }
     const larghi = await page.evaluate(() => [...window.__collaudo.larghi])

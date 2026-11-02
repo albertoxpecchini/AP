@@ -2471,7 +2471,11 @@ firmware vero del Flipper in WebAssembly, tolti tutti e due): lo schermo dello z
   tasti, del testo). Le schede: la barra a sinistra, l'icona di Alberto e il titolo, il testo a 40 colonne, i campi, il
   piè, i tasti di seguito. Si scrive dalla tastiera vera (Invio manda) o, con OK a riga vuota, da quella sullo schermo;
   sopra la riga i suggerimenti di chat/predittivo.js (comandi e argomenti: sinistra/destra scelgono, OK o Tab completano);
-  a riga vuota sinistra/destra ripescano le scelte rapide (zaino.rapidi) o le azioni di seguito dell'ultima scheda; su e
+  a riga vuota sopra la riga ci sono i **consigliati** (2.11, Alberto: «fai che la chat mostri subito dei tasti da dove
+  cominciare e con i comandi consigliati»): tasti incorniciati coi comandi pronti adesso (giornaliero se il premio c'è,
+  missioni se una quest è pronta, lavora e pesca se non c'è attesa), poi le ultime righe scritte (zaino.rapidi) e saldo,
+  negozio, aiuto, al più otto; ◀ ▶ ai lati quando non ci stanno tutti. ← → li scelgono (la riga li mostra) e OK li manda,
+  il clic li manda subito. Se l'ultima scheda ha le sue azioni di seguito, ← → vanno a quelle e i consigliati spariscono; su e
   giù scorrono; quando un minigioco aspetta una scelta la croce va sui suoi tasti o sulle celle della griglia e OK preme;
   quando aspetta una parola la riga lo dice. La storia resta (sessione o conto). Le altre app del menu dicono «in arrivo»:
   si fanno quando Alberto dà l'ok sulla chat.
@@ -2666,7 +2670,10 @@ esportata da telefono/app/ e non copiata, e il collaudo di REGOLE.md su ogni vis
 - **Il quiz** (`os/quiz.js`): l'ingresso (le regole in una riga, le pagate di oggi, il record, gli argomenti); la domanda
   (a che punto e i pallini, la barra dei 15 secondi che si accorcia e gli ultimi tre che ticchettano, la difficoltà col premio,
   la serie, il testo, le risposte A–D con ↑ ↓ e OK o coi tasti a–d e 1–4, la scelta lunga che scorre da sola); risposto, la
-  giusta col ✓ e la tua sbagliata con la x incorniciate, la spiegazione al posto della domanda, il premio in fondo. Le foto
+  giusta col ✓ e la tua sbagliata con la x incorniciate, la spiegazione al posto della domanda, il premio in fondo; poi la
+  prossima arriva da sola (2.11, Alberto: «fai che i quiz avanzino senza premere ogni volta enter»): 2,5 s dopo una giusta,
+  4,5 s dopo una sbagliata, con una barretta sopra l'esito che si accorcia; OK la chiama subito, il dialogo di INDIETRO
+  ferma anche questa attesa, e dopo l'ultima arriva da solo il riepilogo. Da quando c'è l'attesa, a domanda risposta i secondi e la barra del tempo restano fermi (prima si ridisegnava per la barretta e si vedeva il tempo correre ancora, 10″, 7″, su una domanda già risposta). Le foto
   dei quiz (Wikimedia, imgur) arrivano a un bit col retino di Bayer e i livelli stirati; se il browser non le lascia leggere, si
   tira a indovinare. INDIETRO in partita chiede se lasciare (e il tempo si ferma). Il riepilogo: quante giuste, i pallini, il
   guadagno, argomenti e ancora. Domande, premi e tetto sono quelli di chat/quiz.js.

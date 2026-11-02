@@ -40,7 +40,7 @@ Si scrive nel repository, non qui ([[Pzkkopedia:Come si aggiorna|come si aggiorn
 * '''2 novembre 2026''': pzkkopedia si riempie.` },
   'Pagina principale/Eventi correnti': { data: D, fonti: F, testo: `* pzkko.it è alla {{Versione|4.0.0|chiocciola zero|1.11.2026}} ed è ancora [[La beta|in beta]]: le cose cambiano spesso.
 * Il 2.11 nel cercapersone zero sono arrivati la [[Lavatrice (app)|lavatrice]] e il [[Decifratore (app)|decifratore]], e l’apertura col 3D non blocca più il sito (da 5,8 s di pagina ferma a 60 ms).
-* In lavorazione il 2.11: i [[I consigliati|consigliati]] della chat e il [[Quiz (app)|quiz]] che passa da solo alla domanda dopo.
+* Sempre il 2.11: la [[Chat (app)|chat]] dello zero mostra subito i [[I consigliati|consigliati]], i tasti da dove cominciare, e il [[Quiz (app)|quiz]] passa da solo alla domanda dopo (col tempo che resta fermo, a domanda risposta).
 * Il [[Il server dei dati in casa|server in casa]] fa anche da [[La banca sul server|banca]]: le regole dei giochi esistono in due copie (il repo per disegnare, il server per decidere) e vanno cambiate insieme.
 * Il dominio dell’[[Ing. Dario Donelli|ing. Dario Donelli]] aspetta ancora: il suo volantino sul muro dice «presto online».` },
   'Pagina principale/Nelle altre lingue': { data: D, fonti: F, testo: `pzkkopedia esiste in una lingua sola: l’italiano in minuscolo di [[pzkko.it]]. La versione inglese del 2008 è [[Better Call Pekko]] (bettercallpekko.it), dove [[Alberto Pecchini|Alberto]] si chiama [[Pekko]] e «SI PARLA ITALIANO» è l’unica riga in italiano; quella seria è [[albertopecchini.it]]. Le pagine di «Better Call Pekko» hanno i «video di consulenza», il forum phpBB e il listino 2009, non una wiki.` },

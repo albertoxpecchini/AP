@@ -900,6 +900,9 @@ L'ingresso: le regole in una riga, le pagate di oggi, il record, gli [[Elenco de
 {{Citazione|fai che i quiz avanzino senza premere ogni volta enter|Alberto, 2 novembre 2026}}
 La prossima domanda arriva da sola: 2,5 s dopo una giusta, 4,5 s dopo una sbagliata, con una barretta sopra l'esito che si accorcia; OK la chiama subito, il dialogo di INDIETRO ferma anche questa attesa, e dopo l'ultima arriva da solo il riepilogo. Nel collaudo lo prova <code>aspetta@3000</code>.
 
+=== Il tempo fermo ===
+Con l'attesa è venuto fuori un difetto: a domanda risposta '''i secondi e la barra dei 15″ continuavano a scendere''' (11″, poi 10″, 7″), perché lo schermo ora si ridisegna per la barretta dell'attesa, e prima, fermo, non lo mostrava. Da allora l'istante della risposta (<code>fermo</code> in <code>os/quiz.js</code>) ferma l'orologio della domanda; il dialogo di INDIETRO sposta solo l'attesa della prossima. Il collaudo col <code>--server-finto</code> (tre domande, la giusta sempre la prima) l'ha visto su tre foto di fila: 11″ dopo la risposta, ancora 11″ un secondo e mezzo dopo, ancora 11″ dopo cinque secondi col dialogo aperto; e poi, chiuso il dialogo con «no», la domanda 2 arrivata da sola.
+
 == Le foto ==
 Le [[Le foto vere dei quiz|foto dei quiz]] (Wikimedia, imgur) arrivano a un bit col retino di Bayer e i livelli stirati; se il browser non le lascia leggere, si tira a indovinare. Domande, premi e tetto sono quelli di chat/quiz.js, e dal 31 ottobre le domande stanno sulla [[La banca sul server|banca]]: la risposta giusta non arriva mai al browser prima della risposta. Nel server finto del collaudo la giusta è sempre la prima.
 

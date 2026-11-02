@@ -197,7 +197,8 @@ node tools/pzkko/zero/prova.mjs --app=<id>
    **Tutte le viste, non solo la prima:** `--tasti=dx,dx,ok,giu,…` fa una sequenza a scelta (con `clic@80x121` un clic del
    mouse sul pixel 80, 121 dell'lcd, attraverso il 3D vero), così si fotografano ogni pagina, ogni dialogo e ogni
    sottovista. Il profilo ne ha usate quattro: le sei pagine, l'acquisto e la faccia chiusa, i clic, i dati peggiori.
-   `okvero` nella sequenza è il tasto OK vero (Ctrl+Invio), per le viste dove Invio fa altro.
+   `okvero` nella sequenza è il tasto OK vero (Ctrl+Invio), per le viste dove Invio fa altro. `aspetta@3000` sta fermo tre
+   secondi senza tasti e fotografa: per le cose che vanno da sole (il quiz che passa alla domanda dopo).
    **Le app che parlano col conto** si provano con `--server-finto` (anche la borsa finta e i colpi: `--rapina=presi`,
    `--rapina=galera`): un wallet finto dentro il collaudo (entra col PIN 1234, crea, sincronizza, converti, invia,
    chi è, PIN, indirizzo) e con `--senzaconto` (il cercapersone chiuso).

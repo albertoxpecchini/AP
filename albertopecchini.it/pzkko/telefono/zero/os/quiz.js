@@ -7,7 +7,9 @@
 //   tre ticchettano), la difficoltà col premio, la serie; il testo; le quattro risposte A–D (↑ ↓ e OK, o i tasti a–d e 1–4;
 //   la scelta lunga scorre da sola). Le foto arrivano a un bit col retino di Bayer (se il browser non le lascia leggere, si tira
 //   a indovinare). Risposto: la giusta col ✓, la tua sbagliata con la x, al posto della domanda la spiegazione, in fondo il
-//   premio; OK avanti. INDIETRO chiede se lasciare la partita (il tempo intanto si ferma).
+//   premio; poi la prossima arriva da sola (2.11, Alberto: «fai che i quiz avanzino senza premere ogni volta enter»): 2,5 s
+//   dopo una giusta, 4,5 s dopo una sbagliata (c'è la spiegazione da leggere), con la barretta che si accorcia sopra
+//   l'esito; OK va avanti subito. INDIETRO chiede se lasciare la partita (il tempo intanto si ferma).
 // - IL RIEPILOGO: quante giuste, i pallini, quanto hai preso, e i tasti argomenti e ancora.
 // Le regole: os/REGOLE.md.
 import { Lcd, W, H } from './lcd.js'
@@ -20,6 +22,7 @@ import { txt, corto, destra, centro, elenco, muovi, pagine, striscia, bottoni } 
 
 const NOMI = ['', 'facile', 'media', 'difficile']
 const LETTERE = 'ABCD'
+const DOPO = { giusta: 2500, sbagliata: 4500 } // quanto resta l'esito prima della prossima domanda (OK la chiama subito)
 
 // ── il riepilogo ──
 function fine(os, p, ancora, argomenti) {
@@ -68,12 +71,16 @@ function fine(os, p, ancora, argomenti) {
 function partita(os, p, arg, torna) {
   let sel = 0, d = null, inizio = 0, risposto = null, scelta = null, pausa = 0, ultimoSec = 0, scorri = 0
   let banca = null // (31.10) la banca sta rispondendo: 'controllo' o 'prossima'. Intanto il tempo è fermo e i tasti pure
-  const resto = () => Math.max(0, quiz.TEMPO * 1000 - ((pausa || performance.now()) - inizio))
-  const nuova = () => { d = p.d; sel = 0; risposto = null; scelta = null; inizio = performance.now(); ultimoSec = quiz.TEMPO; scorri = 0 }
+  let via = 0, viaDurata = 0 // (2.11) quando la prossima arriva da sola (performance.now), e quanto dura l'attesa
+  // (2.11) fermo: l'istante della risposta. Da lì i secondi e la barra del tempo restano dove sono: prima, con l'esito che si
+  // ridisegna per la barretta dell'attesa, si vedeva il tempo correre ancora (10″, 7″…) su una domanda già risposta
+  let fermo = 0
+  const resto = () => Math.max(0, quiz.TEMPO * 1000 - ((fermo || pausa || performance.now()) - inizio))
+  const nuova = () => { d = p.d; sel = 0; risposto = null; scelta = null; inizio = performance.now(); ultimoSec = quiz.TEMPO; scorri = 0; via = 0; fermo = 0 }
   nuova()
   async function rispondi(i) {
     if (risposto || pausa || banca) return
-    scelta = i; banca = 'controllo'; pausa = performance.now(); os.ridisegna()
+    scelta = i; banca = 'controllo'; pausa = fermo = performance.now(); os.ridisegna()
     const r = await quiz.rispondi(p, i)
     banca = null; pausa = 0
     if (os.corrente() !== v) return
@@ -81,11 +88,13 @@ function partita(os, p, arg, torna) {
     p.esiti.push(r.giusta)
     if (r.bonus) p.bonus = r.bonus // (il riepilogo dice «il bonus è tuo» solo se chat/quiz.js l'ha pagato davvero)
     risposto = r
+    viaDurata = r.giusta ? DOPO.giusta : DOPO.sbagliata; via = performance.now() + viaDurata
     if (r.giusta) os.suoni.sigla('moneta'); else os.suoni.bip('pagerGiu')
     os.ridisegna()
   }
   const avanti = async () => {
     if (!risposto || banca || os.corrente() !== v) return // (due clic nello stesso fotogramma: il secondo non trova più la partita)
+    via = 0 // (OK prima del tempo: l'attesa finisce qui, e il tic non la richiama)
     if (p.finita) { os.togli(); os.spingi(fine(os, p, (x) => parti(os, arg, torna, x, true), () => { os.togli() })); return } // («ancora» prepara dal riepilogo, con la rotellina)
     banca = 'prossima'; os.ridisegna()
     const a = await quiz.prossima(p) // (il tempo della banca parte adesso, non mentre si leggeva l'esito)
@@ -98,13 +107,15 @@ function partita(os, p, arg, torna) {
     pausa = performance.now()
     const r = await os.dialogo({ titolo: 'lasci?', testo: 'la partita si perde: le risposte date restano contate.', tasti: ['no', 'lascia'] })
     if (r === 'lascia' && os.corrente() === v) { os.togli(); return } // (se sopra c'è altro non si toglie quello)
-    inizio += performance.now() - pausa; pausa = 0
+    const ferma = performance.now() - pausa
+    if (!fermo) inizio += ferma; if (via) via += ferma; pausa = 0 // (col dialogo aperto anche l'attesa della prossima si ferma; a domanda risposta il tempo è già fermo)
   }
   const v = {
     nome: 'quiz-domanda', app: 'quiz',
     tic(t) {
       if (banca) return os.ridisegna() // (la rotellina in fondo)
-      if (risposto || pausa) return // (risposto o in pausa non si anima niente: non si ridisegna)
+      if (pausa) return // (in pausa non si anima niente: non si ridisegna)
+      if (risposto) { if (!via) return; if (performance.now() >= via) return avanti(); return os.ridisegna() } // (la barretta dell'attesa; poi la prossima da sola)
       const s = Math.ceil(resto() / 1000)
       if (s !== ultimoSec) { ultimoSec = s; if (s <= 3 && s > 0) os.suoni.bip('cursore') }
       if (resto() <= 0) return rispondi(null)
@@ -163,6 +174,7 @@ function partita(os, p, arg, torna) {
       if (risposto) {
         const r = risposto, s = r.giusta ? `✓ ${r.pagato ? `+${fmt(r.premio)} $pzk` : 'giusto!'} · +${r.xp} xp${r.serie > 1 ? ` · serie ${r.serie}` : ''}${r.bonus ? ` · perfetta +${fmt(r.bonus)}` : ''}` : scelta === null ? '! tempo scaduto' : '! sbagliato'
         l.riempi(10, H - 11, W - 20, 10); centro(l, H - 9, corto(`${s} · OK ${p.finita ? 'risultato' : 'avanti'}`, 38), { inv: true })
+        if (via) l.riempi(10, H - 13, Math.round((W - 20) * Math.max(0, Math.min(1, (via - performance.now()) / viaDurata))), 1) // (quanto manca alla prossima)
         os.zona(10, H - 11, W - 20, 10, avanti)
       } else centro(l, H - 9, '↑↓ sceglie · OK risponde · o a b c d')
     },

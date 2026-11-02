@@ -9,8 +9,11 @@
 //
 // Come si usa: si scrive dalla tastiera vera (le lettere, Backspace, Invio manda) o, con OK a riga vuota, dalla tastiera
 // sullo schermo (os.tastiera). Mentre si scrive, sopra la riga ci sono i suggerimenti (chat/predittivo.js, gli stessi
-// della chat grande: i comandi e i loro argomenti): sinistra/destra scelgono, OK completa; a riga vuota sinistra/destra
-// ripescano le ultime scelte (zaino.rapidi) e OK le manda. Su e giù scorrono i messaggi. INDIETRO cancella la riga, e a
+// della chat grande: i comandi e i loro argomenti): sinistra/destra scelgono, OK completa. A riga vuota sopra la riga ci
+// sono i CONSIGLIATI (2.11, Alberto: «fai che la chat mostri subito dei tasti da dove cominciare e con i comandi
+// consigliati»): tasti coi comandi pronti adesso (il premio giornaliero, le quest pronte, lavora, pesca), poi le ultime
+// righe scritte (zaino.rapidi) e saldo, negozio, aiuto; ← → li scelgono, OK manda, il clic li manda subito. Su e giù
+// scorrono i messaggi. INDIETRO cancella la riga, e a
 // riga vuota esce dall'app. Quando un minigioco aspetta una scelta, la croce va sui suoi tasti (o sulle celle della
 // griglia) e OK preme; quando aspetta una parola (scrivi), la riga mostra cosa vuole. I messaggi restano (storia:
 // sessionStorage nella sessione, localStorage per conto), come nella chat grande.
@@ -20,6 +23,7 @@ import * as icone from './icone.js'
 import * as zaino from '../../../chat/zaino.js'
 import * as pzk from '../../../games/pzk.js'
 import * as led from '../../../chat/led.js'
+import * as missioni from '../../../chat/missioni.js'
 import * as chat from '../../../chat/chat.js'
 import { icona, conIcone } from '../../../chat/icone.js'
 import { COMANDI, PER_NOME, CATEGORIE } from '../../../chat/comandi/index.js'
@@ -27,7 +31,7 @@ import { eventoCasuale, salutoIniziale } from '../../../chat/comandi/eventi.js'
 import { NEGOZIO, PER_ID } from '../../../chat/testi.js'
 import { prezzoDi } from '../../../chat/mercato.js'
 import { calcola } from '../../../chat/predittivo.js'
-import { txt } from './pezzi.js'
+import { txt, corto } from './pezzi.js'
 
 const RIDOTTO = matchMedia('(prefers-reduced-motion: reduce)')
 const { fmt, pzkHtml, eurHtml, nome, importo, caso, rnd, tra, durata, analizza, dormi } = chat
@@ -352,8 +356,21 @@ function completa() {
   riga = `${r.prima}${v.v} `
   suggerisci()
 }
-const RAPIDI_INIZIALI = ['giornaliero', 'lavora', 'pesca', 'saldo', 'aiuto']
-const rapidi = () => (zaino.pagerRotto() ? AZIONI_SCASSATO.map(([r]) => r) : zaino.rapidi().length ? zaino.rapidi() : RAPIDI_INIZIALI)
+// i consigliati: prima quello che è pronto adesso, poi le ultime righe scritte, poi i comandi per orientarsi
+const PRONTI = [['giornaliero', () => zaino.manca('giornaliero') === 0], ['missioni', () => missioni.pronte() > 0], ['lavora', () => zaino.manca('lavora') === 0], ['pesca', () => zaino.manca('pesca') === 0]]
+function rapidi() {
+  if (zaino.pagerRotto()) return AZIONI_SCASSATO.map(([r]) => r)
+  const l = []
+  for (const [c, pronto] of PRONTI) { try { if (pronto()) l.push(c) } catch {} }
+  return [...new Set([...l, ...zaino.rapidi().slice(0, 4), 'saldo', 'negozio', 'aiuto'])].slice(0, 8)
+}
+/** L'ultima scheda del bot con le sue azioni di seguito ([compra] [usa]…), se a riga vuota la croce va su quelle. */
+function ultimaConAzioni() {
+  const ub = msgs.findLast((m) => m.tipo === 'bot')
+  return !riga.trim() && !aspettaTesto && ub?.fatto && !ub.scelte?.length && azioniDi(ub).length ? ub : null // (con le scelte le azioni non si disegnano)
+}
+/** I consigliati si vedono quando ← → vanno a loro: niente da completare, niente scelte, riga vuota (o uno di loro scelto). */
+const conConsigli = () => !sugg && !scelta && !aspettaTesto && (!riga.trim() || iRapidi >= 0) && !ultimaConAzioni()
 
 // ── l'impaginazione: ogni messaggio diventa righe { h, d(l, y) } ──
 // il clic del mouse (os.zona): solo dentro la fascia dei messaggi che si vede, e un tasto si preme come con OK
@@ -449,8 +466,9 @@ export function vista() {
       if (ancora || msgs.some((m) => m.pensa || m.tipo === 'pensa' || m.rulli?.some((r) => r.gira) || m.tempo)) os.ridisegna()
     },
     disegna(l, t) {
-      const conSugg = !!sugg
-      const yIn = H - 17, yTop = BARRA + 1, yFondo = yIn - (conSugg ? 11 : 1)
+      const consigli = conConsigli() ? rapidi() : null
+      const conSugg = !!sugg || !!consigli
+      const yIn = H - 17, yTop = BARRA + 1, yFondo = yIn - (consigli ? 14 : conSugg ? 11 : 1) // (sopra i tasti consigliati un filo d'aria: l'ultima riga ci finiva attaccata)
       // i messaggi, dal fondo in su
       l.ritaglia([0, yTop, W, yFondo - yTop])
       banda = [yTop, yFondo]
@@ -467,7 +485,28 @@ export function vista() {
       l.ritaglia(null)
       if (scorri > 0) { const s = `↓ ${Math.ceil(scorri / 16)}`, w = Lcd.larghezza(s) + 6, x = W - os.MARGINE - 4 - w; l.riempi(x - 1, yTop, w + 2, 12, 0); l.riempi(x, yTop + 1, w, 10); l.testo(x + 3, yTop + 2, s, { inv: true }); os.zona(x, yTop + 1, w, 10, () => { scorri = 0 }) } // (un bollino rovesciato con l'aria attorno: prima il testo finiva attaccato a quello dei messaggi)
       // i suggerimenti sopra la riga
-      if (conSugg) {
+      // i consigliati: tasti incorniciati in fila; quello scelto rovesciato e sempre in vista (la fila parte più avanti)
+      if (consigli) {
+        // (quelli che non ci stanno: ◀ e ▶ ai lati dicono che ce ne sono altri, e ← → ci arrivano)
+        const lista = consigli.map((c) => { const s = corto(txt(c), 20); return { c, s, w: Lcd.larghezza(s) + 6 } })
+        const tutti = 10 + lista.reduce((a, b) => a + b.w + 3, 0) <= W - 8, x0 = tutti ? 10 : 17, fine = tutti ? W - 8 : W - 15
+        let da = 0
+        while (iRapidi > da && x0 + lista.slice(da, iRapidi + 1).reduce((a, b) => a + b.w + 3, 0) - 3 > fine) da++
+        let x = x0, ultimo = da - 1
+        for (let i = da; i < lista.length; i++) {
+          const { c, s, w } = lista[i]
+          if (x + w > fine) break
+          ultimo = i
+          const on = i === iRapidi
+          if (on) l.riempi(x, yIn - 11, w, 10); else l.cornice(x, yIn - 11, w, 10)
+          l.testo(x + 3, yIn - 10, s, { inv: on })
+          os.zona(x, yIn - 11, w, 10, () => { riga = ''; iRapidi = -1; storia.push(c); iStoria = storia.length; manda(c) }) // (il clic manda subito)
+          x += w + 3
+        }
+        if (da > 0) l.testo(8, yIn - 10, '◀')
+        if (ultimo < lista.length - 1) l.testo(W - 13, yIn - 10, '▶')
+      }
+      if (sugg) {
         let x = 10
         l.orizz(6, yIn - 12, W - 12)
         sugg.forEach((s, i) => { const w = Lcd.larghezza(s.v) + 4; if (x + w > W - 8) return; if (i === iSugg) l.riempi(x - 1, yIn - 10, w, 9); l.testo(x + 1, yIn - 9, txt(s.v), { inv: i === iSugg }); os.zona(x - 1, yIn - 11, w, 11, () => { iSugg = i; completa() }); x += w + 4 })
@@ -480,7 +519,7 @@ export function vista() {
       else if (aspettaTesto) l.testo(16, yIn + 3, `[${aspettaTesto.segnaposto}]`)
       else if (scelta?.dir) l.testo(16, yIn + 3, `premi ${Object.keys(scelta.dir).map((k) => FRECCIA[k]).join(' ')} o fai clic`)
       else if (scelta) l.testo(16, yIn + 3, 'croce: scegli · OK: premi')
-      else { if (t % 10 < 5) l.riempi(16, yIn + 2, 5, 9); l.testo(24, yIn + 3, 'scrivi un comando (aiuto)') } // (il cursore prima del suggerimento: sopra ne copriva la «s»)
+      else { if (t % 10 < 5) l.riempi(16, yIn + 2, 5, 9); l.testo(24, yIn + 3, consigli ? 'scrivi, o ←→ un consiglio e OK' : 'scrivi un comando (aiuto)') } // (il cursore prima del suggerimento: sopra ne copriva la «s»)
     },
     tasto(n) {
       riordina()
@@ -504,12 +543,11 @@ export function vista() {
       if (n === 'giu') { scorri = Math.max(0, scorri - 16); return true }
       // le azioni di seguito dell'ultima scheda (i tasti [compra] [usa]…): a riga vuota la croce le sceglie e OK le manda. Solo
       // l'ultima scheda del bot (30.10: prima ← → pescavano l'ultima con azioni anche lontana, fuori schermo, e i rapidi non si raggiungevano)
-      const ub = msgs.findLast((m) => m.tipo === 'bot')
-      const ua = !riga.trim() && !aspettaTesto && ub?.fatto && !ub.scelte?.length && azioniDi(ub).length ? ub : null // (con le scelte le azioni non si disegnano)
+      const ua = ultimaConAzioni()
       if (n === 'sx' || n === 'dx') {
         if (sugg) { iSugg = (iSugg + (n === 'dx' ? 1 : -1) + sugg.length) % sugg.length; return true }
         if (ua && iRapidi < 0) { const l = ua.azioniObj, i = l.indexOf(ua.selAzione); ua.selAzione = l[(i + (n === 'dx' ? 1 : -1) + l.length) % l.length]; for (const m of msgs) if (m !== ua && m.selAzione) { m.selAzione = null; m.righe = null } scorri = 0; invalida(ua); return true }
-        if (!riga.trim() || iRapidi >= 0) { const r = rapidi(); iRapidi = (iRapidi + (n === 'dx' ? 1 : -1) + r.length) % r.length; riga = r[iRapidi]; return true }
+        if (!riga.trim() || iRapidi >= 0) { const r = rapidi(); iRapidi = iRapidi < 0 ? (n === 'dx' ? 0 : r.length - 1) : (iRapidi + (n === 'dx' ? 1 : -1) + r.length) % r.length; riga = r[iRapidi]; return true } // (da nessuno: → il primo, ← l'ultimo)
         return true
       }
       if (n === 'ok') {

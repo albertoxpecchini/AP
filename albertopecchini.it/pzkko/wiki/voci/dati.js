@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 703 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>2ac0343</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 704 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>247cc84</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 188
 |-
 | 2026-11
-| 4
+| 5
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/247cc84 247cc84] chore(pzkko): pzkkopedia allineata a 2ac0343
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/2ac0343 2ac0343] feat(pzkko): pzkkopedia piena, la wiki di tutto, aggiornata a ogni push
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/f46c118 f46c118] feat(pzkko): la lavatrice e il decifratore nel cercapersone zero, l'apertura col 3D senza bloccare il sito
 * 2026-11-01 [https://github.com/albertoxpecchini/AP/commit/c3efd30 c3efd30] Catture aggiornate: Alberto Pecchini, pzkko
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/03ef8a6 03ef8a6] fix(pzkko): dopo l'uscita dal conto il messaggio dice che per il cercapersone serve di nuovo il conto
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/70f5b08 70f5b08] Catture aggiornate: pzkko
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/620bb29 620bb29] fix(pzkko): cercapersone solo col conto, e sessione e conto sono portafogli separati
-* 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/209c4eb 209c4eb] feat(pzkko): quiz, side quest, traguardi, foto, comandi, economia, barra e wiki vuota
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
