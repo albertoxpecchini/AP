@@ -1,0 +1,13 @@
+{
+  "$comment": "Il gancio di pzkkopedia (2.11.2026, Alberto: «ad ogni push nuovo bisogna aggiornarla»): prima di un `git push` lanciato da Claude Code, tools/pzkko/wiki/controlla.mjs --hook legge il comando e, se la wiki di pzkko è rimasta indietro rispetto ai file del sito cambiati, ferma il push e dice quali voci rileggere. I comandi che non sono un push passano subito.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node albertopecchini.it/tools/pzkko/wiki/controlla.mjs --hook", "timeout": 60 }
+        ]
+      }
+    ]
+  }
+}

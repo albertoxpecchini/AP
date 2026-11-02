@@ -5,18 +5,27 @@
 <!-- 27.10: X-Frame-Options SAMEORIGIN, per la cornice della musica (suono/cornice.js). Toccata anche per questo: i browser che tenevano la pagina in cache con DENY, al 304 senza intestazioni, continuavano a rifiutarla nel riquadro -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>pzkkopedia, l’enciclopedia libera del muro</title>
-<meta name="description" content="pzkkopedia, l’enciclopedia libera del muro: la wiki di pzkko.it (per ora vuota).">
-<meta name="robots" content="noindex"><!-- finché è vuota -->
+<meta name="description" content="pzkkopedia, l’enciclopedia libera del muro: la wiki di pzkko.it, una voce per ogni cosa del sito, dei giochi, del cercapersone zero, degli strumenti, del repository e della memoria di Claude.">
+<link rel="canonical" href="https://www.pzkko.it/wiki/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pzkko">
+<meta property="og:title" content="pzkkopedia, l’enciclopedia libera del muro">
+<meta property="og:description" content="la wiki di pzkko.it: una voce per ogni cosa del sito, tutte collegate, con la cronologia vera dei commit.">
+<meta property="og:url" content="https://www.pzkko.it/wiki/">
+<meta property="og:image" content="https://www.pzkko.it/og.jpg">
+<meta property="og:locale" content="it_IT">
 <meta name="author" content="Alberto Pecchini">
 <link rel="author" href="https://www.albertopecchini.it">
 <meta name="theme-color" content="#665d56">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+<script>try{var t=localStorage.getItem("pzkkopedia-tema");if(t==="chiaro")document.documentElement.dataset.theme="light";else if(t==="scuro")document.documentElement.dataset.theme="dark"}catch(e){}</script><!-- (2.11) l'aspetto scelto, prima del primo disegno: niente lampo bianco col tema scuro -->
+<meta name="color-scheme" content="light dark">
 <link rel="stylesheet" href="/barra/barra.css"><!-- la barra in alto con le sezioni (barra/barra.js) -->
 <link rel="stylesheet" href="/wiki/wiki.css">
-<!-- pzkkopedia: la wiki del sito, uno scheletro vuoto. Una pagina sola: l’indirizzo della voce sta nell’hash
-     (/wiki/#/Titolo_della_voce), tutto il resto lo disegna wiki.js; i contenuti stanno in voci.js -->
+<!-- pzkkopedia: la wiki del sito (dal 2.11.2026 piena: tools/pzkko/wiki/README.md). Una pagina sola: l’indirizzo della voce sta nell’hash
+     (/wiki/#/Titolo_della_voce), tutto il resto lo disegna wiki.js; le voci stanno in voci/*.js, unite da voci.js -->
 </head>
 <body>
 <div id="app"></div>

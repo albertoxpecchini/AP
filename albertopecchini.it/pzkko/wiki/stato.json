@@ -1,0 +1,18 @@
+{
+  "commit": "f46c118",
+  "data": "2026-11-02",
+  "generata": "2026-11-02T10:50:27.621Z",
+  "voci": 1075,
+  "commit_totali": 702,
+  "moduli": {
+    "principale": 55,
+    "sito": 56,
+    "scena": 61,
+    "giochi": 40,
+    "cercapersone": 45,
+    "chat": 56,
+    "dietro": 62,
+    "memoria": 32,
+    "dati": 668
+  }
+}

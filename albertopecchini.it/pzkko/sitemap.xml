@@ -6,5 +6,6 @@
   <url><loc>https://www.pzkko.it/oggetti/</loc><priority>0.5</priority></url>
   <url><loc>https://www.pzkko.it/traguardi/</loc><priority>0.5</priority></url>
   <url><loc>https://www.pzkko.it/info/</loc><priority>0.5</priority></url>
+  <url><loc>https://www.pzkko.it/wiki/</loc><priority>0.7</priority></url>
   <url><loc>https://www.pzkko.it/tools/lezioni/</loc><priority>0.7</priority></url>
 </urlset>

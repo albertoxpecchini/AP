@@ -2,7 +2,8 @@
 # che escono da questo repository, albertopecchini.it e bettercallpekko.it
 # (SITE=bcp), e controlla le pagine generate con albertopecchini.it/tools/controllo/:
 # credito col www, link e immagini interni, titoli, dati mancanti nei template,
-# sitemap. Se qualcosa non va, il commit prende la ❌ e GitHub manda un'email.
+# sitemap; e la wiki di pzkko (pzkkopedia, tools/pzkko/wiki/controlla.mjs). Se
+# qualcosa non va, il commit prende la ❌ e GitHub manda un'email.
 #
 # Vercel intanto pubblica per conto suo: questo controllo non blocca niente,
 # avvisa. I commit del bot delle catture (catture.yml) non lo avviano: le spinte
@@ -61,6 +62,11 @@ jobs:
 
       - name: Controllo di albertopecchini.it
         run: node tools/controllo/controllo.mjs dist
+
+      # pzkkopedia (pzkko/wiki/) deve dire il vero sul sito: le voci si caricano, le fonti esistono, le immagini ci sono,
+      # i link rossi sono pochi. Il confronto coi commit (la wiki è indietro?) lo fa in locale il gancio di Claude Code
+      - name: Controllo di pzkkopedia
+        run: node tools/pzkko/wiki/controlla.mjs --solo-voci
 
       - name: Build di bettercallpekko.it
         env:

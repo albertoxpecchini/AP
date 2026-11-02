@@ -9,7 +9,7 @@
 // nuove: gadget, oggetti, traguardi, info), così le voci stanno in un posto solo. L'altezza è --barra (barra.css): la home
 // ci sposta sotto il wallet e il cercapersone.
 // ACCOUNT nella home apre il cercapersone sull'app Account (games/pzk.js, apriWallet('conto')); nelle altre pagine porta
-// alla home con #account, che fa lo stesso. WIKI (pzkkopedia, /wiki/) c'è ma è vuota: una voce senza indirizzo (null) si
+// alla home con #account, che fa lo stesso. WIKI è pzkkopedia (/wiki/), piena dal 2.11. Una voce senza indirizzo (null) si
 // vedrebbe sbiadita, con «presto».
 
 import { src } from '../chat/icone.js'
@@ -25,7 +25,7 @@ const VOCI = [
   ['/traguardi/', 'traguardi', 'trofeo', 'gli achievement: quelli fatti e quelli da fare', 'rosa', 'tondo'],
   ['#account', 'account', 'app-account', 'il conto: crealo, entra, cambia, invia', 'quaderno', 'mono'],
   ['/info/', 'info', 'cuore', 'cos’è pzkko, chi l’ha fatto, il copyright', 'bianca', 'mano'],
-  ['/wiki/', 'wiki', 'manuale-landini', 'pzkkopedia, la wiki del sito: per ora è vuota', 'grigia', 'bungee'],
+  ['/wiki/', 'wiki', 'manuale-landini', 'pzkkopedia, l’enciclopedia libera del muro: una voce per ogni cosa del sito', 'grigia', 'bungee'],
 ]
 
 // il caso col seme (mulberry32): la barra è uguale a ogni visita

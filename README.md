@@ -10,6 +10,11 @@ AP/
 └─ .vscode/              F5 in VS Code avvia il server di sviluppo e apre Edge sul sito
 ```
 
+La **wiki di tutto** (il sito, i giochi, il cercapersone, gli strumenti, questo repository, il server in casa,
+la memoria di Claude) è **pzkkopedia**, su <https://www.pzkko.it/wiki/>: le voci stanno in
+`albertopecchini.it/pzkko/wiki/voci/` e si aggiornano **a ogni push** (`node tools/pzkko/wiki/aggiorna.mjs`
+da `albertopecchini.it/`, vedi [tools/pzkko/wiki/README.md](albertopecchini.it/tools/pzkko/wiki/README.md)).
+
 ## Avvio
 
 ```bash

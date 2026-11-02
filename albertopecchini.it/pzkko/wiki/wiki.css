@@ -1,11 +1,12 @@
 /* pzkkopedia (26.10, wiki/wiki.js): le proporzioni e la grafica della skin Vector 2022 di Wikipedia in italiano (sfondo grigio
-   chiarissimo, contenuto bianco col bordo sottile #a2a9b1, testo nero, link blu #0645ad e rossi #ba0000 per le voci che non
+   chiarissimo, contenuto bianco col bordo sottile var(--bordo), testo nero, link blu #0645ad e rossi #ba0000 per le voci che non
    esistono, titoli di sezione col serif, il resto senza grazie), con un TOCCO di pzkko e basta: Anton per il titolo della voce
    e per il nome in alto, la fascia di ruggine (#665d56) col filo giallo (#ffd400) dietro la barra del sito, la linguetta
    attiva sottolineata di giallo, la chiocciola per logo. La barra del sito (barra/barra.css) sta sopra la fascia. */
 @font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-weight:400;font-display:swap}
 :root{--sfondo:#f8f9fa;--bordo:#a2a9b1;--testo:#202122;--grigio:#54595d;--link:#0645ad;--visitato:#0b0080;--rosso:#ba0000;--rosso-vis:#a55858;--ruggine:#665d56;--giallo:#ffd400;--blu:#36c;
-  --serif:"Linux Libertine","Georgia","Times",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Lato,Helvetica,Arial,sans-serif;--anton:"Anton",Impact,"Arial Narrow",sans-serif;color-scheme:light}
+  --serif:"Linux Libertine","Georgia","Times",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Lato,Helvetica,Arial,sans-serif;--anton:"Anton",Impact,"Arial Narrow",sans-serif;color-scheme:light;
+  --carta:#fff;--grigio-2:#eaecf0;--bordo-2:#c8ccd1;--nero:#000;--grigio-3:#72777d;--tinta-blu:#eaf3ff;--tinta-gialla:#fef6e7;--tinta-rossa:#fee7e6;--tinta-verde:#dff3ec;--tinta-testa:#f2f4f7;--tinta-testa-2:#fbfbfc;--tinta-carta:#faf8f5;--tinta-kraft:#f3f0ea;--tinta-grigia:#ededed;--vuoto:#dcdedf;--ombra:rgba(0,0,0,.18)}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--barra,72px) + 8px)}
 body{position:relative;min-height:100vh;margin:0;padding-top:var(--barra,72px);background:var(--sfondo);color:var(--testo);font:14px/1.6 var(--sans)}
@@ -19,57 +20,57 @@ a.new:visited{color:var(--rosso-vis)}
 .solo-lettori{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* la fascia di ruggine dietro la barra del sito */
-.fascia{position:absolute;left:0;right:0;top:0;height:var(--barra,72px);background:var(--ruggine);border-bottom:3px solid var(--giallo)}
-.salta{position:absolute;left:8px;top:-60px;z-index:90;padding:8px 14px;background:#fff;border:2px solid var(--blu);border-radius:2px;color:var(--link)}
+.fascia{position:fixed;z-index:75;left:0;right:0;top:0;height:calc(var(--barra,72px) + env(safe-area-inset-top));background:var(--ruggine);border-bottom:3px solid var(--giallo)}
+.salta{position:absolute;left:8px;top:-60px;z-index:90;padding:8px 14px;background:var(--carta);border:2px solid var(--blu);border-radius:2px;color:var(--link)}
 .salta:focus{top:calc(var(--barra,72px) + 6px)}
 
 /* l'intestazione: menu e logo a sinistra, la ricerca al centro, le utenze a destra */
-.intestazione{position:relative;z-index:40;display:flex;align-items:center;gap:16px;min-height:52px;padding:6px 16px;background:#fff;border-bottom:1px solid var(--bordo)}
+.intestazione{position:relative;z-index:40;display:flex;align-items:center;gap:16px;min-height:52px;padding:6px 16px;background:var(--carta);border-bottom:1px solid var(--bordo)}
 .int-sx{flex:none;display:flex;align-items:center;gap:6px}
 .hamburger,.bt-icona{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid transparent;border-radius:2px;background:none;color:var(--grigio);cursor:pointer}
-.hamburger:hover,.bt-icona:hover{background:#eaecf0}
-.hamburger[aria-expanded="true"],.bt-icona[aria-expanded="true"]{background:#eaecf0;border-color:var(--bordo)}
+.hamburger:hover,.bt-icona:hover{background:var(--grigio-2)}
+.hamburger[aria-expanded="true"],.bt-icona[aria-expanded="true"]{background:var(--grigio-2);border-color:var(--bordo)}
 .logo{display:flex;align-items:center;gap:8px;color:var(--testo)}
 .logo:hover{text-decoration:none}
 .logo:visited{color:var(--testo)}
 .logo-svg{flex:none;display:block}
 .marchio{display:flex;flex-direction:column;line-height:1.1}
-.nome{font:400 24px/1 var(--anton);letter-spacing:.02em;color:#000}
+.nome{font:400 24px/1 var(--anton);letter-spacing:.02em;color:var(--nero)}
 .slogan{margin-top:3px;font-size:11px;color:var(--grigio)}
 .ricerca{flex:1;min-width:0;max-width:720px;margin:0 auto}
-.ricerca-box{position:relative;display:flex;align-items:center;height:34px;border:1px solid var(--bordo);border-radius:2px;background:#eaecf0;color:var(--grigio)}
-.ricerca-box:focus-within{background:#fff;border-color:var(--blu);box-shadow:inset 0 0 0 1px var(--blu)}
+.ricerca-box{position:relative;display:flex;align-items:center;height:34px;border:1px solid var(--bordo);border-radius:2px;background:var(--grigio-2);color:var(--grigio)}
+.ricerca-box:focus-within{background:var(--carta);border-color:var(--blu);box-shadow:inset 0 0 0 1px var(--blu)}
 .ricerca-box>svg{position:absolute;left:9px;pointer-events:none}
 .ricerca input{flex:1;min-width:0;height:100%;padding:0 8px 0 36px;border:0;background:none;color:var(--testo);font:14px var(--sans);outline:none}
 .ricerca input::-webkit-search-cancel-button{display:none}
 .bt-cerca{height:100%;padding:0 12px;border:0;border-left:1px solid var(--bordo);border-radius:0 2px 2px 0;background:none;color:var(--testo);font:700 13px var(--sans);cursor:pointer}
-.bt-cerca:hover{background:#f8f9fa}
-#suggerimenti{position:absolute;left:-1px;right:-1px;top:calc(100% + 1px);z-index:70;margin:0;padding:0;list-style:none;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 3px rgba(0,0,0,.2)}
+.bt-cerca:hover{background:var(--sfondo)}
+#suggerimenti{position:absolute;left:-1px;right:-1px;top:calc(100% + 1px);z-index:70;margin:0;padding:0;list-style:none;background:var(--carta);border:1px solid var(--bordo);box-shadow:0 2px 3px rgba(0,0,0,.2)}
 #suggerimenti a{display:block;padding:7px 12px;color:var(--testo)}
 #suggerimenti a:hover{text-decoration:none}
-#suggerimenti [aria-selected="true"],#suggerimenti li:hover{background:#eaf3ff}
-#suggerimenti .sg-cerca{border-top:1px solid #eaecf0;color:var(--link)}
+#suggerimenti [aria-selected="true"],#suggerimenti li:hover{background:var(--tinta-blu)}
+#suggerimenti .sg-cerca{border-top:1px solid var(--grigio-2);color:var(--link)}
 #suggerimenti .sg-cerca a{color:var(--link)}
 .int-dx{flex:none;display:flex;align-items:center;gap:4px;white-space:nowrap}
 .int-dx>a{padding:6px 8px}
 .tendina{position:relative}
-.pannello{position:absolute;top:100%;z-index:60;min-width:200px;margin:2px 0 0;padding:6px 0;list-style:none;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 6px rgba(0,0,0,.2);text-align:left}
+.pannello{position:absolute;top:100%;z-index:60;min-width:200px;margin:2px 0 0;padding:6px 0;list-style:none;background:var(--carta);border:1px solid var(--bordo);box-shadow:0 2px 6px rgba(0,0,0,.2);text-align:left}
 .pannello-dx{right:0}
 .pannello a{display:block;padding:6px 14px;white-space:nowrap}
-.pannello a:hover{background:#eaf3ff;text-decoration:none}
-.pannello-nota{padding:4px 14px 6px;border-bottom:1px solid #eaecf0;margin-bottom:4px;color:var(--grigio);font-size:12px}
+.pannello a:hover{background:var(--tinta-blu);text-decoration:none}
+.pannello-nota{padding:4px 14px 6px;border-bottom:1px solid var(--grigio-2);margin-bottom:4px;color:var(--grigio);font-size:12px}
 
 /* la pagina: menu principale e indice a sinistra, il resto a destra */
 .pagina{position:relative;display:grid;grid-template-columns:208px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:20px;max-width:1264px;margin:0 auto;padding:16px 16px 0}
 .centro{grid-column:2;grid-row:1/span 2;min-width:0}
 .menu-principale{display:none;font-size:13px}
 .menu-fisso .menu-principale{display:block;grid-column:1;grid-row:1}
-.menu-aperto .menu-principale{display:block;position:absolute;z-index:60;left:16px;top:0;width:250px;padding:10px 16px 14px;background:#fff;border:1px solid var(--bordo);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.menu-aperto .menu-principale{display:block;position:absolute;z-index:60;left:16px;top:0;width:250px;padding:10px 16px 14px;background:var(--carta);border:1px solid var(--bordo);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .mp-testa{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .menu-principale h2{margin:0 0 4px;font:700 13px var(--sans);color:var(--testo)}
 .mp-sposta{padding:0;border:0;background:none;color:var(--link);font:12px var(--sans);cursor:pointer}
 .mp-sposta:hover{text-decoration:underline}
-.menu-principale h3{margin:14px 0 4px;padding-bottom:3px;border-bottom:1px solid #c8ccd1;font:700 12px var(--sans);color:var(--grigio);text-transform:none}
+.menu-principale h3{margin:14px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--bordo-2);font:700 12px var(--sans);color:var(--grigio);text-transform:none}
 .menu-principale ul{margin:0;padding:0;list-style:none}
 .menu-principale li a{display:block;padding:3px 0}
 .toc-lato{grid-column:1;grid-row:2;align-self:start;position:sticky;top:calc(var(--barra,72px) + 8px);max-height:calc(100vh - var(--barra,72px) - 24px);overflow:auto;margin-top:18px;font-size:13px}
@@ -98,19 +99,19 @@ a.new:visited{color:var(--rosso-vis)}
 .lin .pannello{min-width:210px}
 
 /* il contenuto: titolo, sottotitolo, testo */
-.corpo{min-height:420px;padding:18px 28px 36px;background:#fff;border:1px solid var(--bordo);border-top:0;outline:none}
+.corpo{min-height:420px;padding:18px 28px 36px;background:var(--carta);border:1px solid var(--bordo);border-top:0;outline:none}
 .titolo{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 h1:focus,h1:focus-visible,.corpo:focus,.corpo:focus-visible{outline:none}
-h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000;overflow-wrap:anywhere;outline:none}
-.btn-lingue{flex:none;display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 10px;border:1px solid #c8ccd1;border-radius:2px;color:#72777d;font-size:12px;cursor:default}
+h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:var(--nero);overflow-wrap:anywhere;outline:none}
+.btn-lingue{flex:none;display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 10px;border:1px solid var(--bordo-2);border-radius:2px;color:var(--grigio-3);font-size:12px;cursor:default}
 .btn-lingue svg{width:15px;height:15px}
 .sottotitolo{margin:0 0 16px;color:var(--grigio);font-size:12.5px}
 .e-principale .sottotitolo,.e-speciale .sottotitolo{display:none}
 .wikitesto{overflow-wrap:break-word}
 .wikitesto p{margin:.5em 0 .9em}
-.wikitesto h2{margin:1.1em 0 .3em;padding:0;border-bottom:1px solid var(--bordo);font:400 1.55em/1.3 var(--serif);color:#000}
-.wikitesto h3{margin:.9em 0 .1em;font:700 1.2em/1.5 var(--sans);color:#000}
-.wikitesto :is(h4,h5,h6){margin:.8em 0 .1em;font:700 1em/1.6 var(--sans);color:#000}
+.wikitesto h2{margin:1.1em 0 .3em;padding:0;border-bottom:1px solid var(--bordo);font:400 1.55em/1.3 var(--serif);color:var(--nero)}
+.wikitesto h3{margin:.9em 0 .1em;font:700 1.2em/1.5 var(--sans);color:var(--nero)}
+.wikitesto :is(h4,h5,h6){margin:.8em 0 .1em;font:700 1em/1.6 var(--sans);color:var(--nero)}
 .wikitesto :is(h2,h3,h4,h5,h6){scroll-margin-top:calc(var(--barra,72px) + 8px)}
 .wikitesto ul{margin:.3em 0 .5em 1.6em;padding:0;list-style:square}
 .wikitesto ol{margin:.3em 0 .5em 3.2em;padding:0}
@@ -118,7 +119,7 @@ h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000
 .wikitesto li::marker{color:var(--link)}
 .wikitesto hr{height:1px;margin:.5em 0;border:0;background:var(--bordo)}
 .wikitesto a.esterno::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:.25em;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1h5v5M11 1 5 7M9 8v3H1V3h3' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1h5v5M11 1 5 7M9 8v3H1V3h3' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat}
-.wikitesto mark,.risultati mark{padding:0 1px;background:#fef6e7;color:inherit;box-shadow:0 0 0 1px var(--giallo)}
+.wikitesto mark,.risultati mark{padding:0 1px;background:var(--tinta-gialla);color:inherit;box-shadow:0 0 0 1px var(--giallo)}
 .categorie .catlinks{margin-top:26px}
 .catlinks{padding:6px 12px;background:var(--sfondo);border:1px solid var(--bordo)}
 .catlinks ul{display:inline;margin:0;padding:0;list-style:none}
@@ -129,21 +130,21 @@ h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000
 .avviso{margin:0 0 14px;padding:10px 14px;border:1px solid var(--bordo);border-radius:2px;background:var(--sfondo)}
 .avviso p{margin:.3em 0}
 .avviso ul{margin:.3em 0 .3em 1.4em;padding:0}
-.avviso-info{background:#eaf3ff;border-color:var(--blu)}
-.avviso-avvertenza{background:#fef6e7;border-color:#edab00}
-.avviso-errore{background:#fee7e6;border-color:#d33}
+.avviso-info{background:var(--tinta-blu);border-color:var(--blu)}
+.avviso-avvertenza{background:var(--tinta-gialla);border-color:#edab00}
+.avviso-errore{background:var(--tinta-rossa);border-color:#d33}
 .bottone{display:inline-block;padding:6px 14px;border:1px solid var(--bordo);border-radius:2px;background:var(--sfondo);color:var(--testo);font:700 14px/1.3 var(--sans);cursor:pointer}
-.bottone:hover{background:#fff;text-decoration:none}
-.bottone-blu,.bottone-blu:visited{background:var(--blu);border-color:var(--blu);color:#fff}
-.bottone-blu:hover{background:#447ff5;border-color:#447ff5;color:#fff}
+.bottone:hover{background:var(--carta);text-decoration:none}
+.bottone-blu,.bottone-blu:visited{background:var(--blu);border-color:var(--blu);color:var(--carta)}
+.bottone-blu:hover{background:#447ff5;border-color:#447ff5;color:var(--carta)}
 .wikitable{border-collapse:collapse;border:1px solid var(--bordo);background:var(--sfondo)}
 .wikitable th,.wikitable td{padding:5px 12px;border:1px solid var(--bordo);text-align:left}
-.wikitable th{background:#eaecf0}
+.wikitable th{background:var(--grigio-2)}
 .wikitable caption{padding:4px;font-weight:700;text-align:left}
 .vuoto-lista{margin:14px 0;padding:14px;border:1px dashed var(--bordo);color:var(--grigio);font-style:italic}
 .colonne{columns:14em;margin:.5em 0 1em 1.4em;padding:0}
 .filtri{margin:0 0 12px;padding:6px 12px;background:var(--sfondo);border:1px solid var(--bordo)}
-.filtri input[type=text],.filtri select,.modulo input{padding:4px 6px;border:1px solid var(--bordo);border-radius:2px;background:#fff;font:14px var(--sans)}
+.filtri input[type=text],.filtri select,.modulo input{padding:4px 6px;border:1px solid var(--bordo);border-radius:2px;background:var(--carta);font:14px var(--sans)}
 .filtri-v label{margin-right:12px}
 .modulo{max-width:360px}
 .modulo input{width:100%;padding:6px 8px}
@@ -161,10 +162,10 @@ h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000
 .modifica{margin-top:6px}
 .mod-barra{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:4px 6px;background:var(--sfondo);border:1px solid var(--bordo);border-bottom:0}
 .mod-tasto{min-width:34px;height:30px;padding:0 9px;border:1px solid transparent;border-radius:2px;background:none;color:var(--testo);font:14px var(--sans);cursor:pointer}
-.mod-tasto:hover{background:#eaecf0;border-color:#c8ccd1}
+.mod-tasto:hover{background:var(--grigio-2);border-color:var(--bordo-2)}
 .mod-spazio{flex:1}
 .mod-aiuto{padding:0 8px;font-size:13px}
-#testo-mod{display:block;width:100%;min-height:24em;padding:8px 10px;border:1px solid var(--bordo);border-radius:0 0 2px 2px;background:#fff;color:var(--testo);font:14px/1.55 "Cascadia Code",ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+#testo-mod{display:block;width:100%;min-height:24em;padding:8px 10px;border:1px solid var(--bordo);border-radius:0 0 2px 2px;background:var(--carta);color:var(--testo);font:14px/1.55 "Cascadia Code",ui-monospace,Menlo,Consolas,monospace;resize:vertical}
 #testo-mod:focus{outline:2px solid var(--blu);outline-offset:-1px}
 .mod-campo{margin:10px 0 0}
 .mod-campo input[type=text]{width:min(100%,520px);padding:5px 8px;border:1px solid var(--bordo);border-radius:2px;font:14px var(--sans)}
@@ -173,21 +174,21 @@ h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000
 .mod-bottoni{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .anteprima{margin-bottom:18px;padding-bottom:6px;border-bottom:1px solid var(--bordo)}
 .anteprima>h2{margin:0 0 8px;font:700 1.3em var(--sans)}
-.ant-corpo{padding:10px 14px;border:1px solid #c8ccd1;background:#fff}
-.segnaposto{margin:0;padding:16px;border:1px dashed #c8ccd1;color:var(--grigio);font-style:italic;text-align:center}
+.ant-corpo{padding:10px 14px;border:1px solid var(--bordo-2);background:var(--carta)}
+.segnaposto{margin:0;padding:16px;border:1px dashed var(--bordo-2);color:var(--grigio);font-style:italic;text-align:center}
 
 /* la pagina principale */
 .mp-benvenuti,.mp-riquadro{margin:0 0 12px;border:1px solid var(--bordo);background:var(--sfondo)}
-.mp-benvenuti{padding:14px 18px;background:#f2f4f7}
+.mp-benvenuti{padding:14px 18px;background:var(--tinta-testa)}
 .mp-benvenuti h2{margin:0;padding:0;border:0;font:400 1.9em/1.2 var(--serif)}
 .mp-nome{font-family:var(--anton);font-size:.95em;letter-spacing:.02em}
 .mp-sotto{margin:2px 0 8px;color:var(--grigio)}
 .mp-porte{margin:10px 0 0;font-size:13px}
 .mp-griglia{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-.mp-riquadro h2{margin:0;padding:5px 12px;border-bottom:1px solid var(--bordo);font:700 1.05em var(--sans);color:#000}
-.mp-corpo{padding:10px 12px;background:#fff}
+.mp-riquadro h2{margin:0;padding:5px 12px;border-bottom:1px solid var(--bordo);font:700 1.05em var(--sans);color:var(--nero)}
+.mp-corpo{padding:10px 12px;background:var(--carta)}
 .mp-corpo p{margin:.3em 0}
-.vetrina h2{background:#eaf3ff}.sapevi h2{background:#dff3ec}.ricorrenze h2{background:#fef6e7}.eventi h2{background:#fee7e6}.lingue h2,.portali h2,.fratelli h2{background:#eaecf0}
+.vetrina h2{background:var(--tinta-blu)}.sapevi h2{background:var(--tinta-verde)}.ricorrenze h2{background:var(--tinta-gialla)}.eventi h2{background:var(--tinta-rossa)}.lingue h2,.portali h2,.fratelli h2{background:var(--grigio-2)}
 
 /* il piè di pagina */
 .piede-wiki{padding:18px 4px 32px;color:var(--grigio);font-size:12px}
@@ -214,3 +215,209 @@ h1{margin:0 0 4px;font:400 38px/1.2 var(--anton);letter-spacing:.01em;color:#000
 .stretto .btn-lingue{display:none}
 .stretto .piede-wiki{padding:18px 16px 32px}
 @media (min-width:1120px){.stretto .slogan{display:block}}
+
+/* ───────────────────────────────────────────── 2.11: la wiki piena: immagini, infobox, citazioni, tabelle, note, commit */
+.wikitesto .thumb{display:block;float:right;clear:right;width:310px;max-width:100%;margin:4px 0 12px 16px;padding:4px;border:1px solid var(--bordo-2);background:var(--sfondo);font-size:12.5px;line-height:1.4}
+.wikitesto .thumb.tleft{float:left;clear:left;margin:4px 16px 12px 0}
+.wikitesto .thumb.tcenter{float:none;clear:both;margin:8px auto 14px}
+.wikitesto .thumb.tnone{float:none;clear:none;margin:8px 0 14px}
+.wikitesto .thumb-img{display:block}
+.wikitesto .thumb img{display:block;width:100%;height:auto;background:var(--carta)}
+.wikitesto .thumbcaption{display:block;padding:5px 2px 1px;color:var(--testo)}
+.wikitesto a.immagine img{max-width:100%;height:auto;vertical-align:middle}
+.wikitesto a.immagine img[style*="width"]{vertical-align:middle;margin:0 2px}
+.infobox{float:right;clear:right;width:300px;max-width:100%;margin:0 0 14px 16px;border:1px solid var(--bordo);border-spacing:3px;background:var(--sfondo);font-size:12.5px;line-height:1.4}
+.infobox caption{padding:6px 8px 4px;font:400 20px/1.15 var(--anton);letter-spacing:.01em;color:var(--nero)}
+.infobox th{width:38%;padding:3px 6px;vertical-align:top;text-align:left;font-weight:700;color:var(--testo)}
+.infobox td{padding:3px 6px;vertical-align:top;overflow-wrap:anywhere}
+.infobox .infobox-img{padding:4px 2px;text-align:center}
+.infobox .infobox-img .thumb,.infobox .infobox-img a.immagine{display:block;float:none;width:auto;margin:0;padding:0;border:0;background:none}
+.infobox .infobox-img img{max-width:100%;width:100%;height:auto}
+.infobox .infobox-img .thumbcaption{display:none}
+.infobox .infobox-did{padding-top:4px;font-size:12px;color:var(--grigio)}
+.infobox code{font-size:11.5px}
+.vedi-anche{clear:both;margin:1.2em 0 .5em;padding:8px 12px;border-left:3px solid var(--giallo);background:var(--sfondo)}
+.principale{margin:.2em 0 .6em;padding-left:1.6em;font-style:italic;color:var(--grigio)}
+blockquote.citazione{margin:.8em 0 1em;padding:8px 16px;border-left:4px solid var(--ruggine);background:var(--tinta-carta);font-size:14.5px}
+blockquote.citazione p{margin:.2em 0}
+blockquote.citazione footer{margin-top:4px;font-size:12.5px;color:var(--grigio)}
+.versione{display:inline-block;padding:0 6px;border:1px solid var(--ruggine);border-radius:2px;background:var(--carta);font-size:12.5px;line-height:1.7}
+.versione b{font-family:var(--anton);font-weight:400;letter-spacing:.02em}
+.template-ignoto{color:var(--rosso)}
+.wikitesto .wikitable{margin:.6em 0 1em;font-size:13px}
+.wikitesto .wikitable th{background:var(--grigio-2);vertical-align:bottom}
+.wikitesto .wikitable img{vertical-align:middle;max-width:none}
+.wikitesto .wikitable.stretta td,.wikitesto .wikitable.stretta th{padding:3px 8px}
+.wikitesto .wikitable.centrata{margin-left:auto;margin-right:auto}
+.wikitesto dl{margin:.3em 0 .6em}
+.wikitesto dt{font-weight:700}
+.wikitesto dd{margin:0 0 .3em 1.6em}
+.wikitesto code,.wikitesto kbd,.wikitesto tt{padding:1px 4px;background:var(--sfondo);border:1px solid var(--grigio-2);border-radius:2px;font-family:"Cascadia Code","Consolas","Menlo",monospace;font-size:12.5px;overflow-wrap:anywhere}
+.wikitesto kbd{border-bottom-width:2px}
+.wikitesto sup.nota{font-size:11px;line-height:1}
+.wikitesto sup.nota a{padding:0 1px}
+.wikitesto ol.note{margin:.3em 0 1em 2em;font-size:12.5px}
+.wikitesto ol.note li{margin-bottom:.3em}
+.wikitesto ol.note li:target,.wikitesto sup.nota a:target{background:var(--tinta-blu)}
+.rinvio-da{color:var(--grigio)}
+.piede-fonti{display:block;margin-top:4px}
+.piede-fonti code{font-size:11px;padding:0 3px;background:var(--carta);border:1px solid var(--grigio-2)}
+.file-grande{margin:0 0 12px;padding:8px;border:1px solid var(--bordo-2);background:var(--sfondo);text-align:center}
+.file-grande img{max-width:100%;height:auto;background:var(--carta)}
+.galleria{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.galleria li{padding:6px;border:1px solid var(--bordo-2);background:var(--sfondo);font-size:12px;overflow-wrap:anywhere}
+.galleria img{display:block;width:100%;height:120px;object-fit:cover;background:var(--carta);margin-bottom:5px}
+ul.commits,ul.registro{margin:0;padding:0;list-style:none;font-size:13px}
+ul.commits li,ul.registro li{padding:3px 0;border-bottom:1px solid var(--grigio-2)}
+ul.commits time,ul.registro time{display:inline-block;min-width:88px;color:var(--grigio);font-variant-numeric:tabular-nums}
+ul.commits .hash{font-family:"Cascadia Code","Consolas",monospace;font-size:12px}
+ul.commits .commit-voci{color:var(--grigio)}
+.wikitesto .colonne,.colonne{columns:3 200px;column-gap:24px;margin:.3em 0 1em;padding:0;list-style:none}
+.wikitesto .colonne li,.colonne li{break-inside:avoid;padding:1px 0}
+.wikitesto .pulisci{clear:both}
+.stretto .wikitesto .thumb,.stretto .infobox{float:none;width:auto;max-width:360px;margin:8px auto 14px}
+.stretto .wikitesto .thumb.tleft,.stretto .wikitesto .thumb.tright{float:none;margin:8px auto 14px}
+.stretto .wikitesto .wikitable{display:block;overflow-x:auto;max-width:100%}
+.stretto .galleria{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+
+/* ───────────────────────────────────────────── 2.11: il visore delle immagini (come il MediaViewer di Wikipedia) */
+.con-visore{overflow:hidden}
+.mv{position:fixed;inset:0;z-index:300;display:grid;grid-template-rows:1fr auto;background:rgba(0,0,0,.93);color:#eaecf0;font:14px/1.5 var(--sans)}
+.mv[hidden]{display:none}
+.mv-quadro{display:flex;align-items:center;justify-content:center;min-height:0;padding:56px 72px 12px}
+.mv-img{max-width:100%;max-height:calc(100vh - 160px);object-fit:contain;background:#000;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.mv-chiudi,.mv-sx,.mv-dx{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+.mv-chiudi:hover,.mv-sx:hover,.mv-dx:hover{background:rgba(255,255,255,.22)}
+.mv-chiudi{top:calc(var(--barra,72px) + 8px);right:14px}
+.mv-sx,.mv-dx{top:50%;transform:translateY(-50%)}
+.mv-sx{left:14px}.mv-dx{right:14px}
+.mv-chiudi svg,.mv-sx svg,.mv-dx svg{width:22px;height:22px}
+.mv-piede{padding:14px 24px 18px;background:#202122;border-top:1px solid #3a3a3a}
+.mv-did{max-width:960px;margin:0 auto 6px;font-size:15px;color:#fff}
+.mv-info{max-width:960px;margin:0 auto;font-size:12.5px;color:#a2a9b1}
+.mv-info a,.mv-info a:visited{color:#88c0ff}
+.mv .mv-chiudi:focus-visible,.mv .mv-sx:focus-visible,.mv .mv-dx:focus-visible{outline:2px solid var(--giallo)}
+.stretto .mv-quadro{padding:56px 10px 8px}
+.stretto .mv-sx,.stretto .mv-dx{top:auto;bottom:96px;transform:none;background:rgba(0,0,0,.5)}
+
+/* ───────────────────────────────────────────── 2.11: la pagina principale «ufficiale» */
+.mp-benvenuti{display:flex;gap:18px;align-items:flex-start;padding:16px 20px;background:linear-gradient(180deg,var(--tinta-testa),var(--tinta-testa-2));border-color:var(--bordo-2)}
+.mp-logo{flex:none;width:72px;height:72px;padding:6px;background:var(--carta);border:1px solid var(--bordo);border-radius:50%}
+.mp-logo svg{width:100%;height:100%}
+.mp-benv-testa{flex:1;min-width:0}
+.mp-benvenuti h2{font:400 2em/1.15 var(--serif)}
+.mp-numeri{display:flex;flex-wrap:wrap;gap:4px 18px;margin:6px 0 10px;padding:0;list-style:none;font-size:13px;color:var(--grigio)}
+.mp-numeri b{color:var(--testo);font-size:15px}
+.mp-intro p{margin:.3em 0}
+.mp-griglia{gap:0 12px;align-items:start}
+.mp-riquadro h2{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.mp-riquadro h2 small{font-weight:400;font-size:.85em;color:var(--grigio)}
+.mp-piede{padding:5px 12px 7px;border-top:1px solid var(--grigio-2);background:var(--carta);font-size:12.5px;text-align:right}
+.commits h2{background:var(--tinta-grigia)}
+.mp-commits{margin:0;padding:0}
+.mp-commits li{padding:4px 0}
+.vetrina .mp-corpo .thumb{width:230px}
+.mp-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px;background:var(--carta)}
+.mp-tiles-6{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mp-tile{display:flex;flex-direction:column;border:1px solid var(--bordo-2);background:var(--sfondo);color:var(--testo);overflow:hidden;transition:box-shadow .15s,transform .15s}
+.mp-tile:hover{text-decoration:none;box-shadow:0 3px 12px rgba(0,0,0,.18);transform:translateY(-1px)}
+.mp-tile:visited{color:var(--testo)}
+.mp-tile-img{display:block;aspect-ratio:16/9;background:var(--vuoto);overflow:hidden}
+.mp-tile-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.mp-tile-testo{display:flex;flex-direction:column;gap:2px;padding:7px 9px 8px;font-size:12.5px;line-height:1.35}
+.mp-tile-testo b{font:400 16px/1.1 var(--anton);letter-spacing:.01em;color:var(--link)}
+.mp-tile-testo small{color:var(--grigio)}
+.mp-tile-testo em{font-style:normal;color:var(--ruggine);font-size:11.5px}
+.categorie-home h2{background:var(--tinta-kraft)}
+.mp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--bordo-2);border-radius:14px;background:var(--sfondo);color:var(--testo);font-size:12.5px}
+.chip:hover{text-decoration:none;border-color:var(--ruggine);background:var(--carta)}
+.chip b{color:var(--ruggine);font-weight:600}
+.stretto .mp-benvenuti{flex-direction:column;gap:10px}
+.stretto .mp-logo{width:56px;height:56px}
+.stretto .mp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stretto .mp-tiles-6{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stretto .vetrina .mp-corpo .thumb{width:auto;float:none;margin:6px auto 10px}
+/* (1) la vetrina che ruota */
+.vetrina .mp-corpo .thumb{width:220px}
+.mp-altre{clear:both;margin:.8em 0 0!important;padding-top:6px;border-top:1px dotted var(--bordo-2);color:var(--grigio)}
+
+/* ───────────────────────────────────────────── (3) il tema scuro (2.11): segue il sistema; «Aspetto» nel piè di pagina lo forza
+   (html[data-theme="light"|"dark"], ricordato in localStorage pzkkopedia-tema). I colori sono variabili: qui cambiano tutte */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sfondo:#101418;--bordo:#54595d;--testo:#eaecf0;--grigio:#a2a9b1;--link:#88a3e8;--visitato:#a799cd;--rosso:#fd7865;--rosso-vis:#e68f80;--blu:#6d8af0;
+  --carta:#1b1d22;--grigio-2:#27292d;--bordo-2:#3a3d44;--nero:#f8f9fa;--grigio-3:#a2a9b1;--tinta-blu:#1c2740;--tinta-gialla:#332a14;--tinta-rossa:#3a1d1d;--tinta-verde:#14302a;--tinta-testa:#1f2329;--tinta-testa-2:#16191d;--tinta-carta:#22201c;--tinta-kraft:#2a251d;--tinta-grigia:#2a2c30;--vuoto:#2e3136;--ombra:rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--sfondo:#101418;--bordo:#54595d;--testo:#eaecf0;--grigio:#a2a9b1;--link:#88a3e8;--visitato:#a799cd;--rosso:#fd7865;--rosso-vis:#e68f80;--blu:#6d8af0;
+  --carta:#1b1d22;--grigio-2:#27292d;--bordo-2:#3a3d44;--nero:#f8f9fa;--grigio-3:#a2a9b1;--tinta-blu:#1c2740;--tinta-gialla:#332a14;--tinta-rossa:#3a1d1d;--tinta-verde:#14302a;--tinta-testa:#1f2329;--tinta-testa-2:#16191d;--tinta-carta:#22201c;--tinta-kraft:#2a251d;--tinta-grigia:#2a2c30;--vuoto:#2e3136;--ombra:rgba(0,0,0,.5);color-scheme:dark}
+:root[data-theme="dark"] .wikitesto img,:root[data-theme="dark"] .mp-tile img{filter:brightness(.92)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wikitesto img,:root:not([data-theme="light"]) .mp-tile img{filter:brightness(.92)}}
+.bt-tema{padding:0;border:0;background:none;color:var(--link);font:inherit;cursor:pointer}
+.bt-tema:hover{text-decoration:underline}
+
+/* ───────────────────────────────────────────── (4) i riquadri col linguaggio di pzkko (2.11): i titoli in Anton come i volantini,
+   il filo a sinistra coi pennarelli del muro (DESIGN.md: giallo fuoco, rosso, verde, blu, teal, ruggine), lo sfondo di carta
+   tinta e un pezzo di nastro adesivo sull'angolo, storto. Le tinte sono variabili: il tema scuro le scurisce */
+:root{--p-giallo:#ffd400;--p-rosso:#a50d25;--p-verde:#0b5d2b;--p-blu:#1446a0;--p-teal:#173f48;--p-ruggine:#665d56;
+  --c-giallo:#fff4bf;--c-rosso:#f9e1e1;--c-verde:#e2f0e2;--c-blu:#e3e9f5;--c-teal:#e0eaec;--c-kraft:#efe4cf;--c-grigia:#ecebe8;--nastro:rgba(222,207,170,.78)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--p-rosso:#e0485f;--p-verde:#3fa86a;--p-blu:#6d8af0;--p-teal:#4fa1b0;--p-ruggine:#b3a69a;--c-giallo:#3a3212;--c-rosso:#3a1d22;--c-verde:#17301f;--c-blu:#1c2740;--c-teal:#16292d;--c-kraft:#2e2719;--c-grigia:#26282b;--nastro:rgba(170,155,120,.45)}}
+:root[data-theme="dark"]{--p-rosso:#e0485f;--p-verde:#3fa86a;--p-blu:#6d8af0;--p-teal:#4fa1b0;--p-ruggine:#b3a69a;--c-giallo:#3a3212;--c-rosso:#3a1d22;--c-verde:#17301f;--c-blu:#1c2740;--c-teal:#16292d;--c-kraft:#2e2719;--c-grigia:#26282b;--nastro:rgba(170,155,120,.45)}
+.mp-riquadro{position:relative;border-color:var(--bordo-2);box-shadow:0 1px 0 var(--bordo-2)}
+.mp-riquadro>h2{position:relative;padding:8px 14px 6px 16px;border-left:5px solid var(--filo,var(--p-ruggine));background:var(--tinta,var(--c-grigia))!important;font:400 19px/1.15 var(--anton);letter-spacing:.015em;color:var(--testo)}
+.mp-riquadro>h2 small{font:400 12.5px var(--sans);letter-spacing:0}
+.mp-riquadro>h2::before{content:"";position:absolute;top:-9px;right:22px;width:58px;height:17px;background:var(--nastro);transform:rotate(4deg);box-shadow:0 1px 1px rgba(0,0,0,.08);pointer-events:none}
+.vetrina{--filo:var(--p-giallo);--tinta:var(--c-giallo)}
+.eventi{--filo:var(--p-rosso);--tinta:var(--c-rosso)}
+.commits{--filo:var(--p-teal);--tinta:var(--c-teal)}
+.sapevi{--filo:var(--p-verde);--tinta:var(--c-verde)}
+.ricorrenze{--filo:var(--p-ruggine);--tinta:var(--c-kraft)}
+.portali{--filo:var(--p-blu);--tinta:var(--c-blu)}
+.categorie-home{--filo:var(--p-ruggine);--tinta:var(--c-kraft)}
+.fratelli{--filo:var(--p-giallo);--tinta:var(--c-giallo)}
+.lingue{--filo:var(--p-teal);--tinta:var(--c-grigia)}
+.sapevi>h2::before,.commits>h2::before{right:auto;left:30%;transform:rotate(-3deg)}
+.mp-tile-testo b{font-size:17px}
+.mp-benvenuti{border-top:5px solid var(--p-giallo)}
+.chip:hover{border-color:var(--p-ruggine)}
+
+/* ───────────────────────────────────────────── (5) la testata della pagina principale (2.11): una fascia col muro vero, la
+   lamiera della saracinesca (art/muro.webp, la stessa della home) e l'insegna «pzkko» disegnata (art/insegna.svg), che sfuma
+   nel riquadro di benvenuto; col tema scuro l'insegna di notte, coi neon accesi. Porta al muro */
+.mp-benvenuti{flex-wrap:wrap;padding-top:0;overflow:hidden}
+.mp-banda{display:block;flex:0 0 calc(100% + 40px);height:150px;margin:0 -20px 2px;background:linear-gradient(to bottom,rgba(0,0,0,0) 52%,var(--tinta-testa) 100%),url(/art/insegna.svg) center 12px/auto 116px no-repeat,linear-gradient(to bottom,rgba(0,0,0,.15),rgba(0,0,0,0) 40%),url(/art/muro.webp) 0 -40px/1100px auto repeat-x;border-bottom:1px solid var(--bordo-2)}
+.mp-banda:hover{filter:brightness(1.04)}
+.mp-benvenuti .mp-logo{margin-top:-44px;position:relative;box-shadow:0 2px 6px var(--ombra)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mp-banda{background:linear-gradient(to bottom,rgba(0,0,0,0) 45%,var(--tinta-testa) 100%),url(/art/insegna-notte.svg) center 12px/auto 116px no-repeat,linear-gradient(rgba(10,14,30,.55),rgba(10,14,30,.55)),url(/art/muro.webp) 0 -40px/1100px auto repeat-x}}
+:root[data-theme="dark"] .mp-banda{background:linear-gradient(to bottom,rgba(0,0,0,0) 45%,var(--tinta-testa) 100%),url(/art/insegna-notte.svg) center 12px/auto 116px no-repeat,linear-gradient(rgba(10,14,30,.55),rgba(10,14,30,.55)),url(/art/muro.webp) 0 -40px/1100px auto repeat-x}
+.stretto .mp-banda{flex:none;width:calc(100% + 40px);align-self:stretch;height:110px;background-size:auto,auto 84px,auto,800px auto}
+.stretto .mp-benvenuti .mp-logo{margin-top:-36px}
+
+/* (6) «nelle altre lingue»: una riga in fondo alla pagina principale, non un riquadro */
+.mp-lingue{display:flex;align-items:center;gap:8px;margin:14px 2px 0;padding-top:10px;border-top:1px solid var(--bordo-2);color:var(--grigio);font-size:12.5px}
+.mp-lingue svg{flex:none;width:16px;height:16px}
+
+/* ───────────────────────────────────────────── (7) le voci (2.11): l'infobox col colore della categoria della voce (il filo in
+   cima e la carta del titolo, --filo-voce e --tinta-voce messi da monta()), le didascalie in corsivo, «Vedi anche» a mattonelle */
+:root{--p-arancio:#f08a24;--c-arancio:#fdebd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c-arancio:#3a2614}}
+:root[data-theme="dark"]{--c-arancio:#3a2614}
+.infobox{border-top:5px solid var(--filo-voce,var(--p-ruggine));border-spacing:0;box-shadow:0 1px 0 var(--bordo-2)}
+.infobox caption{padding:8px 10px 6px;background:var(--tinta-voce,var(--c-grigia));border:1px solid var(--bordo);border-bottom:0;border-top:0}
+.infobox th,.infobox td{border-top:1px solid var(--grigio-2)}
+.infobox .infobox-img{border-top:0}
+.wikitesto .thumbcaption,.infobox .infobox-did,.mv-did{font-style:italic}
+.vedi-anche{padding:0;border-left:0;background:none}
+.vedi-anche .va-titolo{margin:1.2em 0 .5em}
+.va-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.va-tile{display:flex;flex-direction:column;border:1px solid var(--bordo-2);border-top:4px solid var(--filo-voce,var(--p-ruggine));background:var(--sfondo);color:var(--testo);overflow:hidden;transition:box-shadow .15s,transform .15s}
+.va-tile:hover{text-decoration:none;box-shadow:0 3px 12px var(--ombra);transform:translateY(-1px)}
+.va-tile:visited{color:var(--testo)}
+.va-img{display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:var(--vuoto);overflow:hidden}
+.va-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.va-img svg{width:44px;height:44px;opacity:.55}
+.va-testo{display:flex;flex-direction:column;gap:3px;padding:7px 9px 9px;font-size:12.5px;line-height:1.35}
+.va-testo b{font:400 16px/1.15 var(--anton);letter-spacing:.01em;color:var(--link)}
+.va-testo small{color:var(--grigio)}
+.va-rossi{margin:.6em 0 0;font-size:13px}
+.stretto .va-griglia{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* le icone a pixel del sito (art/chat-*) nell'infobox: piccole e coi pixel netti, non stirate a tutta larghezza */
+.infobox .infobox-img img[src*="/art/chat-"]{width:150px!important;margin:6px auto;image-rendering:pixelated}
+.wikitesto a.immagine img[src*="/art/chat-"],.wikitable img[src*="/art/chat-"]{image-rendering:pixelated}

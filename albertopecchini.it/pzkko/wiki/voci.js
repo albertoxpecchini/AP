@@ -1,23 +1,30 @@
-// Le voci di pzkkopedia: per ora NESSUNA, la wiki è uno scheletro vuoto. wiki.js legge da qui.
+// Le voci di pzkkopedia (2.11): unisce i moduli di voci/*.js in VOCI (titolo → voce) e dice per ogni titolo in quale
+// modulo sta (FILE_DI), così «Modifica» e «Il testo su GitHub» portano al file giusto. Il formato di una voce
+// ({ data, fonti, testo }) e i titoli canonici sono in tools/pzkko/wiki/README.md. voci/dati.js e cronologia.js li
+// genera tools/pzkko/wiki/genera.mjs; gli altri moduli si scrivono a mano.
 //
-// FORMATO
-//   chiave  = il titolo della voce con gli spazi (non i trattini bassi) e la prima lettera maiuscola:
-//             'Chiocciola', 'Categoria:Molluschi', 'Pzkkopedia:Informativa sulla privacy', 'Discussione:Chiocciola'
-//   valore  = il wikitesto, una stringa; oppure { testo: '…', data: '2026-10-26' } se si vuole la data
-//             dell’ultima modifica nel piè di pagina (senza, vale quella della nascita della wiki)
-//   Il wikitesto capisce: '''grassetto''', ''corsivo'', == titolo ==, === sottotitolo ===, [[voce]], [[voce|testo]],
-//   [[voce#sezione]], [[#sezione]], [https://… testo], elenchi con * e #, ---- e [[Categoria:X]] in fondo.
-//   I link a voci che non esistono vengono rossi, come su ogni wiki.
-//
-// LA PAGINA PRINCIPALE
-//   'Pagina principale' (se c’è) prende il posto di quella di serie. Altrimenti ogni riquadro cerca la sua sottopagina, e
-//   se non c’è mostra «nessun contenuto ancora»: 'Pagina principale/Benvenuti', '…/Voce in vetrina', '…/Lo sapevi che',
-//   '…/Ricorrenze', '…/Eventi correnti', '…/Nelle altre lingue', '…/Portali', '…/Progetti fratelli'.
-//
-// ESEMPIO (da togliere dal commento quando c’è qualcosa da dire)
-//   'Chiocciola': { data: '2026-10-26', testo: `La '''chiocciola''' è un animale lento.
-//   == Dove vive ==
-//   Sul [[muro]] e sotto le foglie.
-//   [[Categoria:Molluschi]]` },
+// LA REGOLA (Alberto, 2.11.2026: «ricorda che ad ogni push nuovo bisogna aggiornarla»): prima di ogni push su main,
+// `node tools/pzkko/wiki/aggiorna.mjs` e le voci rimaste indietro si rileggono. Lo controlla tools/pzkko/wiki/controlla.mjs.
+
+import { VOCI as principale } from './voci/principale.js'
+import { VOCI as sito } from './voci/sito.js'
+import { VOCI as scena } from './voci/scena.js'
+import { VOCI as giochi } from './voci/giochi.js'
+import { VOCI as cercapersone } from './voci/cercapersone.js'
+import { VOCI as chat } from './voci/chat.js'
+import { VOCI as dietro } from './voci/dietro.js'
+import { VOCI as memoria } from './voci/memoria.js'
+import { VOCI as dati } from './voci/dati.js'
+
+export const MODULI = { principale, sito, scena, giochi, cercapersone, chat, dietro, memoria, dati }
 
 export const VOCI = {}
+export const FILE_DI = {}
+for (const [modulo, voci] of Object.entries(MODULI)) {
+  for (const [chiave, voce] of Object.entries(voci)) {
+    const titolo = chiave.replace(/'/g, '’').replace(/\s+/g, ' ').trim() // l'apostrofo tipografico, come nei link
+    if (Object.hasOwn(VOCI, titolo)) { console.warn(`[pzkkopedia] «${titolo}» è scritta due volte (${FILE_DI[titolo]}.js e ${modulo}.js): vale la prima`); continue }
+    VOCI[titolo] = voce
+    FILE_DI[titolo] = modulo
+  }
+}
