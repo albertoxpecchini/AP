@@ -1,5 +1,5 @@
 // La logica della Lavatrice (26.10, Alberto: «una lavatrice di denaro che ti permette in solo 10 minuti di pulire fino a 50000
-// pzk: costa 2000 pzk puliti»), pronta per l'app del cercapersone zero che ancora non c'è (telefono/zero/os/): i soldi sporchi
+// pzk: costa 2000 pzk puliti»), per l'app del cercapersone zero (dall'1.11 telefono/zero/os/lavatrice.js): i soldi sporchi
 // (il bottino delle rapine: api/_economia.mjs) diventano puliti. Si sceglie quanto (al più 50.000, al più quelli che si
 // hanno), si paga la commissione alla cassa di pzk e dopo dieci minuti sono puliti (pzk.lava, cioè api/wallet.mjs, lava; il
 // server li pulisce alla prima richiesta dopo la fine; ritira li prende subito). Una lavatrice alla volta; in galera non

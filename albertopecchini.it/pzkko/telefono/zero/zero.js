@@ -124,6 +124,26 @@ export function crea({ dlg, ledEl }) {
   auto.position.set(26, -110, 360)
   scene.add(auto)
   const pmrem = new T.PMREMGenerator(renderer)
+  // (2.11) i programmi del filtro dei riflessi (dal cielo, dalla foto della scena, la sfocatura, il GGX) si fanno compilare
+  // subito alla scheda, in parallelo (compileAsync): prima il primo ambiente li compilava di colpo, mezzo secondo col sito
+  // fermo. Si compilano con una tela intermedia attaccata, come quando li usa il filtro (senza tono, lineari: un'altra
+  // versione), e al lato 64 delle nostre trame (il cielo 256 × 128, le facce 64). _setSize, _allocateTargets e i
+  // materiali col trattino sono privati di three, ma three è quella di lib/, ferma (come in scena/scena.js)
+  let riflessiOk = false
+  const riflessiPronti = (() => {
+    const prima = renderer.getRenderTarget()
+    let rt = null
+    try {
+      pmrem._setSize(64); rt = pmrem._allocateTargets() // (la tela d'uscita del filtro: qui serve solo attaccata)
+      renderer.setRenderTarget(rt)
+      pmrem.compileEquirectangularShader(); pmrem.compileCubemapShader()
+      const sc = new T.Scene()
+      // (coi suoi piani: con un piano qualunque la versione compilata era un'altra, e il filtro rifaceva tutto da capo)
+      for (const m of [pmrem._equirectMaterial, pmrem._cubemapMaterial, pmrem._blurMaterial, pmrem._ggxMaterial]) if (m) sc.add(new T.Mesh(pmrem._lodMeshes[0].geometry, m))
+      return renderer.compileAsync(sc, camera).catch(() => {}).then(() => { riflessiOk = true })
+    } catch { riflessiOk = true; return Promise.resolve() }
+    finally { renderer.setRenderTarget(prima); rt?.dispose() }
+  })()
   let ambiente = null
   const mettiAmbiente = (t) => { if (ambiente) ambiente.dispose(); ambiente = t; scene.environment = t; scene.environmentIntensity = 0.9; sporco = true }
   let luceChiave = '', ambienteT = 0, catturaT = 0
@@ -132,6 +152,7 @@ export function crea({ dlg, ledEl }) {
   const FISSA = { sole: { el: 0.8, dir: V3(-0.35, 0.75, 0.56).normalize() }, giorno: 0.85, buio: 0, notte: 0, lampioni: 0, insegna: 0, auto: { x: 0.5, l: 0, c: [1, 0.89, 0.67] } }
   let luceMescola = 1
   function aggiornaLuce(forza = false) {
+    if (!riflessiOk) { riflessiPronti.then(() => aggiornaLuce(true)); return } // (il filtro si sta ancora compilando)
     const vera = luce.stato(), m = luceMescola
     const s = m >= 1 ? vera : m <= 0 ? FISSA : { sole: { el: lerp(FISSA.sole.el, vera.sole.el, m), dir: FISSA.sole.dir.clone().lerp(vera.sole.dir, m).normalize() }, giorno: lerp(FISSA.giorno, vera.giorno, m), buio: vera.buio * m, notte: vera.notte * m, lampioni: vera.lampioni, insegna: vera.insegna, auto: { ...vera.auto, l: vera.auto.l * m } }
     const d = s.sole.dir
@@ -150,18 +171,36 @@ export function crea({ dlg, ledEl }) {
     if (chiave === luceChiave && !forza) return
     luceChiave = chiave; sporco = true
     const ora = performance.now()
-    if (m >= 1 && window.pzkkoScena && ora - catturaT > 1500) { catturaT = ora; if (ambienteReale()) return }
+    // (2.11) la foto della scena si fa quando la pagina ha un momento libero (requestIdleCallback), mai dentro un clic o
+    // un fotogramma del volo: sono sei disegni della home, e il primo filtro dei riflessi può essere ancora in compilazione
+    // Fra una foto e l'altra resta la foto (prima ci tornava il cielo disegnato ogni 350 ms: i riflessi saltavano fra i due);
+    // se la foto non riesce, il cielo, e si riprova fra dieci secondi
+    if (m >= 1 && window.pzkkoScena && ora - fotoFallita > 10000) {
+      if (ora - catturaT > 1500 && !fotoChiesta) {
+        catturaT = ora; fotoChiesta = true
+        libero(async () => {
+          if (!fermo && luceMescola >= 1 && !(await ambienteReale())) { fotoFallita = performance.now(); if (!fermo) disegnaCielo(luce.stato()) }
+          fotoChiesta = false
+        })
+      }
+      if (scene.environment) return
+    }
     if (ora - ambienteT < 350 && !forza) return
     ambienteT = ora
+    disegnaCielo(s)
+  }
+  let fotoChiesta = false, fotoFallita = -Infinity
+  const libero = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 600 }) : setTimeout(f, 60))
+  function disegnaCielo(s) {
     const t = new T.CanvasTexture(luce.cielo(s))
     t.mapping = T.EquirectangularReflectionMapping; t.colorSpace = T.SRGBColorSpace
     mettiAmbiente(pmrem.fromEquirectangular(t).texture)
     t.dispose()
   }
-  /** Le sei facce della scena 3D della home dal punto del cercapersone (luce.cattura) → l'ambiente. → false se non si può */
-  function ambienteReale() {
-    const facce = luce.cattura(64)
-    if (!facce) return false
+  /** Le sei facce della scena 3D della home dal punto del cercapersone (luce.cattura) → l'ambiente. → Promise, false se non si può */
+  async function ambienteReale() {
+    const facce = await luce.cattura(64)
+    if (!facce || fermo || luceMescola < 1) return !!facce // (chiuso o in volo mentre la scheda finiva: la foto non serve più)
     try {
       const cubo = new T.CubeTexture(facce.map((b) => new T.DataTexture(b, 64, 64, T.RGBAFormat, T.UnsignedByteType)))
       cubo.format = T.RGBAFormat; cubo.type = T.UnsignedByteType; cubo.colorSpace = T.SRGBColorSpace; cubo.needsUpdate = true
@@ -300,7 +339,13 @@ export function crea({ dlg, ledEl }) {
       dec.name = 'scritta'
       corpo.add(dec)
       disegnaLcd()
-      ok()
+      // (2.11, Alberto: «lagga un casino l'avvio»): i materiali si compilano senza fermare la pagina (compileAsync, coi
+      // programmi che la scheda prepara in parallelo); fino ad allora non si disegna niente (compilato) e il tasto sul muro
+      // resta lì. Prima il primo fotogramma li compilava tutti di colpo: mezzo secondo col sito fermo
+      riflessiPronti.then(() => {
+        if (!scene.environment) aggiornaLuce(true) // (la versione dei materiali coi riflessi, quella che si disegnerà)
+        return renderer.compileAsync(scene, camera)
+      }).catch(() => {}).then(() => { compilato = true; sporco = true; avvia(); ok() })
     }, undefined, (e) => no(e))
   })
 
@@ -362,7 +407,7 @@ export function crea({ dlg, ledEl }) {
   }
 
   // ── il disegno: solo quando serve (sporco), e sempre durante i voli, il cavo e il led ──
-  let sporco = true, animazioni = 0, fermo = false, raf = 0
+  let sporco = true, animazioni = 0, fermo = false, raf = 0, compilato = false
   const dpr = () => Math.min(2, devicePixelRatio || 1)
   function misuraTela() {
     renderer.setPixelRatio(dpr())
@@ -377,7 +422,7 @@ export function crea({ dlg, ledEl }) {
     ledPasso(t)
     inclinaPasso()
     if (t - luceT > 120) { luceT = t; aggiornaLuce() } // la luce del sito cambia da sola (la sera, l'auto che passa)
-    if (sporco || animazioni > 0) { renderer.render(scene, camera); sporco = false }
+    if ((sporco || animazioni > 0) && compilato) { renderer.render(scene, camera); sporco = false }
     raf = requestAnimationFrame(disegna)
   }
   const avvia = () => { if (!raf && !fermo) raf = requestAnimationFrame(disegna) }

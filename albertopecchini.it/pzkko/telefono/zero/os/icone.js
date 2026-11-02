@@ -34,6 +34,8 @@ const SVG = {
   sirena: ['M5 6a3 3 0 0 1 6 0v5H5z M7 6h1v4H7z', 'M3 12h10v3H3z', 'M7 1h2v2H7z', 'M1 3h2l1 2H2z', 'M13 3h2l-1 2h-2z'], // (presi: il lampeggiante)
   'app-lavatrice': ['M2 1h12v14H2z M4 2h3v1H4z M8 8a3 3 0 1 1 0 .1z M8 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'],
   'app-decifratore': ['M3 7h10v8H3z M5 7V5a3 3 0 0 1 6 0v2H9V5a1 1 0 0 0-2 0v2z M7 10h2v3H7z'],
+  'wallet-pzk': ['M3 2h10v2H3z', 'M1 4h14v10H1z M2 6h12v7H2z M10 8h4v3h-4z M11 9h1v1h-1z'], // (1.11, il decifratore: il portafoglio con la fibbia)
+  chiavetta: ['M1 5h10v6H1z M3 7h5v2H3z', 'M11 6h4v4h-4z M12 7h2v2h-2z'], // (la chiavetta usb: l'etichetta, la presa)
   'app-conversioni': ['M1 3h3v2H3v6h1v2H1z M12 3h3v10h-3v-2h1V5h-1z M5 4h2v8H5z M9 4h2v3H9v2h2v3H9v-2h1V7H9z'],
   'app-calcolatrice': ['M2 1h12v14H2z M4 3h8v3H4z M4 8h2v2H4z M7 8h2v2H7z M10 8h2v2h-2z M4 11h2v2H4z M7 11h2v2H7z M10 11h2v2h-2z'],
   'app-compilatore': ['M11 3a6 6 0 1 0 0 10l-2-2a3 3 0 1 1 0-6z'],

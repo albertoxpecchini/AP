@@ -2140,7 +2140,7 @@ i simboli dei tasti), `telefono.css`, la home a pagine, il tubo catodico e le ap
 le logiche che le app di pzk os (`telefono/zero/os/`) importano: le regole, i cataloghi, le chiamate alla banca.
 Le app sono quelle di pzk os (`APP` in telefono.js, `PRONTE` in os/os.js): chat, profilo, account, shop, pzkstore, sfide,
 quiz, quest, giocatori, zaino, miniera, foto, virtual, banca, rapina, le app veloci (bin·hex, calcoli, codice C, cucina) e
-quelle comprate nel pzkstore. La lavatrice e il decifratore non hanno ancora la loro app in pzk os: il menu dice «presto».
+quelle comprate nel pzkstore (la lavatrice e il decifratore: dall'1.11 hanno la loro app in pzk os).
 
 **La miniera** (23.10; app `telefono/app/miniera.js`, regole `chat/miniera.js`, catalogo `chat/miniera-dati.mjs`, disegni
 `chat/miniera-pixel.js`): si minano $pzk col PC, ma prima bisogna comprare i pezzi e farsi la postazione. Dodici posti
@@ -2506,10 +2506,21 @@ con l'inclinazione non si vedono… la luce deve essere = a quella del sito… i
   muro sopra la saracinesca e i fari dell'auto che passa (una luce che scorre da sinistra a destra davanti al
   cercapersone). I riflessi: se la scena 3D della home è accesa (`window.pzkkoScena`), ogni 1,5 s si fotografano davvero le
   sei facce del posto dal punto del cercapersone (`luce.cattura`: la telecamera della scena girata sulle sei direzioni,
-  64 × 64 letti dalla sua tela) e diventano l'ambiente (PMREM); se no, un cielo disegnato con l'ora (il sole, l'orizzonte
+  64 × 64) e diventano l'ambiente (PMREM); se no, un cielo disegnato con l'ora (il sole, l'orizzonte
   arancione dei lampioni, la striscia calda dei fari dove sta l'auto). Esposizione 0,7. La foto del tasto sul muro è
   scattata con una luce fissa di giorno (`FISSA`): aprendo, il 3D parte con quella e passa alla luce vera durante il volo
   (`luceMescola`), al ritorno il contrario, così non si vede mai un cambio secco.
+- **L'apertura senza fermare il sito** (2.11, Alberto: «quando c'è il 3D acceso lagga un casino l'avvio… si freeza tutto
+  il sito per 5 s»). Misurato: 5,8 s di pagina ferma, quasi tutti nella foto dei riflessi, che disegnava la scena della home
+  dritta sullo schermo mentre lei col post-processing disegna in una tela intermedia (HalfFloat, lineare, senza tono): la
+  scheda compilava al volo un'altra versione di ogni suo materiale. Ora: (1) `luce.cattura` disegna in una tela come quella
+  del composer (le versioni ci sono già; il tono, ACES, e lo sRGB li fa lei a mano; sul telefono, `liv.diretta`, la scena
+  disegna già sullo schermo e la foto pure) e legge le facce in un buffer della scheda ritirato a lavoro finito
+  (`fenceSync`), senza aspettarla; (2) la foto si fa nei momenti liberi (`requestIdleCallback`), mai nel clic o nel volo, e
+  fra una foto e l'altra resta lei (prima tornava il cielo disegnato ogni 350 ms); (3) i materiali dello zero si compilano
+  con `compileAsync` (in parallelo, KHR_parallel_shader_compile) prima del primo fotogramma, e così i programmi del filtro
+  PMREM (con la sua tela d'uscita attaccata e i suoi piani: con un piano qualunque la versione era un'altra). Dopo:
+  nessun blocco oltre i ~60 ms all'apertura, con o senza 3D, di giorno e di notte.
 - **L'inclinazione col mouse** (`zero.js`, `inclinazione`): da aperto il cercapersone (con l'lcd, la scritta e la spina,
   che stanno nel suo `corpo`) ruota piano attorno al suo centro verso il mouse (±5° in su e in giù, ±7° di lato), torna
   dritto quando il mouse esce; si spegne nelle impostazioni.
@@ -2729,6 +2740,29 @@ esportata da telefono/app/ e non copiata, e il collaudo di REGOLE.md su ogni vis
   l'ultimo colpo per due ore, e «va bene» prima lo rifaceva vedere (anche nell'app vecchia). Nuovi: la sigla della rapina,
   i suoni del colpo riuscito e della sirena, le icone del sacco e della sirena, e nel `--server-finto` i colpi
   (`--rapina=presi`, `--rapina=galera`).
+
+- **La lavatrice** (`os/lavatrice.js`, 1.11: Alberto ha detto «sì» a rifarla dopo che il cercapersone nero se n'era andato
+  con la sua): le regole della banca (al più 50.000 a lavaggio, 2.000 puliti di commissione, dieci minuti, una alla volta,
+  in galera non parte) e la logica di `telefono/app/lavatrice.js`. A sinistra la macchina disegnata, e nell'oblò quello che
+  succede: il sacco degli sporchi, il cestello che gira con l'acqua (due volte al secondo, e la macchina che vibra), la
+  moneta pronta, il lucchetto della galera. A destra, ferma: quanto lavare (di serie il massimo; ↑ ↓, o il clic su ▲ ▼,
+  di 5.000 in 5.000), la commissione e quanto pesa, i puliti di dopo, gli sporchi che restano coi lavaggi che servono,
+  l'avviso se si lava meno della commissione, «lava» con la conferma. Gira: quanto manca, la barra, a che ora è pronta (si
+  può chiudere: lava da sola). Pronta: i tre bip di fine lavaggio se finisce mentre la guardi, e «ritira». Senza sporchi,
+  senza i 2.000 puliti o in galera dice perché. Le altre pagine: la storia dei soldi sporchi (rapine, commissioni, lavaggi,
+  puliti dal tempo) e come funziona. Nuove le sigle `lavatrice` e `lavatrice-pronta`.
+
+- **Il decifratore** (`os/decifratore.js`, 1.11, lo stesso «sì»): i codici li prepara la banca (`decifratore.apri`,
+  `decifratore.risolvi`) e la banca paga (`decifra`, tre al giorno). La lista: quanti se ne sono aperti oggi (tre
+  caselle), i wallet e le chiavette nello zaino con quanto c'è dentro; senza pezzi dice che li trova lo spazzino di uffici.
+  OK apre il codice: il pezzo, a che codice sei, le vite (♥), la domanda (le parole stanno in `DOMANDE`, ora testo semplice
+  e non più html), il codice grande nel riquadro, le quattro risposte in due file, che la croce sceglie (anche col clic).
+  Giusta: il prossimo; sbagliata: un altro codice e una vita in meno; al terzo errore il lucchetto chiuso, «bloccato» (il
+  pezzo resta nello zaino). Risolti tutti e tre: la moneta che salta e i $pzk puliti. Nuove le icone `wallet-pzk` e
+  `chiavetta` e le sigle `decifratore`, `decifratore-giusto`, `-aperto`, `-bloccato`. Il collaudo le prova con
+  `--server-finto --economia` (sporchi, le due app installate, due wallet e una chiavetta; `--economia=vuota`,
+  `--economia=poveri`, `--lavaggio=gira` o `=pronto`); nel finto la risposta giusta è sempre la prima. Nel collaudo di
+  sempre le app del pzkstore sono già installate, se no non sarebbero nel menu.
 
 - **bin·hex** (`os/conversioni.js`): le conversioni fra le basi, coi conti dell'app vecchia (BigInt, la parte dopo la
   virgola, il complemento a 2) e la stessa scelta ricordata. «Come si fa» dell'app vecchia ora è fatto di dati (`passi`:

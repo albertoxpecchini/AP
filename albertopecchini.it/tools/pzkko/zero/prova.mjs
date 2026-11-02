@@ -9,6 +9,7 @@
 //   node tools/pzkko/zero/prova.mjs --app=chat      dopo l'apertura apre quell'app e la COLLAUDA (tutti i tasti, l'lcd
 //                                                  salvato a ogni passo, angoli, margini, glifi, errori; vedi REGOLE.md)
 //   … --suoni                                      coi suoni accesi: il collaudo vuole anche il bip a ogni tasto
+//   … --server-finto --economia [--lavaggio=gira|pronto]   sporchi, lavatrice e decifratore installati, wallet nello zaino
 // Serve puppeteer-core in tools/catture e un browser (tools/pzkko/browser.mjs). Niente server vero: il wallet e lo zaino
 // restano nel browser (le richieste alle api falliscono, e il sito sta in piedi lo stesso).
 import { createServer } from 'node:http'
@@ -37,9 +38,59 @@ const TASSO = 0.0123
 const rapina = (process.argv.find((a) => a.startsWith('--rapina=')) ?? '').slice(9) // presi, galera
 let colpoFinto = null, cassaFinta = 812345, giriColpo = 0
 if (rapina === 'galera') contoFinto.galera = ORA + 4.5 * 36e5
+// l'economia finta (1.11, la lavatrice e il decifratore): --economia dà 73.500 sporchi di una rapina, la lavatrice e il
+// decifratore installati, due wallet e una chiavetta nello zaino; --lavaggio=gira (mancano sette minuti) o =pronto (finito:
+// la banca finta lo pulisce alla seconda richiesta di stato, cioè a «ritira», così si vede la lavatrice pronta)
+// (--economia=vuota: niente sporchi; =poveri: 73.500 sporchi ma solo 1.200 puliti, meno della commissione)
+const ecoArg = process.argv.find((a) => a.startsWith('--economia')), economia = !!ecoArg, ecoTipo = ecoArg?.split('=')[1] ?? '', lavaggio = (process.argv.find((a) => a.startsWith('--lavaggio=')) ?? '').slice(11)
+if (economia) {
+  const sp = ecoTipo === 'vuota' ? 0 : 73500
+  if (ecoTipo === 'poveri') contoFinto.pzk = 1200
+  contoFinto.pzk += sp; contoFinto.sporchi = sp
+  contoFinto.zaino = { v: 1, t: 0, xp: 300, mestiere: null, turni: 0, oggetti: { canna: 1, 'wallet-pzk': 2, chiavetta: 1 }, app: { lavatrice: 1, decifratore: 1 }, attese: {}, effetti: {}, serie: {}, stat: {} }
+  contoFinto.mosse.push({ t: ORA - 2 * 36e5, tipo: 'rapina', n: 73500 })
+  contoFinto.decifrati = 0
+}
+if (lavaggio) contoFinto.lavaggio = { n: 50000, fino: lavaggio === 'pronto' ? ORA - 6e4 : ORA + 7 * 6e4 }
+let stati = 0, tavoloFinto = null
+// i giochini finti del decifratore: la risposta giusta è sempre la prima delle scelte (così OK la dà, → e OK sbagliano)
+const PROVE = [{ k: 'cesare', codice: 'NJODJP', giusta: 'MINCIO', scelte: ['MINCIO', 'MANTOVA', 'ZUCCA', 'SARACINESCA'] }, { k: 'binario', codice: '1011', giusta: '11', scelte: ['11', '12', '10', '13'] }, { k: 'sequenza', codice: '3 · 7 · 11 · 15', giusta: '19', scelte: ['19', '20', '17', '23'] }, { k: 'specchio', codice: 'ACCUZ', giusta: 'ZUCCA', scelte: ['ZUCCA', 'NUTRIA', 'LUCCIO', 'GONZAGA'] }]
+const vedeFinto = (t) => ({ tipo: t.tipo, i: t.i, errori: t.errori, prova: t.prove[t.i] && { k: t.prove[t.i].k, codice: t.prove[t.i].codice, scelte: t.prove[t.i].scelte } })
 function walletFinto(body) {
   const ok = (extra = {}) => { contoFinto.agg++; contoFinto.puliti = contoFinto.pzk; return { ok: true, conto: contoFinto, tasso: TASSO, t: Date.now(), ...extra } }
   const a = body.a
+  if (a === 'stato' && ++stati > 1 && contoFinto.lavaggio?.fino <= Date.now()) { const n = Math.min(contoFinto.lavaggio.n, contoFinto.sporchi ?? 0); contoFinto.sporchi -= n; contoFinto.mosse.push({ t: Date.now(), tipo: 'lavati', n }); delete contoFinto.lavaggio }
+  if (a === 'lava') {
+    if (contoFinto.lavaggio) return { ok: false, errore: 'la lavatrice gira già' }
+    const n = Math.min(contoFinto.sporchi ?? 0, 50000, Number(body.quanto) > 0 ? Number(body.quanto) : Infinity)
+    contoFinto.pzk -= 2000; contoFinto.lavaggio = { n, fino: Date.now() + 10 * 6e4 }; contoFinto.mosse.push({ t: Date.now(), tipo: 'lavatrice', n: 2000 })
+    return ok({ fatto: { lavaggio: contoFinto.lavaggio } })
+  }
+  if (a === 'fai' && body.cosa === 'decifratore.apri') {
+    const ogg = body.args?.tipo === 'chiavetta' ? 'chiavetta' : 'wallet-pzk'
+    if (!(contoFinto.zaino?.oggetti?.[ogg] > 0)) return { ok: false, errore: 'non hai wallet da decifrare' }
+    tavoloFinto = { tipo: body.args.tipo, prove: PROVE.slice(0, 3), i: 0, errori: 0 }
+    return ok({ esito: vedeFinto(tavoloFinto) })
+  }
+  if (a === 'fai' && body.cosa === 'decifratore.risolvi') {
+    const t = tavoloFinto
+    if (!t) return { ok: false, errore: 'nessun codice da risolvere: apri un pezzo' }
+    if (body.args?.risposta !== t.prove[t.i].giusta) {
+      if (++t.errori > 2) { tavoloFinto = null; return ok({ esito: { giusta: false, bloccato: true } }) }
+      t.prove[t.i] = PROVE[3]
+      return ok({ esito: { giusta: false, ...vedeFinto(t) } })
+    }
+    if (++t.i < t.prove.length) return ok({ esito: { giusta: true, ...vedeFinto(t) } })
+    t.risolto = t.tipo
+    return ok({ esito: { giusta: true, risolto: true, tipo: t.tipo } })
+  }
+  if (a === 'decifra') {
+    if (tavoloFinto?.risolto !== body.tipo) return { ok: false, errore: 'prima si risolve il codice' }
+    const ogg = body.tipo === 'chiavetta' ? 'chiavetta' : 'wallet-pzk', n = body.tipo === 'chiavetta' ? 2750 : 830
+    contoFinto.zaino.oggetti[ogg]--; contoFinto.zaino = { ...contoFinto.zaino, oggetti: { ...contoFinto.zaino.oggetti } }
+    contoFinto.pzk += n; contoFinto.decifrati++; tavoloFinto = null; contoFinto.mosse.push({ t: Date.now(), tipo: 'decifrato', n })
+    return ok({ fatto: { n, tipo: body.tipo } })
+  }
   if (a === 'entra') return body.pin === '1234' ? ok({ token: 'finto' }) : { ok: false, errore: 'nome o PIN sbagliati' }
   if (a === 'crea') { contoFinto = { ...contoFinto, nome: body.nome, ind: 'pzk123456', creato: Date.now(), pzk: 1000, eur: 0, invii: false, inviiDa: Date.now() + 48 * 36e5, mosse: [{ t: Date.now(), tipo: 'nato', n: 1000 }] }; return ok({ token: 'finto' }) }
   if (a === 'converti') {
@@ -127,18 +178,19 @@ try {
   await page.goto('about:blank')
   console.log('webgl:', await page.evaluate(() => { const gl = document.createElement('canvas').getContext('webgl2'); if (!gl) return 'niente'; const d = gl.getExtension('WEBGL_debug_renderer_info'); return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) }))
   // lo zaino (senza «zero»: dal 31.10 lo zero c'è per tutti) e il conto finto, prima che la pagina parta
-  await page.evaluateOnNewDocument((suoniAccesi, peggiori, senzaConto) => {
+  // (1.11) le app del pzkstore (la lavatrice, il decifratore) si collaudano installate: se no non sono nel menu e non si aprono
+  await page.evaluateOnNewDocument((suoniAccesi, peggiori, senzaConto, daStore) => {
     const zaino = { v: 1, t: 0, xp: peggiori ? 987654 : 300, ...(peggiori && { profilo: { av: 'av-gonzaga', avs: ['av-gonzaga'], col: 'blu', cor: 'pixel', mot: 'chi va piano va sano e va lontano, ma chi va forte arriva prima' } }), mestiere: null, turni: 0, oggetti: { canna: 1 }, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] }
     sessionStorage.setItem('pzkko-chat-sessione', JSON.stringify(zaino))
     localStorage.setItem('pzkko-chat', JSON.stringify({ ind: 'pzk000001', zaino, visto: 0 }))
-    if (!senzaConto) localStorage.setItem('pzkko-wallet', JSON.stringify({ token: 'prova.prova', conto: { ind: 'pzk000001', nome: peggiori ? 'Bartolomeo Pecchinix' : 'prova', pzk: peggiori ? 987654321 : 52340, ...(peggiori && { creato: Date.UTC(2026, 9, 1), sporchi: 123456 }), eur: 0, mosse: [], t: Date.now() }, tasso: 1, t: Date.now() }))
+    if (!senzaConto) localStorage.setItem('pzkko-wallet', JSON.stringify({ token: 'prova.prova', conto: { ind: 'pzk000001', nome: peggiori ? 'Bartolomeo Pecchinix' : 'prova', pzk: peggiori ? 987654321 : 52340, ...(peggiori && { creato: Date.UTC(2026, 9, 1), sporchi: 123456 }), ...(daStore && { zaino: { v: 1, t: 0, xp: 300, mestiere: null, turni: 0, oggetti: {}, app: { lavatrice: 1, decifratore: 1 }, attese: {}, effetti: {}, serie: {}, stat: {} } }), eur: 0, mosse: [], t: Date.now() }, tasso: 1, t: Date.now() }))
     localStorage.setItem('pzkko-benvenuto', JSON.stringify({ versione: 99 }))
     if (!location.search.includes('guida')) localStorage.setItem('pzkko-zero-guida', 'si')
     // i suoni: si contano gli oscillatori che nascono (ogni suono di suono/interfaccia.js ne fa almeno uno)
     localStorage.setItem('pzkko-suono', suoniAccesi ? 'si' : 'no')
     const AC = window.AudioContext
     if (AC) { const crea = AC.prototype.createOscillator; AC.prototype.createOscillator = function () { if (/interfaccia.js/.test(new Error().stack ?? '')) window.__oscillatori = (window.__oscillatori ?? 0) + 1; return crea.call(this) } } // (solo i suoni di suono/interfaccia.js: la musica e la strada ne fanno di continuo)
-  }, suoni, peggiori, senzaConto)
+  }, suoni, peggiori, senzaConto, ['lavatrice', 'decifratore'].includes(app))
 
   await page.goto(`${base}/?muro=1&chat&ora=${ora}`, { waitUntil: 'networkidle2', timeout: 60000 })
   await page.waitForSelector('.chat-tasto.zero', { timeout: 30000 })

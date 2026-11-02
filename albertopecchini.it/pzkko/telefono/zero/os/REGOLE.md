@@ -16,7 +16,7 @@ detto ok.
    il cercapersone vecchio (`chat/`, `games/pzk.js`, `chat/zaino.js`). Mai una seconda copia delle regole di un gioco, mai
    un nuovo posto dove salvare dati del server. La chat l'ha fatto così: usa i comandi veri di `chat/comandi/`.
 3. **L'id dell'app è quello di `APP` in `telefono/telefono.js`** (chat, profilo, account, negozio, pzkstore, sfide, quiz,
-   missioni, giocatori, zaino, miniera, foto, virtual, banca, rapina, conversioni, calcolatrice, compilatore, cucina). Da lì vengono il nome e l'icona del menu.
+   missioni, giocatori, zaino, miniera, foto, virtual, banca, rapina, lavatrice, decifratore, conversioni, calcolatrice, compilatore, cucina). Da lì vengono il nome e l'icona del menu.
 
 ## 2. Com'è fatta un'app
 
