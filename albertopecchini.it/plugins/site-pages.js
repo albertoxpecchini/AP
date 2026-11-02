@@ -23,6 +23,7 @@ const ENTRY_CSS = 'src/style.css'
 const PAGE_CSS = [
   { entry: 'src/styles/stile.css', marker: 'data-canvas' },
   { entry: 'src/styles/aragosta.css', marker: 'data-aragosta' },
+  { entry: 'src/styles/tempo.css', marker: 'data-tempo' },
   { entry: 'src/styles/viewer.css', marker: 'data-viewer' },
   { entry: 'src/styles/email.css', marker: 'data-email' },
   { entry: 'src/styles/wrapped5bt.css', marker: 'data-wrapped' },

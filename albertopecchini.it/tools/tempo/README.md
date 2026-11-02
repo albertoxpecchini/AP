@@ -1,0 +1,53 @@
+# La macchina del tempo
+
+La pagina `/tempo/` è una copia della Wayback Machine: la barra in cima con l'istogramma
+dei commit per giorno e le frecce fra una cattura e l'altra, sotto la home com'era quel
+giorno, dal primo commit (24 maggio 2026, «Add files from Figma Make») a oggi. Le versioni le ricostruisce questo
+strumento dal codice di allora, e le fotografa.
+
+```sh
+node tools/tempo/tempo.mjs                 # un giorno alla volta: l'ultimo commit di ogni giorno che manca
+node tools/tempo/tempo.mjs --forza         # rifà anche le versioni già fotografate
+node tools/tempo/tempo.mjs --solo=<sha>    # una versione sola (più sha separati da virgola)
+node tools/tempo/tempo.mjs --da=2026-09-01 # solo da quel giorno in poi
+node tools/tempo/tempo.mjs --limite=5      # al massimo cinque versioni, poi si ferma
+node tools/tempo/tempo.mjs --manifesto     # riscrive solo src/data/tempo.js da quello che c'è
+```
+
+## Come funziona
+
+1. **I giorni.** `git log` del repository, fuori pzkko, Better Call Pekko, i workflow e i
+   documenti di radice; di ogni giorno (ora italiana) si tiene l'ultimo commit e si conta
+   quanti ne ha avuti.
+2. **La ricostruzione.** `git archive` del commit in `tools/tempo/lavoro/sito` (fuori da git).
+   Le dipendenze restano da una versione all'altra se `package-lock.json` non è cambiato,
+   altrimenti `npm ci` (o `npm install`, dove il lock non c'era). Poi `npm run build`
+   (`npx vite build` se non c'è lo script); la cartella è `dist`, `build` o `out`. Fino
+   al 17 settembre 2026 il sito stava alla radice del repository, dopo in `albertopecchini.it/`:
+   lo strumento guarda dov'è il `package.json`.
+3. **La foto.** Un server statico sulla cartella compilata (le app a pagina singola
+   rispondono con la home a ogni indirizzo), Chromium headless con `puppeteer-core` di
+   `tools/catture` (il browser lo trova `tools/pzkko/browser.mjs`), `prefers-reduced-motion`,
+   pagina fatta scorrere fino in fondo, poi la home a 1280 px a tutta altezza e a 390 px.
+   Con sharp diventano WebP larghi 960 e 390 (al massimo 6000 di altezza) in
+   `public/media/tempo/<sha>-d.webp` e `-m.webp`. Si salva anche il `<title>` della pagina.
+4. **Il manifesto.** `src/data/tempo.js` (GENERATO): una riga per versione — numero, sha,
+   data, ora, messaggio, commit del giorno, misure delle foto, titolo. Una versione che non
+   si compila o non si fotografa resta con il suo `errore`: la pagina la racconta lo stesso.
+   Il manifesto si riscrive dopo ogni versione, quindi si può interrompere e riprendere.
+
+## Il deposito per il server di casa
+
+Con `--deposito=C:pzkko-server	empo` ogni versione viene anche depositata intera in
+`versioni<sha>`: i file di testo (HTML, CSS, JS, manifest, JSON) con gli indirizzi assoluti
+riscritti su `/tempo/<sha>/` (`href="/x"`, `src="/x"`, `url(/x)`, le stringhe `"/assets/…"` nel
+JS, `href="/"`, i `srcset`), i binari una volta sola in `store<hash>` con collegamenti fisici.
+`stato.json` elenca le versioni pronte. Li serve `C:pzkko-server	emposerver.mjs` (127.0.0.1:8789,
+fuori col Funnel di Tailscale sul percorso `/tempo`, vedi il LEGGIMI lì): la pagina `/tempo/` lo
+interroga e, se risponde, mostra le pagine vere in un iframe invece delle foto.
+
+## Quanto ci mette
+
+Circa un minuto a versione quando le dipendenze non cambiano, qualche minuto quando
+serve `npm ci`: tutte le versioni dall'inizio sono un paio d'ore. Le foto pesano
+50–150 KB l'una.

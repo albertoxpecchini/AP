@@ -55,3 +55,6 @@ tools/lezioni/__pycache__/
 *.sln
 *.sw?
 tools/pzkko/lavoro/
+
+# la macchina del tempo: le versioni ricostruite, una alla volta
+tools/tempo/lavoro/

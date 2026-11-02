@@ -40,6 +40,8 @@ const initJelly = onDemand('[data-jelly]', 'initJelly', () => import('./client/j
 const initWrapped = onDemand('[data-wrapped]', 'initWrapped', () => import('./client/wrapped.js'))
 // le Live Photo: solo dove ce n'è una (il fun fact di pzkko)
 const initLive = onDemand('[data-live]', 'initLive', () => import('./client/live.js'))
+// la macchina del tempo: solo in /tempo/
+const initTempo = onDemand('[data-tempo]', 'initTempo', () => import('./client/tempo.js'))
 
 const modules = [
   initTransitions,
@@ -70,6 +72,7 @@ const modules = [
   initJelly,
   initWrapped,
   initLive,
+  initTempo,
   initParallax,
   initLume,
   initSpot,

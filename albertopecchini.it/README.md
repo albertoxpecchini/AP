@@ -79,6 +79,7 @@ albertopecchini.it/
 │  ├─ aragosta/            l’aragosta di fiume della home (intera, poi in pezzi di burattino), gpt-image-2 su Replicate (vedi il suo README)
 │  ├─ cartina/             fondo illustrato della carta dell’area operativa (/contatti/), gpt-image-2 su Replicate
 │  ├─ catture/             catture dei siti nei progetti web, rifatte da sole quando un sito cambia (vedi il suo README)
+│  ├─ tempo/               la macchina del tempo: ricostruisce e fotografa il sito com'era a ogni giorno di lavoro, per /tempo/ (vedi il suo README)
 │  ├─ email-generator/     generatore di email HTML (vedi il suo README)
 │  ├─ lezioni/             le lezioni su Teams registrate, trascritte con Whisper in sincrono con la lavagna e messe in appunti PDF; si scarica da pzkko.it/tools/lezioni (vedi il suo README)
 │  ├─ nota/                le «note» di fine stagione (interventi, riepilogo, totale) in PDF A4 coi caratteri del sito (vedi il suo README)
@@ -193,6 +194,7 @@ albertopecchini.it/
 | `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. Esiste con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in sei tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti, mascotte) su un piano con zoom e spostamento, come in un programma di disegno; dal 2 novembre 2026 descrive il vestito nuovo |
+| `/tempo/` | La macchina del tempo, copiata dalla Wayback Machine: la barra in cima (marchio, indirizzo, «salvata N volte», l’istogramma con una barra per giorno alta quanti commit, le frecce con la data) e sotto la pagina com’era, a tutta larghezza; tutte le versioni dal primo commit (24.5.2026) a oggi, una per giorno di lavoro, ricostruite e fotografate da [`tools/tempo`](tools/tempo/README.md) (manifesto generato `src/data/tempo.js`); quando il server di casa è acceso (`site.archivio`, `C:pzkko-server	empo`) la pagina è quella vera in un iframe, altrimenti la foto; senza testata né piè di pagina del sito, linkata nel footer |
 | `/aragosta/` | L’hero della home com’era fino al 2 novembre 2026 (il nome a tutta larghezza, l’aragosta e l’inchiostro, il luogo comune sbarrato) su una tavola 1440 × 900 dello stesso piano navigabile, coi caratteri e i colori di allora e un cartiglio da foglio CAD (`src/templates/pages/aragosta.js`, `src/styles/aragosta.css`); linkata nel footer |
 | `/wrapped5BT/` | Il Wrapped 5BT: frame 9:16 con 74 slide verticali a scatto sulla chat di classe (nove capitoli, ognuna col pannello «Come si calcola»), contenuti da `src/data/wrapped.js` e numeri da [`tools/wrapped`](tools/wrapped/README.md). Fuori da menu, sitemap e indicizzazione |
 | `/privacy/` · `/cookie/` | Note legali |

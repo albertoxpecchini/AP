@@ -2152,3 +2152,90 @@
     display: none;
   }
 }
+
+
+/* ── La macchina del tempo, a metà home (3.11.2026) ──────────────────────── */
+/* Testo a sinistra, quattro fotogrammi a destra sfalsati come una pellicola
+   che scorre indietro; al passaggio si raddrizzano. */
+
+.tmz__grid {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.tmz__copy {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+  align-content: center;
+}
+
+.tmz__title {
+  max-width: 16ch;
+}
+
+.tmz__lead {
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.tmz__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.tmz__film {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.tmz__frame a {
+  display: grid;
+  gap: 0.5rem;
+  transform: translateY(calc(var(--i) * -0.75rem)) rotate(calc((var(--i) - 1.5) * -1.2deg));
+  transition: transform var(--t-3) var(--ease-silk);
+}
+
+.tmz__shot {
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  background: var(--card);
+  box-shadow: 0 1.5rem 2.5rem -1.5rem rgb(0 0 0 / 0.35);
+}
+
+.tmz__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform var(--t-4) var(--ease-silk);
+}
+
+.tmz__date {
+  text-align: center;
+}
+
+@media (hover: hover) {
+  .tmz__frame a:hover {
+    transform: translateY(-0.5rem);
+  }
+
+  .tmz__frame a:hover .tmz__shot img {
+    transform: scale(1.04);
+  }
+}
+
+@media (min-width: 900px) {
+  .tmz__grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: var(--col-gap);
+    align-items: center;
+  }
+}

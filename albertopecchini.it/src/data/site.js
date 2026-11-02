@@ -106,6 +106,11 @@ export const site = {
     budgets: ['Da definire insieme', 'Fino a 1.000 €', '1.000 — 3.000 €', '3.000 — 6.000 €', 'Oltre 6.000 €'],
   },
 
+  // La macchina del tempo (/tempo/): il server di casa che serve i siti interi di ogni
+  // versione (C:pzkko-server	empo, dietro Tailscale Funnel sul percorso /tempo). Quando è
+  // spento la pagina mostra le foto.
+  archivio: 'https://desktop-inpvhr2.tail6c90b3.ts.net/tempo',
+
   // Mostra il contrassegno ◇ sui progetti dimostrativi (`sample: true` in projects.js).
   // Oggi non ha effetto: i dimostrativi non vengono pubblicati (`showSamples`
   // in projects.js). Serve solo se li si rimette online, per dichiararli.

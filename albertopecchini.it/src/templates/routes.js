@@ -13,6 +13,7 @@ import { contattiPage } from './pages/contact.js'
 import { privacyPage, cookiePage, creditiPage, notFoundPage } from './pages/legal.js'
 import { stilePage } from './pages/stile.js'
 import { aragostaPage } from './pages/aragosta.js'
+import { tempoPage } from './pages/tempo.js'
 import { tavolePage, sheetCount, hasSheets } from './pages/tavole.js'
 import { emailPage } from './pages/email.js'
 import { wrapped5btPage } from './pages/wrapped5bt.js'
@@ -197,6 +198,18 @@ export const routes = [
     pageClass: 'page--stile',
     noFooter: true,
     jsonld: () => [crumbs({ label: 'L’aragosta', href: '/aragosta/' })],
+  },
+  {
+    // La macchina del tempo (3.11.2026): tutte le versioni del sito, una per giorno,
+    // ricostruite e fotografate da tools/tempo/tempo.mjs.
+    path: '/tempo/',
+    priority: 0.5,
+    title: 'La macchina del tempo — il sito giorno per giorno',
+    description: 'Tutte le versioni del sito di Alberto Pecchini dal primo commit a oggi, una per giorno di lavoro, ricostruite dal codice e fotografate, come nella Wayback Machine: l’istogramma dei commit e le frecce da una cattura all’altra.',
+    render: tempoPage,
+    pageClass: 'page--tempo',
+    noFooter: true, // la barra è il guscio, come nella Wayback Machine
+    jsonld: () => [crumbs({ label: 'La macchina del tempo', href: '/tempo/' })],
   },
   {
     // Strumento privato: non è nei menu, nel footer, nella sitemap né nei motori

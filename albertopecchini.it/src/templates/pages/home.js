@@ -12,6 +12,7 @@ import { steps } from '../../data/method.js'
 import { bio, photos, facts } from '../../data/studio.js'
 import { button, textLink, sectionHead, media, picture, stat, icon, splitWords, figurina, figName } from '../components/ui.js'
 import { siteCard, indexRow } from '../components/project.js'
+import { versioni } from '../../data/tempo.js'
 import { COORDS } from '../layout.js'
 
 // I siti mostrati nel carosello: prima quelli in evidenza, poi gli altri.
@@ -268,6 +269,46 @@ function strip() {
   `
 }
 
+// ── La macchina del tempo: la novità, a metà home ────────────────────────────
+// Alberto (3.11.2026): «metti a metà home questa novità con una frase simpatica».
+// Quattro foto prese lungo la strada (la prima, due in mezzo, l'ultima) e il link.
+
+function tempo() {
+  const conFoto = versioni.filter((v) => v.d)
+  if (!conFoto.length) return ''
+  const prime = conFoto[0]
+  const ultime = conFoto.at(-1)
+  const scelte = [0, 1 / 3, 2 / 3, 1].map((t) => conFoto[Math.round(t * (conFoto.length - 1))])
+  const data = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '')
+  return html`
+    <section class="section tmz" id="tempo" data-theme="tint" data-section="Tempo" aria-labelledby="tmz-title">
+      <div class="container tmz__grid">
+        <div class="tmz__copy">
+          <p class="label" data-reveal="fade"><span class="sec-head__index">↺</span>Novità · la macchina del tempo</p>
+          <h2 class="h2 tmz__title" id="tmz-title" data-reveal="words">${splitWords(`Ho cambiato idea ${versioni.length} volte. Le ho tenute tutte.`, { accent: ['tenute', 'tutte.'] })}</h2>
+          <p class="lead tmz__lead" data-reveal="up">Dal ${data(prime.data)} ogni giorno di lavoro è una versione di questo sito, ricostruita dal codice di allora: Figma Make, Bootstrap Italia, il neroverde del Sassuolo, il viola, i giochi, i burattini… fino a questa. Una copia della Wayback Machine, con l’istogramma dei miei commit.</p>
+          <div class="tmz__actions" data-reveal="up" style="--d:80ms">
+            ${button({ href: '/tempo/', label: 'Torna indietro nel tempo', variant: 'dark' })}
+            <span class="label">${conFoto.length === versioni.length ? `${versioni.length} versioni` : `${conFoto.length} versioni pronte su ${versioni.length}`} · dal ${data(prime.data)} al ${data(ultime.data)}</span>
+          </div>
+        </div>
+        <ul class="tmz__film" data-reveal="up" style="--d:120ms">
+          ${scelte.map(
+            (v, k) => html`
+              <li class="tmz__frame" style="--i:${k}">
+                <a href="/tempo/#v=${v.short}" aria-label="Il sito il ${data(v.data)}">
+                  <span class="tmz__shot"><img src="/media/tempo/${v.short}-d.webp" width="960" height="${v.d.h}" alt="" loading="lazy" decoding="async" data-no-srcset></span>
+                  <span class="label tmz__date">${data(v.data)}</span>
+                </a>
+              </li>
+            `,
+          )}
+        </ul>
+      </div>
+    </section>
+  `
+}
+
 // ── Il manifesto a tutta larghezza ───────────────────────────────────────────
 // La frase a sinistra, Alberto scontornato a destra (la foto «curioso» dello studio) (come il «The most
 // important technology…» di reflection).
@@ -423,12 +464,12 @@ function index() {
 /** Indicatore di posizione: sezione corrente della pagina (solo schermi larghi, decorativo). */
 const sectionIndicator = () => html`
   <div class="secind label" aria-hidden="true" data-secind>
-    <span class="secind__n"><span data-secind-n>01</span> / <span data-secind-total>09</span></span>
+    <span class="secind__n"><span data-secind-n>01</span> / <span data-secind-total>10</span></span>
     <span class="secind__bar"><i data-secind-bar></i></span>
     <span data-secind-name>Intro</span>
   </div>
 `
 
 export function homePage() {
-  return [hero(), mission(), aree(), selected(), strip(), banner(), convictions(), method(), numbers(), studio(), index(), sectionIndicator()].join('\n')
+  return [hero(), mission(), aree(), selected(), strip(), tempo(), banner(), convictions(), method(), numbers(), studio(), index(), sectionIndicator()].join('\n')
 }

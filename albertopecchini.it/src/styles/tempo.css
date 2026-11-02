@@ -1,0 +1,363 @@
+/* La macchina del tempo (/tempo/), copiata dalla Wayback Machine di Internet
+   Archive: la barra grigia in cima, in Arial, con il marchio, il campo
+   dell'indirizzo, il conteggio, l'istogramma e le frecce con la data; sotto la
+   pagina com'era. La testata e il piè di pagina del sito non ci sono: la barra è
+   il guscio. Si collega solo alle pagine con [data-tempo] (PAGE_CSS). */
+
+.page--tempo .site-header,
+.page--tempo .progress,
+.page--tempo .lume,
+.page--tempo .cursor {
+  display: none !important;
+}
+
+.page--tempo {
+  background: #fff;
+}
+
+.wb {
+  --wb-bg: #efefef;
+  --wb-line: #c6c6c6;
+  --wb-fg: #000;
+  --wb-muted: #555;
+  --wb-blue: #0066cc;
+  --wb-bar: #777;
+  --wb-font: Arial, Helvetica, 'Liberation Sans', sans-serif;
+  min-height: 100vh;
+  background: #fff;
+  color: var(--wb-fg);
+  font-family: var(--wb-font);
+  font-size: 11px;
+  line-height: 1.25;
+  text-transform: none; /* la Wayback Machine scrive normale */
+}
+
+/* ── La barra ── */
+
+.wb__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--wb-bg);
+  border-bottom: 1px solid var(--wb-line);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+}
+
+.wb__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'logo url'
+    'graph graph'
+    'nav nav'
+    'about about';
+  gap: 8px 14px;
+  align-items: center;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 8px 12px;
+}
+
+.wb__logo {
+  grid-area: logo;
+  display: grid;
+  gap: 1px;
+  color: var(--wb-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wb__logo-top {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--wb-muted);
+}
+
+.wb__logo-big {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wb__url {
+  grid-area: url;
+  display: flex;
+  min-width: 0;
+}
+
+.wb__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #999;
+  border-right: 0;
+  border-radius: 3px 0 0 3px;
+  background: #fff;
+  color: var(--wb-fg);
+  font: 13px var(--wb-font);
+  text-transform: none;
+}
+
+.wb__go {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #999;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(#fdfdfd, #e3e3e3);
+  color: var(--wb-fg);
+  font: 12px var(--wb-font);
+  cursor: pointer;
+}
+
+.wb__go:hover {
+  background: linear-gradient(#fff, #d8d8d8);
+}
+
+/* ── Il conteggio e l'istogramma: una barra per giorno, alta quanti commit ── */
+
+.wb__graph {
+  grid-area: graph;
+  display: grid;
+  gap: 4px;
+}
+
+.wb__count {
+  color: var(--wb-muted);
+}
+
+.wb__count b {
+  color: var(--wb-fg);
+  font-weight: 700;
+}
+
+.wb__spark {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid #999;
+  background: #fff;
+}
+
+.wb__col {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--k) / var(--n) * 100%);
+  width: calc(100% / var(--n));
+  height: var(--h, 0);
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #fff;
+  background: var(--wb-bar);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.wb__col--empty {
+  cursor: default;
+}
+
+.wb__col.is-off {
+  background: #c9c9c9;
+}
+
+.wb__col:hover,
+.wb__col:focus-visible {
+  background: var(--wb-blue);
+  outline: none;
+}
+
+.wb__col.is-current {
+  background: var(--wb-blue);
+}
+
+.wb__col.is-current::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+  border-bottom-color: var(--wb-blue);
+  transform: translateX(-50%);
+}
+
+.wb__months {
+  position: relative;
+  height: 12px;
+  color: var(--wb-muted);
+  font-size: 9px;
+}
+
+.wb__months span {
+  position: absolute;
+  left: calc(var(--k) / var(--n) * 100%);
+  padding-left: 3px;
+  border-left: 1px solid #999;
+}
+
+/* ── Le frecce e la data ── */
+
+.wb__nav {
+  grid-area: nav;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.wb__arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--wb-blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wb__arrow--next {
+  justify-self: end;
+}
+
+.wb__arrow:hover .wb__arrow-date {
+  text-decoration: underline;
+}
+
+.wb__arrow[aria-disabled='true'] {
+  color: #999;
+  pointer-events: none;
+}
+
+.wb__tri {
+  font-size: 14px;
+}
+
+.wb__current {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  text-align: center;
+}
+
+.wb__day {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wb__time {
+  font-size: 11px;
+  color: var(--wb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wb__n {
+  font-size: 10px;
+  color: var(--wb-muted);
+}
+
+/* ── Questa cattura: il commit ── */
+
+.wb__about {
+  grid-area: about;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--wb-line);
+  color: var(--wb-muted);
+}
+
+.wb__about-label {
+  font-weight: 700;
+  color: var(--wb-fg);
+}
+
+.wb__commit {
+  min-width: 0;
+  color: var(--wb-blue);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.wb__commit:hover {
+  text-decoration: underline;
+}
+
+.wb__commit code {
+  font-family: Consolas, Menlo, monospace;
+  font-size: 11px;
+  color: var(--wb-fg);
+}
+
+/* ── La pagina com'era ── */
+
+.wb__frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - var(--wb-h, 150px));
+  min-height: 480px;
+  border: 0;
+  background: #fff;
+}
+
+.wb__live {
+  padding: 4px 12px;
+  color: var(--wb-muted);
+  font-size: 10px;
+  text-align: right;
+}
+
+.wb__live a {
+  color: var(--wb-blue);
+}
+
+.wb__page {
+  max-width: none;
+}
+
+.wb__page {
+  position: relative;
+  max-width: 1280px;
+  margin-inline: auto;
+  background: #fff;
+}
+
+.wb__pic {
+  display: block;
+}
+
+.wb__shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.2s ease;
+}
+
+.wb__shot.is-loading {
+  opacity: 0.4;
+}
+
+.wb__err {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--wb-muted);
+  font-size: 13px;
+}
+
+/* da 900 px la barra sta su due righe come l'originale: marchio · indirizzo · conteggio e istogramma · frecce; sotto, il commit */
+@media (min-width: 900px) {
+  .wb__row {
+    grid-template-columns: auto minmax(220px, 2fr) minmax(0, 3fr) auto;
+    grid-template-areas:
+      'logo url graph nav'
+      'about about about about';
+    gap: 6px 18px;
+  }
+
+  .wb__nav {
+    grid-template-columns: auto auto auto;
+    gap: 12px;
+  }
+}

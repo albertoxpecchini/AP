@@ -212,6 +212,7 @@ function footer({ route, compact = false }) {
     { label: 'Crediti immagini', href: '/crediti/' },
     { label: 'Stile', href: '/stile/' },
     { label: 'L’aragosta', href: '/aragosta/' },
+    { label: 'La macchina del tempo', href: '/tempo/' },
   ]
   const flink = (p) => `<a class="foot-link" href="${p.href}"${isCurrent(route, p.href) && p.href !== '/' ? ' aria-current="page"' : ''}>${esc(p.label)}</a>`
 
