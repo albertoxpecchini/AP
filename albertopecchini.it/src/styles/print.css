@@ -1,4 +1,28 @@
-/* Stampa: pensata soprattutto per il curriculum (/studio/profilo/). */
+/* Stampa: pensata soprattutto per il curriculum (/cv/, prima /studio/profilo/). */
+
+/* /cv/?print: sullo schermo la pagina è già il foglio (chrome.js, initActions) */
+.is-printing .site-header,
+.is-printing .site-footer,
+.is-printing .progress,
+.is-printing .crumbs,
+.is-printing .cv__actions,
+.is-printing .lume,
+.is-printing .cursor {
+  display: none !important;
+}
+
+.is-printing .cv {
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cv__hint {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.cv__hint a {
+  color: var(--accent-text);
+}
 
 @media print {
   :root {

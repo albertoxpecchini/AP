@@ -150,6 +150,15 @@ export function initActions() {
   )
   $$('[data-print]').forEach((el) => el.addEventListener('click', () => window.print()))
 
+  // /cv/?print (3.11.2026): la pagina si spoglia di testata, piè di pagina e
+  // tasti (classe is-printing, in print.css) e apre da sola la finestra di
+  // stampa appena i caratteri sono pronti; chiusa la finestra, resta così.
+  if (/[?&]print(?:=|&|$)/.test(location.search) && $('.cv')) {
+    root.classList.add('is-printing')
+    const stampa = () => setTimeout(() => window.print(), 150)
+    document.fonts?.ready ? document.fonts.ready.then(stampa) : stampa()
+  }
+
   // le regioni a scorrimento orizzontale entrano nell'ordine di tabulazione solo se scorrono
   const regions = $$('[data-scroll-region]')
   const sync = () => regions.forEach((el) => (el.scrollWidth > el.clientWidth + 1 ? el.setAttribute('tabindex', '0') : el.removeAttribute('tabindex')))

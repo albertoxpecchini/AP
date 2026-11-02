@@ -189,7 +189,7 @@ albertopecchini.it/
 | `/servizi/informatica/` | L’assistenza informatica sul serio: i servizi dell’area D in quattro gruppi, le versioni di Windows (XP → 11, LTSC, ARM64, Server) e di Office (Click-to-Run, installazione personalizzata, MSI, Mac), l’installazione di Windows o Office in regalo al primo intervento sopra i 50 € (il lavoro, non la licenza), come si svolge un intervento, regole, FAQ e invito con telefono, WhatsApp e modulo (`/contatti/?tipo=Assistenza%20informatica#modulo` preseleziona la voce). Dati in `src/data/informatica.js`, servizi in `src/data/services.js` (campo `group`) |
 | `/metodo/` | Le sette fasi del lavoro |
 | `/studio/` | Chi sono: biografia, ritratto, timeline, approccio, valori, strumenti; sotto gli strumenti «Con cosa gira» questo sito: diciannove icone sfalsate che si accavallano e fanno da gelatina al passaggio e al tocco, col nome e cosa fa in un fumetto (`src/data/stack.js`, `src/client/jelly.js`, caricato solo qui); in fondo «Tempo libero» (Better Call Saul, bettercallpekko.it e la legenda dei suoi riferimenti, spiegati con parole nostre: niente battute della serie citate alla lettera) e le domande personali (serie TV, natura e animali, veicoli, vacanze, amici). Testi in `src/data/tempo-libero.js`, compilati da Alberto nel documento «Studio — tempo libero e FAQ personali»: una risposta vuota non compare, le righe della legenda con `ok: false` aspettano la sua conferma, e finché ne mancano la build le elenca tra i segnaposto |
-| `/studio/profilo/` | Curriculum sintetico, stampabile |
+| `/cv/` | Curriculum sintetico, stampabile; `/cv/?print` si spoglia di testata e piè di pagina e apre da solo la finestra di stampa (`initActions` in `chrome.js`, classe `is-printing` in `print.css`). `/studio/profilo/` resta come indirizzo vecchio, col canonico su `/cv/` |
 | `/contatti/` | Modulo di contatto, recapiti, telefono (un iPhone con il numero sul tastierino), area operativa |
 | `/portfolio/tavole/` | Il visualizzatore di tutte le tavole vere, raggruppate per progetto; `#<slug>-<NN>` apre una tavola precisa. Esiste con `showSheets = true` (vedi [Tavole vere](#tavole-vere)) |
 | `/stile/` | Il sistema visivo in sei tavole (home a 1440 px, colore, tipografia, forma e movimento, componenti, mascotte) su un piano con zoom e spostamento, come in un programma di disegno; dal 2 novembre 2026 descrive il vestito nuovo |
@@ -537,7 +537,7 @@ Scelte fatte apposta, da non cambiare senza motivo:
 - **Burattini** (`mascot.css`, markup da `puppet()` in `ui.js`): ogni `.pup__part` è il riquadro di un pezzo, messo in percentuale del genitore e girato intorno al perno (`--o`); i pezzi dietro al genitore hanno `z-index` negativo e restano sotto la sua immagine perché ogni pezzo isola il proprio impilamento. Gli occhi sono quelli delle mascotte; la vespa ha le palpebre inclinate e le ali che frullano.
 - **Stile** (`stile.css`): il piano navigabile della pagina `/stile/` e le sue tavole, a misure fisse in px (sono fogli inquadrati dalla finestra, non layout fluidi).
 - **Visualizzatore** (`viewer.css`): le tavole vere, nel case study, nella pagina `/portfolio/tavole/` e a schermo intero.
-- **Stampa** (`print.css`): la pagina `/studio/profilo/` è pensata per essere stampata come curriculum.
+- **Stampa** (`print.css`): la pagina `/cv/` (e `/studio/profilo/`) è pensata per essere stampata come curriculum; con `?print` parte da sola.
 
 ## JavaScript del browser
 

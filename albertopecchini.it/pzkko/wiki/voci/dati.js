@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 711 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>45df816</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-02", fonti: ["README.md"], testo: `'''I 712 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>33cb3e7</code>, 2026-11-02). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 10
+| 11
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/33cb3e7 33cb3e7] feat(albertopecchini.it): il blu #007acc al posto del minio, catture nuove di rivaltasulmincio.it, GitHub ygpzk
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/45df816 45df816] feat(albertopecchini.it): il nome gigante torna in home (più piccolo), l'aragosta su una tavola CAD, /stile/ col vestito nuovo
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/40c5862 40c5862] Merge remote-tracking branch 'origin/albertopecchini.it' into albertopecchini.it
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/93a5eaf 93a5eaf] feat(albertopecchini.it): il vestito nuovo, impaginato come reflection.ai con un quinto di anthropic
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/47362a1 47362a1] feat(pzkko): la musica non si ferma cambiando pagina (la cornice)
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/31202bc 31202bc] Catture aggiornate: Alberto Pecchini, pzkko
 * 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/77d823e 77d823e] fix(pzkko): la musica al 30%
-* 2026-10-26 [https://github.com/albertoxpecchini/AP/commit/edbcbc0 edbcbc0] feat(email): l'informativa privacy e l'avviso di riservatezza in fondo a ogni email
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

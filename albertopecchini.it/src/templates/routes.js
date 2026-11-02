@@ -138,8 +138,20 @@ export const routes = [
     jsonld: () => [crumbs({ label: 'Studio', href: '/studio/' }), personLd()],
   },
   {
-    path: '/studio/profilo/',
+    // Il curriculum, all'indirizzo corto (3.11.2026): /cv/?print apre da solo la
+    // finestra di stampa, senza testata né piè di pagina (chrome.js, initPrint).
+    path: '/cv/',
     priority: 0.5,
+    title: 'Curriculum vitae',
+    description: 'Curriculum di Alberto Pecchini: formazione, esperienze, competenze tecniche, web e grafiche. Versione stampabile: /cv/?print apre subito la stampa.',
+    render: profiloPage,
+    jsonld: () => [crumbs({ label: 'Studio', href: '/studio/' }, { label: 'Curriculum', href: '/cv/' })],
+  },
+  {
+    // Lo stesso curriculum al vecchio indirizzo; il canonico è /cv/.
+    path: '/studio/profilo/',
+    canonical: '/cv/',
+    priority: 0.3,
     title: 'Profilo e curriculum',
     description: 'Curriculum di Alberto Pecchini: formazione, esperienze, competenze tecniche, web e grafiche. Versione stampabile.',
     render: profiloPage,

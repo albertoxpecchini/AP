@@ -263,7 +263,7 @@ export function studioPage() {
 
     <section class="section stl">
       <div class="container">
-        ${sectionHead({ index: 'B', label: 'Timeline professionale', title: 'Da dove arrivo', meta: `${timeline[0].year} — ${timeline.at(-1).year}`, link: { href: '/studio/profilo/', label: 'Profilo e curriculum' } })}
+        ${sectionHead({ index: 'B', label: 'Timeline professionale', title: 'Da dove arrivo', meta: `${timeline[0].year} — ${timeline.at(-1).year}`, link: { href: '/cv/', label: 'Il curriculum' } })}
         <ol class="stl__list">
           ${timeline.map(
             (t) => html`
@@ -392,7 +392,7 @@ function domandePersonali() {
   `
 }
 
-// ── /studio/profilo/ ─────────────────────────────────────────────────────────
+// ── /cv/ (e /studio/profilo/) ─────────────────────────────────────────────────────────
 
 const cvList = (items) => html`
   <ol class="cv__list">
@@ -408,7 +408,7 @@ export function profiloPage() {
   return html`
     <article class="cv">
       <div class="container cv__wrap">
-        ${breadcrumb([{ label: 'Home', href: '/' }, { label: 'Studio', href: '/studio/' }, { label: 'Profilo', href: '/studio/profilo/' }])}
+        ${breadcrumb([{ label: 'Home', href: '/' }, { label: 'Studio', href: '/studio/' }, { label: 'Curriculum', href: '/cv/' }])}
         <header class="cv__head">
           <div>
             <p class="label">Curriculum vitae · agg. ${new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}</p>
@@ -425,6 +425,7 @@ export function profiloPage() {
         <div class="cv__actions">
           ${button({ label: 'Stampa o salva in PDF', variant: 'ghost', iconName: 'arrowDown', attrs: { 'data-print': true } })}
           ${textLink({ href: '/contatti/', label: 'Contattami' })}
+          <p class="cv__hint label">Link diretto alla stampa: <a href="/cv/?print">${esc(site.url.replace('https://', ''))}/cv/?print</a></p>
         </div>
 
         <section class="cv__sec"><h2 class="label">Profilo</h2><p class="cs-lead">${esc(profile.summary)}</p></section>
