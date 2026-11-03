@@ -1,9 +1,9 @@
 {
-  "commit": "c6203a0",
+  "commit": "4bd1f81",
   "data": "2026-11-03",
-  "generata": "2026-11-03T13:11:57.389Z",
-  "voci": 1076,
-  "commit_totali": 721,
+  "generata": "2026-11-03T13:31:51.675Z",
+  "voci": 1077,
+  "commit_totali": 723,
   "moduli": {
     "principale": 55,
     "sito": 56,
@@ -12,7 +12,7 @@
     "cercapersone": 45,
     "chat": 56,
     "dietro": 63,
-    "memoria": 32,
+    "memoria": 33,
     "dati": 668
   }
 }

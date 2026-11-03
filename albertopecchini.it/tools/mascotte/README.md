@@ -1,12 +1,16 @@
-# Mascotte — la chiocciola, la nutria e i burattini
+# Mascotte — la chiocciola, la tartaruga e i burattini
 
-La **chiocciola gigante africana**, l'animale di Alberto, e la **nutria golosa**
-del Mincio (dal 18 ottobre 2026 al posto della tartaruga di terra) custodiscono
-il sito: la chiocciola (solo la testa, con gli occhi sui peduncoli) sta accanto
-al marchio nella testata, tutte e due affiancano la firma nel piè di pagina. Sono
-due immagini di **openai/gpt-image-2** su Replicate (1536 × 1024, qualità high),
-nello stesso stile delle figurine e con lo stesso bordo adesivo; quella della
-nutria è l'«intero» del suo burattino (vedi sotto).
+La **chiocciola gigante africana**, l'animale di Alberto, e la **tartaruga di
+terra** col casco da cantiere custodiscono il sito. Sono due immagini di
+**openai/gpt-image-2** su Replicate (1536 × 1024, qualità high), nello stesso stile
+delle figurine e con lo stesso bordo adesivo. Nel piè di pagina la tartaruga sta
+intera, come mascotte, a destra della firma; la chiocciola, a sinistra, è il suo
+burattino (vedi sotto).
+
+La tartaruga è quella del 27 settembre 2026 (`c82e7e8`). Dal 1° al 18 ottobre è
+stata un burattino di profilo, dal 18 ottobre al 2 novembre al suo posto c'era la
+**nutria golosa**; il 3 novembre Alberto l'ha voluta di nuovo, «esattamente»: la
+stessa immagine, gli stessi occhi, lo stesso naso.
 
 Gli **occhi** li muove il codice: il modello li disegna bianchi, tondi, con la
 pupilla al centro; il sito ci mette sopra un occhio suo — disco bianco, pupilla che
@@ -18,11 +22,11 @@ inseguimento del puntatore e niente battiti.
 
 | File | Cosa è |
 | --- | --- |
-| `mascotte.js` | lo stile comune e le due mascotte: soggetto e testo alternativo |
+| `mascotte.js` | lo stile comune e le due mascotte: soggetto e testo alternativo (la tartaruga col prompt del 27.9.2026) |
 | `mascotte.mjs` | lo script: genera, prepara (rifila, trova gli occhi, scrive il WebP e le misure), recupera una predizione già pagata |
 | `lavoro/` | i PNG generati con il JSON dell'input (esclusi da Git) |
 | `../../src/data/mascotte.js` | generato: misure dell'immagine, centro e semiassi degli occhi, colore delle palpebre; il **naso** si segna a mano e lo script lo conserva |
-| `../../public/media/mascotte/` | `lumaca.webp`, `nutria.webp` (larghezza massima 1200 px) |
+| `../../public/media/mascotte/` | `lumaca.webp`, `tartaruga.webp` (larghezza massima 1200 px) |
 | `../../src/templates/components/ui.js` | `mascot(nome, { crop })` scrive il markup; `crop` mostra solo un ritaglio (la testa, in testata) |
 | `../../src/client/mascot.js` | occhi, naso, palpebre, sguardo in giro |
 | `../../src/styles/mascot.css` | occhi, palpebre, ritaglio |
@@ -33,7 +37,7 @@ figurine (il token sta in `.env.local`, vedi [`tools/copertine/README.md`](../co
 ## Uso
 
 ```bash
-node tools/mascotte/mascotte.mjs genera lumaca            # la nutria intera viene da burattini.mjs: qui solo «usa»
+node tools/mascotte/mascotte.mjs genera tartaruga
 node tools/mascotte/mascotte.mjs usa lumaca tools/mascotte/lavoro/lumaca/<file>.png
 node tools/mascotte/mascotte.mjs recupera lumaca <id>     # se l'attesa si interrompe: l'immagine è già pagata
 ```
@@ -48,14 +52,14 @@ sull'altezza.
 
 Il **naso** (`nose: { x, y, rx, ry }`) va messo a mano guardando l'immagine (per
 esempio con una griglia: `ffmpeg -i lumaca.webp -vf "drawgrid=w=iw/10:h=ih/10:c=red" griglia.png`).
-Per la chiocciola è il muso sotto i peduncoli, per la nutria il naso. Il ritaglio della testata (`HEAD_CROP` in `src/templates/layout.js`) è in
+Per la chiocciola è il muso sotto i peduncoli, per la tartaruga il becco sotto il casco. Il ritaglio della testata (`HEAD_CROP` in `src/templates/layout.js`) è in
 percentuale dell'immagine, e la testata lo sfuma in basso con una maschera.
 
 Se si rigenera una mascotte, gli occhi vengono ritrovati da soli, il naso resta
 quello vecchio: va controllato che sia ancora al posto giusto. La fonte è
 dichiarata in `/crediti/` e nel README del sito.
 
-## Burattini — la chiocciola, la nutria, l'airone, la gazza e la vespa
+## Burattini — la chiocciola, l'airone, la gazza e la vespa
 
 Nel piè di pagina gli animali non sono un'immagine sola ma **burattini di
 carta**: pezzi separati uniti da fermacampioni, che il sito rimonta e muove.
@@ -63,16 +67,14 @@ L'**airone elegante** (corpo con lo zaino da geometra, collo con il papillon,
 testa, ala, due zampe), la **gazza furbissima** (corpo, testa con la chiave
 rubata, ala, coda, due zampe), la **vespa cattiva ma precisa** (torace con le
 zampe, testa, addome col pungiglione, due ali, due antenne), la **chiocciola**
-smontata dalla mascotte (corpo, guscio, due peduncoli, stazione totale) e la
-**nutria golosa**, dal 18 ottobre 2026 al posto della tartaruga (vedi sotto).
+smontata dalla mascotte (corpo, guscio, due peduncoli, stazione totale). La
+tartaruga accanto a loro non è un burattino ma la mascotte intera.
 
 Due passaggi di gpt-image-2 per animale, sempre in qualità high:
 
 1. **intero** (1536 × 1024): l'animale completo, con `lumaca.webp` come
-   riferimento di stile (fino al 18.10.2026 anche la tartaruga; l'airone ha
-   preso lo zaino della chiocciola); un animale può avere i suoi `riferimenti`
-   e la sua `premessa` (la nutria ha solo la chiocciola, senza copiarne lo
-   zaino); con `--candidati=2` il modello ne disegna due e si sceglie;
+   riferimento di stile (l'airone ha preso lo zaino della chiocciola); un
+   animale può avere i suoi `riferimenti` e la sua `premessa`; con `--candidati=2` il modello ne disegna due e si sceglie;
 2. **pezzi** (2048 × 2048): lo stesso animale smontato, con l'intero come
    riferimento. Ogni pezzo che si muove finisce in una linguetta con un
    fermacampioni dorato: è il perno su cui gira. `ritaglia` in `burattini.js`
@@ -83,36 +85,13 @@ Dal 30.09.2026 il modello rifiuta il fondo trasparente: i fogli si fanno su
 magenta pieno e `usa` lo toglie con una chiave cromatica (`chiave()` in
 `immagine.mjs`); lo stesso vale per `mascotte.mjs usa`.
 
-### La nutria
+### La nutria (18 ottobre – 2 novembre 2026)
 
-Di profilo, seduta sulle zampe di dietro a mangiare, in otto pezzi: il corpo è
-il tronco; **testa** (sulle spalle, perno dietro la nuca, con i due incisivi al
-minio), **mascella** (dietro alla testa, all'85 % con `scala`, si apre in
-negativo: masticate e boccone, con il buio della bocca `mouth`), **braccio**
-(gira sulla spalla: a riposo porta la mano alla bocca, verso −90° scende a
-terra; quello lontano riusa la stessa immagine con `img`, più scuro in CSS),
-**erba** (il ciuffo nella mano, figlio del braccio: si consuma riducendosi
-intorno al perno con `hide` manuale), **zampa** (il piede palmato, dietro al
-corpo), **coda** (dietro, la punta si alza), **cespo** (l'erba a terra davanti,
-senza perno suo: nel montaggio il perno è il centro della base, e oscilla
-quando lo si strappa). `scena: { lift: true }` fa prendere e sollevare il
-corpo col mouse. Il carattere (mangia a riprese e consuma il ciuffo, scende al
-cespo a strapparne un altro, si blocca con gli occhi sbarrati se ti avvicini e
-poi mangia guardandoti, annusa, batte il piede, si strofina il muso se resti
-via a lungo, ingoia tutto se le tocchi la testa, si scrolla se le tocchi il
-corpo, scalcia sollevata e torna a saltelli) è `NUTRIA` in
-`src/client/puppet.js`; la stessa immagine intera, scontornata, è
-`public/media/mascotte/nutria.webp` (la usa Better Call Pekko).
-
-```bash
-node tools/mascotte/burattini.mjs intero nutria --candidati=2
-node tools/mascotte/burattini.mjs pezzi nutria tools/mascotte/lavoro/nutria/intero/<file>.png --candidati=2
-node tools/mascotte/burattini.mjs usa nutria tools/mascotte/lavoro/nutria/pezzi/<file>.png testa,corpo,mascella,braccio,erba,zampa,cespo,coda
-node tools/mascotte/mascotte.mjs usa nutria tools/mascotte/lavoro/nutria/intero/<file>.png   # l'intera, per BCP
-```
-
-Costo del 18.10.2026: due predizioni high con due candidate l'una (l'intera 3:2
-e il foglio 2048²).
+Per due settimane al posto della tartaruga c'è stata la nutria golosa, un
+burattino di profilo in otto pezzi che mangiava l'erba dal cespo. Il 3 novembre
+2026 Alberto ha rivoluto la tartaruga: via i pezzi, il montaggio, il carattere
+(`NUTRIA` in `src/client/puppet.js`) e le immagini. Il prompt e la storia
+restano nella cronologia di git, dal commit `9aa755a`.
 
 | File | Cosa è |
 | --- | --- |

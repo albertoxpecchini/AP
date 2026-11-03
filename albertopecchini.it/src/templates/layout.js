@@ -5,14 +5,15 @@
 // Dal 2.11.2026 l'impaginazione segue reflection.ai (e per un quinto
 // anthropic.com): testata sottile con il marchio a sinistra, le voci in mezzo e
 // l'invito a pillola a destra; piè di pagina scuro a colonne, con l'invito
-// grande in cima e la firma custodita dai burattini — la chiocciola gigante
-// africana, la nutria golosa e gli altri animali, che seguono il puntatore con
-// gli occhi (puppet(), src/client/puppet.js) — in fondo.
+// grande in cima e la firma custodita dagli animali — la chiocciola gigante
+// africana e gli altri burattini (puppet(), src/client/puppet.js), e la
+// tartaruga di terra col casco da cantiere, una mascotte intera (mascot(),
+// src/client/mascot.js), tutti con gli occhi che seguono il puntatore — in fondo.
 
 import { html, esc, jsonLd, cx } from './html.js'
 import { site, nav, cta, closing } from '../data/site.js'
 import { serviceAreas } from '../data/services.js'
-import { logo, monogram, signature, splitWords, icon, button, puppet } from './components/ui.js'
+import { logo, monogram, signature, splitWords, icon, button, puppet, mascot } from './components/ui.js'
 
 const abs = (path) => site.url + path
 
@@ -268,7 +269,7 @@ function footer({ route, compact = false }) {
               <span class="foot-sign__float" data-parallax="0.04">${signature()}</span>
             </a>
           </div>
-          ${puppet('nutria', { className: 'foot-sign__guard foot-sign__guard--r' })}
+          ${mascot('tartaruga', { className: 'foot-sign__guard foot-sign__guard--r' })}
           ${puppet('gazza', { className: 'foot-sign__guard foot-sign__pup foot-sign__pup--gazza' })}
           <p class="foot-sign__name">${esc(site.name)}</p>
           <p class="foot-sign__tag">${esc(site.title)} · ${esc(site.tagline)}</p>

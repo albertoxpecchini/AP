@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  BURATTINI — gli animali del piè di pagina: la chiocciola e la nutria,
+//  BURATTINI — gli animali del piè di pagina: la chiocciola,
 //  l'airone, la gazza e la vespa. Non sono un'immagine sola ma burattini di
 //  carta: pezzi separati (corpo, testa, ali, zampe…) uniti da fermacampioni, che
 //  il sito rimonta e muove col puntatore.
@@ -55,38 +55,7 @@ export const burattini = {
     ],
     alt: 'La chiocciola gigante africana, burattino del sito',
   },
-  // La nutria (18.10.2026), al posto della tartaruga: pensata subito come
-  // burattino, di profilo, seduta sulle zampe di dietro a mangiare un ciuffo
-  // d'erba. Le braccia portano il ciuffo alla bocca, la mascella mastica, il
-  // ciuffo si consuma (scala) e quando è finito il braccio scende a strapparne
-  // un altro dal cespo che sta a terra davanti a lei. Il braccio lontano riusa
-  // l'immagine di quello vicino. Per riferimento di stile solo la chiocciola.
-  nutria: {
-    titolo: 'La nutria golosa',
-    riferimenti: ['public/media/mascotte/lumaca.webp'],
-    premessa: `A single cute mascot character, centred and large, on ${FONDO}, for the website of a young Italian surveyor (geometra) who is also a web designer and a graphic designer. It joins the other mascots of the same site: the attached image, a giant African land snail, is a STYLE REFERENCE ONLY — match its drawing style, outline weight, colouring, eye design and sticker border exactly, but do NOT draw a snail and do NOT copy its backpack, camera or tools.`,
-    soggetto: `A nutria (coypu, Myocastor coypus), the big plump river rodent of the banks of the Mincio near Mantua: round, chubby, placid and very greedy, always eating. Strict SIDE VIEW (profile) of the whole animal, sitting upright on its haunches like a beaver and facing the viewer's LEFT:
-- a plump, round, slightly hunched body covered in dense fur, dark chocolate brown on the back and a warmer lighter brown on the belly, drawn as flat colour with just a few short ink strokes suggesting fur;
-- a broad, blunt, rounded head with a short muzzle, small rounded dark ears, a pale off-white patch around the muzzle and chin, long white whiskers, a small dark nose, and a clearly drawn mouth line: the lower jaw is clearly separate from the upper lip; under the upper lip stick out two big, square, vermilion-orange front incisors, its only vermilion detail;
-- two short front arms raised to the mouth, their small dark five-fingered hands gripping a loose bunch of fresh green grass blades (some blades bent over, a few pale thin roots dangling from the bottom) that it is munching;
-- one big webbed hind foot with long toes, flat on the ground under the body;
-- a long, round, tapering, rat-like tail with a scaly texture and a few sparse hairs, lying on the ground behind it in a gentle curve;
-- on the ground in front of its foot, a small low tuft of grass: green blades fanning up from a small clod of dark earth, where it picks its grass.
-No clothes, no hat, no bag, no tools. The head is turned three-quarters toward the viewer so both big round eyes are visible above the muzzle; the rest of the body stays in profile.`,
-    // il braccio lontano riusa l'immagine di quello vicino (più scuro in CSS):
-    // meno pezzi nel foglio, pezzi più grandi
-    pezzi: [
-      'BODY: the plump furry body sitting upright, with the haunch and the belly, WITHOUT head, WITHOUT the front arms, WITHOUT the hind foot and WITHOUT the tail: where they came out, the body simply ends in its clean closed outline, no holes, no stumps.',
-      'HEAD: the head with both big round eyes, the small rounded ears, the blunt muzzle with its pale patch, the white whiskers, the nose and the two big vermilion upper incisors sticking out under the upper lip, WITHOUT the lower jaw: the bottom edge of the head is the upper lip. The pin tab is at the back of the head, at the neck.',
-      'LOWER JAW: the lower jaw and chin alone, with the pale chin fur, the same colours as the head; the pin tab is at its back end, the hinge under the head.',
-      'FRONT ARM: one short brown front arm with its small dark five-fingered hand, the fingers curled closed as if gripping a handle, WITHOUT any grass; the pin tab is at the top (shoulder) end.',
-      'GRASS BUNCH: the loose bunch of fresh green grass blades that the hand holds, some blades bent over, a few pale thin roots dangling from the bottom, drawn alone; the pin tab is at the bottom of the bunch, where the hand grips it.',
-      'HIND FOOT: the big webbed hind foot with its long toes and the ankle; the pin tab is at the top (hip) end, which slides under the body.',
-      'TAIL: the long round tapering rat-like tail with its scaly texture, in a gentle curve; the pin tab is at its base (root).',
-      'GRASS TUFT: the small low tuft of grass with its clod of dark earth, drawn alone, with no pin (it does not move).',
-    ],
-    alt: 'La nutria golosa, burattino del sito',
-  },
+
   airone: {
     titolo: "L'airone elegante",
     soggetto: `A grey heron (Ardea cinerea), the elegant heron of the Mincio river marshes near Mantua: tall and slender, standing gracefully on ONE long straight thin leg, the other leg lifted and bent at the knee in front of the body; a long elegant S-curved neck; pale grey plumage, a slate-grey folded wing with darker flight feathers, white face and neck with a thin black stripe down the front, a long black crest plume flowing back from the head; a long closed dagger-like ochre-yellow beak. At the base of its neck a small vermilion bow tie, its only vermilion detail. Poised, refined, a little haughty but kind. The body is in side view facing the viewer's right; the head is turned three-quarters toward the viewer so both big round eyes are visible above the beak.`,

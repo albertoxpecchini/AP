@@ -1,5 +1,5 @@
 /* ── Mascotte ──────────────────────────────────────────────────────────────
-   La chiocciola e la nutria (tools/mascotte). Sull'immagine, che ha gli
+   La tartaruga di terra col casco (e, nei dati, la chiocciola; tools/mascotte). Sull'immagine, che ha gli
    occhi bianchi, stanno due occhi del sito: un disco bianco con la pupilla che
    segue il puntatore (--px/--py da src/client/mascot.js) e la palpebra del
    colore della pelle che scende per sbattere. Centri e semiassi arrivano in
@@ -123,7 +123,7 @@
 }
 
 /* ── Burattini ─────────────────────────────────────────────────────────────
-   La chiocciola, la nutria, l'airone, la gazza e la vespa: burattini di carta a pezzi (tools/mascotte,
+   La chiocciola, l'airone, la gazza e la vespa: burattini di carta a pezzi (tools/mascotte,
    markup da puppet() in ui.js). Ogni .pup__part è un riquadro con il rapporto
    del suo pezzo (--ar), messo in percentuale del genitore, che gira intorno al
    perno (--o) di --rest a riposo; src/client/puppet.js scrive la rotazione in
@@ -252,37 +252,3 @@
   }
 }
 
-/* ── La nutria ─────────────────────────────────────────────────────────────
-   Di profilo, seduta, a otto pezzi (src/data/burattini.js). Il braccio lontano
-   è la stessa immagine di quello vicino, in ombra. La bocca è un buio dietro
-   alla testa che si apre con la mascella (--open, da puppet.js). Se ti avvicini
-   si blocca con gli occhi sbarrati (pupille piccole); se le tocchi l'erba la
-   stringe a sé socchiudendo gli occhi (is-sly, qui sopra). */
-
-.pup--nutria .pup__part--braccio2 > .pup__img {
-  filter: brightness(0.66) saturate(0.85);
-}
-
-.pup__mouth {
-  position: absolute;
-  z-index: -2;
-  display: block;
-  background: #2a1810;
-  border-radius: 0 0 55% 55% / 0 0 100% 100%;
-  transform-origin: 0 0;
-  transform: rotate(var(--tilt, 0deg)) scaleY(var(--open, 0));
-}
-
-.pup--nutria .masc__lid {
-  transition-duration: 0.16s;
-}
-
-/* all'erta: pupille piccole */
-.pup--nutria .masc__pupil {
-  transition: transform 0.1s ease-out, width 0.18s ease, height 0.18s ease;
-}
-
-.pup--nutria.is-alert .masc__pupil {
-  width: 32%;
-  height: 32%;
-}

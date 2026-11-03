@@ -749,7 +749,7 @@ Il credito ad Alberto Pecchini è stato tolto dalla home e dalla 404 di pzkko il
 Il volto è il suo: gli ingredienti dei banner (ritagli di Pekko in nove completi sgargianti e da web designer, balli per le silhouette, selfie da webcam) sono disegnati da [[gpt-image-2]] con la fototessera come riferimento, e [[Le immagini di Better Call Pekko|i banner]] si compongono a strati in HTML con la Impact bianca coi bordi colorati («colorato pieno non si legge», regola di Alberto) e si fotografano col browser headless. Le aziende (Mincio Discount Mattress Barn, Gino's Pizza & Data Recovery, Zio Beppe's Salami & Web Hosting, Turtle Insurance, Snail Express) non esistono e la pagina lo dichiara. L'unica riga in italiano è «SI PARLA ITALIANO», che è la battuta.
 
 == Pekko e pzkko ==
-Dal 29.09.2026 la sezione «Pekko makes websites» porta ai siti veri di Alberto dentro «Pekko Explorer 6», un browser del 2008 con una scheda per sito; dal 18.10 c'è anche [[pzkko.it]], col banner della saracinesca di notte e «3D ROULETTE INSIDE!». Pekko compare pure sul muro di pzkko: il pennarello rosso «pekko» sopra la porta, l'adesivo «hello my name is pekko» sul pluviale ([[I graffiti e gli adesivi della facciata]]), i sei meme bolognesi della [[La storia del muro|storia]] (gli spaghetti rifiutati, la nonna col mattarello, il ragù, la Garisenda, la mortadella, il fotografo di saracinesche). Il codice Konami, o cinque clic sulla [[La nutria|nutria]], apre il segreto; la nutria intera compare solo lì («secured by a nutria» è uno dei bottoni 88×31).
+Dal 29.09.2026 la sezione «Pekko makes websites» porta ai siti veri di Alberto dentro «Pekko Explorer 6», un browser del 2008 con una scheda per sito; dal 18.10 c'è anche [[pzkko.it]], col banner della saracinesca di notte e «3D ROULETTE INSIDE!». Pekko compare pure sul muro di pzkko: il pennarello rosso «pekko» sopra la porta, l'adesivo «hello my name is pekko» sul pluviale ([[I graffiti e gli adesivi della facciata]]), i sei meme bolognesi della [[La storia del muro|storia]] (gli spaghetti rifiutati, la nonna col mattarello, il ragù, la Garisenda, la mortadella, il fotografo di saracinesche). Il codice Konami, o cinque clic sulla [[La tartaruga di terra|tartaruga]], apre il segreto; la tartaruga intera è «THE TORTOISE», capo della sicurezza («secured by a tortoise» è uno dei bottoni 88×31). Dal 18 ottobre al 2 novembre 2026 al suo posto c'era la nutria.
 
 {{Vedi anche|Better Call Pekko|Alberto Pecchini|Le immagini di Better Call Pekko|Il contatore di Better Call Pekko|pzkko (il nome)}}
 [[Categoria:Le persone]]
@@ -787,34 +787,54 @@ Dal 29.09.2026 la sezione «Pekko makes websites» porta ai siti veri di Alberto
 == Nel nome ==
 La versione 3.0 di pzkko si chiama «lumaca catodica», la 4.0 «chiocciola zero» ([[Le versioni di pzkko]]).
 
-{{Vedi anche|Le mascotte|I burattini|Il tomodachi|Il bot pzk|La lumachina|La nutria}}
+{{Vedi anche|Le mascotte|I burattini|Il tomodachi|Il bot pzk|La lumachina|La tartaruga di terra}}
 [[Categoria:Le persone]]`,
   },
 
   'La nutria': {
-    data: '2026-10-19',
-    fonti: ['albertopecchini.it/tools/mascotte/README.md', 'albertopecchini.it/src/client/puppet.js', 'albertopecchini.it/src/data/burattini.js'],
+    data: '2026-11-03',
+    fonti: ['albertopecchini.it/tools/mascotte/README.md', 'albertopecchini.it/src/data/mascotte.js'],
     testo: `{{Infobox
 | titolo = La nutria
 | chi è = la nutria golosa del Mincio
-| dal = 18 ottobre 2026 (al posto della tartaruga di terra)
-| su albertopecchini.it = burattino nel piè di pagina, intera su Better Call Pekko
-| pezzi = otto: corpo, testa, mascella, braccio, erba, zampa, coda, cespo
+| su albertopecchini.it = burattino nel piè di pagina dal 18 ottobre al 2 novembre 2026
 | su pzkko = adesivo sul muro, una bestia della caccia, i tavolini di virtual, una side quest
 }}
-'''La nutria''' golosa del [[Il Mincio|Mincio]] è la seconda [[Le mascotte|mascotte]] di [[albertopecchini.it]], dal 18 ottobre 2026 al posto della tartaruga di terra: di profilo, seduta sulle zampe di dietro a mangiare l'erba, nel piè di pagina accanto alla [[La chiocciola gigante africana|chiocciola]], ai lati della firma.
+'''La nutria''' golosa del [[Il Mincio|Mincio]] è stata la seconda [[Le mascotte|mascotte]] di [[albertopecchini.it]] dal 18 ottobre al 2 novembre 2026, al posto della [[La tartaruga di terra|tartaruga di terra]]: di profilo, seduta sulle zampe di dietro a mangiare l'erba, nel piè di pagina accanto alla [[La chiocciola gigante africana|chiocciola]]. Il 3 novembre 2026 Alberto ha rivoluto la tartaruga, «esattamente» quella del 27 settembre, e la nutria è uscita dal sito.
 
 == Il burattino ==
-È un [[I burattini|burattino di carta]] in otto pezzi disegnati da [[gpt-image-2]] in due passaggi (l'intera con la chiocciola come riferimento di stile, poi lo stesso animale smontato con l'intera come riferimento, su fondo magenta tolto con la chiave cromatica): il corpo è il tronco; la testa sulle spalle, col perno dietro la nuca e i due incisivi al minio; la mascella dietro alla testa, che si apre in negativo (masticate e boccone, col buio della bocca); il braccio che gira sulla spalla e a riposo porta la mano alla bocca (quello lontano riusa la stessa immagine, più scuro); l'erba nella mano, figlia del braccio, che si consuma; la zampa palmata, la coda con la punta che si alza, il cespo d'erba a terra. Il carattere è <code>NUTRIA</code> in <code>src/client/puppet.js</code>: mangia a riprese e consuma il ciuffo, scende al cespo a strapparne un altro, si blocca con gli occhi sbarrati se ti avvicini e poi mangia guardandoti, annusa, batte il piede, si strofina il muso se resti via a lungo, ingoia tutto se le tocchi la testa, si scrolla se le tocchi il corpo, scalcia se la sollevi col mouse e torna a saltelli. Costo del 18.10.2026: due predizioni high con due candidate l'una.
+Era un [[I burattini|burattino di carta]] in otto pezzi disegnati da [[gpt-image-2]] in due passaggi (corpo, testa coi denti al minio, mascella, braccio, ciuffo d'erba, piede, coda, cespo): mangiava a riprese consumando il ciuffo, scendeva al cespo a strapparne un altro, si bloccava con gli occhi sbarrati se ti avvicinavi, ingoiava tutto se le toccavi la testa, si scrollava, scalciava sollevata. Il montaggio, il carattere (<code>NUTRIA</code> in <code>puppet.js</code>) e le immagini sono stati tolti il 3 novembre; restano nella cronologia di git, dal commit <code>9aa755a</code>. In quei giorni anche su [[Better Call Pekko]] c'era lei, «THE NUTRIA» e il bottone «secured by a nutria»: ora di nuovo la tartaruga.
 
 == Altrove ==
-* Su [[Better Call Pekko]] compare intera (<code>nutria.webp</code>): cinque clic su di lei aprono il segreto, come il codice Konami, e «secured by a nutria» è un bottone 88×31.
 * Sul [[Il muro|muro]] di pzkko è un adesivo vicino al [[Il citofono|citofono]].
 * Nella [[La caccia|caccia]] della chat «una nutria» vale 30 $pzk; cacciarne 50 fa «cacciatore di nutrie» e 200 «incubo delle nutrie» ([[I traguardi]]); i [[Bagnino del Mincio|bagnini]] del Mincio fischiano a chi fa il bagno con le nutrie, e l'avvocato difende «una nutria accusata di vandalismo».
 * In [[Virtual|virtual]] una partita su 120 finisce a tavolino, anche per «invasione di nutrie».
 * «[[La nutria sindacalista]]» è una [[Le side quest|side quest]] del 26.10: sciopero sull'argine.
 
-{{Vedi anche|Le mascotte|I burattini|La chiocciola gigante africana|Il Mincio|La caccia}}
+{{Vedi anche|La tartaruga di terra|Le mascotte|I burattini|Il Mincio|La caccia}}
+[[Categoria:Le persone]]`,
+  },
+
+  'La tartaruga di terra': {
+    data: '2026-11-03',
+    fonti: ['albertopecchini.it/src/data/mascotte.js', 'albertopecchini.it/public/media/mascotte/tartaruga.webp', 'albertopecchini.it/src/templates/layout.js', 'albertopecchini.it/tools/mascotte/mascotte.js', 'albertopecchini.it/tools/mascotte/README.md'],
+    testo: `{{Infobox
+| titolo = La tartaruga di terra
+| immagine = https://www.albertopecchini.it/media/mascotte/tartaruga.webp
+| didascalia = la tartaruga col casco da cantiere, la mascotte del 27 settembre 2026
+| chi è = una testuggine di Hermann col casco da cantiere al minio
+| su albertopecchini.it = mascotte intera nel piè di pagina, a destra della firma
+| su Better Call Pekko = THE TORTOISE, capo della sicurezza; il bottone «secured by a tortoise»
+}}
+'''La tartaruga di terra''' è la seconda [[Le mascotte|mascotte]] di [[albertopecchini.it]], accanto alla [[La chiocciola gigante africana|chiocciola]]: una testuggine di Hermann col guscio a scudi gialli e bruni, gli occhi grandi e un casco da cantiere al minio un po' di traverso. Un'immagine di [[gpt-image-2]] (<code>public/media/mascotte/tartaruga.webp</code>, 1193 × 966) col bordo adesivo delle figurine; sopra il sito disegna gli occhi suoi, che seguono il puntatore, sbattono le palpebre, si incrociano sul naso e si guardano intorno quando non c'è nessuno.
+
+== La storia ==
+* '''27 settembre 2026''' (<code>c82e7e8</code>): è la tartaruga di questa foto, intera, nel piè di pagina.
+* '''1º ottobre''': ridisegnata di profilo come [[I burattini|burattino]] a pezzi (masticava, sbadigliava, si addormentava con l'elmetto sugli occhi, rientrava nel guscio).
+* '''18 ottobre''': al suo posto arriva [[La nutria|la nutria golosa]].
+* '''3 novembre''': Alberto la rivuole, «al posto della nutria mi rimetti questa tartaruga ESATTAMENTE e cambi tutte le cose legate alla nutria; è la versione c82e7e8». Torna la stessa immagine, con gli stessi occhi e lo stesso naso, come mascotte intera (<code>mascot('tartaruga')</code> in <code>layout.js</code>); su [[Better Call Pekko]] tornano «THE TORTOISE» e il bottone «secured by a tortoise», e i cinque clic che aprono il segreto sono di nuovo sulla tartaruga.
+
+{{Vedi anche|Le mascotte|La chiocciola gigante africana|La nutria|I burattini|Better Call Pekko}}
 [[Categoria:Le persone]]`,
   },
 

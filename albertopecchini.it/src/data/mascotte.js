@@ -11,11 +11,13 @@ export const mascotte = {
     eyes: [{ x: 71.11, y: 9.06, rx: 5.19, ry: 5.67, skin: '#947664' }, { x: 92.36, y: 14.93, rx: 5.05, ry: 5.57, skin: '#967766' }],
     nose: { x: 74, y: 41, rx: 10, ry: 11 },
   },
-  nutria: {
-    w: 1062,
-    h: 905,
-    alt: 'La nutria golosa, mascotte del sito',
-    eyes: [{ x: 20.57, y: 14.42, rx: 1.88, ry: 2.32, skin: '#6a5243' }, { x: 32.3, y: 15.14, rx: 2.4, ry: 2.93, skin: '#60493b' }],
-    nose: { x: 18.4, y: 23.5, rx: 5, ry: 6 },
+  // la tartaruga di terra col casco da cantiere, la stessa del 27.9.2026 (c82e7e8):
+  // il 3.11.2026 Alberto l'ha voluta di nuovo al posto della nutria, «esattamente»
+  tartaruga: {
+    w: 1193,
+    h: 966,
+    alt: 'La tartaruga di terra, mascotte del sito',
+    eyes: [{ x: 11.94, y: 32.71, rx: 3.1, ry: 5.54, skin: '#c1985b' }, { x: 28.25, y: 28, rx: 4.15, ry: 5.8, skin: '#be9257' }],
+    nose: { x: 20, y: 36, rx: 6.5, ry: 8 },
   },
 }

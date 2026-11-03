@@ -8,7 +8,7 @@ import { html, esc, cx, pad } from '../html.js'
 import { site, nav, cta, stats, closing } from '../../data/site.js'
 import { projects, byArea, allAreas } from '../../data/projects.js'
 import * as S from '../../data/stile.js'
-import { logo, button, textLink, tagList, picture, icon, puppet } from '../components/ui.js'
+import { logo, button, textLink, tagList, picture, icon, puppet, mascot } from '../components/ui.js'
 import { burattino } from '../../data/burattini.js'
 import { COORDS } from '../layout.js'
 
@@ -378,13 +378,13 @@ function mascotteBoard(b) {
     b,
     html`
       <div class="bd">
-        ${head(b, 'Chiocciola · Nutria · Airone · Gazza · Vespa · Aragosta', 'gpt-image-2 · pezzi su molle')}
+        ${head(b, 'Chiocciola · Tartaruga · Airone · Gazza · Vespa · Aragosta', 'gpt-image-2 · pezzi su molle')}
         ${intro(`Sei animali, ${em('a pezzi')}.`, 'Custodiscono il sito. Li disegna gpt-image-2 in uno stile solo e smontati come burattini di carta, con i fermacampioni ai giunti; il codice li rimonta e li muove: occhi che seguono il puntatore, pezzi da tirare, un carattere per ciascuno.')}
         <div class="bd-zoo">
           ${S.zoo.map(
             (a, i) => html`
               <figure class="bd-animal" data-bd="up" style="--d:${i * 90}ms">
-                <div class="bd-animal__stage" style="--pup-w:${a.w}px">${puppet(a.key, { className: 'bd-animal__pup' })}</div>
+                <div class="bd-animal__stage" style="--pup-w:${a.w}px">${a.mascotte ? mascot(a.key, { className: 'bd-animal__pup' }) : puppet(a.key, { className: 'bd-animal__pup' })}</div>
                 <figcaption>
                   <p class="bd-name bd-animal__name">${esc(a.name)}</p>
                   <p class="bd-note">${esc(a.trait)}</p>

@@ -1,5 +1,5 @@
-// I burattini del piè di pagina: la chiocciola, la nutria, l'airone, la gazza
-// e la vespa (tools/mascotte, comando «burattini»). I pezzi, con misure, perno e
+// I burattini del piè di pagina: la chiocciola, l'airone, la gazza e la vespa
+// (la tartaruga, accanto, è una mascotte intera: src/data/mascotte.js) (tools/mascotte, comando «burattini»). I pezzi, con misure, perno e
 // occhi, li scrive lo script in burattini-pezzi.js; qui si monta a mano ciascun
 // animale.
 //
@@ -20,16 +20,14 @@
 //            (nelle direzioni del genitore; con `own` nelle sue, lungo il pezzo
 //            anche quando gira), s scala, r rotazione in gradi, tutti a ritiro
 //            completo; `out` quanto può uscire oltre il riposo, `manual` se lo
-//            muove solo il carattere (il ciuffo d'erba della nutria che si
-//            consuma); il ritiro lo comanda il carattere (i peduncoli della
+//            muove solo il carattere; il ritiro lo comanda il carattere (i peduncoli della
 //            chiocciola)
-//   img      usa l'immagine di un altro pezzo (il braccio lontano della nutria)
+//   img      usa l'immagine di un altro pezzo
 //   mouth    [x, y, w, h] il buio della bocca, dietro al pezzo: si vede quando
 //            la mascella si apre
 // `scena` (per animale) va allo script così com'è: `lift` il corpo si solleva
 // col mouse, `blink` quanto dura un battito di palpebre in ms.
-// Il carattere di ciascuno (i peduncoli che si ritirano, la nutria che mangia
-// e strappa l'erba, l'inchino dell'airone, la gazza che nasconde la chiave, la
+// Il carattere di ciascuno (i peduncoli che si ritirano, l'inchino dell'airone, la gazza che nasconde la chiave, la
 // vespa che prende la mira) sta in src/client/puppet.js.
 
 import { pezzi } from './burattini-pezzi.js'
@@ -43,36 +41,6 @@ export const burattini = {
       peduncolo2: { parent: 'corpo', at: [606, 58], z: -1, rest: 16, min: -16, max: 20, look: 0.3, tip: [72.3, 69.5], drag: true, k: 55, damp: 0.4, hide: { s: 0.06 } },
       guscio: { parent: 'corpo', at: [285, 335], pin: [365, 554.5], z: 1, min: -5, max: 5, drag: true, k: 160 },
       stazione: { parent: 'corpo', at: [655, 488], z: 2, min: -9, max: 9, drag: true, k: 120 },
-    },
-  },
-  // La nutria (18.10.2026, al posto della tartaruga): di profilo, seduta, il
-  // corpo è il tronco. La testa sta sulle spalle (perno dietro la nuca) e la
-  // mascella dietro alla testa si apre in negativo (masticate, boccone, con il
-  // buio della bocca `mouth`). Il braccio vicino gira sulla spalla: a riposo
-  // (rest 30) porta la mano alla bocca, verso -90 scende al cespo; quello
-  // lontano riusa la stessa immagine (`img`), più scuro in CSS, dietro al
-  // corpo. Il ciuffo d'erba sta nella mano (figlio del braccio) e si consuma
-  // riducendosi intorno al perno (`hide` manuale, dal carattere). Il piede e
-  // la coda dietro al corpo; il cespo a terra davanti, senza perno suo (il
-  // perno è il centro della base), oscilla quando lo si strappa. `lift`: il
-  // corpo si prende col mouse e si solleva, lei scalcia.
-  nutria: {
-    alt: 'La nutria golosa, burattino del sito',
-    scena: { lift: true },
-    parti: {
-      corpo: {},
-      coda: { parent: 'corpo', scala: 0.66, at: [183, 467], z: -1, min: -30, max: 12, drag: true, k: 60, damp: 0.35 },
-      cespo: { parent: 'corpo', scala: 0.7, at: [-5, 490], pin: [119, 192], z: -1, min: 0, max: 0, k: 160, damp: 0.3 },
-      zampa: { parent: 'corpo', scala: 0.55, at: [120, 440], z: -1, min: -25, max: 20, drag: true, k: 150, damp: 0.5 },
-      braccio2: { img: 'braccio', parent: 'corpo', scala: 0.9, at: [95, 178], z: -1, rest: 38, min: -100, max: 8, k: 90, damp: 0.7 },
-      // davanti anche alla testa (z 3): la mano sta sotto il muso, come nell'intero
-      braccio: { parent: 'corpo', scala: 0.9, at: [73, 187], z: 3, rest: 38, min: -100, max: 8, drag: true, k: 90, damp: 0.7 },
-      // il ciuffo nella mano: il perno è dove la mano lo stringe; `s` è quanto
-      // ne resta quando è tutto mangiato
-      erba: { parent: 'braccio', scala: 0.5, at: [40, 90], z: -1, rest: -22, min: -12, max: 12, drag: true, k: 120, damp: 0.4, hide: { manual: true, s: 0.12 } },
-      // min < max in modulo: il tocco (grab senza trascinare) la fa scattare col naso in su
-      testa: { parent: 'corpo', at: [201, 66], z: 2, min: -20, max: 22, look: 0.35, tip: [90, 150], drag: true, k: 90, damp: 0.5, mouth: [72, 212, 120, 46, -6] },
-      mascella: { parent: 'testa', scala: 0.85, at: [260, 187], z: -1, min: -32, max: 4, drag: true, k: 160, damp: 0.5 },
     },
   },
   airone: {
@@ -118,7 +86,7 @@ export function burattino(nome) {
   if (!rig || !img) return null
   const parti = Object.entries(rig.parti).map(([id, p]) => {
     const i = img[p.img || id]
-    // `scala` riduce il pezzo (la mascella, il braccio, la coda della nutria):
+    // `scala` riduce il pezzo (una mascella, un braccio, una coda):
     // misure, perno, occhi, punta e bocca sono in pixel dell'immagine e si
     // riducono con lui
     const s = p.scala || 1

@@ -179,7 +179,7 @@ export const motionNote = 'Rivelazioni: up, soft, fade, clip, line, draw e parol
 
 export const zoo = [
   { key: 'lumaca', name: 'La chiocciola gigante africana', w: 250, trait: 'Toccata, ritira i peduncoli come una chiocciola vera e li riallunga piano.' },
-  { key: 'nutria', name: 'La nutria golosa', w: 250, trait: 'Mangia un ciuffo d’erba e, finito, ne strappa un altro dal cespo; se ti avvicini si blocca con gli occhi sbarrati; toccata sulla testa ingoia tutto, sul corpo si scrolla; sollevata scalcia.' },
+  { key: 'tartaruga', mascotte: true, name: 'La tartaruga di terra', w: 250, trait: 'Col casco da cantiere: non è un burattino ma una mascotte intera, la stessa del 27 settembre 2026. Ti segue con gli occhi, sbatte le palpebre, si guarda intorno quando non ci sei.' },
   { key: 'airone', name: 'L’airone elegante', w: 132, trait: 'Lento e composto, il collo smorzato; toccato fa l’inchino.' },
   { key: 'gazza', name: 'La gazza furbissima', w: 250, trait: 'Testa a scatti; se ti avvicini alla chiave la nasconde, poi l’occhiolino.' },
   { key: 'vespa', name: 'La vespa cattiva ma precisa', w: 200, trait: 'Si libra e punta il pungiglione dove sei; vicina si arrabbia, toccata punge.' },
@@ -206,7 +206,7 @@ export const exploded = { key: 'gazza', scale: 0.46 }
 export const puppetRules = [
   { name: 'Occhi', text: 'Il modello li disegna bianchi e tondi; sopra ci sono quelli del sito: pupilla al 46%, palpebra del colore della pelle, ognuno per conto suo.' },
   { name: 'Bordo adesivo', text: 'Carta #F3F1EC intorno alla sagoma, come le figurine: sul fondo inchiostro del piè di pagina gli animali restano staccati.' },
-  { name: 'Un solo blu', text: 'Un dettaglio per animale: l’apice del guscio, i denti della nutria, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
+  { name: 'Un solo blu', text: 'Un dettaglio per animale: l’apice del guscio, il casco della tartaruga, il papillon, il cartellino della chiave, la punta del pungiglione. L’aragosta fa eccezione: il rosso è lei.' },
   { name: 'Fermacampioni', text: 'Dischi dorati sui perni: lo script li trova da solo, il pezzo ci gira intorno e torna a riposo su una molla.' },
   { name: 'Movimento ridotto', text: 'Con prefers-reduced-motion restano gli sguardi: niente battiti di palpebre, salti né ritiri animati.' },
 ]
@@ -214,7 +214,7 @@ export const puppetRules = [
 export const puppetPlaces = [
   { where: 'Testata', what: 'Fino al 2.11.2026 la testa della chiocciola accanto al marchio; ora la testata è sottile e la chiocciola sta solo nel piè di pagina.' },
   { where: 'Home e /aragosta/', what: 'L’aragosta dorme sopra la disponibilità e, se stai fermo, riempie d’inchiostro il cognome (più piccolo di prima); in /aragosta/ la tavola com’era, a grandezza naturale.' },
-  { where: 'Piè di pagina', what: 'I cinque burattini intorno alla firma; la vespa si libra sopra.' },
+  { where: 'Piè di pagina', what: 'La chiocciola e la tartaruga ai lati della firma, l’airone e la gazza alle ali, la vespa che si libra sopra.' },
   { where: '404', what: 'La gazza tiene nel becco la pagina che manca, e scappa lungo la quota.' },
   { where: 'Contatti', what: 'L’airone del Mincio accanto alla carta, che guarda la sede.' },
 ]

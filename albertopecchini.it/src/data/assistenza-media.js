@@ -77,7 +77,7 @@ export const media = {
   'btn-hand': { w: 88, h: 31, src: '/media/assistenza/btn-hand.png' },
   'btn-html': { w: 88, h: 31, src: '/media/assistenza/btn-html.png' },
   'btn-ita': { w: 88, h: 31, src: '/media/assistenza/btn-ita.png' },
-  'btn-nutria': { w: 88, h: 31, src: '/media/assistenza/btn-nutria.png' },
+  'btn-tortoise': { w: 88, h: 31, src: '/media/assistenza/btn-tortoise.png' },
   'btn-pzkko': { w: 88, h: 31, src: '/media/assistenza/btn-pzkko.gif' },
   'btn-rivalta': { w: 88, h: 31, src: '/media/assistenza/btn-rivalta.png' },
   'btn-vite': { w: 88, h: 31, src: '/media/assistenza/btn-vite.png' },

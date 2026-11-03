@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Burattini del piè di pagina (chiocciola, nutria, airone, gazza, vespa) con
+// Burattini del piè di pagina (chiocciola, airone, gazza, vespa) con
 // openai/gpt-image-2 su Replicate, sempre in qualità high.
 //
 //   node tools/mascotte/burattini.mjs intero <nome|tutti> [--candidati=2]

@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 721 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>c6203a0</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 723 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>4bd1f81</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,12 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 20
+| 22
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4bd1f81 4bd1f81] fix(tempo): le versioni con la mappa si aprono anche dal tunnel, e la prova di tutte
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/e2a76b0 e2a76b0] fix(tempo): il credito anche nella macchina del tempo, e la Build torna verde
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/c6203a0 c6203a0] fix(tempo): la copia rotta del 3 novembre restava nella cache del browser
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5385409 5385409] fix(tempo): la versione del 3 novembre si apriva senza CSS né JS
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/b6fde57 b6fde57] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
@@ -12425,8 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/39e1ec1 39e1ec1] fix(pzkko): il cercapersone rosso anche per chi aveva la foto vecchia, le frecce indietro rosse, e di partenza audio spento, ora e meteo veri
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/7f98ca6 7f98ca6] feat(pzkko): il cercapersone si accende in 400 ms, la home a pagine 3×3 coi puntini, la barra di stato vera, indietro rosso
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/6a0d6bd 6a0d6bd] fix(pzkko): il segreto del server si legge anche incollato male
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/2329ffb 2329ffb] fix(pzkko): i dati sul server di Alberto, e Vercel Blob tolto per sempre
-* 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/33edc22 33edc22] Catture aggiornate: pzkko
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
