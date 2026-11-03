@@ -5,9 +5,10 @@
 // Tutto sta in C:\Users\Alberto\.cruscotto (CRUSCOTTO per un'altra cartella):
 //   stati/<chi>.json   lo stato di un processo: una barra, un sito della macchina del tempo…
 //   log.txt            una riga per evento: «ora \t chi \t testo»
-//   claude.json        quello che scrivono i ganci di Claude Code (gancio.mjs): la richiesta di
-//                      Alberto, lo strumento in corso, i conti della sessione
-//   piano.json         i passi del lavoro, con quello in corso
+//   sessioni/<sigla>.json  una per sessione di Claude Code, la scrivono i ganci (gancio.mjs): la
+//                      richiesta di Alberto, lo strumento in corso, la fine del turno, i conti
+//   piano-<sigla>.json i passi del lavoro di quella sessione, con quello in corso (piano.json
+//                      per chi scrive da fuori di Claude Code)
 //   finestra.json      il battito della finestra aperta (pid e ora)
 //
 //   node tools/cruscotto/diretta.mjs "sto scrivendo il selettore"     la nota di Claude
@@ -28,6 +29,13 @@ export const LOG = join(CARTELLA, 'log.txt')
 // (per chi la chiamava così: la macchina del tempo)
 export const DIRETTA = STATI
 mkdirSync(STATI, { recursive: true })
+
+// Chi scrive da un comando di Claude Code ne eredita CLAUDE_CODE_SESSION_ID: la nota, il piano e
+// le sue righe del log sono di quella sessione, e un'altra sessione aperta insieme non li tocca
+export const sigla = (id) => String(id || '').replace(/[^a-z0-9]/gi, '').slice(0, 4)
+const SIGLA = sigla(process.env.CLAUDE_CODE_SESSION_ID)
+const CLAUDE = SIGLA ? `claude#${SIGLA}` : 'claude'
+const PIANO = join(CARTELLA, SIGLA ? `piano-${SIGLA}.json` : 'piano.json')
 
 const ora = () => new Date().toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour12: false })
 const ultimi = new Map()
@@ -67,22 +75,22 @@ export function log(chi, riga) {
 }
 
 export function nota(testo) {
-  stato('claude-nota', { tipo: 'nota', nota: testo }, { subito: true })
-  log('claude', testo)
+  stato(SIGLA ? `claude-nota-${SIGLA}` : 'claude-nota', { tipo: 'nota', nota: testo, sessione: SIGLA || undefined }, { subito: true })
+  log(CLAUDE, testo)
 }
 
 export function piano(passi) {
-  scrivi(join(CARTELLA, 'piano.json'), { passi, corrente: 0, inizio: Date.now(), agg: Date.now() })
-  log('claude', `piano: ${passi.join(' → ')}`)
+  scrivi(PIANO, { passi, corrente: 0, inizio: Date.now(), agg: Date.now(), sessione: SIGLA || undefined })
+  log(CLAUDE, `piano: ${passi.join(' → ')}`)
 }
 
 export function passo(n) {
-  const p = leggi(join(CARTELLA, 'piano.json'))
+  const p = leggi(PIANO)
   if (!p) return
   p.corrente = n === 'fine' ? p.passi.length : Math.max(0, Number(n) - 1)
   p.agg = Date.now()
-  scrivi(join(CARTELLA, 'piano.json'), p)
-  log('claude', n === 'fine' ? 'piano finito' : `passo ${n}: ${p.passi[p.corrente] || ''}`)
+  scrivi(PIANO, p)
+  log(CLAUDE, n === 'fine' ? 'piano finito' : `passo ${n}: ${p.passi[p.corrente] || ''}`)
 }
 
 export function barra(chi, nome, fatte, totale, testo = '') {
@@ -99,7 +107,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   } else if (primo === '--piano') piano(resto.join(' ').split('|').map((x) => x.trim()).filter(Boolean))
   else if (primo === '--passo') passo(resto[0])
   else if (primo === '--barra') barra(resto[0], resto[1], resto[2], resto[3], resto.slice(4).join(' '))
-  else if (primo === '--log') log('claude', resto.join(' '))
+  else if (primo === '--log') log(CLAUDE, resto.join(' '))
   else if (primo) nota([primo, ...resto].join(' '))
   else console.log(CARTELLA)
 }

@@ -1,17 +1,21 @@
 // Il disegno della regia (3.11.2026). cruscotto.mjs lo ricarica da solo quando questo file
-// cambia: si migliora la regia mentre è aperta, senza chiuderla. Qui solo lettura dei dati della
-// diretta e disegno; tasti, battito, sistema, git e server li raccoglie cruscotto.mjs.
+// cambia: si migliora la regia mentre è aperta, senza chiuderla. Qui la lettura dei dati della
+// diretta, la sessione in cima, i tasti e il disegno; battito, sistema, git e server li raccoglie
+// cruscotto.mjs.
 //
 // Dall'alto: lo stato (lavora, tocca a te, ti aspetta), la richiesta di Alberto, la nota di
-// Claude, lo strumento in corso; il piano dei passi; le barre (download, siti della macchina del
-// tempo, barre qualsiasi); sistema, server di casa, git, sessione; il log in diretta.
+// Claude, lo strumento in corso o la fine del turno; le altre sessioni; il piano dei passi; le
+// barre (download, siti della macchina del tempo, barre qualsiasi); sistema, server di casa, git,
+// sessione; il log in diretta.
 
-import { readdirSync, readFileSync, openSync, readSync, fstatSync, closeSync, existsSync } from 'node:fs'
+import { readdirSync, openSync, readSync, fstatSync, closeSync, existsSync, rmSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { STATI, LOG, CARTELLA, leggi } from './diretta.mjs'
 
 // la macchina del tempo prima della regia generale scriveva qui: i giri partiti allora si vedono ancora
 const VECCHIA = 'C:/Users/Alberto/Documents/AP/albertopecchini.it/tools/tempo/lavoro/diretta'
+// una per sessione di Claude (le scrive gancio.mjs): Alberto ne tiene aperte più d'una
+const SESSIONI = join(CARTELLA, 'sessioni')
 
 const E = '\x1b['
 const c = (n, s) => `${E}38;5;${n}m${s}${E}39m`
@@ -28,6 +32,13 @@ const STRUMENTO = { Bash: 75, PowerShell: 75, Edit: 114, Write: 114, MultiEdit: 
 const colore = (chi = '') => {
   if (chi.startsWith('claude-')) return STRUMENTO[chi.slice(7)] ?? (chi.includes('mcp__') ? 213 : 81)
   return COLORE[chi.split('-').pop()] ?? COLORE[chi.split('-')[0]] ?? 250
+}
+// ogni sessione il suo colore, sempre lo stesso: viene dalla sigla
+const TINTE = [81, 213, 114, 215, 141, 117, 209, 151, 186, 75]
+const tinta = (sigla = '') => TINTE[[...sigla].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7) % TINTE.length]
+const corto = (s, n) => {
+  const t = String(s ?? '').replace(/\s+/g, ' ').trim()
+  return t.length > n ? t.slice(0, n - 1) + '…' : t
 }
 // solo simboli che Consolas, il carattere della console, ha davvero: ✓ e i puntini braille
 // uscivano come quadratini (3.11.2026)
@@ -124,54 +135,134 @@ function coda(file, n) {
 
 export function raccogli() {
   const stati = [...statiDa(STATI), ...statiDa(VECCHIA)]
-  // dei due «claude» (la nota di prima e di adesso) vince il più recente
+  // le note di Claude, la più recente prima: ogni sessione ha la sua (diretta.mjs le firma)
   const note = stati.filter((s) => s.tipo === 'nota').sort((a, b) => b.agg - a.agg)
+  // i piani: piano-<sigla>.json per sessione, piano.json di chi scrive da fuori di Claude Code
+  const piani = {}
+  for (const f of readdirSync(CARTELLA)) {
+    const m = f.match(/^piano(?:-(\w+))?\.json$/)
+    if (m) piani[m[1] || ''] = leggi(join(CARTELLA, f))
+  }
   const righe = [...coda(LOG, 400), ...coda(join(VECCHIA, 'log.txt'), 200).filter((r) => !r.includes('\tclaude\t'))].sort((a, b) => a.slice(0, 8).localeCompare(b.slice(0, 8)))
+  const tutte = statiDa(SESSIONI)
+  // le sessioni dell'ultimo giorno; quelle chiuse restano un minuto, perché si veda che sono chiuse
+  const sessioni = tutte.filter((s) => Date.now() - (s.agg || 0) < 86400 * 1000 && !(s.stato === 'chiusa' && Date.now() - (s.chiusa || 0) > 60 * 1000)).sort((a, b) => b.agg - a.agg)
   return {
     stati: stati.filter((s) => s.tipo !== 'nota'),
-    nota: note[0],
-    claude: leggi(join(CARTELLA, 'claude.json'), {}),
-    piano: leggi(join(CARTELLA, 'piano.json')),
+    note,
+    sessioni,
+    // i ganci contano i suoni (fine turno, attesa) in ogni sessione: il guscio suona quando la somma cresce
+    suona: tutte.reduce((n, s) => n + (s.suona || 0), 0),
+    claude: principale(sessioni) || {},
+    piani,
     righe,
   }
 }
 
+// La sessione in cima: quella fissata col tasto «s»; se no, fra quelle che lavorano (o aspettano)
+// l'ultima a cui Alberto ha chiesto qualcosa, così la cima non salta a ogni strumento quando ne
+// lavorano due insieme; se nessuna lavora, l'ultima che si è mossa.
+export function principale(sessioni = [], fissata = null) {
+  if (fissata) {
+    const s = sessioni.find((x) => x.sigla === fissata)
+    if (s) return s
+  }
+  const attive = sessioni.filter((s) => s.stato === 'lavora' || s.stato === 'aspetta')
+  if (attive.length) return attive.sort((a, b) => (b.richiesta?.da || b.agg) - (a.richiesta?.da || a.agg))[0]
+  return sessioni.find((s) => s.stato !== 'chiusa') || sessioni[0]
+}
+
+// la cartella su cui il guscio misura git: quella della sessione in cima
+export const cartella = (tasti = {}) => principale(statiDa(SESSIONI).sort((a, b) => b.agg - a.agg), tasti.sessione)?.cwd
+
+// I tasti (tranne «q», che resta al guscio): stanno qui perché se ne aggiungano a regia aperta.
+// Torna true se il tasto era suo.
+export function tasto(k, tasti) {
+  if (k === 'a') Object.assign(tasti, { filtro: 'tutto', scorri: 0 })
+  else if (k === 'c') Object.assign(tasti, { filtro: 'claude', scorri: 0 })
+  else if (k === 'l') Object.assign(tasti, { filtro: 'lavori', scorri: 0 })
+  else if (k === 'e') Object.assign(tasti, { filtro: 'errori', scorri: 0 })
+  else if (k === 'p') tasti.pausa = !tasti.pausa
+  else if (k === '\x1b[A') tasti.scorri += 1
+  else if (k === '\x1b[B') tasti.scorri = Math.max(0, tasti.scorri - 1)
+  else if (k === '\x1b[5~') tasti.scorri += 15
+  else if (k === '\x1b[6~') tasti.scorri = Math.max(0, tasti.scorri - 15)
+  else if (k === 's') {
+    // da «tutte» alla prima sessione, alla seconda, … e di nuovo a «tutte»
+    const elenco = raccogli().sessioni.filter((s) => s.stato !== 'chiusa').map((s) => s.sigla)
+    const i = elenco.indexOf(tasti.sessione)
+    tasti.sessione = i + 1 < elenco.length ? elenco[i + 1] : null
+    tasti.scorri = 0
+  } else if (k === 'x') {
+    // via le barre dei lavori finiti e le sessioni chiuse
+    for (const f of readdirSync(STATI)) if (leggi(join(STATI, f))?.fine) rmSync(join(STATI, f), { force: true })
+    if (existsSync(SESSIONI)) for (const f of readdirSync(SESSIONI)) if (leggi(join(SESSIONI, f))?.stato === 'chiusa') rmSync(join(SESSIONI, f), { force: true })
+  } else return false
+  return true
+}
+
 // ── il disegno ───────────────────────────────────────────────────────────────
-export function disegna({ W, H, giro, dati, sistema, server, git, sito, tasti }) {
+export function disegna({ W, H, giro, dati, sistema, server, git, sito, pubblici, tasti }) {
   const righe = []
   const adesso = Date.now()
   const gira = GIRA[giro % GIRA.length]
-  const cl = dati.claude || {}
+  const sessioni = dati.sessioni || []
+  const cl = principale(sessioni, tasti.sessione) || dati.claude || {}
   const NOME = 22
   const BAR = Math.max(16, Math.min(44, W - 92))
+  const progettoDi = (s) => basename(s.radice || s.cwd || '?')
 
   // lo stato di Claude
-  const fermo = cl.stato === 'fermo'
+  const fermo = cl.stato === 'fermo' || cl.stato === 'chiusa'
   const aspetta = cl.stato === 'aspetta'
-  const badge = aspetta ? sf(ROSSO, forte(c(231, ' TI ASPETTA '))) : fermo ? sf(GIALLO, forte(c(232, ' TOCCA A TE '))) : sf(VERDE, forte(c(231, ` ${gira} LAVORA `)))
-  const progetto = cl.cwd ? basename(cl.cwd) : ''
+  const badge = cl.stato === 'chiusa' ? sf(240, forte(c(231, ' CHIUSA '))) : aspetta ? sf(ROSSO, forte(c(231, ' TI ASPETTA '))) : fermo ? sf(GIALLO, forte(c(232, ' TOCCA A TE '))) : sf(VERDE, forte(c(231, ` ${gira} LAVORA `)))
+  const progetto = cl.cwd ? progettoDi(cl) : ''
+  // con più sessioni aperte, la sigla di quella in cima (col suo colore, lo stesso dei segni nel log)
+  const sigla = sessioni.length > 1 && cl.sigla ? `  ${c(tinta(cl.sigla), '▌#' + cl.sigla)}${tasti.sessione ? grigio(' fissata') : ''}` : ''
   const orologio = new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  righe.push(destra(` ${c(33, '■')} ${forte('REGIA DI CLAUDE')}  ${badge}  ${progetto ? grigio('in ') + forte(progetto) : ''}${git?.ramo ? grigio(' · ') + c(141, git.ramo) : ''}`, grigio(`${orologio} `), W))
+  righe.push(destra(` ${c(33, '■')} ${forte('REGIA DI CLAUDE')}  ${badge}  ${progetto ? grigio('in ') + forte(progetto) : ''}${git?.ramo ? grigio(' · ') + c(141, git.ramo) : ''}${sigla}`, grigio(`${orologio} `), W))
   righe.push(scuro('─'.repeat(W)))
 
   // la richiesta di Alberto, la nota di Claude, lo strumento in corso
   if (cl.richiesta?.testo) {
     const r = aCapo(cl.richiesta.testo, W - 26, 2)
     righe.push(` ${c(GIALLO, 'Alberto ►')}  ${r[0]}${r.length === 1 ? '  ' + scuro(fra(cl.richiesta.da) + ' fa') : ''}`)
-    if (r[1]) righe.push(`             ${r[1]}  ${scuro(fra(cl.richiesta.da) + ' fa')}`)
+    if (r[1]) righe.push(`            ${r[1]}  ${scuro(fra(cl.richiesta.da) + ' fa')}`)
   }
-  righe.push(` ${c(81, 'Claude  ►')}  ${dati.nota ? dati.nota.nota : grigio('—')}`)
-  if (aspetta) righe.push(` ${c(ROSSO, 'Aspetta ►')}  ${forte(cl.avviso || 'una tua risposta')}`)
-  else if (fermo) righe.push(` ${c(GIALLO, 'Fermo   ►')}  ${grigio('ho finito il turno ' + fra(cl.fineTurno || adesso) + ' fa: tocca a te')}`)
-  else if (cl.adesso) righe.push(` ${c(VERDE, 'Adesso  ►')}  ${c(STRUMENTO[cl.adesso.tool] ?? 81, pad(cl.adesso.tool, 10))} ${cl.adesso.testo}  ${scuro(fra(cl.adesso.da))}`)
+  // la nota la scrive Claude a mano (diretta.mjs), e la firma con la sua sessione; una senza
+  // firma (scritta da fuori) vale solo se è nata durante la richiesta in corso; dopo sei ore tace
+  const diQuesta = (x) => x && (x.sessione ? x.sessione === cl.sigla : !cl.sigla || x.agg >= (cl.richiesta?.da || Infinity))
+  const n = (dati.note || []).find((x) => x.sessione === cl.sigla) || (dati.note || []).find((x) => !x.sessione && diQuesta(x))
+  const nota = n && adesso - (n.agg || 0) < 6 * 3600 * 1000 ? `${n.nota}  ${scuro(fra(n.agg) + ' fa')}` : grigio('—')
+  righe.push(` ${c(81, 'Claude  ►')}  ${nota}`)
+  if (aspetta) righe.push(` ${c(ROSSO, 'Aspetta ►')}  ${forte(cl.avviso || 'una tua risposta')}  ${scuro(fra(cl.agg) + ' fa')}`)
+  else if (fermo) {
+    // il turno finito: quanto è durato, con quanti strumenti, e l'inizio della risposta
+    const r = cl.risposta
+    const come = r?.secondi != null ? ` (ci ho messo ${durata(r.secondi)}${r.strumenti ? `, ${r.strumenti} ${r.strumenti === 1 ? 'strumento' : 'strumenti'}` : ''})` : ''
+    righe.push(` ${c(GIALLO, 'Fermo   ►')}  ${grigio(`${cl.stato === 'chiusa' ? 'sessione chiusa' : 'ho finito il turno'} ${fra(cl.fineTurno || cl.chiusa || adesso)} fa${come}: tocca a te`)}`)
+    if (r?.testo) for (const riga of aCapo(r.testo, W - 16, 2)) righe.push(`            ${c(252, riga)}`)
+  } else if (cl.adesso) righe.push(` ${c(VERDE, 'Adesso  ►')}  ${c(STRUMENTO[cl.adesso.tool] ?? 81, pad(cl.adesso.tool, 10))} ${cl.adesso.testo}  ${scuro(fra(cl.adesso.da))}${cl.turno > 1 ? scuro(` · ${cl.turno}° strumento del turno`) : ''}`)
+
+  // le altre sessioni di Claude aperte (al massimo quattro): progetto, stato, cosa fanno
+  const altre = sessioni.filter((s) => s !== cl && adesso - (s.agg || 0) < 3 * 3600 * 1000).slice(0, 4)
+  altre.forEach((s, i) => {
+    const st = s.stato === 'chiusa' ? scuro('chiusa    ') : s.stato === 'aspetta' ? sf(ROSSO, c(231, 'TI ASPETTA')) : s.stato === 'lavora' ? c(VERDE, pad(`${gira} lavora`, 10)) : c(GIALLO, 'tocca a te')
+    const cosa = s.stato === 'aspetta' ? forte(corto(s.avviso, 60)) : s.stato === 'lavora' && s.adesso ? `${c(STRUMENTO[s.adesso.tool] ?? 81, s.adesso.tool)} ${grigio(corto(s.adesso.testo, 50))}` : grigio(corto(s.risposta?.testo, 60))
+    const testa = i ? '         ' : c(250, 'Altre   ►')
+    righe.push(` ${testa}  ${c(tinta(s.sigla), '▌')}${pad(forte(progettoDi(s)), 18)} ${scuro(pad('#' + s.sigla, 6))} ${st}  ${c(GIALLO, '«' + corto(s.richiesta?.testo || '—', 44) + '»')}  ${cosa}  ${scuro(fra(s.agg) + ' fa')}`)
+  })
   righe.push('')
 
   // il piano
-  const p = dati.piano
+  const p = dati.piani?.[cl.sigla] || (diQuesta(dati.piani?.['']) ? dati.piani[''] : null)
   if (p?.passi?.length && adesso - p.agg < 6 * 3600 * 1000) {
-    const voci = p.passi.map((x, i) => (i < p.corrente ? c(VERDE, OK + ' ') + grigio(x) : i === p.corrente ? c(GIALLO, gira + ' ') + forte(x) : scuro('· ' + x)))
+    let voci = p.passi.map((x, i) => (i < p.corrente ? c(VERDE, OK + ' ') + grigio(x) : i === p.corrente ? c(GIALLO, gira + ' ') + forte(x) : scuro('· ' + x)))
     const fatto = Math.min(p.corrente, p.passi.length)
-    righe.push(` ${forte('PIANO')} ${grigio(`${fatto}/${p.passi.length}`)}  ${barra(fatto / p.passi.length, 12, VERDE)}  ${voci.join(scuro('  →  '))}`)
+    const testa = ` ${forte('PIANO')} ${grigio(`${fatto}/${p.passi.length}`)}  ${barra(fatto / p.passi.length, 12, VERDE)}  `
+    // se non ci sta tutto, i passi fatti diventano uno solo: si vede sempre quello in corso e i prossimi
+    if (visibile(testa + voci.join('  →  ')).length > W && fatto > 1) voci = [c(VERDE, `${OK} ${fatto} fatti`), ...voci.slice(fatto)]
+    righe.push(testa + voci.join(scuro('  →  ')))
     righe.push('')
   }
 
@@ -232,7 +323,8 @@ export function disegna({ W, H, giro, dati, sistema, server, git, sito, tasti })
   if (server?.length) {
     const pallino = (s) => (s.su ? c(VERDE, '●') : c(ROSSO, '●'))
     const dettaglio = server.map((s) => `${pallino(s)} ${s.nome} ${scuro(s.su ? `${s.ms} ms` : 'spento')}`).join('   ')
-    const pub = sito ? `${sito.su ? c(VERDE, '●') : c(ROSSO, '●')} ${sito.nome} ${scuro(sito.su ? `${sito.codice} · ${sito.ms} ms` : sito.codice || 'non risponde')}` : ''
+    // fuori di casa: il sito pubblico e il tunnel della macchina del tempo (quello che vede Gabry)
+    const pub = (pubblici || (sito ? [sito] : [])).map((p) => `${p.su ? c(VERDE, '●') : c(ROSSO, '●')} ${p.nome} ${scuro(p.su ? `${p.codice} · ${p.ms} ms` : p.codice || 'non risponde')}`).join('   ')
     righe.push(` ${etichetta('SERVER')} ${dettaglio}   ${pub}`)
   }
   if (git?.ramo) {
@@ -243,7 +335,7 @@ export function disegna({ W, H, giro, dati, sistema, server, git, sito, tasti })
   }
   if (cl.sessione) {
     const conti = Object.entries(cl.conteggi || {}).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t, n]) => `${c(STRUMENTO[t] ?? 81, t.replace(/^mcp__\w+__/, ''))} ${n}`).join(grigio(' · '))
-    righe.push(` ${etichetta('SESSIONE')} ${forte(String(cl.strumenti || 0))} ${grigio('strumenti')}  ${conti}  ${grigio('·')} ${(cl.file || []).length} ${grigio('file toccati')}${cl.errori ? '  ' + c(ROSSO, `${cl.errori} errori`) : ''}  ${grigio('da')} ${fra(cl.inizioSessione || adesso)}`)
+    righe.push(` ${etichetta('SESSIONE')} ${forte(String(cl.strumenti || 0))} ${grigio('strumenti')}  ${conti}  ${grigio('·')} ${(cl.file || []).length} ${grigio((cl.file || []).length === 1 ? 'file toccato' : 'file toccati')}${cl.errori ? '  ' + c(ROSSO, `${cl.errori} ${cl.errori === 1 ? 'errore' : 'errori'}`) : ''}  ${grigio('da')} ${fra(cl.inizioSessione || adesso)}`)
     // gli ultimi file che Claude ha scritto o cambiato
     if (cl.file?.length) righe.push(` ${etichetta('FILE')} ${cl.file.slice(0, 8).map((f, i) => (i ? grigio(basename(f)) : c(114, basename(f)))).join(scuro('  ·  '))}`)
   }
@@ -256,26 +348,37 @@ export function disegna({ W, H, giro, dati, sistema, server, git, sito, tasti })
   righe.push(scuro('─'.repeat(W)))
   const piede = 1
   const spazio = Math.max(3, H - righe.length - piede)
+  // «claude-Bash#728a»: chi scrive e, dopo il #, la sessione (le righe dei lavori non ce l'hanno)
   let log = dati.righe.map((r) => {
-    const [ora, chi = '', ...resto] = r.split('\t')
-    return { ora, chi, testo: resto.join(' ') }
+    const [ora, tutto = '', ...resto] = r.split('\t')
+    const [chi, sess] = tutto.split('#')
+    return { ora, chi, sess, testo: resto.join(' ') }
   })
+  // un errore comincia con ×; per i lavori anche una riga che dice «errore», «fallito»…, ma non
+  // per Claude e Alberto, che scrivono «errori» anche solo per dire cosa fanno
+  const sbagliato = (l) => /^\s*[×✗⚠!]/.test(l.testo) || (!l.chi.startsWith('claude') && l.chi !== 'alberto' && /errore|error|fallit|non risponde/i.test(l.testo))
+  if (tasti.sessione) log = log.filter((l) => !l.sess || l.sess === tasti.sessione)
   if (filtro === 'claude') log = log.filter((l) => l.chi.startsWith('claude') || l.chi === 'alberto')
-  else if (filtro === 'errori') log = log.filter((l) => /^\s*[×✗⚠]|errore|error|fallit|non risponde/i.test(l.testo))
+  else if (filtro === 'errori') log = log.filter(sbagliato)
   else if (filtro === 'lavori') log = log.filter((l) => !l.chi.startsWith('claude') && l.chi !== 'alberto')
   const fino = Math.max(0, log.length - (tasti.scorri || 0))
-  for (const l of log.slice(Math.max(0, fino - spazio), fino)) {
+  const visto = log.slice(Math.max(0, fino - spazio), fino)
+  // il segno della sessione solo quando nel log ce n'è più d'una
+  const segni = new Set(visto.map((l) => l.sess).filter(Boolean)).size > 1
+  for (const l of visto) {
     let testo = l.testo.replace(/✗/g, '×').replace(/⚠/g, '!')
     if (/^\s*(√|✓|ok\b)/.test(testo)) testo = c(VERDE, testo.replace(/✓/g, OK))
-    else if (/^\s*[×⚠]|errore|error|fallit|non risponde/i.test(testo)) testo = c(ROSSO, testo)
+    else if (sbagliato(l)) testo = c(ROSSO, testo)
     else if (l.chi === 'alberto') testo = c(GIALLO, testo)
     const chi = l.chi.startsWith('claude-') ? l.chi.slice(7).replace(/^mcp__\w+__/, '') : l.chi
-    righe.push(` ${scuro(l.ora || '')} ${pad(c(colore(l.chi), chi), 14)} ${testo}`)
+    const segno = segni ? (l.sess ? c(tinta(l.sess), '▌') : ' ') : ''
+    righe.push(`${segno || ' '}${scuro(l.ora || '')} ${pad(c(colore(l.chi), chi), 14)} ${testo}`)
   }
   while (righe.length < H - piede) righe.push('')
 
   // i tasti
   const t = (k, s) => `${sf(238, c(255, ` ${k} `))} ${grigio(s)}`
-  righe.push(' ' + [t('a', 'tutto'), t('c', 'Claude'), t('l', 'lavori'), t('e', 'errori'), t('p', 'pausa'), t('↑↓', 'scorri'), t('x', 'pulisci finiti'), t('q', 'esci')].join('  '))
+  const voceSessione = tasti.sessione ? `sessione #${tasti.sessione}` : 'tutte le sessioni'
+  righe.push(' ' + [t('a', 'tutto'), t('c', 'Claude'), t('l', 'lavori'), t('e', 'errori'), ...(sessioni.length > 1 || tasti.sessione ? [t('s', voceSessione)] : []), t('p', 'pausa'), t('↑↓', 'scorri'), t('x', 'pulisci finiti'), t('q', 'esci')].join('  '))
   return righe.slice(0, H).map((r) => taglia(r, W) + `${E}0m${E}K`).join('\n')
 }

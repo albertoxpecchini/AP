@@ -4,9 +4,12 @@
 # Lo schermo si riconosce dalle misure fisiche che il monitor dichiara (EDID): vince quello con
 # la diagonale più vicina ai 24 pollici (l'HP 24f); se non si trova, il principale.
 #
-#   powershell -ExecutionPolicy Bypass -File tools\cruscotto\cruscotto.ps1 [-Pollici 24] [-Colonne 160] [-Righe 50] [-Nuova]
+#   powershell -ExecutionPolicy Bypass -File tools\cruscotto\cruscotto.ps1 [-Pollici 24] [-Colonne 160] [-Righe 50] [-Nuova] [-Riavvia]
+#
+# -Riavvia chiude la regia che c'è e ne apre una nuova: serve quando cambia il guscio
+# (cruscotto.mjs); i cambi della vista (vista.mjs) arrivano da soli, a regia aperta.
 
-param([double]$Pollici = 24, [int]$Colonne = 160, [int]$Righe = 50, [switch]$Nuova)
+param([double]$Pollici = 24, [int]$Colonne = 160, [int]$Righe = 50, [switch]$Nuova, [switch]$Riavvia)
 
 $titolo = 'Regia di Claude'
 Add-Type -AssemblyName System.Windows.Forms
@@ -79,6 +82,16 @@ function Centra([IntPtr]$h) {
   [void][RegiaFinestra]::SetWindowPos($h, [IntPtr]::Zero, $x, $y, $w, $hh, 0x0044)
   [void][RegiaFinestra]::SetForegroundWindow($h)
   Write-Host "regia: ${w}x${hh} in ($x, $y) su $($schermo.DeviceName)"
+}
+
+# da riavviare: via node e il cmd che lo tiene (con lui si chiude la finestra)
+if ($Riavvia) {
+  Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -like '*cruscotto.mjs*' } | ForEach-Object {
+    $padre = Get-CimInstance Win32_Process -Filter "ProcessId = $($_.ParentProcessId)" -ErrorAction SilentlyContinue
+    Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+    if ($padre -and $padre.Name -eq 'cmd.exe') { Stop-Process -Id $padre.ProcessId -Force -ErrorAction SilentlyContinue }
+  }
+  for ($i = 0; $i -lt 20 -and [RegiaFinestra]::FindWindow([NullString]::Value, $titolo) -ne [IntPtr]::Zero; $i++) { Start-Sleep -Milliseconds 150 }
 }
 
 # già aperta? davanti e al centro

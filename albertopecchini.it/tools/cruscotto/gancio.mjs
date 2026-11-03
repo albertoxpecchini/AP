@@ -7,15 +7,23 @@
 //   PreToolUse                       cosa sta facendo Claude adesso, e una riga nel log
 //   PostToolUseFailure               lo strumento che è andato storto
 //   Notification                     Claude aspetta Alberto (un permesso, una risposta): suona
-//   Stop                             Claude ha finito il turno: tocca ad Alberto, suona
+//   Stop                             Claude ha finito il turno: tocca ad Alberto, suona; l'inizio
+//                                    della risposta, quanto è durato il turno e con quanti strumenti
+//   SessionEnd                       la sessione è chiusa: la regia la toglie dalle altre
 
 import { execFileSync } from 'node:child_process'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { mkdirSync, readdirSync, rmSync, openSync, readSync, fstatSync, closeSync } from 'node:fs'
 import { CARTELLA, log, leggi, scrivi } from './diretta.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
-const FILE = join(CARTELLA, 'claude.json')
+// Una cartella per sessione: i ganci sono di tutto l'utente, e le altre sessioni di Claude aperte
+// insieme si sovrascrivevano lo stato e i conti (3.11.2026). Nel log la sessione è il «#xxxx»
+// dopo chi scrive, perché la regia dia a ognuna il suo colore.
+const SESSIONI = join(CARTELLA, 'sessioni')
+mkdirSync(SESSIONI, { recursive: true })
+const sigla = (id) => String(id || 'anon').replace(/[^a-z0-9]/gi, '').slice(0, 4)
 
 let testo = ''
 process.stdin.setEncoding('utf8')
@@ -54,6 +62,45 @@ function descrivi(tool, i = {}) {
   return corto(Object.values(i).find((x) => typeof x === 'string') || '')
 }
 
+// L'ultimo messaggio scritto, dalla coda della trascrizione (JSONL): «assistant» la risposta di
+// Claude, «user» la richiesta di Alberto (non i risultati degli strumenti, non i pezzi <…> che
+// aggiunge l'editor, non il riassunto della compattazione)
+function ultimo(trascrizione, tipo, kb = 512) {
+  if (!trascrizione) return null
+  const fd = openSync(trascrizione, 'r')
+  try {
+    const size = fstatSync(fd).size
+    const quanto = Math.min(size, kb * 1024)
+    const buf = Buffer.alloc(quanto)
+    readSync(fd, buf, 0, quanto, size - quanto)
+    for (const riga of buf.toString('utf8').split('\n').reverse()) {
+      if (!riga.includes(`"${tipo}"`)) continue
+      let m
+      try {
+        m = JSON.parse(riga)
+      } catch {
+        continue
+      }
+      if (m.type !== tipo || m.isMeta || m.isCompactSummary) continue
+      const c = m.message?.content
+      const pezzi = typeof c === 'string' ? [c] : Array.isArray(c) ? c.filter((p) => p.type === 'text').map((p) => p.text) : []
+      const testo = pezzi.filter((p) => !p.trimStart().startsWith('<')).join(' ')
+      if (testo.trim()) return { testo, da: Date.parse(m.timestamp) || Date.now() }
+    }
+    return null
+  } finally {
+    closeSync(fd)
+  }
+}
+
+// le sessioni ferme da più di tre giorni non servono più a nessuno
+function pulisci() {
+  for (const f of readdirSync(SESSIONI)) {
+    const s = leggi(join(SESSIONI, f))
+    if (!s || Date.now() - (s.agg || 0) > 3 * 86400 * 1000) rmSync(join(SESSIONI, f), { force: true })
+  }
+}
+
 // la regia è aperta? se no la si apre (non più di una volta ogni 20 secondi)
 function apri(s) {
   const f = leggi(join(CARTELLA, 'finestra.json'))
@@ -75,38 +122,62 @@ function apri(s) {
 
 function gestisci(e) {
   const evento = e.hook_event_name || ''
-  const s = leggi(FILE, {})
+  const id = sigla(e.session_id)
+  const FILE = join(SESSIONI, `${id}.json`)
+  const s = leggi(FILE, null) || { sessione: e.session_id, sigla: id, inizioSessione: Date.now(), conteggi: {}, file: [], errori: 0, strumenti: 0 }
   const adesso = Date.now()
-  if (e.session_id && s.sessione !== e.session_id) Object.assign(s, { sessione: e.session_id, inizioSessione: adesso, conteggi: {}, file: [], errori: 0, strumenti: 0 })
   s.cwd = e.cwd || s.cwd
+  // il progetto è la cartella in cui la sessione è nata: i comandi poi la portano altrove
+  s.radice ||= s.cwd
   s.agg = adesso
   s.conteggi ||= {}
   s.file ||= []
+  const scrive = (chi, testo) => log(`${chi}#${id}`, testo)
+  // una sessione che la regia vede per la prima volta a metà (ganci nuovi, compattazione): la
+  // richiesta di Alberto la si ripesca dalla trascrizione, una volta sola
+  if (!s.richiesta && !s.cercata && evento !== 'UserPromptSubmit') {
+    s.cercata = true
+    try {
+      const u = ultimo(e.transcript_path, 'user', 24 * 1024)
+      if (u) s.richiesta = { testo: corto(u.testo, 400), da: u.da }
+    } catch {}
+  }
 
   if (evento === 'SessionStart') {
     apri(s)
-    log('alberto', `sessione nuova in ${basename(s.cwd || '')}`)
+    pulisci()
+    // «resume» e «compact» riprendono la stessa sessione: non è nuova
+    Object.assign(s, { stato: s.stato === 'chiusa' ? 'fermo' : s.stato || 'fermo' })
+    scrive('alberto', e.source === 'compact' ? 'la conversazione si è compattata e riprende' : e.source === 'resume' ? `riprendo la sessione in ${basename(s.cwd || '')}` : `sessione nuova in ${basename(s.cwd || '')}`)
   } else if (evento === 'UserPromptSubmit') {
     apri(s)
-    Object.assign(s, { stato: 'lavora', richiesta: { testo: corto(e.prompt, 400), da: adesso }, adesso: null, avviso: null })
-    log('alberto', corto(e.prompt, 300))
+    Object.assign(s, { stato: 'lavora', richiesta: { testo: corto(e.prompt, 400), da: adesso }, adesso: null, avviso: null, turno: 0 })
+    scrive('alberto', corto(e.prompt, 300))
   } else if (evento === 'PreToolUse') {
     const tool = e.tool_name || '?'
     const cosa = descrivi(tool, e.tool_input)
-    Object.assign(s, { stato: 'lavora', adesso: { tool, testo: cosa, da: adesso }, avviso: null, strumenti: (s.strumenti || 0) + 1 })
+    Object.assign(s, { stato: 'lavora', adesso: { tool, testo: cosa, da: adesso }, avviso: null, strumenti: (s.strumenti || 0) + 1, turno: (s.turno || 0) + 1 })
     s.conteggi[tool] = (s.conteggi[tool] || 0) + 1
     const f = e.tool_input?.file_path
     if (f && /^(Edit|Write|NotebookEdit|MultiEdit)$/.test(tool)) s.file = [f, ...s.file.filter((x) => x !== f)].slice(0, 40)
-    log(`claude-${tool}`, cosa)
+    scrive(`claude-${tool}`, cosa)
   } else if (evento === 'PostToolUseFailure') {
     s.errori = (s.errori || 0) + 1
-    log(`claude-${e.tool_name || '?'}`, `× ${corto(e.error || e.tool_response?.error || 'non è andato', 200)}`)
+    scrive(`claude-${e.tool_name || '?'}`, `× ${corto(e.error || e.tool_response?.error || 'non è andato', 200)}`)
   } else if (evento === 'Notification') {
     Object.assign(s, { stato: 'aspetta', avviso: corto(e.message, 160), suona: (s.suona || 0) + 1 })
-    log('alberto', `⚠ ${corto(e.message, 200)}`)
+    scrive('alberto', `⚠ ${corto(e.message, 200)}`)
   } else if (evento === 'Stop') {
-    Object.assign(s, { stato: 'fermo', adesso: null, fineTurno: adesso, suona: (s.suona || 0) + 1 })
-    log('claude', '√ ho finito: tocca a te')
+    let testo = e.last_assistant_message || ''
+    try {
+      testo ||= ultimo(e.transcript_path, 'assistant')?.testo || ''
+    } catch {}
+    const durata = s.richiesta?.da ? Math.round((adesso - s.richiesta.da) / 1000) : null
+    Object.assign(s, { stato: 'fermo', adesso: null, fineTurno: adesso, suona: (s.suona || 0) + 1, risposta: { testo: corto(testo, 400), da: adesso, secondi: durata, strumenti: s.turno || 0 } })
+    scrive('claude', `√ ho finito${durata != null ? ` in ${durata < 60 ? durata + 's' : Math.floor(durata / 60) + 'm ' + String(durata % 60).padStart(2, '0') + 's'}` : ''}${s.turno ? ` con ${s.turno} ${s.turno === 1 ? 'strumento' : 'strumenti'}` : ''}: ${corto(testo, 160) || 'tocca a te'}`)
+  } else if (evento === 'SessionEnd') {
+    Object.assign(s, { stato: 'chiusa', adesso: null, chiusa: adesso })
+    scrive('alberto', `sessione chiusa${e.reason && e.reason !== 'other' ? ` (${e.reason})` : ''}`)
   }
   scrivi(FILE, s)
 }

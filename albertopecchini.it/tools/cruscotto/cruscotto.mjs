@@ -15,8 +15,7 @@ import https from 'node:https'
 import os from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { CARTELLA, scrivi, leggi, STATI } from './diretta.mjs'
-import { readdirSync, rmSync } from 'node:fs'
+import { CARTELLA, scrivi, leggi } from './diretta.mjs'
 
 const QUI = dirname(fileURLToPath(import.meta.url))
 const VISTA = join(QUI, 'vista.mjs')
@@ -41,7 +40,7 @@ async function caricaVista() {
 }
 
 // ── le misure, raccolte in disparte ─────────────────────────────────────────
-const misure = { sistema: null, server: [], git: null, sito: null }
+const misure = { sistema: null, server: [], git: null, pubblici: null }
 
 let cpuPrima = os.cpus()
 function sistema() {
@@ -86,45 +85,48 @@ const prova = (url, modulo = http) =>
 async function server() {
   misure.server = await Promise.all(SERVER.map(async (s) => ({ ...s, ...(await prova(`http://127.0.0.1:${s.porta}/`)) })))
 }
+// fuori di casa: il sito e il tunnel di Tailscale da cui gli altri vedono la macchina del tempo
+const PUBBLICI = [
+  { nome: 'albertopecchini.it', url: 'https://www.albertopecchini.it/' },
+  { nome: 'tunnel', url: 'https://desktop-inpvhr2.tail6c90b3.ts.net/tempo/' },
+]
 async function sito() {
-  misure.sito = { nome: 'albertopecchini.it', ...(await prova('https://www.albertopecchini.it/', https)) }
+  misure.pubblici = await Promise.all(PUBBLICI.map(async (p) => ({ nome: p.nome, ...(await prova(p.url, https)) })))
 }
 
 const esegui = (cmd, args, cwd) => new Promise((ok) => execFile(cmd, args, { cwd, timeout: 8000, windowsHide: true }, (e, so) => ok(e ? '' : String(so))))
 async function git() {
-  const cwd = leggi(join(CARTELLA, 'claude.json'), {})?.cwd || 'C:\\Users\\Alberto\\Documents\\AP'
+  // la cartella della sessione in cima (la sceglie la vista; claude.json era della regia di prima)
+  let cwd = null
+  try {
+    cwd = vista?.cartella?.(tasti)
+  } catch {}
+  cwd ||= leggi(join(CARTELLA, 'claude.json'), {})?.cwd || 'C:\\Users\\Alberto\\Documents\\AP'
   if (!existsSync(cwd)) return
   const stato = await esegui('git', ['status', '--porcelain=v1', '-b'], cwd)
   if (!stato) return (misure.git = null)
   const [testa, ...file] = stato.split('\n').filter(Boolean)
-  const m = testa.match(/^## ([^.\s]+)(?:\.\.\.(\S+))?(?: \[(?:ahead (\d+))?,? ?(?:behind (\d+))?\])?/) || []
+  // il ramo può avere dei punti («albertopecchini.it»): finisce ai «...» del remoto o alla fine
+  const m = testa.match(/^## (.+?)(?:\.\.\.(\S+))?(?: \[(?:ahead (\d+))?,? ?(?:behind (\d+))?\])?$/) || []
   // l'ora del commit come numero: «3 ore fa» lo scrive la vista, in italiano (git lo diceva in inglese)
   const ultimo = (await esegui('git', ['log', '-1', '--format=%h%x09%s%x09%ct'], cwd)).trim().split('\t')
   misure.git = { ramo: m[1], avanti: Number(m[3] || 0), indietro: Number(m[4] || 0), cambiati: file.filter((f) => !f.startsWith('?? node_modules')).length, ultimo: { sha: ultimo[0], msg: ultimo[1], ct: Number(ultimo[2]) } }
 }
 
 // ── i tasti ─────────────────────────────────────────────────────────────────
-const tasti = { filtro: 'tutto', pausa: false, scorri: 0 }
+// gli altri tasti li decide la vista (vista.tasto), perché se ne aggiungano a regia aperta
+const tasti = { filtro: 'tutto', pausa: false, scorri: 0, sessione: null }
 let fermo = null // le righe del log congelate in pausa
 if (process.stdin.isTTY) {
   process.stdin.setRawMode(true)
   process.stdin.setEncoding('utf8')
   process.stdin.on('data', (k) => {
     if (k === 'q' || k === '\u0003') esci()
-    else if (k === 'a') Object.assign(tasti, { filtro: 'tutto', scorri: 0 })
-    else if (k === 'c') Object.assign(tasti, { filtro: 'claude', scorri: 0 })
-    else if (k === 'l') Object.assign(tasti, { filtro: 'lavori', scorri: 0 })
-    else if (k === 'e') Object.assign(tasti, { filtro: 'errori', scorri: 0 })
-    else if (k === 'p') tasti.pausa = !tasti.pausa
-    else if (k === '\x1b[A') tasti.scorri += 1
-    else if (k === '\x1b[B') tasti.scorri = Math.max(0, tasti.scorri - 1)
-    else if (k === '\x1b[5~') tasti.scorri += 15
-    else if (k === '\x1b[6~') tasti.scorri = Math.max(0, tasti.scorri - 15)
-    else if (k === 'x')
-      for (const f of readdirSync(STATI)) {
-        const s = leggi(join(STATI, f))
-        if (s?.fine) rmSync(join(STATI, f), { force: true })
-      }
+    const prima = tasti.sessione
+    try {
+      vista?.tasto?.(k, tasti)
+    } catch {}
+    if (tasti.sessione !== prima) git()
     disegna()
   })
 }
@@ -147,8 +149,8 @@ function disegna() {
     const dati = vista.raccogli()
     if (tasti.pausa) dati.righe = fermo ||= dati.righe
     else fermo = null
-    // un suono quando Claude ha finito o aspetta (i ganci contano i suoni in claude.json)
-    const suona = dati.claude?.suona || 0
+    // un suono quando Claude ha finito o aspetta, in qualsiasi sessione (i ganci contano i suoni)
+    const suona = dati.suona ?? dati.claude?.suona ?? 0
     if (suonato !== null && suona > suonato) out.write('\x07')
     suonato = suona
     const frame = vista.disegna({ W, H, giro, dati, ...misure, tasti })
