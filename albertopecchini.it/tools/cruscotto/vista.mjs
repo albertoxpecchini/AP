@@ -298,7 +298,8 @@ export function disegna({ W, H, giro, dati, sistema, server, git, sito, pubblici
       totTot += s.totale || 0
       const media = s.tempi?.length ? s.tempi.reduce((a, b) => a + b, 0) / s.tempi.length : NaN
       const resta = s.fine ? 0 : (media * ((s.totale || 0) - (s.fatte || 0)))
-      fine = Math.max(fine, resta || 0)
+      // un sito che lavora senza ancora una media: la fine non si sa
+      fine = Number.isNaN(fine) || (!s.fine && !Number.isFinite(resta)) ? NaN : Math.max(fine, resta || 0)
       const conti = `${pad(`${s.fatte || 0}/${s.totale || 0}`, 8)} ${c(VERDE, `${OK}${s.ok || 0}`)} ${s.errori ? c(ROSSO, `×${s.errori}`) : scuro('×0')}`
       const tempo = s.fine ? c(VERDE, 'finito') : ferma ? c(ROSSO, 'fermo') : `${grigio('~')}${durata(media)}${grigio('/v · resta')} ${durata(resta)}`
       righe.push(`  ${pad(c(col, s.nome), NOME)} ${barra(fr, BAR, col)} ${pad(`${Math.round(fr * 100)}%`, 5)} ${pad(conti, 20)} ${pad(grigio(s.fase || ''), 9)} ${tempo}`)
