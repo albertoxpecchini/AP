@@ -16,10 +16,10 @@
 // di allora e non si possono riportare in vita.
 
 import { spawn } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import net from 'node:net'
 import * as browser from '../pzkko/browser.mjs'
-import { SITI, prefisso } from './siti.mjs'
+import { SITI, prefisso, fileIstantanea } from './siti.mjs'
 import { stato as diretta, log } from './diretta.mjs'
 
 const argv = process.argv.slice(2)
@@ -28,6 +28,35 @@ const DEPOSITO = opt('deposito') || 'C:/pzkko-server/tempo'
 const stato = JSON.parse(readFileSync(`${DEPOSITO}/stato.json`, 'utf8'))
 const scelte = argv.filter((a) => !a.startsWith('--'))
 const siti = SITI.filter((s) => !opt('sito') || opt('sito').split(',').includes(s.id))
+
+// Le istantanee (public/tempo/<dominio>/<data>/pagina/), sui file: niente script, niente indirizzi
+// locali o segnaposto rimasti, ogni risorsa citata c'è; e quanto pesano.
+const RISORSE = new URL('../../public/media/tempo/risorse/', import.meta.url)
+let istantanee = 0
+let rotteIst = 0
+let peso = 0
+for (const s of siti) {
+  const m = (await import(new URL(`../../src/data/tempo/${s.id}.js`, import.meta.url))).default
+  for (const v of m.versioni.filter((x) => x.pagina && (!scelte.length || scelte.includes(x.short)))) {
+    istantanee++
+    const f = fileIstantanea(s, v)
+    const guai = []
+    if (!existsSync(f)) guai.push('manca il file')
+    else {
+      const t = readFileSync(f, 'utf8')
+      peso += t.length
+      if (/<script\b/i.test(t)) guai.push('ha uno script')
+      if (/127\.0\.0\.1:\d+|tm-(res|shot):/.test(t)) guai.push('indirizzi locali o segnaposto')
+      for (const r of new Set([...t.matchAll(/\/media\/tempo\/risorse\/([0-9a-f]{16}\.\w+)/g)].map((x) => x[1]))) if (!existsSync(new URL(r, RISORSE))) guai.push(`manca la risorsa ${r}`)
+    }
+    if (guai.length) {
+      rotteIst++
+      console.log(`× istantanea ${s.id} ${v.data} ${v.short} · ${guai.slice(0, 3).join(' · ')}`)
+    }
+  }
+}
+console.log(`${istantanee - rotteIst} istantanee a posto su ${istantanee} · ${Math.round(peso / 1024)} KB di HTML in tutto`)
+if (argv.includes('--istantanee')) process.exit(rotteIst ? 1 : 0)
 
 // Gli errori che c'erano nel sito vero quel giorno (controllati sul codice di allora): l'archivio
 // li mostra com'erano, la prova non li conta.

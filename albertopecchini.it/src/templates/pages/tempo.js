@@ -113,10 +113,19 @@ export function tempoCatturaPage(s, k) {
         </div>
       </div>
 
-      <div class="wb__page">
-        <p class="wb__live">foto di ${esc(nome)} il ${esc(lunga(v.data))}${v.titolo ? ` · «${esc(v.titolo)}»` : ''} · <a href="${esc(vivaUrl(site.archivio, s, v))}" target="_blank" rel="noopener" title="Dal server di casa di Alberto: il sito intero di quel giorno, può essere lento">la pagina vera ↗</a></p>
+      <!-- l'istantanea non ha script, ma il sandbox deve lasciarli accesi: con gli script spenti il
+           browser ignora loading="lazy" e scaricava tutte le immagini subito (5,9 MB invece di 0,8) -->
+      <div class="wb__page${v.pagina ? ' wb__page--html' : ''}">
         ${
-          conFoto(v)
+          v.pagina
+            ? html`<p class="wb__live">${esc(nome)} il ${esc(lunga(v.data))}${v.titolo ? ` · «${esc(v.titolo)}»` : ''} · l’HTML di quel giorno, ${num(v.pagina.kb)} KB, senza script · <a href="${catturaPath(s, v)}pagina/" target="_blank" rel="noopener">da sola ↗</a> · <a href="${esc(vivaUrl(site.archivio, s, v))}" target="_blank" rel="noopener" title="Dal server di casa di Alberto: il sito intero di quel giorno, può essere lento">il sito intero di allora ↗</a></p>
+                <iframe class="wb__frame" src="${catturaPath(s, v)}pagina/" title="${esc(nome)} il ${esc(lunga(v.data))}" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>`
+            : `<p class="wb__live">foto di ${esc(nome)} il ${esc(lunga(v.data))}${v.titolo ? ` · «${esc(v.titolo)}»` : ''} · <a href="${esc(vivaUrl(site.archivio, s, v))}" target="_blank" rel="noopener" title="Dal server di casa di Alberto: il sito intero di quel giorno, può essere lento">la pagina vera ↗</a></p>`
+        }
+        ${
+          v.pagina
+            ? ''
+            : conFoto(v)
             ? html`<picture class="wb__pic">
                 <source media="(max-width: 600px)" srcset="${foto(s.id, v.short, 'm')}" width="${v.m.w}" height="${v.m.h}">
                 <img class="wb__shot" src="${foto(s.id, v.short, 'd')}" width="${v.d.w}" height="${v.d.h}" alt="${esc(nome)} il ${esc(lunga(v.data))}" fetchpriority="high" decoding="async" data-no-srcset>

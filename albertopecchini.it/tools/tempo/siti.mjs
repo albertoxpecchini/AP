@@ -27,7 +27,7 @@ export const REPOS = join(LAVORO, 'repo')
 // albertopecchini.it: fuori pzkko, Better Call Pekko, i workflow e i documenti di radice, e fuori
 // quello che produce la macchina del tempo stessa (foto, manifesto, strumento): altrimenti ogni
 // aggiornamento delle foto diventava il «giorno di oggi» da fotografare, all'infinito
-const FUORI_AP = [':!albertopecchini.it/src/data/tempo.js', ':!albertopecchini.it/src/data/tempo', ':!albertopecchini.it/public/media/tempo', ':!albertopecchini.it/tools/tempo', ':!albertopecchini.it/pzkko', ':!albertopecchini.it/tools/pzkko', ':!albertopecchini.it/public/bcp', ':!albertopecchini.it/src/data/assistenza.js', ':!albertopecchini.it/src/templates/pages/assistenza.js', ':!albertopecchini.it/api/bcp.js', ':!.github', ':!README.md', ':!CLAUDE.md', ':!PRODUCT.md', ':!DESIGN.md', ':!.claude']
+const FUORI_AP = [':!albertopecchini.it/src/data/tempo.js', ':!albertopecchini.it/src/data/tempo', ':!albertopecchini.it/public/media/tempo', ':!albertopecchini.it/public/tempo', ':!albertopecchini.it/tools/tempo', ':!albertopecchini.it/pzkko', ':!albertopecchini.it/tools/pzkko', ':!albertopecchini.it/public/bcp', ':!albertopecchini.it/src/data/assistenza.js', ':!albertopecchini.it/src/templates/pages/assistenza.js', ':!albertopecchini.it/api/bcp.js', ':!.github', ':!README.md', ':!CLAUDE.md', ':!PRODUCT.md', ':!DESIGN.md', ':!.claude']
 
 export const SITI = [
   {
@@ -110,13 +110,20 @@ export const SITI = [
     // dal 28.9.2026 Better Call Pekko è un progetto a parte: lo stesso Vite del sito con SITE=bcp
     // fuori quello che produce la macchina del tempo: le foto di BCP stanno in public/media/tempo/bcp/,
     // e ogni loro commit diventava un «giorno» nuovo di Better Call Pekko (3.11.2026)
-    percorsi: [':(glob)albertopecchini.it/**/*bcp*', ':(glob)albertopecchini.it/**/*bcp*/**', ':(glob)albertopecchini.it/**/*assistenza*', ':(glob)albertopecchini.it/**/*assistenza*/**', ':!albertopecchini.it/public/media/tempo', ':!albertopecchini.it/src/data/tempo', ':!albertopecchini.it/tools/tempo'],
+    percorsi: [':(glob)albertopecchini.it/**/*bcp*', ':(glob)albertopecchini.it/**/*bcp*/**', ':(glob)albertopecchini.it/**/*assistenza*', ':(glob)albertopecchini.it/**/*assistenza*/**', ':!albertopecchini.it/public/media/tempo', ':!albertopecchini.it/public/tempo', ':!albertopecchini.it/src/data/tempo', ':!albertopecchini.it/tools/tempo'],
     da: '2026-09-28',
     radice: (casa) => join(casa, 'albertopecchini.it'),
     costruisci: 'npm',
     env: { SITE: 'bcp' },
   },
 ]
+
+// l'archivio pubblico sul server di casa, come site.archivio in src/data/site.js: i link delle
+// istantanee alle altre pagine di quel giorno portano lì
+export const ARCHIVIO = 'https://desktop-inpvhr2.tail6c90b3.ts.net/tempo'
+// dove va l'istantanea di una cattura: /tempo/<dominio>/<AAAA-MM-GG>/pagina/
+export const dominio = (s) => s.url.replace(/^https?:\/\/(www\.)?/, '')
+export const fileIstantanea = (s, v) => join(SITO, 'public/tempo', dominio(s), v.data, 'pagina/index.html')
 
 export const sito = (id) => SITI.find((s) => s.id === id)
 export const cartellaGit = (s) => (s.repo ? join(REPOS, `${s.id}.git`) : REPO)

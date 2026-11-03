@@ -918,3 +918,32 @@ a.wb__n:hover {
   cursor: pointer;
   font-weight: 700;
 }
+
+/* l'istantanea (3.11.2026 sera): l'HTML di quel giorno in un iframe senza script, alto quanto la
+   finestra meno la barra; sul telefono la barra scorre via e l'iframe prende tutto lo schermo */
+.wb__page--html {
+  max-width: none;
+}
+
+.wb__page--html .wb__frame {
+  height: calc(100vh - var(--wb-h, 150px));
+  height: calc(100dvh - var(--wb-h, 150px));
+  min-height: 420px;
+}
+
+.wb__page--html .wb__live {
+  padding: 3px 12px;
+  border-bottom: 1px solid var(--wb-line);
+  background: #f7f7f7;
+}
+
+@media (max-width: 899px) {
+  .page--tempo .wb__bar {
+    position: relative;
+  }
+
+  .wb__page--html .wb__frame {
+    height: 100vh;
+    height: 100dvh;
+  }
+}

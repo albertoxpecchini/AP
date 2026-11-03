@@ -17,6 +17,15 @@ export function initTempo() {
     if (dove) return location.replace(dove)
   }
 
+  // l'altezza della barra (più la riga sopra l'istantanea), perché l'iframe riempia il resto della finestra
+  const barra = $('.wb__bar', root)
+  const riga = $('.wb__page--html .wb__live', root)
+  if (barra && riga && 'ResizeObserver' in window) {
+    const misura = () => root.style.setProperty('--wb-h', `${barra.offsetHeight + riga.offsetHeight}px`)
+    new ResizeObserver(misura).observe(barra)
+    misura()
+  }
+
   const sito = $('[data-tm-sito]', root)
   sito?.addEventListener('change', () => sito.value && (location.href = sito.value))
 

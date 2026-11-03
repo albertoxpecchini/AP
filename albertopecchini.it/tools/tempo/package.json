@@ -1,0 +1,9 @@
+{
+  "$comment": "Le dipendenze della macchina del tempo (3.11.2026): subset-font taglia i font delle istantanee ai soli caratteri della pagina e li scrive in WOFF2 (istantanea.mjs). sharp e puppeteer-core vengono da tools/catture.",
+  "name": "tempo",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "subset-font": "^2.9.0"
+  }
+}

@@ -34,6 +34,9 @@ node tools/tempo/tempo.mjs --manifesto     # riscrive solo i manifesti e le stat
 node tools/tempo/tempo.mjs --corte         # rifà le foto rimaste al primo schermo (alte 600 px)
 node tools/tempo/tempo.mjs --ripassa       # riapplica le regole del deposito, senza ricompilare
 node tools/tempo/prova.mjs                 # apre ogni versione depositata come dal tunnel
+node tools/tempo/prova.mjs --istantanee    # solo le istantanee, sui file: script, segnaposto, risorse mancanti
+node tools/tempo/confronta.mjs             # ogni istantanea contro il primo schermo della pagina vera, le più diverse
+node tools/tempo/tempo.mjs --fase=pagine   # solo le istantanee
 node tools/tempo/diretta.mjs "testo"       # la nota in cima al cruscotto
 ```
 
@@ -48,8 +51,39 @@ sito da `src/templates/pages/tempo.js` (rotte in `tempoRotte()`):
 - `/tempo/`: l'archivio, i cinque siti con l'ultima cattura;
 - `/tempo/<dominio>/`: tutte le catture di un sito, mese per mese, con le anteprime;
 - `/tempo/<dominio>/<AAAA-MM-GG>/`: una cattura. La barra (istogramma di link veri, frecce,
-  statistiche, «Momenti» già scritti nell'HTML coi commit del giorno dal manifesto) e la foto
-  da Vercel: una decina di richieste, circa 350 KB. La pagina vera dal server di casa è un link.
+  statistiche, «Momenti» già scritti nell'HTML coi commit del giorno dal manifesto) e, sotto,
+  l'istantanea di quel giorno in un iframe senza script. Il sito intero dal server di casa è
+  solo un link;
+- `/tempo/<dominio>/<AAAA-MM-GG>/pagina/`: l'istantanea da sola.
+
+## Le istantanee
+
+Alberto, dopo le pagine con le foto: «ma non foto, voglio sempre l'html ma non un repo intero,
+solo un index indipendente, super ottimizzato». `istantanea.mjs` (fase `--fase=pagine`) apre la
+versione depositata come la vede il pubblico, la fa scorrere fino in fondo e congela il DOM già
+disegnato in un solo `index.html`:
+
+- niente JavaScript (la pagina è già disegnata: niente script, niente errori, niente rete);
+- la pagina crede di essere a mezzogiorno del giorno della cattura, col sistema in tema chiaro:
+  i siti col tema «Auto» cambiavano con l'ora (Rivalta ad agosto, albertopecchini.it d'estate) e
+  le istantanee fatte la sera uscivano scure;
+- il CSS dentro il file, potato alle regole che toccano qualcosa che c'è (gli stati `:hover`,
+  `:focus`… restano), coi font usati davvero e le animazioni citate; i fogli di altri domini
+  (Google Fonts, CDN) scaricati e messi dentro anche loro;
+- le immagini ridotte a una volta e mezza la misura a cui si vedevano, in WebP; subito solo
+  quelle della prima finestra, le altre quando ci si arriva; le animate restano animate solo
+  se pesano meno di 150 KB, se no il primo fotogramma;
+- i font tagliati ai soli caratteri della pagina e scritti in WOFF2 (`subset-font`, cioè
+  harfbuzz in WebAssembly, in `tools/tempo/package.json`: `npm ci` lì dentro);
+- mappe, video, tele WebGL e iframe diventano la loro foto (ritagliata sulla finestra: quella
+  «oltre la finestra» di una tela WebGL usciva nera);
+- i link alle altre pagine del sito portano alla versione intera sul server di casa.
+
+Immagini e font stanno una volta sola in `public/media/tempo/risorse/<hash>` (condivisi fra le
+catture, e quindi nella cache del browser da una all'altra); sotto i 2 KB dentro l'HTML.
+L'istantanea va in `public/tempo/<dominio>/<AAAA-MM-GG>/pagina/index.html` (fuori dai giorni
+di albertopecchini.it e di BCP, come le foto). Rivalta del 13 maggio: 10,9 MB al primo
+caricamento con la prima versione, 806 KB dopo. Le foto restano come riserva e per le anteprime.
 
 Le pagine dei siti e delle catture sono `noindex` e fuori dalla sitemap; nessuna precarica i
 font del sito (`senzaFont`). I vecchi indirizzi `#v=<sha>` e `#s=<sito>&v=<sha>` di `/tempo/`

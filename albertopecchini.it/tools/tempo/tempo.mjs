@@ -41,8 +41,9 @@ import { createRequire } from 'node:module'
 import { dirname, join, resolve, extname, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import * as browser from '../pzkko/browser.mjs'
-import { SITI, SITO, REPO, LAVORO, cartellaGit, prefisso, cartellaDeposito } from './siti.mjs'
+import { SITI, SITO, REPO, LAVORO, ARCHIVIO, cartellaGit, prefisso, cartellaDeposito, dominio, fileIstantanea } from './siti.mjs'
 import { stato as diretta, log as dlog } from './diretta.mjs'
+import { istantanea, prepara } from './istantanea.mjs'
 
 const sharp = createRequire(join(SITO, 'tools/catture/package.json'))('sharp')
 const MEDIA = join(SITO, 'public/media/tempo')
@@ -858,44 +859,8 @@ async function fotografa(s, v, base, lavoro) {
     lavoro.passo(v, `foto ${w} px`)
     await page.setViewport({ width: w, height: h, deviceScaleFactor: dpr, isMobile: w < 600, hasTouch: w < 600 })
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 }).catch(() => {})
-    await page
-      .evaluate(async () => {
-        const dorm = (ms) => new Promise((r) => setTimeout(r, ms))
-        await (document.fonts?.ready || Promise.resolve())
-        // Dal 14.6 al 17.9.2026 albertopecchini.it scorreva dentro il body: si fa scorrere chi scorre davvero
-        const scorre = (e) => e.scrollHeight > e.clientHeight + 50 && /(auto|scroll)/.test(getComputedStyle(e).overflowY)
-        const contenitori = [...document.querySelectorAll('html, body, body > *, #root, #app, main')].filter(scorre)
-        const tutti = [document.scrollingElement || document.documentElement, ...contenitori]
-        // giù piano: le immagini pigre si caricano e le animazioni all'ingresso partono
-        for (const el of tutti) {
-          for (let y = 0; y < el.scrollHeight && y < 30000; y += 500) {
-            el.scrollTop = y
-            await dorm(90)
-          }
-          el.scrollTop = 0
-        }
-        if (contenitori.length) {
-          const s = document.createElement('style')
-          s.textContent = 'html, body { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; }'
-          document.head.append(s)
-          for (const el of contenitori) Object.assign(el.style, { height: 'auto', maxHeight: 'none', overflow: 'visible' })
-        }
-        // le immagini pigre che non sono partite: si caricano subito
-        document.querySelectorAll('img[loading="lazy"]').forEach((i) => (i.loading = 'eager'))
-        await Promise.race([Promise.all([...document.images].filter((i) => !i.complete).map((i) => new Promise((r) => ((i.onload = i.onerror = r))))), dorm(6000)])
-        // animazioni e transizioni al loro stato finale, niente a metà dissolvenza nella foto
-        const ferma = document.createElement('style')
-        ferma.textContent = '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition-duration: 0s !important; transition-delay: 0s !important; caret-color: transparent !important; }'
-        document.head.append(ferma)
-        // via i pannelli che coprirebbero la pagina: cookie, modali di benvenuto, chat
-        document.querySelectorAll('[class*="cookie" i], [id*="cookie" i], [class*="consent" i], [id*="consent" i], [aria-modal="true"], dialog[open]').forEach((el) => (el.style.display = 'none'))
-        for (const el of document.querySelectorAll('body *')) {
-          const cs = getComputedStyle(el)
-          if (cs.position === 'fixed' && el.getBoundingClientRect().height > innerHeight * 0.6 && Number(cs.zIndex) > 10) el.style.display = 'none'
-        }
-        window.scrollTo(0, 0)
-      })
-      .catch(() => {})
+    // giù piano fino in fondo, immagini pigre, animazioni ferme, via cookie e modali (istantanea.mjs)
+    await prepara(page)
     // una scena WebGL a tutta finestra (pzkko dal 21.10.2026): qualche secondo in più perché si
     // disegni, e la foto della sola finestra: «oltre la finestra» con una tela che si ridisegna
     // di continuo non finiva mai (Page.captureScreenshot timed out)
@@ -1052,9 +1017,62 @@ async function giroSito(s) {
       }
     }
   }
+
+  // 3. le istantanee: la home di quel giorno in un solo index.html leggero (istantanea.mjs)
+  if (fase === 'tutto' || fase === 'pagine') {
+    const pronte = new Set(depositate(s))
+    const daFare = versioni.filter((v) => scelta(v) && pronte.has(v.short) && (forza || !v.pagina || !existsSync(fileIstantanea(s, v)))).slice(0, limite)
+    lavoro.aggiorna({ fase: 'pagine', totale: daFare.length, fatte: 0, ok: 0, errori: 0, tempi: [], fine: false })
+    dlog(`sito-${s.id}`, `${s.nome}: ${daFare.length} istantanee da fare`)
+    if (daFare.length) {
+      const arch = await serverArchivio()
+      const origine = new URL(arch.base).origin
+      try {
+        for (const v of daFare) {
+          const inizio = Date.now()
+          const b = await apriBrowser()
+          const page = await b.newPage()
+          try {
+            lavoro.passo(v, 'istantanea')
+            await page.setRequestInterception(true)
+            page.on('request', (r) => {
+              const u = new URL(r.url())
+              if (u.origin === origine && !u.pathname.startsWith('/tempo/')) return r.abort()
+              r.continue()
+            })
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
+            const P = prefisso(s, v.short)
+            const r = await istantanea(page, {
+              url: `${arch.base}${P}/`,
+              prefisso: P,
+              archivio: ARCHIVIO,
+              intestazione: `La macchina del tempo · ${dominio(s)} il ${v.data} (${v.short}), istantanea statica · https://www.albertopecchini.it/tempo/${dominio(s)}/${v.data}/`,
+              esce: fileIstantanea(s, v),
+              giorno: v.data,
+              privato: (t) => privato(t, s.id),
+            })
+            v.pagina = r
+            lavoro.aggiorna({ ok: lavoro.ok + 1 })
+            dlog(`sito-${s.id}`, `√ pagina ${v.data} ${v.short}: ${r.kb} KB di HTML, ${r.risorse} file (immagini e font condivisi)`)
+          } catch (e) {
+            lavoro.aggiorna({ errori: lavoro.errori + 1 })
+            dlog(`sito-${s.id}`, `× pagina ${v.data} ${v.short}: ${errore(e)}`)
+            if (/Target closed|Session closed|Protocol error|disconnected/i.test(String(e))) chromium = null
+          } finally {
+            await page.close().catch(() => {})
+          }
+          lavoro.tempi.push((Date.now() - inizio) / 1000)
+          lavoro.aggiorna({ fatte: lavoro.fatte + 1, ultimo: `ultima: ${v.data} ${v.short}` })
+          salva()
+        }
+      } finally {
+        arch.chiudi()
+      }
+    }
+  }
   salva()
   lavoro.aggiorna({ fine: true, corrente: null })
-  dlog(`sito-${s.id}`, `√ ${s.nome}: finito (${versioni.filter((v) => v.d).length} foto su ${versioni.length} versioni)`)
+  dlog(`sito-${s.id}`, `√ ${s.nome}: finito (${versioni.filter((v) => v.pagina).length} pagine e ${versioni.filter((v) => v.d).length} foto su ${versioni.length} versioni)`)
 }
 
 for (const s of siti) {
