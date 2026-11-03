@@ -97,6 +97,8 @@ export function tempoPage() {
             <span class="wb__about-label">Questa cattura</span>
             <a class="wb__commit" href="${GITHUB}${corrente.sha}" target="_blank" rel="noopener" data-tm-github><code data-tm-sha>${corrente.short}</code> <span data-tm-msg>${esc(corrente.msg)}</span></a>
             <span class="wb__meta"><span data-tm-commit>${corrente.commit}</span> commit quel giorno · aggiornato il ${lunga(aggiornato)}</span>
+            <!-- il credito di ogni pagina (CLAUDE.md): qui non c'è il piè di pagina del sito, la barra è il guscio -->
+            <a class="wb__credit" href="${esc(site.url)}" rel="author">Sito di ${esc(site.name)}</a>
           </div>
         </div>
       </div>

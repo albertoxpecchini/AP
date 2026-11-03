@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 720 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>5385409</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 721 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>c6203a0</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 19
+| 20
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/c6203a0 c6203a0] fix(tempo): la copia rotta del 3 novembre restava nella cache del browser
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5385409 5385409] fix(tempo): la versione del 3 novembre si apriva senza CSS né JS
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/b6fde57 b6fde57] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/ca111d9 ca111d9] feat(tempo): tutte le 108 versioni, a pagina intera
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/6a0d6bd 6a0d6bd] fix(pzkko): il segreto del server si legge anche incollato male
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/2329ffb 2329ffb] fix(pzkko): i dati sul server di Alberto, e Vercel Blob tolto per sempre
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/33edc22 33edc22] Catture aggiornate: pzkko
-* 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/99aaf00 99aaf00] feat(pzkko): l'icona del telefono rifatta, con la sagoma raddrizzata e il bordo omogeneo
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

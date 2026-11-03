@@ -361,3 +361,15 @@
     gap: 12px;
   }
 }
+
+/* il credito di ogni pagina, in fondo alla riga della cattura */
+.wb__credit {
+  margin-left: auto;
+  color: var(--wb-blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wb__credit:hover {
+  text-decoration: underline;
+}
