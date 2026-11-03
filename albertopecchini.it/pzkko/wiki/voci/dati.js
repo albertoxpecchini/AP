@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 724 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>7d62c46</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 727 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>f185289</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,13 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 23
+| 26
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/f185289 f185289] Merge remote-tracking branch 'origin/main' into albertopecchini.it
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/13ff3ec 13ff3ec] feat(tempo): la macchina del tempo di cinque siti, col selettore, le statistiche e i momenti
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5e7c98b 5e7c98b] Catture aggiornate: Alberto Pecchini
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/7d62c46 7d62c46] feat(mascotte): torna la tartaruga col casco al posto della nutria
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4bd1f81 4bd1f81] fix(tempo): le versioni con la mappa si aprono anche dal tunnel, e la prova di tutte
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/e2a76b0 e2a76b0] fix(tempo): il credito anche nella macchina del tempo, e la Build torna verde
@@ -12424,9 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-31 [https://github.com/albertoxpecchini/AP/commit/92ef038 92ef038] feat(pzkko): la banca sul server di Alberto, il browser non decide più niente
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/b402ac7 b402ac7] feat(pzkko): le vincite salve al millesimo, due telefoni in sync, le classifiche che tornano, il pzkstore e il testo predittivo
 * 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/aaea5cb aaea5cb] feat(albertopecchini.it): il file di verifica del dominio per Discord in /.well-known/discord
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/75830a5 75830a5] Catture aggiornate: pzkko
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/39e1ec1 39e1ec1] fix(pzkko): il cercapersone rosso anche per chi aveva la foto vecchia, le frecce indietro rosse, e di partenza audio spento, ora e meteo veri
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/7f98ca6 7f98ca6] feat(pzkko): il cercapersone si accende in 400 ms, la home a pagine 3×3 coi puntini, la barra di stato vera, indietro rosso
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
