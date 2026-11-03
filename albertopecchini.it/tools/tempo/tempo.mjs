@@ -55,8 +55,10 @@ const limite = Number(opt('limite')) || Infinity
 const soloManifesto = argv.includes('--manifesto')
 const deposito = opt('deposito') ? resolve(opt('deposito')) : null
 
-// quello che cambia il sito di Alberto: fuori pzkko, Better Call Pekko, i workflow e i documenti di radice
-const FUORI = [':!albertopecchini.it/pzkko', ':!albertopecchini.it/tools/pzkko', ':!albertopecchini.it/public/bcp', ':!albertopecchini.it/src/data/assistenza.js', ':!albertopecchini.it/src/templates/pages/assistenza.js', ':!albertopecchini.it/api/bcp.js', ':!.github', ':!README.md', ':!CLAUDE.md', ':!PRODUCT.md', ':!DESIGN.md', ':!.claude']
+// quello che cambia il sito di Alberto: fuori pzkko, Better Call Pekko, i workflow e i documenti di radice,
+// e fuori quello che produce la macchina del tempo stessa (foto, manifesto, strumento): altrimenti ogni
+// aggiornamento delle foto diventava il «giorno di oggi» da fotografare, all'infinito (3.11.2026)
+const FUORI = [':!albertopecchini.it/src/data/tempo.js', ':!albertopecchini.it/public/media/tempo', ':!albertopecchini.it/tools/tempo',':!albertopecchini.it/pzkko', ':!albertopecchini.it/tools/pzkko', ':!albertopecchini.it/public/bcp', ':!albertopecchini.it/src/data/assistenza.js', ':!albertopecchini.it/src/templates/pages/assistenza.js', ':!albertopecchini.it/api/bcp.js', ':!.github', ':!README.md', ':!CLAUDE.md', ':!PRODUCT.md', ':!DESIGN.md', ':!.claude']
 
 const git = (...args) => execFileSync('git', args, { cwd: REPO, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).trim()
 const dorm = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -237,9 +239,6 @@ async function fotografa(dist, short) {
 
 const RISCRIVI = new Set(['.html', '.htm', '.css', '.js', '.mjs', '.webmanifest', '.json'])
 const SEGUE = '[A-Za-z0-9_.@%~-]' // dopo la barra deve venire un pezzo di percorso: «//cdn» e «/"» restano com'erano
-const reUrl = new RegExp('url\\(\\s*(["\']?)\\/(?=' + SEGUE + ')', 'g')
-const reStringa = new RegExp('(["\'`])\\/(?=' + SEGUE + ')', 'g')
-const reSrcset = new RegExp('(,\\s*)\\/(?=' + SEGUE + ')', 'g')
 
 // Le stringhe fra virgolette si riscrivono solo se puntano a qualcosa che c'è davvero
 // nella versione: il primo pezzo del percorso deve essere un file o una cartella in
@@ -247,11 +246,20 @@ const reSrcset = new RegExp('(,\\s*)\\/(?=' + SEGUE + ')', 'g')
 // il voto «8.5» col suffisso "/10" diventava «8.5/tempo/540d403/10» (3.11.2026).
 // Gli attributi dell'HTML (href, src, action, poster, srcset) sono sempre indirizzi:
 // quelli si riscrivono tutti.
-const reAttr = new RegExp('\\b(href|src|action|poster|data-src)=(["\'])\\/(?=' + SEGUE + '|\\2)', 'g')
+//
+// Un indirizzo già riscritto non si tocca più (NON, qui sotto): dal 3.11.2026 il sito
+// ha una cartella tempo/ (la macchina del tempo stessa), e il passaggio delle stringhe
+// prendeva "/tempo/<sha>/assets/…", appena scritto dagli attributi, per un percorso
+// che esiste e ci rimetteva il prefisso davanti: «/tempo/bc7ba74/tempo/bc7ba74/…».
 
 function riscrivi(testo, ext, prefisso, cima) {
   const P = prefisso.replace(/\$/g, '$$$$')
+  const NON = '(?!' + prefisso.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/)'
+  const reUrl = new RegExp('url\\(\\s*(["\']?)\\/' + NON + '(?=' + SEGUE + ')', 'g')
   if (ext === '.css') return testo.replace(reUrl, `url($1${P}/`)
+  const reAttr = new RegExp('\\b(href|src|action|poster|data-src)=(["\'])\\/' + NON + '(?=' + SEGUE + '|\\2)', 'g')
+  const reSrcset = new RegExp('(^\\s*|,\\s*)\\/' + NON + '(?=' + SEGUE + ')', 'g')
+  const reStringa = new RegExp('(["\'`])\\/' + NON + '(' + SEGUE + '[^"\'`\\s]*)', 'g')
   // un «%» che non è una sequenza valida (un testo, non un indirizzo) non fa cadere il deposito
   const esiste = (resto) => {
     const primo = resto.split(/[/?#]/)[0]
@@ -264,13 +272,14 @@ function riscrivi(testo, ext, prefisso, cima) {
   let out = testo
   if (ext === '.html' || ext === '.htm') {
     out = out.replace(reAttr, `$1=$2${P}/`)
-    out = out.replace(/srcset="([^"]*)"/g, (m, v) => `srcset="${v.replace(/^\s*\/(?!\/)/, `${P}/`).replace(reSrcset, `$1${P}/`)}"`)
+    out = out.replace(/srcset="([^"]*)"/g, (m, v) => `srcset="${v.replace(reSrcset, `$1${P}/`)}"`)
   }
   // le stringhe nel JS (e negli script dentro l'HTML): "/assets/x.js", '/media/y.webp'
-  out = out.replace(new RegExp('(["\'`])\\/(' + SEGUE + '[^"\'`\\s]*)', 'g'), (m, q, resto) => (esiste(resto) ? `${q}${prefisso}/${resto}` : m))
+  out = out.replace(reStringa, (m, q, resto) => (esiste(resto) ? `${q}${prefisso}/${resto}` : m))
   if (ext !== '.json' && ext !== '.webmanifest') out = out.replace(reUrl, `url($1${P}/`)
   return out
 }
+
 
 function deposita(dist, short) {
   const dest = join(deposito, 'versioni', short)

@@ -16,8 +16,10 @@ node tools/tempo/tempo.mjs --manifesto     # riscrive solo src/data/tempo.js da 
 
 ## Come funziona
 
-1. **I giorni.** `git log` del repository, fuori pzkko, Better Call Pekko, i workflow e i
-   documenti di radice; di ogni giorno (ora italiana) si tiene l'ultimo commit e si conta
+1. **I giorni.** `git log` del repository, fuori pzkko, Better Call Pekko, i workflow, i
+   documenti di radice e quello che produce la macchina stessa (foto, manifesto, `tools/tempo`:
+   altrimenti ogni aggiornamento delle foto diventerebbe il «giorno di oggi» da rifotografare);
+   di ogni giorno (ora italiana) si tiene l'ultimo commit e si conta
    quanti ne ha avuti.
 2. **La ricostruzione.** `git archive` del commit in `tools/tempo/lavoro/sito` (fuori da git).
    Le dipendenze restano da una versione all'altra se `package-lock.json` non è cambiato,
@@ -44,6 +46,9 @@ riscritti su `/tempo/<sha>/`. Si riscrivono sempre gli attributi dell'HTML (`hre
 `action`, `poster`, i `srcset`) e i `url(/x)` del CSS; le stringhe del JS solo se il primo pezzo
 del percorso è un file o una cartella che c'è in cima alla versione: `"/assets/…"` sì, il
 suffisso `"/10"` di un voto no (il 3.11.2026 «8.5/10» era diventato «8.5/tempo/540d403/10»).
+Un indirizzo che ha già il prefisso della versione non si riscrive più: dal 3.11.2026 il sito ha
+una cartella `tempo/` (la macchina del tempo stessa) e il passaggio sulle stringhe raddoppiava il
+prefisso, «/tempo/bc7ba74/tempo/bc7ba74/assets/…», così CSS e JS non si caricavano.
 Gli indirizzi che il JS di allora costruisce da sé il server li rimanda dentro la versione,
 guardando da quale pagina arriva la richiesta. I binari stanno una volta sola in
 `store\<hash>` con collegamenti fisici. `stato.json` elenca le versioni pronte.
