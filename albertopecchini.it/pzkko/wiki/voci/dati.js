@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 714 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>4b1e5b2</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 717 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>bc7ba74</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,13 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 13
+| 16
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/bc7ba74 bc7ba74] Merge remote-tracking branch 'origin/main' into albertopecchini.it
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/de6b6f3 de6b6f3] fix(tempo): «8.5/10» non diventa più «8.5/tempo/540d403/10»
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/8144e0c 8144e0c] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4b1e5b2 4b1e5b2] feat(albertopecchini.it): la macchina del tempo, /tempo/, copia della Wayback Machine
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/1a67f1e 1a67f1e] feat(albertopecchini.it): /cv/ e /cv/?print, il curriculum che si stampa da solo
 * 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/33cb3e7 33cb3e7] feat(albertopecchini.it): il blu #007acc al posto del minio, catture nuove di rivaltasulmincio.it, GitHub ygpzk
@@ -12424,9 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/4e7c90d 4e7c90d] feat(pzkko): il canale sempre aperto e il salvataggio quasi immediato
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/d48798d d48798d] fix(pzkko): bug trovati dalla revisione di musica, cornice e zaino
 * 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/fe4721b fe4721b] fix(pzkko): la barra cambia pagina anche quando il riquadro è rifiutato o si clicca due volte
-* 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/a2ff3ef a2ff3ef] fix(pzkko): la cornice si può aprire: X-Frame-Options SAMEORIGIN nel vercel.json che conta
-* 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/1f0fb48 1f0fb48] fix(pzkko): lo zaino sincronizzato fra i dispositivi, unito e non sovrascritto
-* 2026-10-27 [https://github.com/albertoxpecchini/AP/commit/47362a1 47362a1] feat(pzkko): la musica non si ferma cambiando pagina (la cornice)
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

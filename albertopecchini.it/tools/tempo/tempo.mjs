@@ -7,7 +7,8 @@
 //   node tools/tempo/tempo.mjs --solo=<sha>    una versione sola (anche più sha, separati da virgola)
 //   node tools/tempo/tempo.mjs --da=2026-09-01 solo da quel giorno in poi
 //   node tools/tempo/tempo.mjs --limite=5      al massimo cinque versioni, poi si ferma
-//   node tools/tempo/tempo.mjs --manifesto     riscrive solo src/data/tempo.js da quello che c'è
+//   node tools/tempo/tempo.mjs --manifesto     riscrive solo src/data/tempo.js da quello che c'è (le misure dalle foto sul disco)
+//   node tools/tempo/tempo.mjs --corte         rifà le foto rimaste al primo schermo (alte 600 px)
 //   node tools/tempo/tempo.mjs --deposito=C:\pzkko-server\tempo
 //                                              deposita anche il sito intero di ogni versione (HTML,
 //                                              CSS, JS, immagini) in <deposito>/versioni/<sha>/, coi
@@ -188,12 +189,25 @@ async function fotografa(dist, short) {
       await page.goto(`http://127.0.0.1:${porta}/`, { waitUntil: 'networkidle2', timeout: 60000 }).catch(() => {})
       await page.evaluate(async () => {
         await (document.fonts?.ready || Promise.resolve())
-        const h = () => document.documentElement.scrollHeight
-        for (let y = 0; y < h() && y < 30000; y += 600) {
-          scrollTo(0, y)
-          await new Promise((r) => setTimeout(r, 60))
+        // Dal 14.6 al 17.9.2026 il sito scorreva dentro il body (html alto quanto la
+        // finestra, body con overflow: auto): la foto «a tutta altezza» prendeva solo il
+        // primo schermo. Si fa scorrere chi scorre davvero, poi lo si sblocca.
+        const scorre = (e) => e.scrollHeight > e.clientHeight + 50 && /(auto|scroll)/.test(getComputedStyle(e).overflowY)
+        const contenitori = [...document.querySelectorAll('html, body, body > *, #root, #app, main')].filter(scorre)
+        const tutti = [document.scrollingElement || document.documentElement, ...contenitori]
+        for (const el of tutti) {
+          for (let y = 0; y < el.scrollHeight && y < 30000; y += 600) {
+            el.scrollTop = y
+            await new Promise((r) => setTimeout(r, 60))
+          }
+          el.scrollTop = 0
         }
-        scrollTo(0, 0)
+        if (contenitori.length) {
+          const s = document.createElement('style')
+          s.textContent = 'html, body { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; }'
+          document.head.append(s)
+          for (const el of contenitori) Object.assign(el.style, { height: 'auto', maxHeight: 'none', overflow: 'visible' })
+        }
         // via i pannelli fissi (cookie, modali di benvenuto) che coprirebbero la foto
         document.querySelectorAll('[class*="cookie" i], [id*="cookie" i]').forEach((el) => (el.style.display = 'none'))
       })
@@ -238,7 +252,15 @@ const reAttr = new RegExp('\\b(href|src|action|poster|data-src)=(["\'])\\/(?=' +
 function riscrivi(testo, ext, prefisso, cima) {
   const P = prefisso.replace(/\$/g, '$$$$')
   if (ext === '.css') return testo.replace(reUrl, `url($1${P}/`)
-  const esiste = (resto) => cima.has(decodeURIComponent(resto.split(/[/?#]/)[0]))
+  // un «%» che non è una sequenza valida (un testo, non un indirizzo) non fa cadere il deposito
+  const esiste = (resto) => {
+    const primo = resto.split(/[/?#]/)[0]
+    try {
+      return cima.has(decodeURIComponent(primo))
+    } catch {
+      return cima.has(primo)
+    }
+  }
   let out = testo
   if (ext === '.html' || ext === '.htm') {
     out = out.replace(reAttr, `$1=$2${P}/`)
@@ -310,16 +332,32 @@ const fatte = new Map(leggiManifesto().map((v) => [v.sha, v]))
 const tutte = giorni()
 let versioni = tutte.map((g) => ({ ...(fatte.get(g.sha) || {}), ...g }))
 
+// le misure delle foto che ci sono già sul disco ma non nel manifesto (un giro interrotto)
+async function misureDalDisco(v) {
+  if (v.d) return
+  const fd = join(OUT, `${v.short}-d.webp`)
+  const fm = join(OUT, `${v.short}-m.webp`)
+  if (!existsSync(fd) || !existsSync(fm)) return
+  const [a, b] = await Promise.all([sharp(fd).metadata(), sharp(fm).metadata()])
+  Object.assign(v, { d: { w: a.width, h: a.height }, m: { w: b.width, h: b.height } })
+}
+for (const v of versioni) await misureDalDisco(v)
+// il numero si riscrive sugli stessi oggetti: il giro qui sotto li modifica, e una copia
+// nuova a ogni passo (com'era prima del 3.11.2026) faceva perdere le misure appena prese
+const numera = () => versioni.forEach((v, i) => (v.n = i + 1))
+
 if (soloManifesto) {
-  versioni = versioni.map((v, i) => ({ n: i + 1, ...v }))
+  numera()
   scriviManifesto(versioni)
   statoDeposito(versioni)
-  console.log(`manifesto: ${versioni.length} versioni`)
+  console.log(`manifesto: ${versioni.length} versioni, ${versioni.filter((v) => v.d).length} con la foto`)
   process.exit(0)
 }
 
+// --corte: rifà le foto rimaste al primo schermo (alte quanto la finestra: 600 px su 960)
+const corte = argv.includes('--corte')
 const depositata = (v) => deposito && existsSync(join(deposito, 'versioni', v.short, 'index.html'))
-const serveFoto = (v) => forza || !fatte.get(v.sha)?.d
+const serveFoto = (v) => forza || !v.d || (corte && v.d.h <= 620)
 const serveDeposito = (v) => Boolean(deposito) && (forza || !depositata(v))
 const daFare = versioni.filter((v) => (solo ? solo.some((s) => v.sha.startsWith(s) || v.short === s) : true) && (!da || v.data >= da) && (serveFoto(v) || serveDeposito(v)))
 console.log(`${versioni.length} giorni di lavoro, ${daFare.length} da ricostruire${Number.isFinite(limite) ? ` (al massimo ${limite})` : ''}${deposito ? ` · deposito in ${deposito}` : ''}`)
@@ -331,28 +369,45 @@ for (const v of daFare) {
   n++
   const inizio = Date.now()
   console.log(`\n[${n}/${Math.min(daFare.length, limite)}] ${v.data} ${v.short} · ${v.msg.slice(0, 70)}`)
+  const errore = (e) => String(e.stderr || e.message || e).split('\n').filter(Boolean).slice(-3).join(' · ').slice(0, 300)
+  let dist
   try {
     const dir = estrai(v.sha)
     dipendenze(dir)
-    const dist = compila(dir)
+    dist = compila(dir)
+  } catch (e) {
+    // non si compila più: è l'unico caso in cui la versione resta senza foto
+    v.errore = errore(e)
+    if (!existsSync(join(OUT, `${v.short}-d.webp`))) {
+      delete v.d
+      delete v.m
+    }
+    console.log(`  ✗ ${v.errore}`)
+  }
+  if (dist) {
+    delete v.errore
     if (serveFoto(v)) {
-      const foto = await fotografa(dist, v.short)
-      Object.assign(v, foto, { errore: undefined })
-      console.log(`  ✓ ${foto.d.w}×${foto.d.h} · ${foto.m.w}×${foto.m.h} · «${foto.titolo}»`)
+      try {
+        const foto = await fotografa(dist, v.short)
+        Object.assign(v, foto)
+        console.log(`  ✓ ${foto.d.w}×${foto.d.h} · ${foto.m.w}×${foto.m.h} · «${foto.titolo}»`)
+      } catch (e) {
+        console.log(`  ✗ foto: ${errore(e)}`) // resta la foto di prima, se c'era
+      }
     }
     if (serveDeposito(v)) {
-      const d = deposita(dist, v.short)
-      console.log(`  ✓ deposito: ${d.file} file, ${d.kb} KB nuovi`)
+      try {
+        const d = deposita(dist, v.short)
+        delete v.erroreDeposito
+        console.log(`  ✓ deposito: ${d.file} file, ${d.kb} KB nuovi`)
+      } catch (e) {
+        v.erroreDeposito = errore(e)
+        console.log(`  ✗ deposito: ${v.erroreDeposito}`)
+      }
     }
-    console.log(`  ${Math.round((Date.now() - inizio) / 1000)} s`)
-  } catch (e) {
-    const msg = String(e.stderr || e.message || e).split('\n').filter(Boolean).slice(-3).join(' · ').slice(0, 300)
-    v.errore = msg
-    delete v.d
-    delete v.m
-    console.log(`  ✗ ${msg}`)
   }
-  versioni = versioni.map((x, i) => ({ n: i + 1, ...x }))
+  console.log(`  ${Math.round((Date.now() - inizio) / 1000)} s`)
+  numera()
   scriviManifesto(versioni)
   statoDeposito(versioni)
 }
