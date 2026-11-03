@@ -17,6 +17,8 @@ export default defineConfig({
   // rete locale). Vale per `npm run dev` e per `npm run preview`.
   // allowedHosts: senza, Vite rifiuta le richieste che arrivano dagli indirizzi
   // inoltrati di VS Code (pannello Porte, *.devtunnels.ms) con «Blocked request».
-  server: { port: 5173, strictPort: false, host: true, allowedHosts: ['.devtunnels.ms'] },
+  // watch.ignored: le cartelle di lavoro degli strumenti (fuori da git) non sono il sito; la
+  // macchina del tempo ci ricostruisce i siti di allora e la pagina si ricaricava di continuo
+  server: { port: 5173, strictPort: false, host: true, allowedHosts: ['.devtunnels.ms'], watch: { ignored: ['**/tools/*/lavoro/**'] } },
   preview: { host: true, allowedHosts: ['.devtunnels.ms'] },
 })

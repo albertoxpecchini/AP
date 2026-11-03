@@ -53,7 +53,7 @@
     'about about';
   gap: 8px 14px;
   align-items: center;
-  max-width: 1280px;
+  max-width: 1600px;
   margin-inline: auto;
   padding: 8px 12px;
 }
@@ -114,12 +114,90 @@
   background: linear-gradient(#fff, #d8d8d8);
 }
 
+/* il selettore del sito al posto del campo dell'indirizzo (3.11.2026): stesso campo, con la freccia */
+.wb__select {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+.wb__select::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  border: 4px solid transparent;
+  border-top-color: #444;
+  margin-top: -2px;
+  pointer-events: none;
+}
+
+.wb__select .wb__input {
+  appearance: none;
+  padding-right: 26px;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.wb__select .wb__input:focus-visible,
+.wb__go:focus-visible,
+.wb__more:focus-visible {
+  outline: 2px solid var(--wb-blue);
+  outline-offset: 1px;
+}
+
+a.wb__go {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 /* ── Il conteggio e l'istogramma: una barra per giorno, alta quanti commit ── */
 
 .wb__graph {
   grid-area: graph;
+  position: relative;
   display: grid;
   gap: 4px;
+}
+
+/* l'anteprima sopra l'istogramma, come il calendario della Wayback Machine */
+.wb__tip {
+  position: absolute;
+  top: calc(100% + 2px);
+  z-index: 30;
+  display: grid;
+  gap: 3px;
+  width: 172px;
+  padding: 6px;
+  border: 1px solid #999;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+
+.wb__tip[hidden] {
+  display: none;
+}
+
+.wb__tip-img {
+  display: block;
+  width: 160px;
+  height: 100px;
+  object-fit: cover;
+  object-position: top;
+  border: 1px solid #ddd;
+  background: #f4f4f4;
+}
+
+.wb__tip-date {
+  font-weight: 700;
+}
+
+.wb__tip-n {
+  color: var(--wb-muted);
 }
 
 .wb__count {
@@ -319,7 +397,7 @@
 
 .wb__page {
   position: relative;
-  max-width: 1280px;
+  max-width: 1600px;
   margin-inline: auto;
   background: #fff;
 }
@@ -362,6 +440,268 @@
   }
 }
 
+/* ── Le statistiche della cattura ── */
+
+.wb__chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.wb__chip {
+  padding: 1px 6px;
+  border: 1px solid #d0d0d0;
+  border-radius: 9px;
+  background: #fff;
+  color: #333;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb__plus {
+  color: #1a7f37;
+  font-weight: 700;
+}
+
+.wb__minus {
+  color: #cf222e;
+  font-weight: 700;
+}
+
+.wb__more {
+  padding: 1px 8px;
+  border: 1px solid #999;
+  border-radius: 3px;
+  background: linear-gradient(#fdfdfd, #e3e3e3);
+  color: var(--wb-fg);
+  font: 11px var(--wb-font);
+  cursor: pointer;
+}
+
+.wb__more[aria-expanded='true'] {
+  background: linear-gradient(#e3e3e3, #fdfdfd);
+}
+
+.wb__more[aria-expanded='true'] span {
+  display: inline-block;
+  transform: rotate(180deg);
+}
+
+/* ── I momenti: il giorno e tutto il sito ── */
+
+.wb__drawer {
+  border-top: 1px solid var(--wb-line);
+  background: #f7f7f7;
+  max-height: min(62vh, 560px);
+  overflow: auto;
+}
+
+.wb__drawer[hidden] {
+  display: none;
+}
+
+.wb__drawer-in {
+  display: grid;
+  gap: 14px 28px;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: 10px 12px 4px;
+}
+
+@media (min-width: 900px) {
+  .wb__drawer-in {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+}
+
+.wb__h {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wb-fg);
+}
+
+.wb__facts {
+  margin: 6px 0 0;
+  color: #333;
+}
+
+.wb__facts code,
+.wb__commits code {
+  font-family: Consolas, Menlo, monospace;
+  font-size: 10px;
+}
+
+.wb__muted {
+  color: var(--wb-muted);
+}
+
+/* il righello delle 24 ore, un puntino per commit; la notte in grigio */
+.wb__ruler {
+  position: relative;
+  height: 30px;
+  margin: 4px 6px 0;
+  border-bottom: 1px solid #999;
+  background: #fff;
+}
+
+.wb__night {
+  position: absolute;
+  inset: 0 auto 0 var(--a);
+  width: calc(var(--b) - var(--a));
+  background: repeating-linear-gradient(135deg, #eee 0 4px, #f7f7f7 4px 8px);
+}
+
+.wb__tick {
+  position: absolute;
+  left: var(--x);
+  bottom: -13px;
+  height: 13px;
+  padding-left: 2px;
+  border-left: 1px solid #999;
+  color: var(--wb-muted);
+  font-size: 9px;
+  line-height: 13px;
+}
+
+.wb__dot {
+  position: absolute;
+  left: var(--x);
+  bottom: 6px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: var(--wb-blue);
+  opacity: 0.75;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.wb__ruler + .wb__facts {
+  margin-top: 18px;
+}
+
+.wb__commits {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wb__commits li {
+  display: grid;
+  grid-template-columns: 38px 56px minmax(0, 1fr);
+  column-gap: 6px;
+  padding: 2px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.wb__c-ora {
+  color: var(--wb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wb__c-sha {
+  color: var(--wb-blue);
+  font-family: Consolas, Menlo, monospace;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.wb__c-sha:hover {
+  text-decoration: underline;
+}
+
+.wb__c-msg {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wb__c-n {
+  grid-column: 3;
+  color: var(--wb-muted);
+  font-size: 10px;
+}
+
+/* la griglia settimana × ora: un cerchio per ora, grande quanti commit */
+.wb__punch {
+  display: grid;
+  grid-template-columns: 26px repeat(24, minmax(0, 1fr));
+  gap: 1px;
+  align-items: center;
+  max-width: 520px;
+}
+
+.wb__pc-day,
+.wb__pc-h {
+  color: var(--wb-muted);
+  font-size: 9px;
+}
+
+.wb__pc {
+  aspect-ratio: 1;
+  position: relative;
+  background: #fff;
+}
+
+.wb__pc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(var(--s) * 100%);
+  height: calc(var(--s) * 100%);
+  border-radius: 50%;
+  background: var(--wb-blue);
+}
+
+.wb__facts-list {
+  display: grid;
+  gap: 3px;
+  margin: 10px 0 0;
+  padding-left: 14px;
+  color: #333;
+}
+
+.wb__privacy {
+  max-width: 1600px;
+  margin: 6px auto 0;
+  padding: 6px 12px 8px;
+  border-top: 1px solid #e2e2e2;
+  color: var(--wb-muted);
+  font-size: 10px;
+}
+
+/* da 1280 px la riga della cattura sta su una linea: il messaggio lungo si taglia (intero nel title) */
+@media (min-width: 1280px) {
+  .wb__about {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .wb__commit {
+    flex: 0 1 auto;
+    min-width: 12ch;
+    max-width: 58ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wb__chips {
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .wb__more,
+  .wb__about-label {
+    flex: none;
+  }
+}
+
 /* il credito di ogni pagina, in fondo alla riga della cattura */
 .wb__credit {
   margin-left: auto;
@@ -372,4 +712,35 @@
 
 .wb__credit:hover {
   text-decoration: underline;
+}
+
+.wb__count a {
+  color: var(--wb-blue);
+  text-decoration: none;
+}
+
+.wb__count a:hover {
+  text-decoration: underline;
+}
+
+/* i commit automatici (le catture dei siti): ci sono, ma non sono momenti di lavoro */
+.wb__dot--auto {
+  background: #aaa;
+  opacity: 0.6;
+}
+
+.wb__commits li.is-auto {
+  color: var(--wb-muted);
+}
+
+.wb__commits li.is-auto .wb__c-sha {
+  color: #888;
+}
+
+.wb__months span.wb__m-end {
+  left: auto;
+  right: 0;
+  padding: 0 3px 0 0;
+  border-left: 0;
+  border-right: 1px solid #999;
 }
