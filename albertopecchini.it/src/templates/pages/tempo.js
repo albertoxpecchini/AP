@@ -1,103 +1,246 @@
-// Pagina /tempo/: la macchina del tempo, copiata dalla Wayback Machine di
-// Internet Archive. Sopra la barra: il marchio, il selettore del sito (al posto del
-// campo dell'indirizzo), «salvata N volte tra … e …», l'istogramma con una barra per
-// giorno alta quanti commit ha avuto quel giorno (da git, cioè da GitHub), le frecce con
-// la data della cattura precedente e successiva; sotto il commit della cattura con le sue
-// statistiche e, a richiesta, i «momenti»: il giorno su un righello di 24 ore coi commit
-// uno per uno, e quando lavoravo su tutto il sito. Sotto la barra la pagina com'era quel
-// giorno: gli HTML veri dal server di casa (site.archivio) in un iframe, altrimenti la foto.
+// La macchina del tempo, copiata dalla Wayback Machine di Internet Archive. Tre pagine,
+// tutte statiche e leggere (dal 3.11.2026 sera: «fai che gli altri vedano l'html leggero
+// con solo le foto e non che debba scaricare il repo intero ogni volta, un html semplice
+// leggibile con percorso completo e univoco»):
+//
+//   /tempo/                               l'archivio: i cinque siti, con l'ultima cattura
+//   /tempo/<dominio>/                     un sito: tutte le catture, mese per mese
+//   /tempo/<dominio>/<AAAA-MM-GG>/        una cattura: la barra e la foto
+//
+// La barra: il marchio, il selettore del sito al posto del campo dell'indirizzo, «salvata N
+// volte tra … e …», l'istogramma con una barra per giorno alta quanti commit (ogni barra è un
+// link alla sua cattura), le frecce con le date intorno alla cattura corrente; sotto, il
+// commit con le statistiche del giorno e i «momenti», già scritti nell'HTML. Le foto vengono
+// da Vercel (public/media/tempo/<id>/); la pagina vera di quel giorno, dal server di casa
+// (site.archivio), è solo un link: scarica il sito intero di allora, ed è per chi la vuole.
 // Le versioni le ricostruisce tools/tempo/tempo.mjs (manifesti in src/data/tempo/).
-// Alberto, 3.11.2026: «fai proprio una copia di Wayback Machine, niente altri strumenti,
-// metti la barra sopra e l'istogramma in base ai commit di github»; poi, lo stesso giorno,
-// i siti diventano cinque (rivaltasulmincio.it, cascinafontana.xyz, pzkko.it,
-// bettercallpekko.it) con «un selettore del repo» e «più statistiche nel commit».
 
 import { html, esc } from '../html.js'
 import { site } from '../../data/site.js'
 import { siti, aggiornato } from '../../data/tempo.js'
-import { istogramma, conteggio, chips, corta, lunga, foto, dominio, datiPagina, momentiSito, momentiGiorno } from './tempo-pezzi.js'
+import { istogramma, conteggio, chips, corta, lunga, foto, dominio, momentiSito, momentiGiorno, sitoPath, catturaPath, vivaUrl, conFoto, num } from './tempo-pezzi.js'
 
-export function tempoPage() {
-  const dati = datiPagina(siti)
-  const sito = dati[0]
-  const lista = sito.versioni
-  const corrente = [...lista].reverse().find((v) => v.foto) || lista.at(-1)
-  const i0 = corrente.n - 1
-  const prev = lista[i0 - 1]
-  const next = lista[i0 + 1]
-  const isto = istogramma(lista, i0)
+const ultima = (s) => [...s.versioni].reverse().find(conFoto) || s.versioni.at(-1)
+const mese = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+const repo = (s) => s.github.replace('https://github.com/', '')
+const commitTotali = (s) => (s.momenti?.commit || 0) + (s.momenti?.auto || 0)
 
+// il selettore: ogni sito porta alla sua cattura più recente
+const selettore = (attuale) => html`
+  <div class="wb__url">
+    <label class="sr-only" for="wb-sito">Sito</label>
+    <span class="wb__select">
+      <select class="wb__input" id="wb-sito" data-tm-sito>
+        ${!attuale && '<option value="" selected disabled>Scegli un sito…</option>'}
+        ${siti.map((s) => `<option value="${catturaPath(s, ultima(s))}"${attuale?.id === s.id ? ' selected' : ''}>${esc(s.url.replace('https://', ''))}/ · ${s.versioni.length} catture</option>`)}
+      </select>
+    </span>
+    <a class="wb__go" href="${esc((attuale || siti[0]).url)}/" target="_blank" rel="noopener" title="Il sito com'è oggi">Oggi</a>
+  </div>
+`
+
+const marchio = html`
+  <a class="wb__logo" href="/tempo/" aria-label="La macchina del tempo: tutti i siti">
+    <span class="wb__logo-top">ARCHIVIO DI ALBERTO</span>
+    <span class="wb__logo-big">Macchina del tempo</span>
+  </a>
+`
+
+// il credito di ogni pagina (CLAUDE.md): qui non c'è il piè di pagina del sito, la barra è il guscio
+const credito = `<a class="wb__credit" href="${esc(site.url)}" rel="author">Sito di ${esc(site.name)}</a>`
+
+const privacy = () => `<p class="wb__privacy">Ore e giorni in ora italiana, presi dai commit già pubblici su GitHub. Niente nomi né indirizzi email: degli autori si conta solo se c’era un assistente, e i commit automatici (le catture dei siti) non contano fra i momenti. Nelle pagine di allora l’indirizzo di casa e i numeri che non uso più non compaiono. Aggiornato il ${esc(lunga(aggiornato))}.</p>`
+
+function grafico(s, k) {
+  const isto = istogramma(s, k)
+  return html`
+    <div class="wb__graph">
+      <p class="wb__count">${conteggio(s)}</p>
+      <div class="wb__spark" data-tm-spark style="--n:${isto.n}" role="group" aria-label="Catture per giorno: una barra per giorno, alta quanti commit">${isto.barre}</div>
+      <div class="wb__months" aria-hidden="true" style="--n:${isto.n}">${isto.mesi}</div>
+      <div class="wb__tip" data-tm-tip hidden aria-hidden="true">
+        <img class="wb__tip-img" data-tm-tip-img alt="" width="160" height="100" decoding="async" data-no-srcset>
+        <span class="wb__tip-date" data-tm-tip-date></span>
+        <span class="wb__tip-n" data-tm-tip-n></span>
+      </div>
+    </div>
+  `
+}
+
+// ── /tempo/<dominio>/<AAAA-MM-GG>/ : una cattura ─────────────────────────────
+
+export function tempoCatturaPage(s, k) {
+  const v = s.versioni[k]
+  const prev = s.versioni[k - 1]
+  const next = s.versioni[k + 1]
+  const nome = dominio(s.url)
   return html`
     <div class="wb" data-tempo data-no-ink>
-      <div class="wb__bar" role="region" aria-label="La macchina del tempo" data-tm-bar>
+      <div class="wb__bar" role="region" aria-label="La macchina del tempo">
         <div class="wb__row">
-          <a class="wb__logo" href="/" aria-label="Archivio di Alberto Pecchini — torna al sito di oggi">
-            <span class="wb__logo-top">ARCHIVIO DI ALBERTO</span>
-            <span class="wb__logo-big">Macchina del tempo</span>
-          </a>
-          <div class="wb__url">
-            <label class="sr-only" for="wb-sito">Sito e repository</label>
-            <span class="wb__select">
-              <select class="wb__input" id="wb-sito" data-tm-sito>
-                ${dati.map((s) => `<option value="${s.id}">${esc(s.url.replace('https://', ''))}/ · ${s.versioni.length} catture</option>`)}
-              </select>
-            </span>
-            <a class="wb__go" href="${esc(sito.url)}/" target="_blank" rel="noopener" data-tm-oggi title="Il sito com'è oggi">Oggi</a>
-          </div>
-          <div class="wb__graph">
-            <p class="wb__count" data-tm-count>${conteggio(sito)}</p>
-            <div class="wb__spark" data-tm-spark style="--n:${isto.n}" role="group" aria-label="Catture per giorno: una barra per giorno, alta quanti commit">${isto.barre}</div>
-            <div class="wb__months" aria-hidden="true" data-tm-months style="--n:${isto.n}">${isto.mesi}</div>
-            <div class="wb__tip" data-tm-tip hidden aria-hidden="true">
-              <img class="wb__tip-img" data-tm-tip-img alt="" width="160" height="100" decoding="async" data-no-srcset>
-              <span class="wb__tip-date" data-tm-tip-date></span>
-              <span class="wb__tip-n" data-tm-tip-n></span>
-            </div>
-          </div>
-          <div class="wb__nav" aria-live="polite">
-            <a class="wb__arrow wb__arrow--prev" href="${prev ? `#v=${prev.short}` : '#'}" data-tm-prev aria-label="Cattura precedente"${prev ? '' : ' aria-disabled="true"'}>
+          ${marchio}
+          ${selettore(s)}
+          ${grafico(s, k)}
+          <nav class="wb__nav" aria-label="Catture vicine">
+            <a class="wb__arrow wb__arrow--prev" href="${prev ? catturaPath(s, prev) : sitoPath(s)}" data-tm-prev aria-label="Cattura precedente"${prev ? '' : ' aria-disabled="true"'}>
               <span class="wb__tri" aria-hidden="true">◀</span>
-              <span class="wb__arrow-date" data-tm-prev-date>${prev ? corta(prev.data) : '—'}</span>
+              <span class="wb__arrow-date">${prev ? corta(prev.data) : '—'}</span>
             </a>
             <div class="wb__current">
-              <span class="wb__day" data-tm-date>${corta(corrente.data)}</span>
-              <span class="wb__time" data-tm-time>${corrente.ora}:00</span>
-              <span class="wb__n">cattura <span data-tm-n>${corrente.n}</span> di <span data-tm-tot>${lista.length}</span></span>
+              <h1 class="wb__day">${corta(v.data)}</h1>
+              <span class="wb__time">${v.ora}:00</span>
+              <a class="wb__n" href="${sitoPath(s)}">cattura ${v.n} di ${s.versioni.length}</a>
             </div>
-            <a class="wb__arrow wb__arrow--next" href="${next ? `#v=${next.short}` : '#'}" data-tm-next aria-label="Cattura successiva"${next ? '' : ' aria-disabled="true"'}>
-              <span class="wb__arrow-date" data-tm-next-date>${next ? corta(next.data) : '—'}</span>
+            <a class="wb__arrow wb__arrow--next" href="${next ? catturaPath(s, next) : sitoPath(s)}" data-tm-next aria-label="Cattura successiva"${next ? '' : ' aria-disabled="true"'}>
+              <span class="wb__arrow-date">${next ? corta(next.data) : '—'}</span>
               <span class="wb__tri" aria-hidden="true">▶</span>
             </a>
-          </div>
+          </nav>
           <div class="wb__about">
             <span class="wb__about-label">Questa cattura</span>
-            <a class="wb__commit" href="${esc(sito.github)}/commit/${corrente.sha}" target="_blank" rel="noopener" title="${esc(corrente.msg)}" data-tm-github><code data-tm-sha>${corrente.short}</code> <span data-tm-msg>${esc(corrente.msg)}</span></a>
-            <span class="wb__chips" data-tm-chips>${chips(corrente)}</span>
+            <a class="wb__commit" href="${esc(s.github)}/commit/${v.sha}" target="_blank" rel="noopener" title="${esc(v.msg)}"><code>${v.short}</code> <span>${esc(v.msg)}</span></a>
+            <span class="wb__chips">${chips(v)}</span>
             <button class="wb__more" type="button" aria-expanded="false" aria-controls="wb-momenti" data-tm-more>Momenti <span aria-hidden="true">▾</span></button>
-            <!-- il credito di ogni pagina (CLAUDE.md): qui non c'è il piè di pagina del sito, la barra è il guscio -->
-            <a class="wb__credit" href="${esc(site.url)}" rel="author">Sito di ${esc(site.name)}</a>
+            ${credito}
           </div>
         </div>
         <div class="wb__drawer" id="wb-momenti" data-tm-drawer hidden>
           <div class="wb__drawer-in">
-            <section class="wb__day-box" data-tm-giorno>${momentiGiorno(corrente, undefined, sito)}</section>
-            <section class="wb__site-box" data-tm-momenti>${momentiSito(sito)}</section>
+            <section class="wb__day-box">${momentiGiorno(v, s.giorni?.[v.data] || null, s)}</section>
+            <section class="wb__site-box">${momentiSito(s)}</section>
           </div>
-          <p class="wb__privacy">Ore e giorni in ora italiana, presi dai commit già pubblici su GitHub. Niente nomi né indirizzi email: degli autori si conta solo se c’era un assistente. Nelle pagine di allora l’indirizzo di casa e i numeri che non uso più non compaiono. Aggiornato il ${esc(lunga(aggiornato))}.</p>
+          ${privacy()}
         </div>
       </div>
 
-      <div class="wb__page" data-tm-page data-tm-archivio="${esc(site.archivio)}">
-        <!-- la pagina vera, dal server di casa (quando è acceso): l'HTML di quel giorno, navigabile -->
-        <iframe class="wb__frame" data-tm-frame title="${esc(dominio(sito.url))} com’era, dal vivo" hidden loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
-        <p class="wb__live label" data-tm-live hidden>pagina vera, servita dal server di casa · <a href="#" data-tm-apri target="_blank" rel="noopener">aprila in una scheda</a></p>
-        <p class="wb__err" data-tm-err${corrente.foto ? ' hidden' : ''}>${corrente.foto ? '' : corrente.errore ? `Questa cattura non si ricostruisce più: ${esc(corrente.errore)}.` : 'Questa cattura è ancora in ricostruzione: torna fra poco.'}</p>
-        <picture class="wb__pic">
-          <source media="(max-width: 600px)" srcset="${corrente.foto ? foto(sito.id, corrente.short, 'm') : ''}" data-tm-src-m>
-          <img class="wb__shot" src="${corrente.foto ? foto(sito.id, corrente.short, 'd') : ''}" width="960" height="${corrente.dh || 800}" alt="${esc(dominio(sito.url))} il ${lunga(corrente.data)}" decoding="async" data-tm-shot data-no-srcset>
-        </picture>
+      <div class="wb__page">
+        <p class="wb__live">foto di ${esc(nome)} il ${esc(lunga(v.data))}${v.titolo ? ` · «${esc(v.titolo)}»` : ''} · <a href="${esc(vivaUrl(site.archivio, s, v))}" target="_blank" rel="noopener" title="Dal server di casa di Alberto: il sito intero di quel giorno, può essere lento">la pagina vera ↗</a></p>
+        ${
+          conFoto(v)
+            ? html`<picture class="wb__pic">
+                <source media="(max-width: 600px)" srcset="${foto(s.id, v.short, 'm')}" width="${v.m.w}" height="${v.m.h}">
+                <img class="wb__shot" src="${foto(s.id, v.short, 'd')}" width="${v.d.w}" height="${v.d.h}" alt="${esc(nome)} il ${esc(lunga(v.data))}" fetchpriority="high" decoding="async" data-no-srcset>
+              </picture>`
+            : `<p class="wb__err">${v.errore ? `Questa cattura non si ricostruisce più: ${esc(v.errore)}.` : 'Questa cattura è ancora in ricostruzione: torna fra poco.'}</p>`
+        }
       </div>
-      <script type="application/json" data-tm-data>${JSON.stringify(dati).replace(/</g, '\\u003c')}</script>
     </div>
   `
+}
+
+// ── /tempo/<dominio>/ : tutte le catture di un sito, mese per mese ──────────
+
+export function tempoSitoPage(s) {
+  const mesi = []
+  for (const v of s.versioni) {
+    const m = v.data.slice(0, 7)
+    if (!mesi.length || mesi.at(-1).m !== m) mesi.push({ m, nome: mese(v.data), versioni: [] })
+    mesi.at(-1).versioni.push(v)
+  }
+  return html`
+    <div class="wb" data-tempo data-no-ink>
+      <div class="wb__bar" role="region" aria-label="La macchina del tempo">
+        <div class="wb__row wb__row--sito">
+          ${marchio}
+          ${selettore(s)}
+          ${grafico(s, -1)}
+          <div class="wb__about">
+            <span class="wb__about-label">${esc(dominio(s.url))}</span>
+            <span>repository <a class="wb__commit" href="${esc(s.github)}" target="_blank" rel="noopener">${esc(repo(s))}</a></span>
+            ${credito}
+          </div>
+        </div>
+      </div>
+      <main class="wb__list">
+        <h1 class="wb__h1">${esc(dominio(s.url))} nella macchina del tempo</h1>
+        <p class="wb__muted">${s.versioni.length} catture, una per giorno di lavoro, dal ${esc(lunga(s.versioni[0].data))} al ${esc(lunga(s.versioni.at(-1).data))}. Ogni cattura ha il suo indirizzo: <code>/tempo/${esc(dominio(s.url))}/AAAA-MM-GG/</code>.</p>
+        ${mesi.map(
+          (m) => html`
+            <section class="wb__mese">
+              <h2 class="wb__h">${esc(m.nome)}</h2>
+              <ol class="wb__giorni">
+                ${m.versioni.map(
+                  (v) => html`
+                    <li>
+                      <a class="wb__giorno" href="${catturaPath(s, v)}">
+                        ${conFoto(v) ? `<img src="${foto(s.id, v.short, v.foto2 ? 't' : 'd')}" width="320" height="200" alt="" loading="lazy" decoding="async" data-no-srcset>` : '<span class="wb__giorno-vuoto">senza foto</span>'}
+                        <span class="wb__giorno-data">${esc(corta(v.data))} · ${v.ora}</span>
+                        <span class="wb__giorno-n">${num(v.commit)} commit${v.st?.piu || v.st?.meno ? ` · <b class="wb__plus">+${num(v.st.piu)}</b> <b class="wb__minus">−${num(v.st.meno)}</b>` : ''}</span>
+                        <span class="wb__giorno-msg">${esc(v.msg)}</span>
+                      </a>
+                    </li>
+                  `,
+                )}
+              </ol>
+            </section>
+          `,
+        )}
+        <details class="wb__mom">
+          <summary>Quando lavoravo su ${esc(dominio(s.url))}</summary>
+          ${momentiSito(s)}
+        </details>
+        ${privacy()}
+      </main>
+    </div>
+  `
+}
+
+// ── /tempo/ : l'archivio ───────────────────────────────────────────────────
+
+export function tempoPage() {
+  // i vecchi indirizzi (#v=<sha> per albertopecchini.it, #s=<sito>&v=<sha>, fino al 3.11.2026
+  // sera) portano alla pagina della loro cattura: sha corto → percorso
+  const vecchi = Object.fromEntries(siti.map((s) => [s.id, Object.fromEntries(s.versioni.map((v) => [v.short, catturaPath(s, v)]))]))
+  return html`
+    <div class="wb" data-tempo data-no-ink>
+      <div class="wb__bar" role="region" aria-label="La macchina del tempo">
+        <div class="wb__row wb__row--indice">
+          ${marchio}
+          ${selettore(null)}
+          <p class="wb__count">${siti.length} siti, ${num(siti.reduce((n, s) => n + s.versioni.length, 0))} catture, ${num(siti.reduce((n, s) => n + commitTotali(s), 0))} commit</p>
+          <div class="wb__about">${credito}</div>
+        </div>
+      </div>
+      <main class="wb__list">
+        <h1 class="wb__h1">La macchina del tempo</h1>
+        <p class="wb__muted">I siti che ho fatto, com’erano a ogni giorno di lavoro: ricostruiti dal codice di allora e fotografati, come nella Wayback Machine. Ogni cattura ha il suo indirizzo, <code>/tempo/&lt;sito&gt;/AAAA-MM-GG/</code>, con l’istogramma dei commit, le statistiche del giorno e la foto.</p>
+        <ul class="wb__siti">
+          ${siti.map((s) => {
+            const u = ultima(s)
+            return html`
+              <li class="wb__sito">
+                <a class="wb__sito-foto" href="${catturaPath(s, u)}" aria-label="${esc(dominio(s.url))}, l’ultima cattura (${esc(lunga(u.data))})">
+                  ${conFoto(u) ? `<img src="${foto(s.id, u.short, u.foto2 ? 't' : 'd')}" width="320" height="200" alt="" decoding="async" data-no-srcset>` : ''}
+                </a>
+                <h2 class="wb__h"><a href="${catturaPath(s, u)}">${esc(dominio(s.url))}</a></h2>
+                <p class="wb__muted">${s.versioni.length} catture dal ${esc(lunga(s.versioni[0].data))} al ${esc(lunga(s.versioni.at(-1).data))} · ${num(commitTotali(s))} commit su ${esc(repo(s))}</p>
+                <p class="wb__sito-link"><a href="${sitoPath(s)}">tutte le catture</a> · <a href="${catturaPath(s, s.versioni[0])}">la prima</a> · <a href="${catturaPath(s, u)}">l’ultima</a></p>
+              </li>
+            `
+          })}
+        </ul>
+        ${privacy()}
+      </main>
+      <script type="application/json" data-tm-vecchi>${JSON.stringify(vecchi).replace(/</g, '\\u003c')}</script>
+    </div>
+  `
+}
+
+// le rotte delle pagine dei siti e delle catture (routes.js): fuori da sitemap e motori,
+// perché le versioni vecchie dei siti dei clienti non finiscano nelle ricerche al posto di oggi
+export function tempoRotte() {
+  return siti.flatMap((s) => [
+    {
+      path: sitoPath(s),
+      title: `${dominio(s.url)} nella macchina del tempo`,
+      description: `Tutte le ${s.versioni.length} versioni di ${dominio(s.url)}, una per giorno di lavoro, ricostruite dal codice e fotografate.`,
+      render: () => tempoSitoPage(s),
+    },
+    ...s.versioni.map((v, k) => ({
+      path: catturaPath(s, v),
+      title: `${dominio(s.url)} il ${lunga(v.data)} — La macchina del tempo`,
+      description: `Com’era ${dominio(s.url)} il ${lunga(v.data)}: ${v.msg}`.slice(0, 300),
+      render: () => tempoCatturaPage(s, k),
+    })),
+  ])
 }

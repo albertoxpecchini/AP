@@ -39,6 +39,22 @@ node tools/tempo/diretta.mjs "testo"       # la nota in cima al cruscotto
 
 Il deposito è `C:\pzkko-server\tempo` se non si dice `--deposito=<cartella>`.
 
+## Le pagine
+
+Statiche e leggere, una per cattura (dal 3.11.2026 sera, quando a Gabry non caricava niente:
+l'iframe scaricava dal server di casa il sito intero di quel giorno). Le genera la build del
+sito da `src/templates/pages/tempo.js` (rotte in `tempoRotte()`):
+
+- `/tempo/`: l'archivio, i cinque siti con l'ultima cattura;
+- `/tempo/<dominio>/`: tutte le catture di un sito, mese per mese, con le anteprime;
+- `/tempo/<dominio>/<AAAA-MM-GG>/`: una cattura. La barra (istogramma di link veri, frecce,
+  statistiche, «Momenti» già scritti nell'HTML coi commit del giorno dal manifesto) e la foto
+  da Vercel: una decina di richieste, circa 350 KB. La pagina vera dal server di casa è un link.
+
+Le pagine dei siti e delle catture sono `noindex` e fuori dalla sitemap; nessuna precarica i
+font del sito (`senzaFont`). I vecchi indirizzi `#v=<sha>` e `#s=<sito>&v=<sha>` di `/tempo/`
+portano alla pagina della loro cattura.
+
 ## Il giro, nell'ordine
 
 Alberto, 3.11.2026: «prima tutti i commit scaricati in locale e per ultimo le foto anteprime

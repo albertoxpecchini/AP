@@ -29,7 +29,8 @@
 // app a pagina singola che crede di stare alla radice). Le foto si fanno dopo, tutte, dal
 // deposito servito da server.mjs come dal tunnel: sono quello che vede il pubblico.
 // I manifesti (src/data/tempo/<id>.js, GENERATI) hanno una riga per versione con le statistiche
-// del giorno; i commit uno per uno stanno in public/media/tempo/<id>/commit.json.
+// del giorno e, in `giorni`, i commit uno per uno: ogni cattura è una pagina statica leggera
+// (/tempo/<dominio>/<AAAA-MM-GG>/) che li scrive già nell'HTML.
 
 import { execSync, execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -306,10 +307,10 @@ function leggiManifesto(s) {
   return []
 }
 
-function scriviManifesto(s, versioni, momenti) {
+function scriviManifesto(s, versioni, momenti, giorni = {}) {
   const ok = versioni.filter((v) => v.d).length
   const pulite = versioni.map(({ ct, ...v }) => v)
-  const dati = { id: s.id, nome: s.nome, url: s.url, github: s.github, aggiornato: new Date().toISOString().slice(0, 10), momenti, versioni: pulite }
+  const dati = { id: s.id, nome: s.nome, url: s.url, github: s.github, aggiornato: new Date().toISOString().slice(0, 10), momenti, versioni: pulite, giorni }
   scriviAtomico(
     fileManifesto(s),
     `// GENERATO da tools/tempo/tempo.mjs — non toccare a mano: le versioni di ${s.nome}, una per
@@ -944,10 +945,9 @@ async function giroSito(s) {
     }
   }
   const salva = () => {
-    scriviManifesto(s, versioni, momenti)
+    scriviManifesto(s, versioni, momenti, dettaglio)
     statoDeposito()
   }
-  scriviAtomico(join(MEDIA, s.id, 'commit.json'), JSON.stringify(dettaglio))
   salva()
   dlog(`sito-${s.id}`, `${s.nome}: ${versioni.length} giorni di lavoro, ${commit.length} commit dal ${momenti.primo}`)
 

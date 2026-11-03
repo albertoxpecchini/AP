@@ -1,7 +1,13 @@
-// I pezzi della macchina del tempo che servono sia al template (la pagina com'esce dalla
-// build, con albertopecchini.it) sia al browser (quando si cambia sito col selettore o
-// cattura): l'istogramma, le statistiche della cattura, i «momenti» del giorno e del sito.
-// Solo stringhe, niente DOM. I dati vengono da src/data/tempo.js (tools/tempo/tempo.mjs).
+// I pezzi della macchina del tempo: gli indirizzi delle pagine, l'istogramma, le statistiche
+// della cattura, i «momenti» del giorno e del sito. Solo stringhe, per i template di
+// pages/tempo.js. I dati vengono da src/data/tempo.js (tools/tempo/tempo.mjs).
+//
+// Dal 3.11.2026 sera ogni cattura è una pagina statica leggera con un indirizzo suo,
+// /tempo/<dominio>/<AAAA-MM-GG>/: la barra e le foto da Vercel, niente iframe né dati di
+// tutti i siti dentro la pagina (Alberto, in chiamata con Gabry: «fai che gli altri vedano
+// l'html leggero con solo le foto e non che debba scaricare il repo intero ogni volta, un
+// html semplice leggibile con percorso completo e univoco»). La pagina vera dal server di
+// casa resta un link, per chi la vuole.
 //
 // Riservatezza (Alberto, 3.11.2026: «ripercorrere i momenti di quando committavo senza
 // violare la mia privacy»): si mostrano ore, giorni e quantità, mai nomi o indirizzi di
@@ -34,10 +40,18 @@ const AI = { claude: 'Claude', copilot: 'Copilot', codex: 'Codex' }
 export const foto = (id, short, k) => `/media/tempo/${id}/${short}-${k}.webp`
 export const percorso = (id, short) => (id === 'ap' ? short : `${id}/${short}`)
 export const dominio = (url) => url.replace(/^https?:\/\/(www\.)?/, '')
+// gli indirizzi: un sito, una cattura (una per giorno, quindi la data basta)
+export const sitoPath = (s) => `/tempo/${dominio(s.url)}/`
+export const catturaPath = (s, v) => `/tempo/${dominio(s.url)}/${v.data}/`
+// la pagina vera sul server di casa: pesante, il sito intero di quel giorno
+export const vivaUrl = (archivio, s, v) => `${archivio}/${percorso(s.id, v.short)}/`
+export const conFoto = (v) => Boolean(v.d && v.m)
 
 // ── L'istogramma: un posto per ogni giorno dal primo all'ultimo, alto quanti commit ──
+// Ogni barra è un link alla sua cattura; l'anteprima (data-t) la mostra il browser al passaggio.
 
-export function istogramma(versioni, corrente) {
+export function istogramma(s, corrente = -1) {
+  const versioni = s.versioni
   if (!versioni.length) return { barre: '', mesi: '', n: 1 }
   const max = Math.max(...versioni.map((v) => v.commit))
   const perData = new Map(versioni.map((v, i) => [v.data, i]))
@@ -55,7 +69,10 @@ export function istogramma(versioni, corrente) {
       const v = g.i >= 0 ? versioni[g.i] : null
       if (!v) return `<span class="wb__col wb__col--empty" style="--k:${k}" aria-hidden="true"></span>`
       const h = Math.max(14, Math.round((v.commit / max) * 100))
-      return `<button class="wb__col${g.i === corrente ? ' is-current' : ''}${v.foto ? '' : ' is-off'}" type="button" style="--k:${k};--h:${h}%" data-tm-go="${g.i}" aria-label="${esc(lunga(v.data))}, ${per(v.commit, 'commit', 'commit')}"></button>`
+      const qui = g.i === corrente
+      const t = conFoto(v) ? ` data-t="${foto(s.id, v.short, v.foto2 ? 't' : 'd')}"` : ''
+      const righe = v.st?.piu || v.st?.meno ? ` · +${num(v.st.piu)} −${num(v.st.meno)}` : ''
+      return `<a class="wb__col${qui ? ' is-current' : ''}${conFoto(v) ? '' : ' is-off'}" href="${catturaPath(s, v)}" style="--k:${k};--h:${h}%" data-tm-go data-d="${esc(lunga(v.data))} · ${v.ora}" data-n="${per(v.commit, 'commit', 'commit')}${righe}"${t} aria-label="${esc(lunga(v.data))}, ${per(v.commit, 'commit', 'commit')}"${qui ? ' aria-current="page"' : ''}></a>`
     })
     .join('')
   // l'ultimo mese, se comincia a pochi giorni dalla fine, si appoggia al bordo destro (sul telefono «NOV» usciva)
@@ -147,16 +164,4 @@ export function momentiSito(sito) {
     <h3 class="wb__h">Tutto ${esc(dominio(sito.url))} · quando lavoravo</h3>
     <div class="wb__punch" role="img" aria-label="Commit per giorno della settimana e ora, ora italiana">${griglia}${ore}</div>
     <ul class="wb__facts-list">${fatti.map((f) => `<li>${f}</li>`).join('')}</ul>`
-}
-
-// i dati dei siti per la pagina: quello che serve al browser, niente di più
-export function datiPagina(siti) {
-  return siti.map((s) => ({
-    id: s.id,
-    nome: s.nome,
-    url: s.url,
-    github: s.github,
-    momenti: s.momenti,
-    versioni: s.versioni.map((v) => ({ n: v.n, sha: v.sha, short: v.short, data: v.data, ora: v.ora, msg: v.msg, commit: v.commit, titolo: v.titolo || '', foto: Boolean(v.d && v.m), t: Boolean(v.foto2), dh: v.d?.h, errore: v.errore || '', nota: v.nota || '', st: v.st })),
-  }))
 }

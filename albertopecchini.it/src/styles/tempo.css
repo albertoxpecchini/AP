@@ -744,3 +744,177 @@ a.wb__go {
   border-left: 0;
   border-right: 1px solid #999;
 }
+
+/* ── Le pagine statiche (3.11.2026 sera): ogni barra dell'istogramma è un link ── */
+
+a.wb__col {
+  display: block;
+}
+
+.wb__day {
+  margin: 0;
+}
+
+a.wb__n {
+  color: var(--wb-muted);
+  text-decoration: none;
+}
+
+a.wb__n:hover {
+  color: var(--wb-blue);
+  text-decoration: underline;
+}
+
+.wb__live {
+  max-width: 1600px;
+  margin-inline: auto;
+  text-align: left;
+  font-size: 11px;
+}
+
+/* l'archivio e l'elenco delle catture di un sito: html semplice, leggibile */
+.wb__row--indice,
+.wb__row--sito {
+  grid-template-areas:
+    'logo url'
+    'graph graph'
+    'about about';
+}
+
+.wb__row--indice .wb__count {
+  grid-area: graph;
+}
+
+@media (min-width: 900px) {
+  .wb__row--indice,
+  .wb__row--sito {
+    grid-template-columns: auto minmax(220px, 2fr) minmax(0, 3fr);
+    grid-template-areas:
+      'logo url graph'
+      'about about about';
+  }
+}
+
+.wb__list {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 16px 32px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.wb__list a {
+  color: var(--wb-blue);
+}
+
+.wb__h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.wb__list code {
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12px;
+}
+
+.wb__siti {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wb__sito .wb__h {
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.wb__sito p {
+  margin: 4px 0 0;
+}
+
+.wb__sito-foto,
+.wb__giorno img,
+.wb__giorno-vuoto {
+  display: block;
+  aspect-ratio: 16 / 10;
+  border: 1px solid #ccc;
+  background: #f4f4f4;
+  overflow: hidden;
+}
+
+.wb__sito-foto img,
+.wb__giorno img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.wb__mese {
+  margin-top: 18px;
+}
+
+.wb__mese .wb__h {
+  text-transform: capitalize;
+  border-bottom: 1px solid var(--wb-line);
+  padding-bottom: 3px;
+}
+
+.wb__giorni {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wb__giorno {
+  display: grid;
+  gap: 2px;
+  color: var(--wb-fg) !important;
+  text-decoration: none;
+}
+
+.wb__giorno:hover .wb__giorno-data {
+  color: var(--wb-blue);
+  text-decoration: underline;
+}
+
+.wb__giorno-vuoto {
+  display: grid;
+  place-items: center;
+  color: var(--wb-muted);
+  font-size: 11px;
+}
+
+.wb__giorno-data {
+  font-weight: 700;
+}
+
+.wb__giorno-n,
+.wb__giorno-msg {
+  color: var(--wb-muted);
+  font-size: 11px;
+}
+
+.wb__giorno-msg {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wb__mom {
+  margin-top: 24px;
+}
+
+.wb__mom summary {
+  cursor: pointer;
+  font-weight: 700;
+}

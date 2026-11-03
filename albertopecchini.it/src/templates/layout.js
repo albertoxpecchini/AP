@@ -63,7 +63,7 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : `<link rel="canon
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-${assets.preloadFonts.map((f) => `<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}
+${!route.senzaFont && assets.preloadFonts.map((f) => `<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin>`)}
 ${assets.styles.map((s) => `<link rel="stylesheet" href="${s}">`)}
 <script>
 (function(d){var c=d.documentElement.classList;c.remove('no-js');c.add('js');

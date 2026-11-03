@@ -296,7 +296,7 @@ function tempo() {
           ${scelte.map(
             (v, k) => html`
               <li class="tmz__frame" style="--i:${k}">
-                <a href="/tempo/#v=${v.short}" aria-label="Il sito il ${data(v.data)}">
+                <a href="/tempo/albertopecchini.it/${v.data}/" aria-label="Il sito il ${data(v.data)}">
                   <span class="tmz__shot"><img src="/media/tempo/ap/${v.short}-d.webp" width="960" height="${v.d.h}" alt="" loading="lazy" decoding="async" data-no-srcset></span>
                   <span class="label tmz__date">${data(v.data)}</span>
                 </a>

@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 727 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>f185289</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 729 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>312bf5c</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,12 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 26
+| 28
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/312bf5c 312bf5c] chore(tempo): le versioni di oggi di albertopecchini.it e pzkko.it
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/a1f781e a1f781e] chore(pzkko): pzkkopedia allineata a f185289
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/f185289 f185289] Merge remote-tracking branch 'origin/main' into albertopecchini.it
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/13ff3ec 13ff3ec] feat(tempo): la macchina del tempo di cinque siti, col selettore, le statistiche e i momenti
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5e7c98b 5e7c98b] Catture aggiornate: Alberto Pecchini
@@ -12425,8 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-01 [https://github.com/albertoxpecchini/AP/commit/6593e7b 6593e7b] feat(pzkko): versione 4.0.0 «chiocciola zero»: il cercapersone zero per tutti, il nero eliminato per sempre
 * 2026-10-31 [https://github.com/albertoxpecchini/AP/commit/ecd3fad ecd3fad] Catture aggiornate: pzkko
 * 2026-10-31 [https://github.com/albertoxpecchini/AP/commit/92ef038 92ef038] feat(pzkko): la banca sul server di Alberto, il browser non decide più niente
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/b402ac7 b402ac7] feat(pzkko): le vincite salve al millesimo, due telefoni in sync, le classifiche che tornano, il pzkstore e il testo predittivo
-* 2026-10-29 [https://github.com/albertoxpecchini/AP/commit/aaea5cb aaea5cb] feat(albertopecchini.it): il file di verifica del dominio per Discord in /.well-known/discord
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
