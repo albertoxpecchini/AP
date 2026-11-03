@@ -33,6 +33,7 @@ export function initTempo() {
   const pic = $('.wb__pic', root)
   const archivio = page?.dataset.tmArchivio || ''
   let vive = new Set() // le versioni che il server di casa serve davvero
+  let depositato = '' // quando il server di casa ha aggiornato il deposito l'ultima volta
   const corta = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '')
   const lunga = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -51,7 +52,9 @@ export function initTempo() {
     live.hidden = !dalVivo
     pic.hidden = dalVivo
     if (dalVivo) {
-      const url = `${archivio}/${v.short}/`
+      // la data dell'ultimo deposito nell'indirizzo: una versione depositata di nuovo non
+      // arriva dalla cache del browser (il 3.11.2026 restava la copia rotta)
+      const url = `${archivio}/${v.short}/${depositato ? `?d=${depositato}` : ''}`
       if (frame.src !== url) frame.src = url
       apri.href = url
       el.err.hidden = true
@@ -122,6 +125,7 @@ export function initTempo() {
       .then((r) => r.json())
       .then((s) => {
         vive = new Set(s.versioni || [])
+        depositato = String(s.aggiornato || '').replace(/\D/g, '').slice(0, 14)
         if (vive.size) vai(i, { spingi: false })
       })
       .catch(() => {})
