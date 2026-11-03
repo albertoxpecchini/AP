@@ -11,7 +11,11 @@ node tools/tempo/tempo.mjs --forza         # rifà anche le versioni già fotogr
 node tools/tempo/tempo.mjs --solo=<sha>    # una versione sola (più sha separati da virgola)
 node tools/tempo/tempo.mjs --da=2026-09-01 # solo da quel giorno in poi
 node tools/tempo/tempo.mjs --limite=5      # al massimo cinque versioni, poi si ferma
-node tools/tempo/tempo.mjs --manifesto     # riscrive solo src/data/tempo.js da quello che c'è
+node tools/tempo/tempo.mjs --manifesto     # riscrive solo src/data/tempo.js (le misure dalle foto sul disco)
+node tools/tempo/tempo.mjs --corte         # rifà le foto rimaste al primo schermo (alte 600 px)
+node tools/tempo/tempo.mjs --deposito=C:\pzkko-server\tempo            # deposita anche i siti interi
+node tools/tempo/tempo.mjs --ripassa --deposito=C:\pzkko-server\tempo  # riapplica le regole ai depositi, senza ricompilare
+node tools/tempo/prova.mjs                 # apre ogni versione depositata come dal tunnel e dice cosa non va
 ```
 
 ## Come funziona
@@ -58,6 +62,32 @@ percorso `/tempo`, vedi il LEGGIMI lì): la pagina `/tempo/` lo interroga e, se 
 le pagine vere in un iframe invece delle foto. Le richieste ai servizi esterni di allora (l'API
 di GitHub sul vecchio nome del repository, i servizi di anteprima) possono non rispondere più:
 quello non si riporta in vita.
+
+Altre regole del deposito, tutte del 3.11.2026:
+
+- **L'aiutante di Vite.** Il codice che carica i pezzi a richiesta (modulepreload, i CSS dei
+  componenti pigri) costruisce l'indirizzo al volo, `function(t){return"/"+t}`: si riscrive
+  col prefisso della versione. Dal tunnel la radice porta al server di pzkko, non all'archivio,
+  e senza questa regola le versioni con la mappa di Rivalta (965daa2, 9cf775d, 4a7a682)
+  restavano bianche: React butta giù la pagina se manca il CSS di un pezzo.
+- **I service worker.** Nell'archivio non possono funzionare (lo scope sarebbe la radice di un
+  altro server): in ogni pagina uno scudo trasforma la registrazione in una promessa vuota e
+  toglie quelli rimasti da visite di prima.
+- **Gli script di Vercel** (`/_vercel/speed-insights/…`) non stanno nella dist: si riscrivono lo
+  stesso e il server risponde con uno script vuoto. Un altro file che manca è «non c'è», mai la
+  home al posto dello script.
+
+Le regole si possono ripassare: un indirizzo che ha già il prefisso non si tocca, lo scudo non si
+mette due volte. Quando cambiano, `--ripassa` le riapplica a tutte le cartelle depositate in
+pochi minuti, senza ricompilare niente.
+
+## La prova
+
+`node tools/tempo/prova.mjs` apre ogni versione depositata col server di casa (127.0.0.1:8789)
+come la apre il pubblico dal tunnel: ogni richiesta fuori da `/tempo/` viene bloccata, perché dal
+Funnel la radice è il server di pzkko. Per ogni versione elenca errori JavaScript, richieste
+fallite o fuori dall'archivio, file che ricevono HTML al posto del loro tipo, pagine vuote. Le
+richieste ai servizi esterni di allora non contano. Esce con 1 se qualcosa non va.
 
 ## Quanto ci mette
 

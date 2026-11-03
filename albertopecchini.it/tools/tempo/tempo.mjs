@@ -263,6 +263,9 @@ function riscrivi(testo, ext, prefisso, cima) {
   // un «%» che non è una sequenza valida (un testo, non un indirizzo) non fa cadere il deposito
   const esiste = (resto) => {
     const primo = resto.split(/[/?#]/)[0]
+    // /_vercel/… (Speed Insights, Analytics) lo aggiungeva Vercel, non sta nella dist: si
+    // riscrive lo stesso, e il server di casa risponde con uno script vuoto
+    if (primo === '_vercel') return true
     try {
       return cima.has(decodeURIComponent(primo))
     } catch {
@@ -277,6 +280,22 @@ function riscrivi(testo, ext, prefisso, cima) {
   // le stringhe nel JS (e negli script dentro l'HTML): "/assets/x.js", '/media/y.webp'
   out = out.replace(reStringa, (m, q, resto) => (esiste(resto) ? `${q}${prefisso}/${resto}` : m))
   if (ext !== '.json' && ext !== '.webmanifest') out = out.replace(reUrl, `url($1${P}/`)
+  if (ext === '.js' || ext === '.mjs' || ext === '.html' || ext === '.htm') {
+    // L'aiutante di Vite che carica i pezzi a richiesta (modulepreload, i CSS dei
+    // componenti pigri) costruisce l'indirizzo al volo: function(t){return"/"+t}. Dal
+    // tunnel la radice porta al server di pzkko, non qui: i pezzi mancavano e la pagina
+    // si rompeva (3.11.2026, la versione 965daa2 con la mappa di Rivalta).
+    out = out.replace(/function\((\w+)\)\{return"\/"\+\1\}/g, (m, a) => `function(${a}){return"${prefisso}/"+${a}}`)
+    out = out.replace(/\((\w+)\)=>"\/"\+\1(?=[,;)}\s])/g, (m, a) => `(${a})=>"${prefisso}/"+${a}`)
+    out = out.replace(/\b(\w+)=>"\/"\+\1(?=[,;)}\s])/g, (m, a) => `${a}=>"${prefisso}/"+${a}`)
+  }
+  if (ext === '.html' || ext === '.htm') {
+    // nell'archivio i service worker non possono funzionare (lo scope sarebbe la radice
+    // di un altro server): la registrazione diventa una promessa vuota, e quelli rimasti
+    // nel browser da una visita di prima si tolgono
+    const scudo = '<script>/* macchina del tempo: niente service worker */try{var s=navigator.serviceWorker;if(s){s.register=function(){return Promise.resolve({})};s.getRegistrations&&s.getRegistrations().then(function(r){r.forEach(function(x){x.unregister()})})}}catch(e){}</script>'
+    if (!out.includes('macchina del tempo: niente service worker')) out = /<head[^>]*>/i.test(out) ? out.replace(/<head[^>]*>/i, (h) => h + scudo) : scudo + out
+  }
   return out
 }
 
@@ -328,9 +347,43 @@ function deposita(dist, short) {
   return { file: n, kb: Math.round(byte / 1024) }
 }
 
-function statoDeposito(versioni) {
+// --ripassa: riapplica la riscrittura ai file di testo già depositati, senza ricompilare.
+// Le regole si possono ripassare: un indirizzo che ha già il prefisso non si tocca, lo
+// scudo dei service worker non si mette due volte. Serve quando cambiano le regole.
+function ripassa(short) {
+  const dest = join(deposito, 'versioni', short)
+  if (!existsSync(join(dest, 'index.html'))) return null
+  const cima = new Set(readdirSync(dest))
+  let cambiati = 0
+  const giro = (dir) => {
+    for (const nome of readdirSync(dir)) {
+      const f = join(dir, nome)
+      if (statSync(f).isDirectory()) {
+        giro(f)
+        continue
+      }
+      const ext = extname(nome).toLowerCase()
+      if (!RISCRIVI.has(ext)) continue
+      const prima = readFileSync(f, 'utf8')
+      const dopo = riscrivi(prima, ext, `/tempo/${short}`, cima)
+      if (dopo !== prima) {
+        writeFileSync(f, dopo)
+        cambiati++
+      }
+    }
+  }
+  giro(dest)
+  return cambiati
+}
+
+// le versioni pronte sono le cartelle depositate, non l'elenco dei giorni di adesso: il
+// «giorno di oggi» cambia a ogni commit, e la pagina pubblicata può chiedere ancora quello
+// di prima (il 3.11.2026 bc7ba74 spariva da stato.json e il 3 novembre tornava foto)
+const depositate = () => (existsSync(join(deposito, 'versioni')) ? readdirSync(join(deposito, 'versioni')).filter((s) => existsSync(join(deposito, 'versioni', s, 'index.html'))) : [])
+
+function statoDeposito() {
   if (!deposito) return
-  const pronte = versioni.filter((v) => existsSync(join(deposito, 'versioni', v.short, 'index.html'))).map((v) => v.short)
+  const pronte = depositate()
   writeFileSync(join(deposito, 'stato.json'), JSON.stringify({ aggiornato: new Date().toISOString(), versioni: pronte }, null, 1))
 }
 
@@ -354,6 +407,21 @@ for (const v of versioni) await misureDalDisco(v)
 // il numero si riscrive sugli stessi oggetti: il giro qui sotto li modifica, e una copia
 // nuova a ogni passo (com'era prima del 3.11.2026) faceva perdere le misure appena prese
 const numera = () => versioni.forEach((v, i) => (v.n = i + 1))
+
+if (argv.includes('--ripassa')) {
+  if (!deposito) throw new Error('--ripassa vuole anche --deposito=<cartella>')
+  let tot = 0
+  for (const short of depositate()) {
+    if (solo && !solo.some((s) => short.startsWith(s))) continue
+    const n = ripassa(short)
+    if (n === null) continue
+    tot += n
+    if (n) console.log(`${short}: ${n} file riscritti`)
+  }
+  statoDeposito(versioni)
+  console.log(`ripassate le versioni depositate: ${tot} file cambiati`)
+  process.exit(0)
+}
 
 if (soloManifesto) {
   numera()
