@@ -38,13 +38,21 @@ node tools/tempo/tempo.mjs --manifesto     # riscrive solo src/data/tempo.js da 
 
 ## Il deposito per il server di casa
 
-Con `--deposito=C:pzkko-server	empo` ogni versione viene anche depositata intera in
-`versioni<sha>`: i file di testo (HTML, CSS, JS, manifest, JSON) con gli indirizzi assoluti
-riscritti su `/tempo/<sha>/` (`href="/x"`, `src="/x"`, `url(/x)`, le stringhe `"/assets/…"` nel
-JS, `href="/"`, i `srcset`), i binari una volta sola in `store<hash>` con collegamenti fisici.
-`stato.json` elenca le versioni pronte. Li serve `C:pzkko-server	emposerver.mjs` (127.0.0.1:8789,
-fuori col Funnel di Tailscale sul percorso `/tempo`, vedi il LEGGIMI lì): la pagina `/tempo/` lo
-interroga e, se risponde, mostra le pagine vere in un iframe invece delle foto.
+Con `--deposito=C:\pzkko-server\tempo` ogni versione viene anche depositata intera in
+`versioni\<sha>\`: i file di testo (HTML, CSS, JS, manifest, JSON) con gli indirizzi assoluti
+riscritti su `/tempo/<sha>/`. Si riscrivono sempre gli attributi dell'HTML (`href`, `src`,
+`action`, `poster`, i `srcset`) e i `url(/x)` del CSS; le stringhe del JS solo se il primo pezzo
+del percorso è un file o una cartella che c'è in cima alla versione: `"/assets/…"` sì, il
+suffisso `"/10"` di un voto no (il 3.11.2026 «8.5/10» era diventato «8.5/tempo/540d403/10»).
+Gli indirizzi che il JS di allora costruisce da sé il server li rimanda dentro la versione,
+guardando da quale pagina arriva la richiesta. I binari stanno una volta sola in
+`store\<hash>` con collegamenti fisici. `stato.json` elenca le versioni pronte.
+
+Li serve `C:\pzkko-server\tempo\server.mjs` (127.0.0.1:8789, fuori col Funnel di Tailscale sul
+percorso `/tempo`, vedi il LEGGIMI lì): la pagina `/tempo/` lo interroga e, se risponde, mostra
+le pagine vere in un iframe invece delle foto. Le richieste ai servizi esterni di allora (l'API
+di GitHub sul vecchio nome del repository, i servizi di anteprima) possono non rispondere più:
+quello non si riporta in vita.
 
 ## Quanto ci mette
 

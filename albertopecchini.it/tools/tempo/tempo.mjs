@@ -227,15 +227,25 @@ const reUrl = new RegExp('url\\(\\s*(["\']?)\\/(?=' + SEGUE + ')', 'g')
 const reStringa = new RegExp('(["\'`])\\/(?=' + SEGUE + ')', 'g')
 const reSrcset = new RegExp('(,\\s*)\\/(?=' + SEGUE + ')', 'g')
 
-function riscrivi(testo, ext, prefisso) {
+// Le stringhe fra virgolette si riscrivono solo se puntano a qualcosa che c'è davvero
+// nella versione: il primo pezzo del percorso deve essere un file o una cartella in
+// cima alla dist (assets, media, favicon.svg…). Prima si riscriveva ogni "/qualcosa", e
+// il voto «8.5» col suffisso "/10" diventava «8.5/tempo/540d403/10» (3.11.2026).
+// Gli attributi dell'HTML (href, src, action, poster, srcset) sono sempre indirizzi:
+// quelli si riscrivono tutti.
+const reAttr = new RegExp('\\b(href|src|action|poster|data-src)=(["\'])\\/(?=' + SEGUE + '|\\2)', 'g')
+
+function riscrivi(testo, ext, prefisso, cima) {
   const P = prefisso.replace(/\$/g, '$$$$')
   if (ext === '.css') return testo.replace(reUrl, `url($1${P}/`)
-  // stringhe fra virgolette che iniziano con una barra sola: href="/x", src='/x', "/assets/x.js" nel JS
-  let out = testo.replace(reStringa, `$1${P}/`)
+  const esiste = (resto) => cima.has(decodeURIComponent(resto.split(/[/?#]/)[0]))
+  let out = testo
   if (ext === '.html' || ext === '.htm') {
-    out = out.replace(/(href|action)="\/"/g, `$1="${P}/"`)
-    out = out.replace(/srcset="([^"]*)"/g, (m, v) => `srcset="${v.replace(reSrcset, `$1${P}/`)}"`)
+    out = out.replace(reAttr, `$1=$2${P}/`)
+    out = out.replace(/srcset="([^"]*)"/g, (m, v) => `srcset="${v.replace(/^\s*\/(?!\/)/, `${P}/`).replace(reSrcset, `$1${P}/`)}"`)
   }
+  // le stringhe nel JS (e negli script dentro l'HTML): "/assets/x.js", '/media/y.webp'
+  out = out.replace(new RegExp('(["\'`])\\/(' + SEGUE + '[^"\'`\\s]*)', 'g'), (m, q, resto) => (esiste(resto) ? `${q}${prefisso}/${resto}` : m))
   if (ext !== '.json' && ext !== '.webmanifest') out = out.replace(reUrl, `url($1${P}/`)
   return out
 }
@@ -246,6 +256,7 @@ function deposita(dist, short) {
   mkdirSync(store, { recursive: true })
   rmSync(dest, { recursive: true, force: true })
   const prefisso = `/tempo/${short}`
+  const cima = new Set(readdirSync(dist))
   let n = 0
   let byte = 0
   const giro = (dir, rel) => {
@@ -261,7 +272,7 @@ function deposita(dist, short) {
       const ext = extname(nome).toLowerCase()
       mkdirSync(dirname(join(dest, r)), { recursive: true })
       if (RISCRIVI.has(ext)) {
-        const t = riscrivi(readFileSync(f, 'utf8'), ext, prefisso)
+        const t = riscrivi(readFileSync(f, 'utf8'), ext, prefisso, cima)
         writeFileSync(join(dest, r), t)
         byte += Buffer.byteLength(t)
       } else {

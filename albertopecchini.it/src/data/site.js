@@ -107,7 +107,7 @@ export const site = {
   },
 
   // La macchina del tempo (/tempo/): il server di casa che serve i siti interi di ogni
-  // versione (C:pzkko-server	empo, dietro Tailscale Funnel sul percorso /tempo). Quando è
+  // versione (C:\pzkko-server\tempo, dietro Tailscale Funnel sul percorso /tempo). Quando è
   // spento la pagina mostra le foto.
   archivio: 'https://desktop-inpvhr2.tail6c90b3.ts.net/tempo',
 
