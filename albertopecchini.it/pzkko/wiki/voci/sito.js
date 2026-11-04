@@ -8,7 +8,7 @@ const INDEX = 'albertopecchini.it/pzkko/index.html'
 export const VOCI = {
   'Pzkko.it': {
     data: '2026-11-01',
-    fonti: [INDEX, README, 'PRODUCT.md', 'albertopecchini.it/pzkko/vercel.json'],
+    fonti: [INDEX, README, 'albertopecchini.it/pzkko/vercel.json'],
     testo: `{{Infobox
 | titolo = pzkko.it
 | immagine = home-giorno.webp
@@ -53,7 +53,7 @@ I $pzk e gli [[Gli EUR€|EUR€]] non si comprano, non si vendono e non valgono
 
   'Il muro': {
     data: '2026-10-29',
-    fonti: [INDEX, README, 'albertopecchini.it/tools/pzkko/disposizione.js', 'DESIGN.md'],
+    fonti: [INDEX, README, 'albertopecchini.it/tools/pzkko/disposizione.js'],
     testo: `{{Infobox
 | titolo = Il muro
 | immagine = home-intera.webp
@@ -219,7 +219,7 @@ Nella scena 1 unità della parete = 1,6 mm: la saracinesca è larga 2,05 m sul c
 
   'I volantini': {
     data: '2026-10-26',
-    fonti: [INDEX, 'albertopecchini.it/tools/pzkko/disposizione.js', 'albertopecchini.it/tools/pzkko/serranda.mjs', README, 'DESIGN.md'],
+    fonti: [INDEX, 'albertopecchini.it/tools/pzkko/disposizione.js', 'albertopecchini.it/tools/pzkko/serranda.mjs', README],
     testo: `{{Infobox
 | titolo = I volantini
 | immagine = home-giorno.webp
@@ -295,7 +295,7 @@ Toccato, un foglio schiocca contro la lamiera col suo materiale (<code>data-suon
 
   'I caratteri del muro': {
     data: '2026-10-22',
-    fonti: [INDEX, 'DESIGN.md', README],
+    fonti: [INDEX, README],
     testo: `'''I caratteri del muro''' sono i font di [[pzkko.it]], serviti da <code>fonts/</code> (solo il sottoinsieme latino, 13–59 KB l'uno, da Google Fonts):
 
 {| class="wikitable"
@@ -361,7 +361,7 @@ Toccato, ogni pezzo schiocca col suo materiale: il cartoncino del dentista, lo s
 
   'Le zone del muro': {
     data: '2026-10-21',
-    fonti: [INDEX, 'albertopecchini.it/tools/pzkko/disposizione.js', README, 'PRODUCT.md'],
+    fonti: [INDEX, 'albertopecchini.it/tools/pzkko/disposizione.js', README],
     testo: `'''Le zone del muro''' sono le quattro parole sprayate sulla [[La lamiera|lamiera]] che fanno da intestazioni e da anchor: '''siti''', '''social''', '''games''', '''tools''' (<code>art/scritte/</code> e <code>scritte2/</code>). PRODUCT.md le aveva pensate come le due zone «tools» e «games» di un link-in-bio, vuote con uno stato vuoto curato (7.10.2026); il 17.10 la saracinesca si è allungata verso l'alto e la zona siti è andata in cima ([[I siti in cima]]).
 
 * '''siti''': un volantino per sito, che si apre in una scheda nuova ([[albertopecchini.it]], [[Better Call Pekko|bettercallpekko.it]], [[rivaltasulmincio.it]], [[cascinafontana.xyz]], [[Il volantino «ti serve un sito?»|«ti serve un sito?»]], e quello non cliccabile dell'[[Ing. Dario Donelli]]); in mezzo [[I manifesti e la roba degli altri|la roba degli altri]];
@@ -920,7 +920,7 @@ Il numero sta in <code>benvenuto/benvenuto.js</code> (lo scontrino si mostra una
 
   'Il portafoglio MagSafe': {
     data: '2026-10-07',
-    fonti: ['PRODUCT.md', README],
+    fonti: [README],
     testo: `'''Il portafoglio MagSafe''' è stato il primo pzkko.it, per poche ore del 7 ottobre 2026: commit 6d339dc, «pzkko.it, il portafoglio MagSafe bianco ghiaccio coi social (SITE=pzk)». Era una pagina del sito Vite di [[albertopecchini.it]] (un terzo <code>SITE</code> accanto a quello serio e a <code>bcp</code>): un iPhone con il portafoglio MagSafe bianco ghiaccio attaccato dietro, e i social come le carte nelle tasche. [[Alberto Pecchini|Alberto]] lo ha bocciato lo stesso giorno, e PRODUCT.md ne tiene la regola: «Prima versione (iPhone + portafoglio MagSafe, commit 6d339dc) bocciata il 2026-10-07: non riproporre oggetti skeuomorfici letterali». Lo stesso giorno la pagina è stata svuotata (5b956e8, «resta solo il credito»), pzkko.it è andato nella sua cartella di file statici (f4a3d41) ed è diventato [[La scrivania di pzkko|la scrivania]]. Il portafoglio è poi tornato, in un altro modo, con [[Il wallet|il wallet]] di pelle alla Fallout del 22.10.
 
 {{Vedi anche|Le versioni di pzkko|La scrivania di pzkko|PRODUCT.md}}
@@ -929,7 +929,7 @@ Il numero sta in <code>benvenuto/benvenuto.js</code> (lo scontrino si mostra una
 
   'La scrivania di pzkko': {
     data: '2026-10-09',
-    fonti: ['PRODUCT.md', README],
+    fonti: [README],
     testo: `'''La scrivania di pzkko''' è stata la seconda home di [[pzkko.it]], dal 7 al 9 ottobre 2026: commit 734f68c, «la scrivania di pzkko, i social come icone in un dock stile Apple». Seguiva alla lettera la richiesta di PRODUCT.md del 7.10: «linguaggio visivo e di movimento di Apple (principi dei talk WWDC tradotti per il web): tipografia di sistema, materiali traslucidi, molle interrompibili, sobrietà», e le due zone «tools» e «games» vuote con uno stato vuoto curato. Il 9.10 il credito e il badge FrogDR sono stati tolti dalla home e dalla 404 («è il suo sito»), e lo stesso giorno è arrivato [[Il muro (versione 2.0)|il muro]], che della scrivania ha tenuto solo l'idea delle zone ([[Le zone del muro]]). Anche su Vercel (a824ef5, 28f90f5): è di quei giorni il trucco di <code>tools/pzkko/build.mjs</code> che pubblica la cartella così com'è ([[Vercel (pzkko)]]).
 
 {{Vedi anche|Le versioni di pzkko|Il portafoglio MagSafe|Il muro (versione 2.0)}}

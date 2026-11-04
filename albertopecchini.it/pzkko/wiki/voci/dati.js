@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-04", fonti: ["README.md"], testo: `'''I 743 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>98f2d1e</code>, 2026-11-04). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-04", fonti: ["README.md"], testo: `'''I 747 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>020ebb6</code>, 2026-11-04). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,14 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 42
+| 46
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/020ebb6 020ebb6] docs(lezioni): nel README la barra a destra del 24", fuori dalla cattura
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/1f9a292 1f9a292] feat(lezioni): la barra sta sul bordo destro del 24" ed esce dalla cattura
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/3b6af0d 3b6af0d] feat(lezioni): si registra sempre e solo lo schermo di Opera GX, e la barra parte aperta
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/fc1e92c fc1e92c] feat(pzkko): nello zero i tasti dicono il vero e chi arriva capisce
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/98f2d1e 98f2d1e] Merge pull request #15 from ygpzk/arena/1daae774-ap
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/993f5d7 993f5d7] docs(esperimenti): nel README i .woff2 di Allianz Neo come si trovano nella cartella firma
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/0757cc8 0757cc8] fix(esperimenti): il generatore del PDF legge anche gli AllianzNeo .woff2 della cartella firma
@@ -12423,10 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5385409 5385409] fix(tempo): la versione del 3 novembre si apriva senza CSS né JS
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/b6fde57 b6fde57] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/ca111d9 ca111d9] feat(tempo): tutte le 108 versioni, a pagina intera
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/bc7ba74 bc7ba74] Merge remote-tracking branch 'origin/main' into albertopecchini.it
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/de6b6f3 de6b6f3] fix(tempo): «8.5/10» non diventa più «8.5/tempo/540d403/10»
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/8144e0c 8144e0c] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4b1e5b2 4b1e5b2] feat(albertopecchini.it): la macchina del tempo, /tempo/, copia della Wayback Machine
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

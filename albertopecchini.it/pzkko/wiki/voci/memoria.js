@@ -51,6 +51,8 @@ Si scrive una memoria quando Alberto dà una regola («tieni il modello per semp
 | [[Riavvio server di casa (memoria)]] || project || 31.10.2026 || come riaccendere il server senza rompere [[Il custode del server|il custode]]; [[La regia del server|la regia]] sulla 8788
 |}
 
+'''Il riordino del 4.11.2026''': con l'uso settimanale al 92%, Alberto ha chiesto di alleggerire regole e memorie. Prima una copia intera così com'era in <code>Documents\memorie-claude-2026-11-04</code>; poi da 20 file (50 KB) a 10 (11 KB): una memoria «alberto» coi dati e le pratiche chiuse (sinistro Allianz, affitto Donegà), «email» (markdown + stile HTML), «server-in-casa» che assorbe banca e riavvio, «rami-per-sito» col push sempre anche su main; tolte quelle che ripetevano [[CLAUDE.md]] (regole delle app, wiki a ogni push) e quelle di lavori finiti (il vestito reflection, il profilo GitHub). La tabella qui sopra è com'era prima del riordino.
+
 Le memorie si rimandano a vicenda: «cercapersone-zero» cita «regole-app-pzk-os», «rami-per-sito» e «icone-rd-plus»; «banca-sul-server» cita «riavvio-server-casa» e «server-in-casa»; «server-in-casa» cita «rami-per-sito». È una piccola wiki prima di questa.
 
 == Cosa non c'è ==
@@ -559,7 +561,7 @@ Per le cose grosse Claude divide il lavoro fra aiutanti (gli appunti di una lezi
 
   'PRODUCT.md': {
     data: '2026-10-26',
-    fonti: ['PRODUCT.md', '.impeccable/config.json'],
+    fonti: ['README.md'],
     testo: `{{Infobox
 | titolo = PRODUCT.md
 | dove = la radice del repository AP
@@ -578,7 +580,7 @@ Per le cose grosse Claude divide il lavoro fra aiutanti (gli appunti di una lezi
 * '''I principi''': una persona, non un brand (prima persona, minuscolo); pochi oggetti fatti bene; il movimento risponde al dito e al puntatore, mai decorazione che gira da sola; cresce per aggiunta.
 
 == Quanto è vecchio ==
-È fermo alla versione della scrivania (7–9 ottobre): parla di tipografia di sistema e materiali traslucidi alla Apple, di zone «tools» e «games» vuote. Il muro, la scena 3D, i $pzk e il cercapersone sono venuti dopo, e li racconta il README di pzkko. [[DESIGN.md]] invece è già il muro.
+Il 4.11.2026, nel riordino del repository, è stato cancellato insieme a [[DESIGN.md]] e alla cartella <code>.impeccable/</code>: resta nella storia git. È fermo alla versione della scrivania (7–9 ottobre): parla di tipografia di sistema e materiali traslucidi alla Apple, di zone «tools» e «games» vuote. Il muro, la scena 3D, i $pzk e il cercapersone sono venuti dopo, e li racconta il README di pzkko. [[DESIGN.md]] invece è già il muro.
 
 {{Vedi anche|DESIGN.md|Pzkko.it|Le versioni di pzkko|Il portafoglio MagSafe|Alberto Pecchini}}
 [[Categoria:Il repository]]`,
@@ -586,7 +588,7 @@ Per le cose grosse Claude divide il lavoro fra aiutanti (gli appunti di una lezi
 
   'DESIGN.md': {
     data: '2026-10-26',
-    fonti: ['DESIGN.md', '.impeccable/design.json'],
+    fonti: ['README.md'],
     testo: `{{Infobox
 | titolo = DESIGN.md
 | immagine = home-giorno.webp
@@ -606,7 +608,7 @@ Gli stessi di [[I caratteri del muro]]: Anton per i titoli (<code>max(26px, 18cq
 == Le misure ==
 La parete è larga 1280 unità sul computer (<code>calc(100cqw / 1280)</code>) e 390 sul telefono (al più 600 px), alta 1700 e 2900 unità in questa versione (sono cresciute: 3191 e 5486 dal 22.10, vedi [[La disposizione]]); i tagliandi alti <code>max(44px, 17cqw)</code>; lo stipite, il portale, il gap del testo. I componenti: il volantino, il titolo, la nota a mano, l'handle, il tagliando, la nota «copiato» (bianco all'85 % col rosso del pennarello), l'insegna (al più 840 px), il marciapiede.
 
-Dopo l'intestazione il file descrive il muro a parole; è fermo al 17–20 ottobre (non sa della [[La scena 3D|scena 3D]], che nel frattempo gli ha copiato ogni colore). Il 8.10 una versione precedente descriveva «la sala del blackjack (scena, consolle, burattini, telecamera)»: è nella [[La storia del repository|storia]].
+Cancellato il 4.11.2026 nel riordino del repository (resta nella storia git). Dopo l'intestazione il file descriveva il muro a parole; è fermo al 17–20 ottobre (non sa della [[La scena 3D|scena 3D]], che nel frattempo gli ha copiato ogni colore). Il 8.10 una versione precedente descriveva «la sala del blackjack (scena, consolle, burattini, telecamera)»: è nella [[La storia del repository|storia]].
 
 {{Vedi anche|PRODUCT.md|I caratteri del muro|Le carte dei volantini|Il muro}}
 [[Categoria:Il repository]]`,
@@ -647,7 +649,7 @@ Dopo l'intestazione il file descrive il muro a parole; è fermo al 17–20 ottob
 |}
 
 == Fuori da tutto ==
-Alla radice del repo il <code>.gitignore</code> tiene fuori anche <code>.impeccable/review/</code> e <code>.playwright-mcp/</code>. Nelle Actions, lo stato delle [[Le catture dei siti (workflow)|catture]] (<code>stato.json</code>) sta nella cache di GitHub, non nel repository.
+Alla radice del repo il <code>.gitignore</code> tiene fuori anche <code>.playwright-mcp/</code>. Nelle Actions, lo stato delle [[Le catture dei siti (workflow)|catture]] (<code>stato.json</code>) sta nella cache di GitHub, non nel repository.
 
 == Cosa se ne ricava ==
 Il repository, da solo, non basta a far girare pzkko: senza il server di casa i conti sono «in pausa» e si gioca coi 1.000 $pzk della sessione; senza i token non si generano immagini; senza l'OBJ non si rifà il cercapersone. La [[La memoria di Claude|memoria]] serve proprio a tenere insieme queste due metà.
@@ -659,7 +661,7 @@ Il repository, da solo, non basta a far girare pzkko: senza il server di casa i 
 
   'Alberto Pecchini': {
     data: '2026-11-02',
-    fonti: ['albertopecchini.it/src/data/site.js', 'albertopecchini.it/src/data/studio.js', 'albertopecchini.it/README.md', 'PRODUCT.md', 'albertopecchini.it/tools/email-generator/README.md'],
+    fonti: ['albertopecchini.it/src/data/site.js', 'albertopecchini.it/src/data/studio.js', 'albertopecchini.it/README.md', 'albertopecchini.it/tools/email-generator/README.md'],
     testo: `{{Infobox
 | titolo = Alberto Pecchini
 | immagine = https://www.albertopecchini.it/media/web/ap-desktop.webp
@@ -700,7 +702,7 @@ Vedi [[Come lavora Alberto con Claude]]: chiede a voce, guarda, boccia, e quando
 
   'pzkko (il nome)': {
     data: '2026-10-07',
-    fonti: ['PRODUCT.md', 'albertopecchini.it/pzkko/index.html', 'albertopecchini.it/pzkko/README.md'],
+    fonti: ['albertopecchini.it/pzkko/index.html', 'albertopecchini.it/pzkko/README.md'],
     testo: `{{Infobox
 | titolo = pzkko
 | immagine = /favicon.png
