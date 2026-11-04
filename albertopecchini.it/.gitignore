@@ -15,9 +15,9 @@ dist-bcp
 
 # Email generate: gli output si rigenerano dal file di input, che invece si tiene.
 # Il tema email è derivato da src/styles/tokens.css e si rigenera da solo.
-emails/out/
-emails/logs/
-config/email-theme.json
+tools/email-generator/emails/out/
+tools/email-generator/emails/logs/
+tools/email-generator/config/email-theme.json
 
 # Tavole: i file intermedi della conversione (DWG, DXF, SVG grezzi) non si tengono;
 # nel repository vanno solo i file finali in public/media/tavole/.

@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-04", fonti: ["README.md"], testo: `'''I 747 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>020ebb6</code>, 2026-11-04). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-04", fonti: ["README.md"], testo: `'''I 748 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>4e41929</code>, 2026-11-04). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 46
+| 47
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/4e41929 4e41929] chore: riordino del repo — via PRODUCT.md, DESIGN.md e .impeccable, CLAUDE.md più corto
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/020ebb6 020ebb6] docs(lezioni): nel README la barra a destra del 24", fuori dalla cattura
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/1f9a292 1f9a292] feat(lezioni): la barra sta sul bordo destro del 24" ed esce dalla cattura
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/3b6af0d 3b6af0d] feat(lezioni): si registra sempre e solo lo schermo di Opera GX, e la barra parte aperta
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/c6203a0 c6203a0] fix(tempo): la copia rotta del 3 novembre restava nella cache del browser
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5385409 5385409] fix(tempo): la versione del 3 novembre si apriva senza CSS né JS
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/b6fde57 b6fde57] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/ca111d9 ca111d9] feat(tempo): tutte le 108 versioni, a pagina intera
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]

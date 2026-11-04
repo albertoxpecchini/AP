@@ -87,9 +87,6 @@ albertopecchini.it/
 │  ├─ onion/               l’indirizzo .onion servito da questo PC, senza Vercel: Tor + server statico, `npm run onion` pubblica (vedi il suo README)
 │  ├─ tavole/              tavole da PDF → SVG per il visualizzatore, riservatezza e pulizia dei PDF (vedi il suo README)
 │  └─ wrapped/             l’analizzatore della chat dietro /wrapped5BT/: unisce gli export di WhatsApp e calcola le metriche delle slide (vedi il suo README)
-├─ emails/                 input, output e allegati delle email generate
-├─ config/                 account mittente e tema email derivato dal CSS
-├─ profiles/               archivio firme versionato
 ├─ public/                 servito così com’è alla radice del sito
 │  ├─ favicon.svg · favicon-32.png · apple-touch-icon.png · icon-512.png · site.webmanifest
 │  ├─ og.png               immagine per le anteprime social (1200×630), generata da tools/og
@@ -599,21 +596,21 @@ repository perché **riusa il linguaggio visivo del sito**: legge `src/styles/to
 e ne ricava colori, scala tipografica e spazi, senza mai modificarlo.
 
 ```bash
-npm run email:new preventivo-studio    # copia EMAIL_INPUT_TEMPLATE.md in emails/in/
-npm run email emails/in/2026-09-18-preventivo-studio.md
+npm run email:new preventivo-studio    # copia il modello in tools/email-generator/emails/in/
+npm run email 2026-09-18-preventivo-studio.md  # basta il nome; il file sta in tools/email-generator/emails/in/
 ```
 
-Il risultato è un solo file da leggere: `emails/out/<data>_<nome>/report.md`.
+Il risultato è un solo file da leggere: `tools/email-generator/emails/out/<data>_<nome>/report.md`.
 
-Gli account mittente stanno in `config/sender-profiles.json`, le firme — versionate —
-in `profiles/footers.json`. Istruzioni complete in
+Gli account mittente stanno in `tools/email-generator/config/sender-profiles.json`, le firme — versionate —
+in `tools/email-generator/profiles/footers.json`. Istruzioni complete in
 [`tools/email-generator/README.md`](tools/email-generator/README.md).
 
 ## Compositore email online
 
 `/email/` è il generatore in pagina: si sceglie da dove parte l’email (scuola,
-personale, aziendale — gli stessi account di `config/sender-profiles.json`, con le
-firme di `profiles/footers.json`), si compila con i tasti della guida (il Markdown
+personale, aziendale — gli stessi account di `tools/email-generator/config/sender-profiles.json`, con le
+firme di `tools/email-generator/profiles/footers.json`), si compila con i tasti della guida (il Markdown
 del generatore funziona), si copia l’output, la si fa migliorare dall’IA (**Claude Opus** con l’abbonamento in locale, **IBM Granite 4.2 8B** online)
 e si leggono statistiche, peso, lunghezza e segnalazioni. In fondo c’è la rubrica:
 preferiti, indirizzi nuovi (salvati nel browser) e i contatti conosciuti di
@@ -627,7 +624,7 @@ incorporato in base64 come fa `fonts.js`. La zona «Output» mostra lo stato
 (READY / WARNING / MISSING_REQUIRED_DATA) con errori e avvisi di `validate.js`,
 l’anteprima in un iframe e le viste email.txt, report.md e sorgente; si scaricano
 `email.html`, `email-lite.html`, `email.txt`, `report.md`, il file di input per
-`emails/in/` (che rigenera la stessa email con `npm run email`) e una bozza `.eml`.
+`tools/email-generator/emails/in/` (che rigenera la stessa email con `npm run email`) e una bozza `.eml`.
 Verificato byte per byte: per lo stesso input pagina e CLI producono file identici.
 Il modulo del browser (`src/client/email.js`) si carica solo su questa pagina, in un
 pezzo a parte, così le altre non ne pagano il peso.

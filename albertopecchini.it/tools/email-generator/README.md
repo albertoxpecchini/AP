@@ -67,7 +67,7 @@ profiles/
 
 ## Compilare il file di input
 
-Si parte sempre da `EMAIL_INPUT_TEMPLATE.md`, nella radice del sito.
+Si parte sempre da `EMAIL_INPUT_TEMPLATE.md`, qui accanto. Dati e uscite (`config/`, `profiles/`, `emails/`) stanno in questa cartella dal 4.11.2026; prima erano alla radice del sito.
 `npm run email:new <nome>` ne fa una copia con id e data già compilati.
 
 Le sezioni indispensabili:

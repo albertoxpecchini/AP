@@ -711,7 +711,7 @@ Il workflow [[Le catture dei siti (workflow)|delle catture]] lo fotografa come <
 
   'cascinafontana.xyz': {
     data: '2026-09-27',
-    fonti: ['albertopecchini.it/src/data/projects.js', 'albertopecchini.it/tools/catture/siti.js', 'albertopecchini.it/config/sender-profiles.json'],
+    fonti: ['albertopecchini.it/src/data/projects.js', 'albertopecchini.it/tools/catture/siti.js', 'albertopecchini.it/tools/email-generator/config/sender-profiles.json'],
     testo: `{{Infobox
 | titolo = cascinafontana.xyz
 | immagine = https://www.albertopecchini.it/media/web/cascina-desktop.webp
@@ -1003,7 +1003,7 @@ I lavori scrivono in <code>C:\\Users\\Alberto\\.cruscotto</code> con <code>tools
 
   'Il generatore di email': {
     data: '2026-10-26',
-    fonti: ['albertopecchini.it/tools/email-generator/README.md', 'albertopecchini.it/tools/email-generator/src/generate.js', 'albertopecchini.it/config/sender-profiles.json', 'albertopecchini.it/profiles/footers.json'],
+    fonti: ['albertopecchini.it/tools/email-generator/README.md', 'albertopecchini.it/tools/email-generator/src/generate.js', 'albertopecchini.it/tools/email-generator/src/paths.js', 'albertopecchini.it/tools/email-generator/EMAIL_INPUT_TEMPLATE.md', 'albertopecchini.it/tools/email-generator/config/sender-profiles.json', 'albertopecchini.it/tools/email-generator/profiles/footers.json'],
     testo: `{{Infobox
 | titolo = Il generatore di email
 | dove = albertopecchini.it/tools/email-generator/
@@ -1013,6 +1013,8 @@ I lavori scrivono in <code>C:\\Users\\Alberto\\.cruscotto</code> con <code>tools
 | dipendenze = nessuna, solo Node 20.19+
 }}
 '''Il generatore di email''' trasforma appunti e file in un'email HTML autosufficiente, pronta da incollare nel composer di Yahoo, Proton o Gmail. Vive nel repository del sito perché '''riusa il linguaggio visivo del sito''': legge <code>src/styles/tokens.css</code> e ne ricava colori, scala tipografica e spazi, senza mai modificarlo. Il risultato di ogni generazione è un solo file da leggere, <code>report.md</code>: «l'email non viene mai stampata a schermo».
+
+Dal 4.11.2026 i suoi dati (<code>config/</code>, <code>profiles/</code>, <code>emails/</code>) e il modello <code>EMAIL_INPUT_TEMPLATE.md</code> stanno dentro <code>tools/email-generator/</code>, non più alla radice del sito: tutti i percorsi passano da <code>src/paths.js</code>. Il modello era stato cancellato per sbaglio il 26.9 (54d8bf5) e <code>npm run email:new</code> non andava più: ripescato dalla storia nel riordino.
 
 == L'input ==
 Si parte da <code>EMAIL_INPUT_TEMPLATE.md</code> (<code>npm run email:new</code> ne fa una copia in <code>emails/in/</code> con id e data). Sezioni: METADATI (mittente, destinatario, oggetto, tono), MATERIALE GREZZO (Markdown: titoli, elenchi, tabelle, <code>:::nota</code>, <code>:::bottone whatsapp</code>), FILE DA LEGGERE (fonti, non allegate), FILE DA ALLEGARE. Il saluto è personale se il destinatario ha il nome («Gentile Mario Rossi,»); da un indirizzo nudo il nome non si deduce.
