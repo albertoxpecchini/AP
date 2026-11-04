@@ -7,8 +7,9 @@ Sul foglio: rec e durata, livello audio, l'ultimo scatto dello schermo (si accen
 ogni fotogramma), «voce −N s» (trascritta fino a N secondi fa), «ocr −N min» (lavagna
 letta fino a N minuti fa; «leggo N» mentre la leggo) e l'ultima frase sentita.
 Clic sulla linguetta: dentro/fuori; trascinarla: su e giù lungo il bordo; doppio clic
-sul foglio: chiude. Sta sul bordo sinistro dello schermo principale: se si registra
-proprio quello (un solo monitor) parte chiusa, per non finire nei fotogrammi.
+sul foglio: chiude. Sta sul bordo destro del 24" (lo schermo di Opera GX, quello che si
+registra) e parte sempre aperta: Windows la esclude dalla cattura, così non finisce nei
+fotogrammi. Senza il 24", il bordo destro dello schermo principale.
 Immagini e caratteri vengono da pzkko.it (albertopecchini.it/pzkko/art e fonts).
 """
 import argparse
@@ -40,6 +41,31 @@ SPORGE = 5  # quanto la linguetta entra sotto la lamiera
 W = PW + TW - SPORGE
 S = 2  # il foglio si disegna al doppio e si rimpicciolisce: il testo storto resta nitido
 TRASPARENZA = 0.78  # piena opacità solo col mouse sopra
+SCHERMO = '24'  # un pezzo del nome del monitor dove sta la barra (l'HP 24f)
+OX = TW - SPORGE  # sul bordo destro la linguetta sta a sinistra della lamiera
+
+
+def monitor_barra():
+    """(left, top, width, height) del 24", se no dello schermo principale."""
+    try:
+        import mss
+        with mss.MSS() as sct:
+            mon = sct.monitors[1:]
+        m = next((m for m in mon if SCHERMO in m.get('name', '')), None) or             next((m for m in mon if m.get('is_primary')), mon[0])
+        return m['left'], m['top'], m['width'], m['height']
+    except Exception:
+        return None
+
+
+def fuori_dalla_cattura(root):
+    """La finestra non compare nelle catture dello schermo (WDA_EXCLUDEFROMCAPTURE, Windows 10 2004+)."""
+    try:
+        import ctypes
+        u = ctypes.windll.user32
+        hwnd = u.GetAncestor(root.winfo_id(), 2) or root.winfo_id()
+        return bool(u.SetWindowDisplayAffinity(hwnd, 0x11))
+    except Exception:
+        return False
 
 
 def font(nome, px):
@@ -106,7 +132,9 @@ class Barra:
         st = leggi_json(P_STATO, {}) or {}
         self.aperta = not chiusa  # all'accensione sempre aperta, che si vedano le stats; si ricorda solo l'altezza
         r = self.root = tk.Tk()
-        self.sh = r.winfo_screenheight()
+        mon = monitor_barra() or (0, 0, r.winfo_screenwidth(), r.winfo_screenheight())
+        self.mx, self.my, mw, self.sh = mon
+        self.destra = self.mx + mw  # il bordo destro del 24"
         self.y = max(0, min(int(st.get('y', 560)), self.sh - PH - 48))
         r.overrideredirect(True)
         r.attributes('-topmost', True)
@@ -115,8 +143,10 @@ class Barra:
         r.configure(bg='#ff00ff')
         self.etichetta = tk.Label(r, bd=0, bg='#ff00ff')
         self.etichetta.pack()
-        self.x = 0 if self.aperta else -PW
-        r.geometry(f'{W}x{PH}+{self.x}+{self.y}')
+        self.x = self.x_aperta() if self.aperta else self.x_chiusa()
+        r.geometry(f'{W}x{PH}+{self.x}+{self.my + self.y}')
+        r.update_idletasks()
+        fuori_dalla_cattura(r)
         self.etichetta.bind('<ButtonPress-1>', self.premi)
         self.etichetta.bind('<B1-Motion>', self.trascina)
         self.etichetta.bind('<ButtonRelease-1>', self.lascia)
@@ -129,9 +159,15 @@ class Barra:
         self.lento_t, self.ocr = 0, {}
         self.giro()
 
+    def x_aperta(self):
+        return self.destra - W
+
+    def x_chiusa(self):  # la lamiera esce tutta a destra, resta la linguetta
+        return self.destra - OX
+
     # --- linguetta: clic per entrare/uscire, trascinamento in verticale
     def sulla_linguetta(self, e):
-        return e.x >= PW - SPORGE and TY <= e.y <= TY + TH
+        return e.x <= OX and TY <= e.y <= TY + TH
 
     def premi(self, e):
         self.presa = (e.y_root, self.y, self.sulla_linguetta(e), False)
@@ -143,13 +179,13 @@ class Barra:
         if abs(e.y_root - y0) > 3:
             self.presa = (y0, y_prima, True, True)
             self.y = max(0, min(y_prima + e.y_root - y0, self.sh - PH - 48))
-            self.root.geometry(f'+{self.x}+{self.y}')
+            self.root.geometry(f'+{self.x}+{self.my + self.y}')
 
     def lascia(self, e):
         if self.presa and self.presa[2]:
             if not self.presa[3]:
                 self.aperta = not self.aperta
-                self.scorri(0 if self.aperta else -PW)  # chiusa: la lamiera esce tutta, resta la linguetta
+                self.scorri(self.x_aperta() if self.aperta else self.x_chiusa())
             self.salva()
         self.presa = None
 
@@ -161,7 +197,7 @@ class Barra:
         da = self.x if da is None else da
         k = (passo + 1) / 12
         self.x = round(da + (dove - da) * (1 - (1 - k) ** 3))
-        self.root.geometry(f'+{self.x}+{self.y}')
+        self.root.geometry(f'+{self.x}+{self.my + self.y}')
         if passo < 11:
             self.root.after(15, self.scorri, dove, passo + 1, da)
 
@@ -319,12 +355,12 @@ class Barra:
         else:
             col = LED if int(ora * 2) % 2 == 0 else LED_SPENTO
         dl.ellipse((9, 8, 21, 20), fill=col, outline=INCHIOSTRO)
-        tela.paste(ling, (PW - SPORGE, TY), ling)
-        tela.paste(p.lamiera, (0, 0))
+        tela.paste(ling, (0, TY), ling)
+        tela.paste(p.lamiera, (OX, 0))
         f = self.foglio(s)
-        tela.paste(f, (12, 6), f)
-        tela.paste(p.nastro, (104, -3), p.nastro)  # in alto, fra la durata e la miniatura
-        tela.paste(p.nastro2, (PW - 46, PH - 34), p.nastro2)  # sull'angolo in basso, fuori dal testo
+        tela.paste(f, (OX + 12, 6), f)
+        tela.paste(p.nastro, (OX + 104, -3), p.nastro)  # in alto, fra la durata e la miniatura
+        tela.paste(p.nastro2, (OX + PW - 46, PH - 34), p.nastro2)  # sull'angolo in basso, fuori dal testo
         # bordi sfumati sul grigio lamiera e non sul magenta, poi la chiave dove non c'è niente
         fondo = Image.new('RGB', tela.size, LAMIERA)
         fondo.paste(tela, mask=tela.getchannel('A'))
@@ -350,16 +386,8 @@ def main():
     ap.add_argument('cartella')
     ap.add_argument('--chiusa', action='store_true', help='parte con il foglio dentro (solo la linguetta)')
     a = ap.parse_args()
-    cart = Path(a.cartella)
-    # se il registratore riprende lo schermo principale (dove sta la barra), si parte chiusi:
-    # aspetta qualche secondo che meta.json dica quale schermo ha scelto
-    for _ in range(20):
-        area = (leggi_json(cart / 'meta.json', {}) or {}).get('schermo', {}).get('area')
-        if area:
-            break
-        time.sleep(0.5)
-    sul_registrato = bool(area) and area[0] <= 0 < area[0] + area[2] and area[1] <= 0 < area[1] + area[3]
-    Barra(cart, a.chiusa or sul_registrato).root.mainloop()  # il 24" con Opera non è il principale: aperta
+    # parte sempre aperta, sul 24" registrato ma esclusa dalla cattura
+    Barra(Path(a.cartella), a.chiusa).root.mainloop()
 
 
 if __name__ == '__main__':
