@@ -57,16 +57,15 @@ variabile `LEZIONI_DIR`). Gli stessi valori si passano anche a `lezione.ps1`
 ## La barra
 
 Un foglio attaccato col nastro a un pezzo di saracinesca, sempre in primo piano sul
-bordo sinistro dello schermo principale: rec e durata, livello audio, l'ultima
+bordo destro del 24" (lo schermo di Opera GX): rec e durata, livello audio, l'ultima
 schermata (la cornice si accende a ogni scatto), «voce −15 s» (trascritta fino a 15
 secondi fa), «ocr −2 min» (lavagna letta fino a 2 minuti fa) e l'ultima frase sentita.
 Diagnosi in un colpo: `%LOCALAPPDATA%\Lezioni\venv\Scripts\python.exe controlla.py`
 (GPU, modello, audio, schermi, Edge, chiave).
-Clic sulla linguetta «lezione»: il foglio rientra nel bordo e resta solo la linguetta
+Clic sulla linguetta «lezione» (a sinistra del foglio): il foglio rientra nel bordo e resta solo la linguetta
 col pallino rec; trascinarla la sposta su e giù; doppio clic sul foglio la chiude. A ogni
-accensione parte aperta (si ricorda solo l'altezza). Se si
-registra proprio lo schermo principale (un solo monitor) parte chiusa, per non finire
-nelle schermate. Immagini e caratteri sono quelli di pzkko.it.
+accensione parte aperta (si ricorda solo l'altezza); Windows la esclude dalla cattura dello
+schermo, così non finisce nelle schermate. Immagini e caratteri sono quelli di pzkko.it.
 
 ## Cosa c'è nella cartella di una lezione
 
