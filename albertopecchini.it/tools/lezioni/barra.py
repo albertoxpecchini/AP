@@ -104,7 +104,7 @@ class Barra:
         self.cart = cart
         self.p = Pezzi()
         st = leggi_json(P_STATO, {}) or {}
-        self.aperta = not chiusa and st.get('aperta', True)
+        self.aperta = not chiusa  # all'accensione sempre aperta, che si vedano le stats; si ricorda solo l'altezza
         r = self.root = tk.Tk()
         self.sh = r.winfo_screenheight()
         self.y = max(0, min(int(st.get('y', 560)), self.sh - PH - 48))
@@ -359,7 +359,7 @@ def main():
             break
         time.sleep(0.5)
     sul_registrato = bool(area) and area[0] <= 0 < area[0] + area[2] and area[1] <= 0 < area[1] + area[3]
-    Barra(cart, a.chiusa or sul_registrato).root.mainloop()
+    Barra(cart, a.chiusa or sul_registrato).root.mainloop()  # il 24" con Opera non è il principale: aperta
 
 
 if __name__ == '__main__':

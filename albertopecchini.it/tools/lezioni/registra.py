@@ -153,23 +153,36 @@ class Audio:
         stato['audio'].update(pezzi=k, fine=True)
 
 
-def finestre_teams():
-    """I rettangoli delle finestre visibili col titolo di Teams (l'app o la scheda del browser)."""
+def finestre_opera():
+    """I rettangoli delle finestre visibili di Opera GX (processo opera.exe), qualunque scheda
+    abbiano aperta: la lezione si segue sempre e solo lì."""
     import ctypes
+    import os
     from ctypes import wintypes
-    u = ctypes.windll.user32
+    u, k = ctypes.windll.user32, ctypes.windll.kernel32
     trovate = []
+
+    def eseguibile(hwnd):
+        pid = wintypes.DWORD()
+        u.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        h = k.OpenProcess(0x1000, False, pid.value)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return ''
+        try:
+            buf, n = ctypes.create_unicode_buffer(1024), wintypes.DWORD(1024)
+            ok = k.QueryFullProcessImageNameW(h, 0, buf, ctypes.byref(n))
+            return os.path.basename(buf.value).lower() if ok else ''
+        finally:
+            k.CloseHandle(h)
 
     @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
     def una(hwnd, _):
-        if u.IsWindowVisible(hwnd) and not u.IsIconic(hwnd):
-            n = u.GetWindowTextLengthW(hwnd)
-            buf = ctypes.create_unicode_buffer(n + 1)
-            u.GetWindowTextW(hwnd, buf, n + 1)
-            if 'teams' in buf.value.lower():
+        if u.IsWindowVisible(hwnd) and not u.IsIconic(hwnd) and u.GetWindowTextLengthW(hwnd) > 0:
+            if eseguibile(hwnd) == 'opera.exe':
                 r = wintypes.RECT()
                 u.GetWindowRect(hwnd, ctypes.byref(r))
-                trovate.append((r.left, r.top, r.right, r.bottom))
+                if r.right - r.left > 300 and r.bottom - r.top > 200:
+                    trovate.append((r.left, r.top, r.right, r.bottom))
         return True
 
     u.EnumWindows(una, 0)
@@ -177,8 +190,8 @@ def finestre_teams():
 
 
 def scegli_schermo(monitori, nome):
-    """Lo schermo da registrare: quello col nome dato, se no quello con la finestra di Teams più
-    grande, se no il secondario (di solito la lezione sta lì), se no il principale."""
+    """Lo schermo da registrare: quello col nome dato, se no (sempre e solo) quello con la
+    finestra di Opera GX più grande, se no il 24" HP, se no il secondario, se no il principale."""
     if nome and nome != 'auto':
         m = next((m for m in monitori if nome.lower() in m.get('name', '').lower()), None)
         if m is None and nome.isdigit() and 1 <= int(nome) <= len(monitori):
@@ -187,13 +200,16 @@ def scegli_schermo(monitori, nome):
             raise SystemExit(f'schermo «{nome}» non trovato: {[m.get("name") for m in monitori]}')
         return m, 'scelto'
     try:
-        for l, t, r, b in sorted(finestre_teams(), key=lambda f: (f[2] - f[0]) * (f[3] - f[1]), reverse=True):
+        for l, t, r, b in sorted(finestre_opera(), key=lambda f: (f[2] - f[0]) * (f[3] - f[1]), reverse=True):
             cx, cy = (l + r) // 2, (t + b) // 2
             for m in monitori:
                 if m['left'] <= cx < m['left'] + m['width'] and m['top'] <= cy < m['top'] + m['height']:
-                    return m, 'Teams'
+                    return m, 'Opera GX'
     except (AttributeError, OSError):
         pass
+    m = next((m for m in monitori if '24' in m.get('name', '')), None)
+    if m:
+        return m, '24" (Opera non trovato)'
     secondari = [m for m in monitori if not m.get('is_primary')]
     return (secondari[0], 'secondario') if secondari else (monitori[0], 'unico')
 
@@ -236,7 +252,7 @@ def schermo(cart, t0, ferma, nome):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('cartella')
-    ap.add_argument('--schermo', default='auto', help='auto (dove c\'è Teams), un pezzo del nome o il numero')
+    ap.add_argument('--schermo', default='auto', help='auto (dove c\'è Opera GX), un pezzo del nome o il numero')
     a = ap.parse_args()
     cart = Path(a.cartella)
     cart.mkdir(parents=True, exist_ok=True)

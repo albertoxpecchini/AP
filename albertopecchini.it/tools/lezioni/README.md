@@ -34,8 +34,8 @@ tutto basta cancellare `%LOCALAPPDATA%\Lezioni` e i due collegamenti (le lezioni
 
 ## Uso
 
-1. Apri la lezione su Teams sullo schermo che vuoi registrare (con due schermi, quello
-   dove c'è la finestra di Teams; Lezioni la trova da solo).
+1. Apri la lezione in Opera GX (Teams nel browser): si registra sempre e solo lo schermo
+   dove c'è la finestra di Opera GX, che Lezioni trova da solo; senza Opera, il 24" HP.
 2. **Lezione** (o `lezione.ps1`): partono registratore, trascrittore e la barra.
 3. **Fine lezione** (o `fine.ps1`) quando la lezione è finita.
 
@@ -49,7 +49,7 @@ Impostazioni fisse, facoltative, in `%LOCALAPPDATA%\Lezioni\config.json`:
 { "schermo": "auto", "materia": "analisi matematica", "lingua": "it", "cartella": "D:\\Università\\Lezioni" }
 ```
 
-`schermo` è `auto`, un pezzo del nome del monitor (`"HP 24f"`) o il numero; `materia`
+`schermo` è `auto` (dove c'è Opera GX), un pezzo del nome del monitor (`"HP 24f"`) o il numero; `materia`
 aiuta Whisper coi termini; `cartella` cambia dove vanno le lezioni (anche con la
 variabile `LEZIONI_DIR`). Gli stessi valori si passano anche a `lezione.ps1`
 (`-Schermo`, `-Materia`, `-Lingua`, `-Cartella`).
@@ -63,7 +63,8 @@ secondi fa), «ocr −2 min» (lavagna letta fino a 2 minuti fa) e l'ultima fras
 Diagnosi in un colpo: `%LOCALAPPDATA%\Lezioni\venv\Scripts\python.exe controlla.py`
 (GPU, modello, audio, schermi, Edge, chiave).
 Clic sulla linguetta «lezione»: il foglio rientra nel bordo e resta solo la linguetta
-col pallino rec; trascinarla la sposta su e giù; doppio clic sul foglio la chiude. Se si
+col pallino rec; trascinarla la sposta su e giù; doppio clic sul foglio la chiude. A ogni
+accensione parte aperta (si ricorda solo l'altezza). Se si
 registra proprio lo schermo principale (un solo monitor) parte chiusa, per non finire
 nelle schermate. Immagini e caratteri sono quelli di pzkko.it.
 
