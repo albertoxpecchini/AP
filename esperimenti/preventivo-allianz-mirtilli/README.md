@@ -22,7 +22,9 @@ qui non ce n'è uno, e così il risultato non dipende da come è configurata la
 stampa.
 
 ```bash
-python3 genera-pdf.py     # serve ReportLab: pip install reportlab
+pip install reportlab             # per scrivere il PDF
+pip install fonttools brotli      # solo se i caratteri sono .woff2
+python3 genera-pdf.py
 ```
 
 I caratteri non stanno nel repository (sono del Gruppo Allianz): lo script li
@@ -32,9 +34,12 @@ cerca, in quest'ordine, in
 2. `C:/Users/Alberto/Documents/firma/caratteri/allianz/`;
 3. la cartella indicata da `ALLIANZ_FONTS`.
 
-Servono `AllianzNeo-Light.ttf`, `AllianzNeo-Regular.ttf` e `AllianzNeo-Bold.ttf`
-(gli stessi pesi che l'HTML chiede come `.woff2`). Il PDF incorpora i caratteri
-in sottoinsieme: il file resta leggibile anche su un computer senza Allianz Neo.
+Servono tre pesi: `AllianzNeo-Light`, `AllianzNeo-Regular`, `AllianzNeo-Bold`,
+come `.woff2` (vanno bene gli stessi file della cartella `firma`: Italic e
+SemiBold il preventivo non li usa) oppure come `.ttf`/`.otf`. I `.woff2`
+vengono scompattati al volo in un `.ttf` temporaneo, perché ReportLab non li
+legge direttamente. Il PDF incorpora i caratteri in sottoinsieme: resta
+leggibile anche su un computer senza Allianz Neo.
 
 ## L'HTML
 
