@@ -284,8 +284,19 @@ const home_ = {
   },
 }
 
-// ── il menu principale: le app, con l'icona a sinistra e la voce scelta rovesciata ──
+// ── il menu principale: le app, con l'icona a sinistra e la voce scelta rovesciata; in fondo cosa fa quella scelta (4.11,
+// Alberto: «uno che non ha mai aperto il sito fa fatica»: «virtual», «bin·hex», «decifra» non dicevano niente a chi arriva) ──
 const RIGA = 20, VISIBILI = 5
+const COSA = {
+  chat: 'parla col bot: lavora, gioca', profilo: 'la tua faccia e i tuoi numeri', account: 'il conto: cambio e invii',
+  negozio: 'cibo, attrezzi e roba', pzkstore: 'app nuove da installare', sfide: 'tre sfide al giorno',
+  quiz: 'domande che pagano', missioni: 'storie a bivi con un premio', giocatori: 'classifiche e altri giocatori',
+  zaino: 'quello che hai: usa e vendi', miniera: 'pc che minano $pzk per te', foto: 'le foto vere dei quiz',
+  virtual: 'scommesse sul calcio finto', banca: 'il portafoglio e la borsa', rapina: 'il colpo alla cassa di pzk',
+  lavatrice: 'lava i soldi sporchi', decifratore: 'apri i wallet trovati', conversioni: 'binario, esadecimale, basi',
+  calcolatrice: 'i calcoli del geometra', compilatore: 'scrivi e prova codice C', cucina: 'le ricette del Mincio',
+  impostazioni: 'luce, suoni, led, la guida',
+}
 function menu() {
   let sel = 0, da = 0
   return {
@@ -306,6 +317,8 @@ function menu() {
       l.vert(W - MARGINE - 3, y0, VISIBILI * RIGA)
       const h = Math.max(6, Math.round((VISIBILI * RIGA * VISIBILI) / Math.max(n, VISIBILI)))
       l.riempi(W - MARGINE - 5, y0 + Math.round(((VISIBILI * RIGA - h) * sel) / Math.max(1, n - 1)), 5, h)
+      const cosa = COSA[APP[sel]?.id] ?? 'OK apre'
+      l.testo(Math.round(W / 2 - Lcd.larghezza(cosa) / 2), H - 9, cosa)
     },
     tasto(n) {
       if (n === 'su') { sel = (sel - 1 + APP.length) % APP.length }
@@ -374,23 +387,68 @@ export function dialogo({ titolo = '', testo = '', icona = null, tasti = ['ok'] 
   })
 }
 
-// ── la guida (Alberto, 29.10: «al primo accesso spiega come funziona»): quattro pagine, una volta sola (pzkko-zero-guida),
-// e di nuovo dalle impostazioni ──
+// ── la guida (Alberto, 29.10: «al primo accesso spiega come funziona»), una volta sola (pzkko-zero-guida) e di nuovo dalle
+// impostazioni. (4.11, Alberto: «uno che non ha mai aperto il sito fa fatica a usare il flipper… fai cose super facili»:
+// prima erano quattro dialoghi di solo testo, e chi arrivava non sapeva quale fosse «la croce» né che le frecce del
+// computer vanno. Adesso tre pagine: i tasti DISEGNATI come sono sul cercapersone, coi tasti del computer accanto; come si
+// usa, con un tasto scelto vero; da dove si comincia.) OK e → vanno avanti, ← torna, INDIETRO la salta, il clic va avanti ──
 const CHIAVE_GUIDA = 'pzkko-zero-guida'
 export const guidaVista = () => { try { return localStorage.getItem(CHIAVE_GUIDA) === 'si' } catch { return false } }
-export async function guida(forza = false) {
-  if (!forza && guidaVista()) return
-  const pagine = [
-    { titolo: 'pzk os', icona: 'app-home', testo: 'Questo è il tuo cercapersone. Si usa coi tasti: la croce per muoverti, OK per scegliere, INDIETRO per tornare.' },
-    { titolo: 'la home', icona: 'pzk', testo: 'Qui vedi i tuoi $pzk, il livello, le sfide e le cose da fare oggi. OK apre il menu delle app, giù apre la chat.' },
-    { titolo: 'la chat', icona: 'app-chat', testo: 'Scrivi un comando dalla tastiera (Invio manda) o con OK a riga vuota, dalla tastiera sullo schermo. Sopra la riga i suggerimenti: destra sceglie, OK completa.' },
-    { titolo: 'spegnere', icona: 'impostazioni', testo: 'INDIETRO una volta torna indietro; tenuto tre secondi spegne e torna sul muro. Luminosità, suoni e led sono nelle impostazioni.' },
-  ]
-  for (let i = 0; i < pagine.length; i++) {
-    const r = await dialogo({ ...pagine[i], tasti: [i < pagine.length - 1 ? 'avanti ▶' : 'ok'] })
-    if (r === null) break
-  }
-  try { localStorage.setItem(CHIAVE_GUIDA, 'si') } catch {}
+/** Un cerchio (pieno o no) di raggio r. */
+function cerchio(l, cx, cy, r, pieno = false) {
+  for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const d = x * x + y * y; if (pieno ? d <= r * r : d <= r * r && d > (r - 1) * (r - 1)) l.px(cx + x, cy + y) }
+}
+// la freccia che torna, quella stampata su INDIETRO (7 × 7)
+const TORNA = ['..#....', '.##....', '######.', '.##...#', '..#...#', '......#', '.#####.']
+const PAGINE_GUIDA = [
+  { titolo: 'i tasti', disegna(l) {
+    // la croce col tasto OK in mezzo, e INDIETRO tondo in basso a destra: come sul cercapersone
+    const cx = 38, cy = 66
+    cerchio(l, cx, cy, 20)
+    l.testo(cx - 2, cy - 17, '▲'); l.testo(cx - 2, cy + 11, '▼'); l.testo(cx - 17, cy - 3, '◀'); l.testo(cx + 13, cy - 3, '▶')
+    cerchio(l, cx, cy, 8, true); l.testo(cx - 5, cy - 3, 'OK', { inv: true })
+    cerchio(l, 64, 94, 7)
+    TORNA.forEach((r, y) => [...r].forEach((c, x) => { if (c === '#') l.px(61 + x, 91 + y) }))
+    ;['la croce ← → ↑ ↓ sceglie', 'OK, in mezzo, preme', 'INDIETRO, il tondo, torna', '(tenuto tre secondi spegne)'].forEach((r, i) => l.testo(80, BARRA + 22 + i * 10, r))
+    ;['dal computer: le frecce,', 'Invio è OK, Esc è INDIETRO,', 'e il clic sullo schermo.'].forEach((r, i) => l.testo(80, BARRA + 67 + i * 10, r))
+  } },
+  { titolo: 'come si usa', disegna(l) {
+    ;["C'è sempre una cosa scelta: è", 'quella rovesciata, così:'].forEach((r, i) => l.testo(MARGINE + 4, BARRA + 22 + i * 10, r))
+    const a = 'scelta', b = 'non scelta', wa = Lcd.larghezza(a) + 8, wb = Lcd.larghezza(b) + 8, x = Math.round(W / 2 - (wa + wb + 6) / 2), y = BARRA + 44
+    l.riempi(x, y, wa, 11); l.testo(x + 4, y + 2, a, { inv: true }); l.cornice(x + wa + 6, y, wb, 11); l.testo(x + wa + 10, y + 2, b)
+    ;['← → ↑ ↓ la cambiano, OK la preme.', "In fondo c'è sempre scritto cosa", 'fanno i tasti, come qui sotto.'].forEach((r, i) => l.testo(MARGINE + 4, BARRA + 62 + i * 10, r))
+  } },
+  { titolo: 'si comincia', disegna(l) {
+    ;['1. crea il conto: un nome e un PIN', '   di 4 cifre. Hai 1.000 $pzk.', '2. nella home OK apre le app,', '   ↓ apre la chat.', '3. nella chat premi «riscuoti il', '   premio»: i $pzk del giorno.', 'La guida torna dalle impostazioni.'].forEach((r, i) => l.testo(MARGINE + 4, BARRA + 22 + i * 10 + (i > 1 ? 3 : 0) + (i > 3 ? 3 : 0) + (i > 5 ? 3 : 0), r))
+  } },
+]
+export function guida(forza = false) {
+  if (!forza && guidaVista()) return Promise.resolve()
+  return new Promise((fine) => {
+    let p = 0
+    const chiudi = () => { try { localStorage.setItem(CHIAVE_GUIDA, 'si') } catch {} fine() }
+    const v = {
+      nome: 'guida',
+      tolta: chiudi,
+      disegna(l) {
+        const pg = PAGINE_GUIDA[p]
+        l.testo(MARGINE + 4, BARRA + 3, pg.titolo, { scala: 2 })
+        // i pallini delle pagine, in alto a destra
+        PAGINE_GUIDA.forEach((_, i) => { const x = W - MARGINE - 8 - (PAGINE_GUIDA.length - 1 - i) * 8; if (i === p) l.riempi(x, BARRA + 7, 5, 5); else l.riquadro(x, BARRA + 7, 5, 5) })
+        pg.disegna(l)
+        const a = p < PAGINE_GUIDA.length - 1 ? 'OK avanti · INDIETRO salta' : 'OK comincia'
+        l.testo(Math.round(W / 2 - Lcd.larghezza(a) / 2), H - 9, a)
+        zona(MARGINE, BARRA, W - 2 * MARGINE, H - BARRA, () => v.tasto('ok'))
+      },
+      tasto(n) {
+        if (n === 'ok' || n === 'dx') { if (p < PAGINE_GUIDA.length - 1) p++; else togli() }
+        else if (n === 'sx') p = Math.max(0, p - 1)
+        else if (n === 'indietro') togli()
+        return true
+      },
+    }
+    spingi(v)
+  })
 }
 
 // ── la tastiera sullo schermo, come la TextInput del Flipper: le file di lettere, la croce sceglie, OK scrive, INDIETRO
@@ -417,6 +475,10 @@ export function tastiera({ testo = '', titolo = 'scrivi', nascosto = false, simb
         const vis = vero.length > max ? vero.slice(-max) : vero
         l.testo(MARGINE + 4, BARRA + 15, vis)
         if (t % 10 < 5) l.riempi(MARGINE + 4 + Lcd.larghezza(vis) + 2, BARRA + 14, 5, 9)
+        // (4.11: chi arriva non sapeva cosa fossero «_», «⌫» e «✓», né che si scrive anche dal computer: nello spazio vuoto fra la
+        // riga e i tasti, cosa fanno; coi simboli lo spazio è una riga sola)
+        const spiega = simboli ? ['← → ↑ ↓ scegli · OK scrive · ✓ fatto'] : ['← → ↑ ↓ scegli · OK scrive la lettera', '⌫ cancella · _ spazio · ✓ fatto', 'o scrivi con la tastiera del computer']
+        spiega.forEach((r, i) => l.testo(Math.round(W / 2 - Lcd.larghezza(r) / 2), BARRA + 28 + i * 10, r))
         F.forEach((fila, i) => [...fila].forEach((k, j) => {
           const x = X0 + j * TX, y = Y0 + i * TY, on = i === r && j === c
           if (on) l.riempi(x, y, TX - 2, TY - 2)

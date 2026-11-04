@@ -7,16 +7,17 @@
 // il piè; i tasti di seguito e le scelte dei minigiochi sono riquadri che la croce sceglie e OK preme. Lo stile è quello
 // del Flipper: tutto a un bit, le cornici smussate, la voce scelta rovesciata.
 //
-// Come si usa: si scrive dalla tastiera vera (le lettere, Backspace, Invio manda) o, con OK a riga vuota, dalla tastiera
-// sullo schermo (os.tastiera). Mentre si scrive, sopra la riga ci sono i suggerimenti (chat/predittivo.js, gli stessi
-// della chat grande: i comandi e i loro argomenti): sinistra/destra scelgono, OK completa. A riga vuota sopra la riga ci
-// sono i CONSIGLIATI (2.11, Alberto: «fai che la chat mostri subito dei tasti da dove cominciare e con i comandi
-// consigliati»): tasti coi comandi pronti adesso (il premio giornaliero, le quest pronte, lavora, pesca), poi le ultime
-// righe scritte (zaino.rapidi) e saldo, negozio, aiuto; ← → li scelgono, OK manda, il clic li manda subito. Su e giù
-// scorrono i messaggi. INDIETRO cancella la riga, e a
-// riga vuota esce dall'app. Quando un minigioco aspetta una scelta, la croce va sui suoi tasti (o sulle celle della
-// griglia) e OK preme; quando aspetta una parola (scrivi), la riga mostra cosa vuole. I messaggi restano (storia:
-// sessionStorage nella sessione, localStorage per conto), come nella chat grande.
+// Come si usa (4.11, Alberto: «i tasti che premo danno comandi diversi da quel che hanno di nome… fai una cosa più facile:
+// uno che non ha mai aperto il sito fa fatica»): c'è SEMPRE un tasto scelto, rovesciato. ← → lo spostano su tutto quello
+// che si può premere adesso: i tasti dell'ultima scheda, poi i CONSIGLIATI nella fila in fondo (2.11, Alberto: «fai che la
+// chat mostri subito dei tasti da dove cominciare»: i comandi pronti adesso, il premio giornaliero, le quest, lavora, pesca;
+// poi le ultime righe scritte, zaino.rapidi, e saldo, negozio, aiuto), poi «scrivi…», la tastiera sullo schermo
+// (os.tastiera). OK preme quello scelto, il clic quello sotto il mouse, e il fumetto dice il nome del tasto premuto. ↑ ↓
+// scorrono i messaggi (in fondo «· ↑ leggi» se sopra c'è da leggere). Dalla tastiera vera si scrive e basta: sopra la
+// riga ci sono i suggerimenti (chat/predittivo.js: i comandi e i loro argomenti), ← → li scelgono, OK completa, Invio
+// manda. INDIETRO cancella la riga, e a riga vuota esce dall'app. Quando un minigioco aspetta una scelta, la croce va sui
+// suoi tasti (o sulle celle della griglia) e OK preme; quando aspetta una parola (scrivi) la parola è un tasto. I messaggi
+// restano (storia: sessionStorage nella sessione, localStorage per conto), come nella chat grande.
 import * as os from './os.js'
 import { Lcd, W, H } from './lcd.js'
 import * as icone from './icone.js'
@@ -42,8 +43,10 @@ const X0 = 10 // dove comincia il testo delle schede (la barra a sinistra sta a 
 // ── i messaggi ──
 let msgs = [] // { tipo: 'tu' | 'sistema' | 'bot' | 'pensa', testo, e, av, fatto, pensa, righe, h, scelte, rulli, tempo }
 let scorri = 0 // px dal fondo
-let riga = '', storia = [], iStoria = -1, iRapidi = -1
+let riga = ''
 let sugg = null, iSugg = -1
+let cur = null // il tasto scelto (la sua chiave, tasti() qui sotto): 'a:<comando>' della scheda, 'c:<comando>' consigliato, 'p:<parola>', 'scrivi'
+let curScheda = null // l'ultima scheda coi tasti già vista: quando ne arriva una nuova, il cursore va sul suo primo tasto
 let scelte = [] // le scelte in corso (scegli), anche più d'una: le mine hanno la griglia e «incassa» sulla stessa scheda
 let scelta = null // quella dove sta la croce
 let aspettaTesto = null // { risolvi, segnaposto }
@@ -57,6 +60,8 @@ const esc = (t) => String(t)
 export function pulisci(html) {
   return txt(String(html ?? '') // (txt: un carattere senza glifo diventa «?», mai il quadratino; anche i nomi degli altri)
     .replace(/<span class="c-carta coperta"><\/span>/gi, ' ■ ').replace(/<span class="c-carta[^"]*">/gi, ' ') // (le carte del blackjack staccate: prima «K♦7♣» tutto attaccato)
+    .replace(/<\/b>\s*<small[^>]*>/gi, '</b> · ').replace(/<\/small>\s*(?=<(small|span)\b)/gi, '</small> · ') // (il nome e la riga piccola sotto: «La campana stonatati manca: livello 2» tutto attaccato)
+    .replace(/<s\b[^>]*>([^<]*)<\/s>\s*(<span class="c-v-sconto">[^<]*<\/span>)?/gi, '$1 → ') // (il prezzo in offerta: «40-20 %32 $pzk» diventa «40 → 32 $pzk»)
     .replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>\s*<p[^>]*>/gi, '\n').replace(/<li[^>]*>/gi, '\n• ').replace(/<\/(div|p|tr|h\d)>/gi, '\n')
     .replace(/<code[^>]*>([^<]*)<\/code>/gi, '[$1]')
     .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, '').replace(/<[^>]+>/g, '')
@@ -110,7 +115,7 @@ export function aggiorna(s, e) {
   if (!m.fatto) { m.fatto = true; m.pensa = false; m.salta?.(); led.finisci() }
   if (e.av) m.av = e.av
   m.e = { ...e }
-  m.azioniObj = null; m.selAzione = null // (le azioni nuove della scheda: prima restavano quelle di prima)
+  m.azioniObj = null // (le azioni nuove della scheda: prima restavano quelle di prima)
   m.rulli = rulliDa(e.html) ?? m.rulli
   invalida(m)
   return s
@@ -257,10 +262,13 @@ function ctxDi(args, testo) {
   }
   return ctx
 }
-export async function esegui(riga, { muto = false } = {}) {
+/** eti: il nome del tasto che l'ha mandato. Il fumetto dice quello (4.11, Alberto: «i tasti che premo danno comandi diversi
+ *  da quel che hanno di nome»: «comincia La rana che canta» diventava il fumetto «quest rana»), e fra gli ultimi comandi
+ *  dei consigliati ci vanno solo quelli scritti o consigliati, non i tasti di una scheda. */
+export async function esegui(riga, { muto = false, eti = null } = {}) {
   const { nome: n, args, testo } = analizza(riga)
   if (!n) return
-  if (!muto) utente(riga.replace(/^\/+/, ''))
+  if (!muto) utente(eti ?? riga.replace(/^\/+/, ''))
   const c = PER_NOME.get(n)
   led.colpo(160)
   if (zaino.pagerRotto() && !passaDaRotto(c, testo)) return soloScassato()
@@ -270,7 +278,7 @@ export async function esegui(riga, { muto = false } = {}) {
     scheda({ colore: 'rosso', av: 'bot-pensa', t: 'eh?', d: `«${n}» non lo conosco. Scrivi <code>aiuto</code> per l'elenco dei comandi.` }); return
   }
   const chiave = c.nomi[0]
-  if (!muto) zaino.ricorda(riga)
+  if (!muto && !eti) zaino.ricorda(riga)
   if (c.attesa) {
     const m = zaino.manca(chiave)
     if (m > 0) { const s = scheda({ colore: 'ambra', av: 'bot-pensa', t: ':clessidra: calma', d: `«${chiave}» lo puoi rifare fra <b>${durata(m)}</b>.${zaino.effetto('caffe') ? '' : ' Un caffè dal negozio dimezza le attese.'}` }); tempo(s, Math.min(m, 60_000)); return }
@@ -294,20 +302,46 @@ export async function esegui(riga, { muto = false } = {}) {
 }
 function invia() {
   const r = riga.trim()
+  riga = ''; sugg = null; iSugg = -1
   if (!r) return
-  riga = ''; sugg = null; iSugg = -1; iRapidi = -1
   if (aspettaTesto) { utente(r); aspettaTesto.risolvi(r); return }
-  storia.push(r); if (storia.length > 50) storia.shift(); iStoria = storia.length
   manda(r)
 }
-/** Le azioni di seguito di una scheda (azioni: [[comando, etichetta, stile]]) si mandano come comandi. */
-function azione(cmd) {
+/** Le azioni di seguito di una scheda (azioni: [[comando, etichetta, stile]]) si mandano come comandi, col fumetto che dice
+ *  il nome del tasto. Un comando da finire («manda pzk123 », «slot <puntata>») apre la tastiera già scritta fin lì. */
+function azione(cmd, eti = null) {
   if (aspettaTesto) return
-  if (/[<[]/.test(cmd)) { riga = cmd.replace(/\s*[<[].*$/, ' '); suggerisci(); return }
-  manda(cmd)
+  if (/[<[]/.test(cmd) || /\s$/.test(cmd)) return scriviComando(cmd.replace(/\s*[<[].*$/, '').trimEnd() + ' ', eti)
+  annulla()
+  return esegui(cmd, { eti: eti || null }) // (un tasto di sola icona ha il nome vuoto: allora il fumetto dice il comando)
 }
-/** Le azioni di seguito di una scheda, come tasti finti (le crea il disegno, le usa anche la croce). */
-const azioniDi = (m) => (m.azioniObj ??= (m.e?.azioni ?? []).map(([cmd, eti, stile]) => ({ dataset: { id: cmd }, eti: pulisci(conIcone(eti ?? cmd)), stile, azione: true })))
+/** La tastiera sullo schermo: quello che si scrive va nella chat (un comando, o la risposta che un gioco aspetta). */
+function scriviComando(testo = '', titolo = null) {
+  const att = aspettaTesto // (30.10: la risposta che arriva tardi, a scrivi già scaduto, non diventa un comando: si butta)
+  os.tastiera({ testo, titolo: titolo ?? (att ? 'la risposta' : 'scrivi un comando') }).then((t) => { if (t == null || !t.trim() || (att && aspettaTesto !== att)) return; riga = t; invia() })
+}
+/** I tasti che nella chat grande stavano DENTRO l'html (data-cmd): «compra» su ogni pezzo della vetrina, i nomi delle
+ *  classifiche («tocca un nome»). Qui non si toccano: diventano tasti della scheda, col nome della cosa («compra Canna»). */
+function azioniHtml(html) {
+  const s = String(html ?? ''), out = []
+  for (const x of s.matchAll(/<(button|tr|li)\b[^>]*\bdata-cmd="([^"]+)"[^>]*>([\s\S]*?)<\/\1>/gi)) {
+    const [, tag, cmd, dentro] = x
+    // (un tasto: il suo testo, il nome in grassetto prima di lui e il prezzo fra i due, se c'è: «compra sbrisolona (40 $pzk)»)
+    const prima = s.slice(0, x.index), b = [...prima.matchAll(/<b>([^<]*)<\/b>/gi)].at(-1), prezzo = b ? [...prima.slice(b.index).matchAll(/<span class="pzk">([^<]*)<\/span>/gi)].at(-1)?.[1] : null
+    const detto = tag.toLowerCase() === 'button' ? `${pulisci(dentro)}${b ? ' ' + pulisci(b[1]) : ''}` : pulisci((/<b>([^<]*)<\/b>/i.exec(dentro) ?? /<td[^>]*>[^<]*<\/td>\s*<td[^>]*>([^<]*)/i.exec(dentro))?.[1] ?? dentro)
+    out.push([cmd, prezzo ? `${detto} (${pulisci(prezzo)})` : detto, '', detto]) // (detto: il fumetto, senza il prezzo)
+  }
+  return out
+}
+/** Un'etichetta che sta in un tasto: se è lunga si accorcia il nome, il prezzo fra parentesi in fondo resta intero. */
+function accorcia(s, n = 38) {
+  if ([...s].length <= n) return s
+  const m = /^(.*?)( \([^()]*\))$/.exec(s)
+  return m && m[2].length < n - 10 ? corto(m[1], n - [...m[2]].length) + m[2] : corto(s, n)
+}
+/** Le azioni di seguito di una scheda, come tasti finti (le crea il disegno, le usa anche la croce). «spento» (una scelta
+ *  di una quest che non puoi fare) non si preme: prima la croce ci arrivava e OK mandava il comando lo stesso. */
+const azioniDi = (m) => (m.azioniObj ??= [...azioniHtml(m.e?.html), ...(m.e?.azioni ?? [])].map(([cmd, eti, stile, detto]) => ({ dataset: { id: cmd }, eti: accorcia(pulisci(conIcone(eti ?? cmd))), detto: detto ?? pulisci(conIcone(eti ?? cmd)), stile, disabled: stile === 'spento', azione: true })))
 
 // ── la storia: i messaggi restano (sessione o conto, come la chat grande) ──
 let storiaDove = null, storiaAttesa = 0
@@ -332,7 +366,8 @@ function carica() {
     ultimoGiorno = j?.giorno ?? ''
     for (const p of j?.msgs ?? []) {
       if (p.tipo !== 'bot') { msgs.push({ tipo: p.tipo, testo: p.testo }); continue }
-      const m = { tipo: 'bot', e: p.e ?? {}, av: p.av ?? 'bot', fatto: true, pronta: Promise.resolve(), righe: null, rulli: p.rulli?.map((r) => ({ icona: r.icona, gira: false })) ?? null }
+      // (vecchia: i tasti delle schede di ieri restano disegnati, spenti; non mandano più niente, erano per allora)
+      const m = { tipo: 'bot', e: p.e ?? {}, av: p.av ?? 'bot', fatto: true, vecchia: true, pronta: Promise.resolve(), righe: null, rulli: p.rulli?.map((r) => ({ icona: r.icona, gira: false })) ?? null }
       const ps = p.scelte ?? (p.bottoni ? [p.bottoni] : null) // (bottoni: la storia di prima, una scelta sola)
       if (ps) m.scelte = ps.map((q) => ({ m, griglia: q.griglia, lista: q.lista.map((b) => Object.assign(bottone(m, { id: b.dataset.id, eti: b.eti, stile: b.stile }), { icona: b.icona, premuto: b.premuto, aperta: b.aperta, bum: b.bum, disabled: true })), sel: 0, fine() {} }))
       msgs.push(m)
@@ -345,8 +380,13 @@ function carica() {
 function suggerisci() {
   iSugg = -1
   if (!riga.trim() || aspettaTesto || scelta) { sugg = null; return }
-  try { sugg = calcola(riga, { passa: passaPredittivo, durata })?.voci?.slice(0, 4) ?? null } catch { sugg = null }
-  if (sugg && !sugg.length) sugg = null
+  let voci = []
+  try { voci = calcola(riga, { passa: passaPredittivo, durata })?.voci?.slice(0, 6) ?? [] } catch {}
+  // solo quelli che ci stanno nella fila: prima ← → arrivavano anche a quelli non disegnati, e OK completava una cosa che non si vedeva
+  sugg = []
+  let x = 10
+  for (const s of voci) { const w = Lcd.larghezza(txt(s.v)) + 4; if (x + w > W - 8) break; sugg.push(s); x += w + 4 }
+  if (!sugg.length) sugg = null
   os.ridisegna()
 }
 function completa() {
@@ -364,22 +404,72 @@ function rapidi() {
   for (const [c, pronto] of PRONTI) { try { if (pronto()) l.push(c) } catch {} }
   return [...new Set([...l, ...zaino.rapidi().slice(0, 4), 'saldo', 'negozio', 'aiuto'])].slice(0, 8)
 }
-/** L'ultima scheda del bot con le sue azioni di seguito ([compra] [usa]…), se a riga vuota la croce va su quelle. */
-function ultimaConAzioni() {
+
+// ── i tasti di adesso (4.11, Alberto: «in chat è buggato perché i tasti che premo danno comandi diversi da quel che hanno di
+// nome… fai una cosa più facile: uno che non ha mai aperto il sito fa fatica»). Prima c'erano tre modi diversi (i consigliati
+// che riempivano la riga, le azioni dell'ultima scheda che li nascondevano, OK a vuoto che apriva la tastiera) e niente di
+// scelto finché non si toccava una freccia. Adesso UN cursore solo, sempre su un tasto che si vede: ← → lo spostano su tutto
+// quello che si può premere adesso (i tasti dell'ultima scheda, poi i consigliati in fondo, poi «scrivi…»), OK preme proprio
+// quello evidenziato, il clic preme quello sotto il mouse, e il fumetto dice il nome del tasto premuto. Il cursore si ricorda
+// per CHIAVE e non per posto: se la fila cambia (un premio diventa pronto), resta sullo stesso tasto o torna al primo ──
+/** L'ultima scheda del bot, se i suoi tasti si premono adesso. Quelle prima, e quelle di ieri, restano disegnate spente. */
+function schedaAttiva() {
+  if (aspettaTesto || scelta) return null
   const ub = msgs.findLast((m) => m.tipo === 'bot')
-  return !riga.trim() && !aspettaTesto && ub?.fatto && !ub.scelte?.length && azioniDi(ub).length ? ub : null // (con le scelte le azioni non si disegnano)
+  return ub?.fatto && !ub.vecchia && !ub.scelte?.length && azioniDi(ub).some((b) => !b.disabled) ? ub : null // (con le scelte le azioni non si disegnano)
 }
-/** I consigliati si vedono quando ← → vanno a loro: niente da completare, niente scelte, riga vuota (o uno di loro scelto). */
-const conConsigli = () => !sugg && !scelta && !aspettaTesto && (!riga.trim() || iRapidi >= 0) && !ultimaConAzioni()
+/** La parola che un evento vuole scritta (la banconota: PRENDILA, la nutria: SCIÒ): diventa un tasto. Coi soli sei tasti
+ *  scriverla in cinque secondi con la tastiera sullo schermo non si fa. */
+const parola = (seg) => (seg && /^[\p{L}\d]{2,16}$/u.test(seg) ? seg : null)
+/** Tutto quello che si può premere adesso, in ordine: { k, eti, fai, b?, m?, fila? } (fila: sta nella fila in fondo). */
+function tasti() {
+  if (scelta || riga) return [] // (una scelta ha la sua croce; mentre si scrive, ← → scelgono i suggerimenti)
+  const l = []
+  if (aspettaTesto) {
+    const p = parola(aspettaTesto.segnaposto)
+    if (p) l.push({ k: 'p:' + p, eti: p, fila: true, fai: () => { const a = aspettaTesto; if (a) { utente(p); a.risolvi(p) } } })
+  } else {
+    const ua = schedaAttiva()
+    if (ua) azioniDi(ua).forEach((b, i) => { if (!b.disabled) l.push({ k: `a:${i}:${b.dataset.id}`, eti: b.eti, b, m: ua, fai: () => azione(b.dataset.id, b.detto) }) })
+    for (const c of rapidi()) l.push({ k: 'c:' + c, eti: c, fila: true, fai: () => manda(c) })
+  }
+  l.push({ k: 'scrivi', eti: 'scrivi…', fila: true, fai: () => scriviComando() })
+  return l
+}
+/** Quale tasto è scelto (senza cambiare niente: lo usa anche il disegno). Una scheda nuova coi tasti porta il cursore sul suo primo. */
+function quale(l) {
+  const ua = schedaAttiva()
+  if (ua && ua !== curScheda) { const i = l.findIndex((t) => t.m === ua); if (i >= 0) return i }
+  const i = l.findIndex((t) => t.k === cur)
+  return i >= 0 ? i : l.length ? 0 : -1
+}
+/** Come quale, ma se lo segna (lo chiamano i tasti, prima di muoversi o premere). */
+function fissa(l) { const i = quale(l); curScheda = schedaAttiva(); cur = l[i]?.k ?? null; return i }
+const Y_IN = H - 17 // la riga in fondo (il suggerimento, o quello che si scrive)
+/** Dove finiscono i messaggi: sopra la fila dei tasti, o dei suggerimenti, o subito sopra la riga in fondo. */
+const fondo = () => Y_IN - (!scelta && !riga ? 14 : riga && sugg ? 11 : 1) // (sopra la fila un filo d'aria: l'ultima riga ci finiva attaccata)
+const maxScorri = () => Math.max(0, msgs.reduce((a, m) => a + altezza(m), 0) - (fondo() - BARRA - 1))
+let selOra = null, attivaOra = null // (solo per il disegno: il tasto scelto e la scheda attiva, presi una volta a disegno)
+/** La riga in fondo quando non si scrive: cosa fanno i tasti adesso, coi tasti per nome (REGOLE.md 3.3 e 3.4). */
+function aiuto() {
+  if (scelta?.dir) return `premi ${Object.keys(scelta.dir).map((k) => FRECCIA[k]).join(' ')} o fai clic`
+  if (scelta) return scelta.griglia ? '← → ↑ ↓ scegli · OK premi' : '← → scegli · OK premi'
+  if (aspettaTesto && !parola(aspettaTesto.segnaposto)) return 'scrivi e Invio, o OK tastiera'
+  return scorri < maxScorri() ? '← → scegli · OK premi · ↑ leggi' : '← → scegli · OK premi' // (4.11: chi arriva non sapeva che ↑ fa leggere i messaggi di prima)
+}
 
 // ── l'impaginazione: ogni messaggio diventa righe { h, d(l, y) } ──
 // il clic del mouse (os.zona): solo dentro la fascia dei messaggi che si vede, e un tasto si preme come con OK
 let banda = [0, 0]
 const zonaChat = (x, y, w, h, fn) => { const y0 = Math.max(y, banda[0]), y1 = Math.min(y + h, banda[1]); if (y1 > y0) os.zona(x, y0, w, y1 - y0, fn) }
 function clicca(sc, b) {
-  if (!b || b.disabled) return
-  if (sc && scelte.includes(sc)) { scelta = sc; sc.sel = sc.lista.indexOf(b); premi(sc, b); invalida(sc.m); return }
-  if (b.azione && !aspettaTesto) azione(b.dataset.id)
+  if (!b || b.disabled || !sc || !scelte.includes(sc)) return
+  scelta = sc; sc.sel = sc.lista.indexOf(b); premi(sc, b); invalida(sc.m)
+}
+/** La cornice a puntini: un tasto che c'è ma adesso non si preme. */
+function puntini(l, x, y, w, h) {
+  for (let i = 0; i < w; i += 2) { l.px(x + i, y); l.px(x + i, y + h - 1) }
+  for (let j = 2; j < h - 1; j += 2) { l.px(x, y + j); l.px(x + w - 1, y + j) }
 }
 const rigaTesto = (s, x, opz) => ({ h: 9, d: (l, y) => l.testo(x, y, s, opz) })
 function impagina(m) {
@@ -400,7 +490,7 @@ function impagina(m) {
   const titolo = pulisci(conIcone(e.t ?? ''))
   if (titolo) { const righe = Lcd.acapo(titolo, 36); righe.forEach((r, i) => { if (i === 0) testa.d = ((d) => (l, y) => { d(l, y); l.testo(X0 + 20, y + 1, r) })(testa.d); else R.push(rigaTesto(r, X0 + 20)) }) }
   else testa.h = 16
-  const corpo = [pulisci(conIcone(e.d ?? '')), m.rulli ? '' : pulisci(conIcone(e.html ?? ''))].filter(Boolean).join('\n')
+  const corpo = [pulisci(conIcone(e.d ?? '')), m.rulli ? '' : pulisci(conIcone(String(e.html ?? '').replace(/<button\b[^>]*\bdata-cmd[^>]*>[\s\S]*?<\/button>/gi, '')))].filter(Boolean).join('\n') // (i tasti data-cmd sono diventati tasti della scheda, azioniHtml: nel testo restava un «compra» che non si premeva)
   for (const r of Lcd.acapo(corpo, COL)) if (r) R.push(rigaTesto(r, X0)); else R.push({ h: 4, d() {} })
   if (m.rulli) R.push({ h: 24, d: (l, y, t) => m.rulli.forEach((r, i) => { const x = X0 + i * 24; l.cornice(x, y, 22, 22); const nome = r.gira ? RULLI[(t + i * 2) % RULLI.length] : r.icona; l.bitmap(icone.bitmap(nome, 16), x + 3, y + 3) }) })
   for (const [n, v] of e.campi ?? []) { const s = `${pulisci(conIcone(n))}: ${pulisci(conIcone(v))}`; for (const r of Lcd.acapo(s, COL)) R.push(rigaTesto(r, X0)) }
@@ -420,7 +510,22 @@ function impagina(m) {
     let r = [], w = 0
     for (const b of fila) { const bw = Lcd.larghezza(b.eti || '?') + 8; if (w + bw > 240 && r.length) { righe.push(r); r = []; w = 0 } r.push(b); w += bw + 3 }
     if (r.length) righe.push(r)
-    for (const fr of righe) R.push({ h: 13, sc, da: sc ? sc.lista.indexOf(fr[0]) : -1, a: sc ? sc.lista.indexOf(fr.at(-1)) : -1, d: (l, y) => { let x = X0; for (const b of fr) { const bw = Lcd.larghezza(b.eti || '?') + 8, on = sc ? scelta === sc && sc.lista[sc.sel] === b : m.selAzione === b; if (on || b.premuto) l.riempi(x, y, bw, 11); else l.cornice(x, y, bw, 11); if (b.disabled && !b.premuto) l.testo(x + 4, y + 2, b.eti || '?'); else l.testo(x + 4, y + 2, b.eti || '?', { inv: on || b.premuto }); { const bb = b; zonaChat(x, y, bw, 11, () => clicca(sc, bb)) } x += bw + 3 } } })
+    // (le azioni: si premono solo quelle dell'ultima scheda, schedaAttiva; le altre e quelle «spento» hanno la cornice a
+    // puntini e il clic non le prende: tutto quello che si clicca si fa anche coi tasti, REGOLE.md)
+    for (const fr of righe) R.push({ h: 13, sc, az: sc ? null : fr, da: sc ? sc.lista.indexOf(fr[0]) : -1, a: sc ? sc.lista.indexOf(fr.at(-1)) : -1, d: (l, y) => {
+      let x = X0
+      const viva = !sc && attivaOra === m
+      for (const b of fr) {
+        const bw = Lcd.larghezza(b.eti || '?') + 8, on = sc ? scelta === sc && sc.lista[sc.sel] === b : viva && selOra?.b === b
+        const morta = !sc && (!viva || b.disabled)
+        if (on || b.premuto) l.riempi(x, y, bw, 11); else if (morta) puntini(l, x, y, bw, 11); else l.cornice(x, y, bw, 11)
+        l.testo(x + 4, y + 2, b.eti || '?', { inv: on || b.premuto })
+        const bb = b
+        if (sc) zonaChat(x, y, bw, 11, () => clicca(sc, bb))
+        else if (!morta) zonaChat(x, y, bw, 11, () => { cur = null; curScheda = m; azione(bb.dataset.id, bb.detto) })
+        x += bw + 3
+      }
+    } })
   }
   R.push({ h: 4, d() {} })
   return R
@@ -428,20 +533,22 @@ function impagina(m) {
 const RULLI = ['ciliegia', 'limone', 'sette', 'campana', 'diamante', 'chiocciola-oro', 'bar', 'trifoglio', 'anguria', 'uva', 'stella', 'dado']
 const righeDi = (m) => (m.righe ??= impagina(m))
 const altezza = (m) => righeDi(m).reduce((a, r) => a + r.h, 0)
-/** La riga della scelta in corso sempre in vista: scorre quanto basta perché ci stia tutta (31.10: la griglia delle mine è
- *  più alta dello schermo, la prima fila restava sopra e la casella scelta non si vedeva). */
+/** La riga della scelta in corso, o del tasto scelto della scheda, sempre in vista: scorre quanto basta perché ci stia tutta
+ *  (31.10: la griglia delle mine è più alta dello schermo, la prima fila restava sopra e la casella scelta non si vedeva). */
 function segui() {
-  const sc = scelta
-  if (!sc) return
-  const k = msgs.indexOf(sc.m)
+  if (scelta) { const sc = scelta; return mostra(sc.m, (r) => r.sc === sc && sc.sel >= r.da && sc.sel <= r.a) }
+  const l = tasti(), t = l[quale(l)]
+  if (t?.b) mostra(t.m, (r) => r.az?.includes(t.b))
+}
+function mostra(m, cerca) {
+  const k = msgs.indexOf(m)
   if (k < 0) return
-  const R = righeDi(sc.m)
   let su = 0, riga = null
-  for (const r of R) { if (r.sc === sc && sc.sel >= r.da && sc.sel <= r.a) { riga = r; break } su += r.h }
+  for (const r of righeDi(m)) { if (cerca(r)) { riga = r; break } su += r.h }
   if (!riga) return
-  let sotto = altezza(sc.m) - su - riga.h // (dal fondo della riga al fondo della chat)
+  let sotto = altezza(m) - su - riga.h // (dal fondo della riga al fondo della chat)
   for (let i = k + 1; i < msgs.length; i++) sotto += altezza(msgs[i])
-  const yIn = H - 17, alta = yIn - (sugg ? 11 : 1) - (BARRA + 1)
+  const alta = fondo() - (BARRA + 1) - 12 // (12: in cima, da scorsi, c'è il bollino «↓ 3»; il tasto scelto ci finiva sotto)
   scorri = Math.max(0, Math.min(sotto, Math.max(scorri, sotto + riga.h - alta)))
 }
 
@@ -461,14 +568,18 @@ export function vista() {
     comando(c) { if (typeof c === 'string' && c.trim()) manda(c) },
     tic(t) {
       let ancora = riordina()
+      // una scheda nuova coi tasti: il cursore va sul suo primo, e quello si vede (la vetrina è più alta dello schermo: il
+      // primo «compra» restava sopra, scelto ma fuori vista)
+      const ua = schedaAttiva()
+      if (ua && ua !== curScheda && !riga) { fissa(tasti()); segui(); ancora = true }
       const ora = Date.now()
       for (const m of msgs) if (m.tempo && (m.tempo.fermo || ora - m.tempo.da >= m.tempo.ms)) { m.tempo = null; m.righe = null; ancora = true } // (la barra del tempo finisce qui e non nel disegno: fuori schermo restava, e il tic ridisegnava per sempre)
       if (ancora || msgs.some((m) => m.pensa || m.tipo === 'pensa' || m.rulli?.some((r) => r.gira) || m.tempo)) os.ridisegna()
     },
     disegna(l, t) {
-      const consigli = conConsigli() ? rapidi() : null
-      const conSugg = !!sugg || !!consigli
-      const yIn = H - 17, yTop = BARRA + 1, yFondo = yIn - (consigli ? 14 : conSugg ? 11 : 1) // (sopra i tasti consigliati un filo d'aria: l'ultima riga ci finiva attaccata)
+      const lista = tasti()
+      selOra = lista[quale(lista)] ?? null; attivaOra = schedaAttiva()
+      const yIn = Y_IN, yTop = BARRA + 1, yFondo = fondo()
       // i messaggi, dal fondo in su
       l.ritaglia([0, yTop, W, yFondo - yTop])
       banda = [yTop, yFondo]
@@ -484,42 +595,42 @@ export function vista() {
       }
       l.ritaglia(null)
       if (scorri > 0) { const s = `↓ ${Math.ceil(scorri / 16)}`, w = Lcd.larghezza(s) + 6, x = W - os.MARGINE - 4 - w; l.riempi(x - 1, yTop, w + 2, 12, 0); l.riempi(x, yTop + 1, w, 10); l.testo(x + 3, yTop + 2, s, { inv: true }); os.zona(x, yTop + 1, w, 10, () => { scorri = 0 }) } // (un bollino rovesciato con l'aria attorno: prima il testo finiva attaccato a quello dei messaggi)
-      // i suggerimenti sopra la riga
-      // i consigliati: tasti incorniciati in fila; quello scelto rovesciato e sempre in vista (la fila parte più avanti)
-      if (consigli) {
-        // (quelli che non ci stanno: ◀ e ▶ ai lati dicono che ce ne sono altri, e ← → ci arrivano)
-        const lista = consigli.map((c) => { const s = corto(txt(c), 20); return { c, s, w: Lcd.larghezza(s) + 6 } })
-        const tutti = 10 + lista.reduce((a, b) => a + b.w + 3, 0) <= W - 8, x0 = tutti ? 10 : 17, fine = tutti ? W - 8 : W - 15
+      // la fila in fondo: i consigliati e «scrivi…», incorniciati; quello scelto rovesciato e sempre in vista (la fila parte
+      // più avanti; ◀ e ▶ ai lati dicono che ce ne sono altri, e ← → ci arrivano)
+      const fila = lista.filter((x) => x.fila)
+      if (fila.length) {
+        const pezzi = fila.map((x) => { const s = corto(txt(x.eti), 20); return { x, s, w: Lcd.larghezza(s) + 6 } })
+        const tutti = 10 + pezzi.reduce((a, p) => a + p.w + 3, 0) <= W - 8, x0 = tutti ? 10 : 17, fine = tutti ? W - 8 : W - 15
+        const iSel = fila.indexOf(selOra)
         let da = 0
-        while (iRapidi > da && x0 + lista.slice(da, iRapidi + 1).reduce((a, b) => a + b.w + 3, 0) - 3 > fine) da++
+        while (iSel > da && x0 + pezzi.slice(da, iSel + 1).reduce((a, p) => a + p.w + 3, 0) - 3 > fine) da++
         let x = x0, ultimo = da - 1
-        for (let i = da; i < lista.length; i++) {
-          const { c, s, w } = lista[i]
+        for (let i = da; i < pezzi.length; i++) {
+          const { x: tasto, s, w } = pezzi[i]
           if (x + w > fine) break
           ultimo = i
-          const on = i === iRapidi
+          const on = i === iSel
           if (on) l.riempi(x, yIn - 11, w, 10); else l.cornice(x, yIn - 11, w, 10)
           l.testo(x + 3, yIn - 10, s, { inv: on })
-          os.zona(x, yIn - 11, w, 10, () => { riga = ''; iRapidi = -1; storia.push(c); iStoria = storia.length; manda(c) }) // (il clic manda subito)
+          os.zona(x, yIn - 11, w, 10, () => { cur = tasto.k; tasto.fai() }) // (il clic preme subito)
           x += w + 3
         }
         if (da > 0) l.testo(8, yIn - 10, '◀')
-        if (ultimo < lista.length - 1) l.testo(W - 13, yIn - 10, '▶')
+        if (ultimo < pezzi.length - 1) l.testo(W - 13, yIn - 10, '▶')
       }
-      if (sugg) {
+      // mentre si scrive: i suggerimenti (chat/predittivo.js) sopra la riga
+      if (riga && sugg) {
         let x = 10
         l.orizz(6, yIn - 12, W - 12)
-        sugg.forEach((s, i) => { const w = Lcd.larghezza(s.v) + 4; if (x + w > W - 8) return; if (i === iSugg) l.riempi(x - 1, yIn - 10, w, 9); l.testo(x + 1, yIn - 9, txt(s.v), { inv: i === iSugg }); os.zona(x - 1, yIn - 11, w, 11, () => { iSugg = i; completa() }); x += w + 4 })
+        sugg.forEach((s, i) => { const w = Lcd.larghezza(txt(s.v)) + 4; if (i === iSugg) l.riempi(x - 1, yIn - 10, w, 9); l.testo(x + 1, yIn - 9, txt(s.v), { inv: i === iSugg }); os.zona(x - 1, yIn - 11, w, 11, () => { iSugg = i; completa() }); x += w + 4 })
       }
-      // la riga da scrivere (dentro il margine: le punte dello schermo sono stondate)
+      // la riga in fondo (dentro il margine: le punte dello schermo sono stondate): quello che si scrive, o cosa fanno i tasti
       l.orizz(6, yIn - 1, W - 12)
-      l.testo(9, yIn + 3, '›')
-      const max = Math.floor((W - 26) / 6)
-      if (riga) { const vis = riga.length > max ? riga.slice(-max) : riga; l.testo(16, yIn + 3, vis); if (t % 10 < 5) l.riempi(16 + Lcd.larghezza(vis) + 2, yIn + 2, 5, 9) }
-      else if (aspettaTesto) l.testo(16, yIn + 3, `[${aspettaTesto.segnaposto}]`)
-      else if (scelta?.dir) l.testo(16, yIn + 3, `premi ${Object.keys(scelta.dir).map((k) => FRECCIA[k]).join(' ')} o fai clic`)
-      else if (scelta) l.testo(16, yIn + 3, 'croce: scegli · OK: premi')
-      else { if (t % 10 < 5) l.riempi(16, yIn + 2, 5, 9); l.testo(24, yIn + 3, consigli ? 'scrivi, o ←→ un consiglio e OK' : 'scrivi un comando (aiuto)') } // (il cursore prima del suggerimento: sopra ne copriva la «s»)
+      if (riga) {
+        const max = Math.floor((W - 26) / 6), vis = riga.length > max ? riga.slice(-max) : riga
+        l.testo(9, yIn + 3, '›'); l.testo(16, yIn + 3, vis)
+        if (t % 10 < 5) l.riempi(16 + Lcd.larghezza(vis) + 2, yIn + 2, 5, 9)
+      } else { const a = aiuto(); l.testo(Math.round(W / 2 - Lcd.larghezza(a) / 2), yIn + 3, a) }
     },
     tasto(n) {
       riordina()
@@ -530,7 +641,7 @@ export function vista() {
         const i = scelte.indexOf(sc), prima = scelte[i - 1], dopo = scelte[i + 1], r = Math.floor(sc.sel / cols), ultima = r >= Math.ceil(N / cols) - 1, selPrima = sc.sel
         if (n === 'sx') sc.sel = (sc.sel - 1 + N) % N
         else if (n === 'dx') sc.sel = (sc.sel + 1) % N
-        else if (n === 'su') { if (sc.griglia && r > 0) sc.sel -= cols; else if (prima) scelta = prima; else if (sc.griglia) sc.sel = (sc.sel - cols + N) % N; else scorri = Math.min(scorri + 16, Math.max(0, msgs.reduce((a, m) => a + altezza(m), 0) - 60)) }
+        else if (n === 'su') { if (sc.griglia && r > 0) sc.sel -= cols; else if (prima) scelta = prima; else if (sc.griglia) sc.sel = (sc.sel - cols + N) % N; else scorri = Math.min(scorri + 16, maxScorri()) }
         else if (n === 'giu') { if (sc.griglia && !ultima) sc.sel = Math.min(N - 1, sc.sel + cols); else if (dopo) scelta = dopo; else if (sc.griglia) sc.sel = (sc.sel + cols) % N; else scorri = Math.max(0, scorri - 16) }
         else if (n === 'ok') premi(sc, sc.lista[sc.sel])
         else if (n === 'indietro') { if (riga) { riga = ''; sugg = null } else os.togli() }
@@ -539,34 +650,28 @@ export function vista() {
         if (scelta !== sc || sc.sel !== selPrima) segui() // (la casella nuova in vista; lo scorrere a mano coi tasti lo lascia stare)
         return true
       }
-      if (n === 'su') { scorri = Math.min(scorri + 16, Math.max(0, msgs.reduce((a, m) => a + altezza(m), 0) - 60)); return true }
+      // ↑ ↓ scorrono i messaggi, sempre
+      if (n === 'su') { scorri = Math.min(scorri + 16, maxScorri()); return true }
       if (n === 'giu') { scorri = Math.max(0, scorri - 16); return true }
-      // le azioni di seguito dell'ultima scheda (i tasti [compra] [usa]…): a riga vuota la croce le sceglie e OK le manda. Solo
-      // l'ultima scheda del bot (30.10: prima ← → pescavano l'ultima con azioni anche lontana, fuori schermo, e i rapidi non si raggiungevano)
-      const ua = ultimaConAzioni()
-      if (n === 'sx' || n === 'dx') {
-        if (sugg) { iSugg = (iSugg + (n === 'dx' ? 1 : -1) + sugg.length) % sugg.length; return true }
-        if (ua && iRapidi < 0) { const l = ua.azioniObj, i = l.indexOf(ua.selAzione); ua.selAzione = l[(i + (n === 'dx' ? 1 : -1) + l.length) % l.length]; for (const m of msgs) if (m !== ua && m.selAzione) { m.selAzione = null; m.righe = null } scorri = 0; invalida(ua); return true }
-        if (!riga.trim() || iRapidi >= 0) { const r = rapidi(); iRapidi = iRapidi < 0 ? (n === 'dx' ? 0 : r.length - 1) : (iRapidi + (n === 'dx' ? 1 : -1) + r.length) % r.length; riga = r[iRapidi]; return true } // (da nessuno: → il primo, ← l'ultimo)
-        return true
+      // mentre si scrive (la tastiera vera): ← → scelgono un suggerimento, OK completa quello scelto o manda la riga
+      if (riga) {
+        if ((n === 'sx' || n === 'dx') && sugg) iSugg = iSugg < 0 ? (n === 'dx' ? 0 : sugg.length - 1) : (iSugg + (n === 'dx' ? 1 : -1) + sugg.length) % sugg.length // (da nessuno: → il primo, ← l'ultimo)
+        else if (n === 'ok') { if (sugg && iSugg >= 0) completa(); else invia() }
+        else if (n === 'indietro') { riga = ''; sugg = null; iSugg = -1 }
+        return n === 'sx' || n === 'dx' || n === 'ok' || n === 'indietro'
       }
-      if (n === 'ok') {
-        if (sugg && iSugg >= 0) { completa(); return true }
-        if (riga.trim()) { invia(); return true }
-        if (ua?.selAzione) { const cmd = ua.selAzione.dataset.id; ua.selAzione = null; invalida(ua); azione(cmd); return true }
-        // a riga vuota: la tastiera sullo schermo; se c'è un'azione di seguito nell'ultima scheda, prima quella
-        const att = aspettaTesto // (30.10: la risposta che arriva tardi, a scrivi già scaduto, non diventa un comando: si butta)
-        os.tastiera({ titolo: att ? att.segnaposto : 'il comando' }).then((t) => { if (t == null || (att && aspettaTesto !== att)) return; riga = t; invia() })
-        return true
-      }
-      if (n === 'indietro') { if (riga) { riga = ''; sugg = null; iRapidi = -1; return true } os.togli(); return true }
+      // se no: il cursore sui tasti di adesso. ← → lo spostano (in tondo), OK preme proprio quello evidenziato
+      const lista = tasti(), i = fissa(lista)
+      if (n === 'sx' || n === 'dx') { if (lista.length) { cur = lista[(i + (n === 'dx' ? 1 : -1) + lista.length) % lista.length].k; scorri = 0; segui() } return true }
+      if (n === 'ok') { lista[i]?.fai(); return true }
+      if (n === 'indietro') { os.togli(); return true }
       return false
     },
-    carattere(ch) { if (ch.length === 1) { riga += ch; iRapidi = -1; suggerisci() } },
-    cancella() { riga = riga.slice(0, -1); iRapidi = -1; suggerisci() },
+    carattere(ch) { if (ch.length === 1) { riga += ch; suggerisci() } },
+    cancella() { riga = riga.slice(0, -1); suggerisci() },
     scrivendo: () => riga.length > 0,
-    invio() { if (sugg && iSugg >= 0) completa(); else if (riga.trim()) invia(); else { riga = ''; v.tasto('ok') } }, // (a riga vuota Invio è OK: preme la scelta, l'azione, apre la tastiera)
-    /** Un'azione di seguito (le [azioni] delle schede): l'ultima scheda con azioni, la prima azione. */
+    invio() { v.tasto('ok') }, // (Invio è OK: completa o manda la riga scritta, o preme il tasto scelto)
+    /** Un'azione di seguito (le [azioni] delle schede), mandata da fuori. */
     azione(cmd) { azione(cmd) },
   }
   vistaUnica = v

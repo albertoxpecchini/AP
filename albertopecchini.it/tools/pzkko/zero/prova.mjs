@@ -29,6 +29,7 @@ const peggiori = process.argv.includes('--peggiori') // i dati peggiori (REGOLE.
 const rider = process.argv.includes('--rider')
 const senzaConto = process.argv.includes('--senzaconto') // nessun conto: il cercapersone chiuso, l'account
 const finto = process.argv.includes('--server-finto') // un server del wallet finto (qui sotto): entra (PIN 1234), crea, converti, invia… // un turno da rider: la consegna con le frecce e coi clic del mouse
+const guidaPrima = process.argv.includes('--guida') // la guida del primo accesso all'apertura (con --senzaconto: il giro di chi arriva)
 const suoni = process.argv.includes('--suoni') // i suoni accesi (pzkko-suono = si): il collaudo vuole un bip a ogni tasto
 const ora = process.argv.includes('--giorno') ? '12:00' : '21:00&notte=1' // di notte (lampioni, l'auto) o di giorno (il sole)
 const TIPI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.glb': 'model/gltf-binary', '.webp': 'image/webp', '.png': 'image/png', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg' }
@@ -206,7 +207,8 @@ try {
     if (AC) { const crea = AC.prototype.createOscillator; AC.prototype.createOscillator = function () { if (/interfaccia.js/.test(new Error().stack ?? '')) window.__oscillatori = (window.__oscillatori ?? 0) + 1; return crea.call(this) } } // (solo i suoni di suono/interfaccia.js: la musica e la strada ne fanno di continuo)
   }, suoni, peggiori, senzaConto, ['lavatrice', 'decifratore'].includes(app))
 
-  await page.goto(`${base}/?muro=1&chat&ora=${ora}`, { waitUntil: 'networkidle2', timeout: 60000 })
+  // (--guida: come chi arriva per la prima volta, la guida all'apertura; con --app l'app non si apre da sola, la guida porta lì)
+  await page.goto(`${base}/?muro=1&chat&ora=${ora}${guidaPrima ? '&guida' : ''}`, { waitUntil: 'networkidle2', timeout: 60000 })
   await page.waitForSelector('.chat-tasto.zero', { timeout: 30000 })
   await page.waitForSelector('.chat-tasto.zero.os', { timeout: 30000 }).catch(() => console.log('  (pzk os sul muro non è partito)'))
   await dorm(1500)
@@ -239,6 +241,22 @@ try {
   if (process.argv.includes('--debug')) { // il tasto OK premuto col mouse e tenuto: deve restare giù e scuro finché non si lascia
     const ok = await page.evaluate(() => window.pzkkoZero?.dove?.('ok'))
     if (ok) { await page.mouse.move(ok.x, ok.y); await page.mouse.down(); await dorm(400); await page.screenshot({ path: join(LAVORO, 'prova-ok-giu.png'), clip: { x: ok.x - 260, y: ok.y - 230, width: 560, height: 460 } }); await page.mouse.up(); await dorm(400); await page.screenshot({ path: join(LAVORO, 'prova-ok-su.png'), clip: { x: ok.x - 260, y: ok.y - 230, width: 560, height: 460 } }); console.log('ok premuto e lasciato:', JSON.stringify(ok)) }
+  }
+  // --croce (4.11, Alberto: «i tasti che premo danno comandi diversi da quel che hanno di nome»): i quattro bracci della
+  // croce 3D presi col mouse. Ognuno deve stare dal suo lato sullo schermo E mandare a pzk os la sua direzione
+  if (process.argv.includes('--croce')) {
+    await page.evaluate(() => { window.__croce = []; const z = window.pzkkoZero, f = z.onTasto; z.onTasto = (n, v) => { window.__croce.push(n === 'croce' ? v : n); return f(n, v) } })
+    const c = await page.evaluate(() => window.pzkkoZero.dove('croce'))
+    const male = []
+    for (const [verso, lx, ly] of [['dx', 0, 0.75], ['sx', 0, -0.75], ['su', -0.75, 0], ['giu', 0.75, 0]]) {
+      const p = await page.evaluate((lx, ly) => window.pzkkoZero.dove('croce', [lx, ly]), lx, ly)
+      const lato = Math.abs(p.x - c.x) > Math.abs(p.y - c.y) ? (p.x > c.x ? 'dx' : 'sx') : p.y < c.y ? 'su' : 'giu'
+      await page.mouse.move(p.x, p.y); await page.mouse.down(); await dorm(90); await page.mouse.up(); await dorm(300)
+      const preso = await page.evaluate(() => window.__croce.pop() ?? '-')
+      console.log(`  croce ${verso.padEnd(3)} sullo schermo a ${lato.padEnd(3)} (${Math.round(p.x)}, ${Math.round(p.y)}) → pzk os riceve ${preso}`)
+      if (lato !== verso || preso !== verso) male.push(`${verso}: sta a ${lato}, manda ${preso}`)
+    }
+    console.log(male.length ? `CROCE: ${male.join(' · ')}` : 'CROCE: tutto a posto')
   }
   if (process.argv.includes('--debug')) console.log('rig:', await page.evaluate(() => JSON.stringify(window.pzkkoZero?.debug?.())), 'url:', await page.evaluate(() => location.search))
   if (process.argv.includes('--debug')) console.log('luce:', await page.evaluate(() => import('/telefono/zero/luce.js').then((l) => { const s = l.stato(); return JSON.stringify({ ora: new Date(window.pzkkoOrologio?.adesso?.() ?? 0).toString().slice(16, 24), pagina: window.pzkkoPagina?.luci, giorno: s.giorno, buio: s.buio, notte: s.notte, el: s.sole.el, lampioni: s.lampioni }) })))
@@ -278,7 +296,7 @@ try {
   for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowDown'); await dorm(200)
   await page.keyboard.press('Enter'); await dorm(500)
   await page.screenshot({ path: join(LAVORO, 'prova-guida.png') })
-  for (let i = 0; i < 4; i++) { await page.keyboard.press('Enter'); await dorm(200) }
+  for (let i = 0; i < 3; i++) { await page.keyboard.press('Enter'); await dorm(200) } // (le tre pagine della guida)
   await page.keyboard.press('Escape'); await dorm(200); await page.keyboard.press('Escape'); await dorm(400)
   }
   if (rider) {
@@ -328,9 +346,11 @@ try {
     // --tasti=dx,dx,ok,giu…: una sequenza a scelta al posto di quella fissa (per vedere tutte le pagine di un'app)
     const TASTI = { su: 'ArrowUp', giu: 'ArrowDown', sx: 'ArrowLeft', dx: 'ArrowRight', ok: 'Enter', indietro: 'Escape', okvero: 'Control+Enter' } // (okvero: il tasto OK anche dove Invio va a capo, l'editor di «codice C»)
     // (e clic@80x121: un clic del mouse sul pixel 80, 121 dell'lcd, attraverso il 3D vero; scrivi@caf: testo dalla tastiera vera, + per lo spazio;
-    // conta@pescati@5: lo zaino conta come dopo cinque pescate, per far avanzare sfide e quest; prendi@caffe@3: tre caffè nello zaino)
-    const scelti = (process.argv.find((a) => a.startsWith('--tasti=')) ?? '').slice(8).split(',').filter((k) => TASTI[k] || /^clic@\d+x\d+$/.test(k) || /^scrivi@[\w+]+$/.test(k) || /^(conta|prendi)@[\w-]+@\d+$/.test(k) || /^aspetta@\d+$/.test(k))
-    const passo = (k) => (TASTI[k] ? [k, TASTI[k]] : k.startsWith('aspetta@') ? [k.replace('@', '-'), { aspetta: Number(k.slice(8)) }] : k.startsWith('scrivi@') ? [k.replace('@', '-'), { scrivi: k.slice(7) }] : k.startsWith('conta@') ? [k.split('@').join('-'), { conta: [k.split('@')[1], Number(k.split('@')[2])] }] : k.startsWith('prendi@') ? [k.split('@').join('-'), { prendi: [k.split('@')[1], Number(k.split('@')[2])] }] : [k.replace('@', '-'), { clic: k.slice(5).split('x').map(Number) }])
+    // conta@pescati@5: lo zaino conta come dopo cinque pescate, per far avanzare sfide e quest; prendi@caffe@3: tre caffè nello zaino;
+    // finta@direzioni|griglia|parola|azioni: nella chat una scheda finta che aspetta le frecce del rider, una griglia come le mine,
+    // la parola della banconota, o dei tasti con uno spento e uno da finire: senza la banca, che nel collaudo non c'è)
+    const scelti = (process.argv.find((a) => a.startsWith('--tasti=')) ?? '').slice(8).split(',').filter((k) => TASTI[k] || /^clic@\d+x\d+$/.test(k) || /^scrivi@[\w+]+$/.test(k) || /^(conta|prendi)@[\w-]+@\d+$/.test(k) || /^aspetta@\d+$/.test(k) || /^finta@\w+$/.test(k))
+    const passo = (k) => (TASTI[k] ? [k, TASTI[k]] : k.startsWith('finta@') ? [k.replace('@', '-'), { finta: k.slice(6) }] : k.startsWith('aspetta@') ? [k.replace('@', '-'), { aspetta: Number(k.slice(8)) }] : k.startsWith('scrivi@') ? [k.replace('@', '-'), { scrivi: k.slice(7) }] : k.startsWith('conta@') ? [k.split('@').join('-'), { conta: [k.split('@')[1], Number(k.split('@')[2])] }] : k.startsWith('prendi@') ? [k.split('@').join('-'), { prendi: [k.split('@')[1], Number(k.split('@')[2])] }] : [k.replace('@', '-'), { clic: k.slice(5).split('x').map(Number) }])
     const passi = scelti.length ? [['apri', null], ...scelti.map(passo)] : [['apri', null], ['giu', 'ArrowDown'], ['giu', 'ArrowDown'], ['su', 'ArrowUp'], ['dx', 'ArrowRight'], ['sx', 'ArrowLeft'], ['ok', 'Enter'], ['ok', 'Enter'], ['indietro', 'Escape'], ['indietro', 'Escape'], ['indietro', 'Escape']]
     const errori = []
     page.on('pageerror', (e) => errori.push('errore nella pagina: ' + e.message))
@@ -371,14 +391,24 @@ try {
       const prima = await page.evaluate(() => window.__oscillatori ?? 0)
       const accesiPrima = await page.evaluate(() => localStorage.getItem('pzkko-suono') === 'si')
       const giaAperta = !k && (await page.evaluate((a) => import('/telefono/zero/os/os.js').then((os) => os.corrente()?.app === a), app)) // (già aperta da sola, come l'account senza conto: la sigla è già suonata) // (se il collaudo li ha appena spenti dalle impostazioni, il silenzio è giusto)
-      if (k?.aspetta) await dorm(k.aspetta) // (aspetta@3000: tre secondi senza toccare niente, per le cose che vanno da sole)
+      if (k?.finta) await page.evaluate(async (tipo) => {
+        const c = await import('/telefono/zero/os/chat.js')
+        window.__esiti ??= []
+        const segna = (p) => { p.then((r) => window.__esiti.push(`${tipo} → ${r}`)) } // (non si aspetta: la scelta aspetta i tasti)
+        if (tipo === 'parola') { const s = c.scheda({ colore: 'oro', t: 'una banconota vola dalla finestra!', d: 'scrivi <b>PRENDILA</b> prima che se la porti il vento.' }); await s.__pronta; return segna(c.scrivi(20000, { segnaposto: 'PRENDILA' })) }
+        if (tipo === 'azioni') return void c.scheda({ t: 'tasti finti', d: 'uno si preme, uno è spento, uno è da finire.', azioni: [['saldo', 'il saldo'], ['quest prova 1', 'non puoi — ti manca la canna', 'spento'], ['manda pzk000002 ', 'manda $pzk']] })
+        const s = c.scheda({ t: tipo === 'direzioni' ? 'la consegna' : 'le mine', d: 'una scelta finta del collaudo' })
+        const b = tipo === 'direzioni' ? ['sinistra', 'dritto', 'destra'] : Array.from({ length: 9 }, (_, i) => String(i + 1))
+        segna(c.scegli(s, b.map((id) => ({ id, eti: id })), 0, tipo === 'griglia' ? { griglia: 'g3' } : {}))
+      }, k.finta)
+      else if (k?.aspetta) await dorm(k.aspetta) // (aspetta@3000: tre secondi senza toccare niente, per le cose che vanno da sole)
       else if (k?.conta) await page.evaluate(([s, n]) => import('/chat/zaino.js').then((z) => z.conta(s, n)), k.conta)
       else if (k?.prendi) await page.evaluate(([s, n]) => import('/chat/zaino.js').then((z) => z.aggiungi(s, n)), k.prendi)
       else if (k?.scrivi) await page.keyboard.type(k.scrivi.replaceAll('+', ' '), { delay: 40 }) // (scrivi@mine+50: il + è lo spazio)
       else if (k?.clic) { const p = await page.evaluate((x, y) => window.pzkkoZero.puntoLcd(x, y), ...k.clic); await page.mouse.click(p.x, p.y) }
       else if (k === 'Control+Enter') { await page.keyboard.down('Control'); await page.keyboard.press('Enter'); await page.keyboard.up('Control') }
       else if (k) await page.keyboard.press(k)
-      else await page.evaluate((a) => import('/telefono/zero/os/os.js').then((os) => os.apri(a)), app)
+      else if (!guidaPrima) await page.evaluate((a) => import('/telefono/zero/os/os.js').then((os) => os.apri(a)), app)
       await dorm(k ? 450 : 1500)
       const r = await controlla()
       const suono = (await page.evaluate(() => window.__oscillatori ?? 0)) - prima
@@ -390,9 +420,11 @@ try {
       if (r.fuori.margine) errori.push(`${i} ${nome}: ${r.fuori.margine} pixel fuori dal margine (${r.fuori.dove.join(' ')})`)
       // (le lettere della tastiera vera, i conti dello zaino e le attese non suonano; 2.11: il push era finito dentro il
       // commento, così il controllo del suono non c'era più e il suo if prendeva la riga dopo)
-      if (suoni && accesiPrima && !suono && !giaAperta && !k?.scrivi && !k?.conta && !k?.prendi && !k?.aspetta) errori.push(`${i} ${nome}: nessun suono`)
-      if (i === 0 && r.app !== app && r.vista !== 'presto') errori.push(`l'app ${app} non si è aperta (c'è ${r.vista})`)
+      if (suoni && accesiPrima && !suono && !giaAperta && !k?.scrivi && !k?.conta && !k?.prendi && !k?.aspetta && !k?.finta) errori.push(`${i} ${nome}: nessun suono`)
+      if (i === 0 && r.app !== app && r.vista !== 'presto' && !guidaPrima) errori.push(`l'app ${app} non si è aperta (c'è ${r.vista})`)
     }
+    const esiti = await page.evaluate(() => window.__esiti ?? [])
+    if (esiti.length) console.log('  le scelte finte: ' + esiti.join(' · '))
     const larghi = await page.evaluate(() => [...window.__collaudo.larghi])
     if (larghi.length) errori.push('testi più larghi dello schermo: ' + larghi.map((t) => JSON.stringify(t)).join(' '))
     const glifi = await page.evaluate(() => [...window.__collaudo.glifi])

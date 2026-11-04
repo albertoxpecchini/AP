@@ -262,7 +262,7 @@ Le foto dei [[Le foto vere dei quiz|quiz]] e dell'app [[Foto (app)|foto]] arriva
   },
 
   'I sei tasti': {
-    data: '2026-10-29',
+    data: '2026-11-04',
     fonti: [ZERO + 'zero.js', TEL, OS + 'os.js', OS + 'REGOLE.md', README],
     testo: `'''I sei tasti''' del [[Il cercapersone zero|cercapersone zero]] sono quelli del Flipper: la croce (su, giu, sx, dx), OK in mezzo alla croce e INDIETRO, il tasto tondo in basso a destra. Sul modello la croce sta a x 40–63 e INDIETRO a x 61,5–69,5.
 
@@ -282,13 +282,17 @@ Le foto dei [[Le foto vere dei quiz|quiz]] e dell'app [[Foto (app)|foto]] arriva
 INDIETRO va sempre preso: dalla radice dell'app si esce con <code>os.togli()</code>; se torna false sulla [[La home di pzk os|home]], il cercapersone si chiude. Tenuto tre secondi spegne: è del sistema, nessuna app lo usa. Le liste girano in tondo, un tasto durante un'animazione non si perde. Niente doppio clic, niente tasti tenuti premuti (il «versa» della [[Cucina (app)|cucina]] si è rifatto per questo: OK apre il sacco e OK lo chiude).
 
 == Nel 3D ==
-Si premono col mouse (il raggio sulla tela): INDIETRO si abbassa di 0,9 mm, la croce s'inclina dal lato premuto e si abbassa anche un filo. Nel terzo giro Alberto ha trovato che «quando premo a destra non si preme ma si solleva»: destra e sinistra giravano col segno sbagliato, perché l'asse X del modello è «giù» nel mondo. Poi «fai tutti i tasti che fin che non tolgo il dito lui rimane premuto»: ora restano giù finché si tiene (mouse, dito e tastiera: <code>premi(…, { tieni: true })</code> e <code>lascia</code> al rilascio) e premuti si scuriscono, ogni tasto col suo materiale: da davanti l'abbassarsi quasi non si vede, il colore sì. Il tasto 3D che si abbassa è del modello (<code>zero.js</code>): le app non lo toccano.
+Si premono col mouse (il raggio sulla tela; sulla croce la direzione è il lato del braccio colpito, dal centro): INDIETRO si abbassa di 0,9 mm, la croce s'inclina dal lato premuto e si abbassa anche un filo. Nel terzo giro Alberto ha trovato che «quando premo a destra non si preme ma si solleva»: destra e sinistra giravano col segno sbagliato, perché l'asse X del modello è «giù» nel mondo. Poi «fai tutti i tasti che fin che non tolgo il dito lui rimane premuto»: ora restano giù finché si tiene (mouse, dito e tastiera: <code>premi(…, { tieni: true })</code> e <code>lascia</code> al rilascio) e premuti si scuriscono, ogni tasto col suo materiale: da davanti l'abbassarsi quasi non si vede, il colore sì. Il tasto 3D che si abbassa è del modello (<code>zero.js</code>): le app non lo toccano.
 
 == Dalla tastiera ==
 Frecce, Invio, Backspace (cancella una lettera; a riga vuota è INDIETRO; tenuto tre secondi spegne), Esc, le lettere che si scrivono. Dove Invio va a capo (l'editor di [[Codice C (app)|codice C]]) il tasto OK della tastiera vera è Ctrl+Invio (<code>okvero</code> nel collaudo).
 
 == Ogni scritta dice il vero ==
 «Nel tutorial c'è scritto avanti freccia destra ma devo premere ok» (Alberto): ora se c'è ▶ sullo schermo, dx lo fa; in un dialogo con un tasto solo, OK e dx fanno la stessa cosa. I tasti si nominano per nome (OK, INDIETRO, ↑ ↓ ← →), ◀ e ▶ vogliono dire sx e dx, mai «indietro». Quando i tasti di una scelta sono direzioni (la consegna del [[Il rider|rider]], il rigore), le frecce li premono subito.
+
+== Il tasto che faceva altro ==
+{{Citazione|in chat è buggato perché i tasti che premo danno comandi diversi da quel che hanno di nome|Alberto, 4 novembre 2026}}
+Prima si è provata la croce 3D: <code>prova.mjs --croce</code> la preme col mouse sui quattro bracci (punti presi in frazioni del tasto: le unità del glb non sono mm, e sette «mm» dal centro cadevano ancora sopra OK) e controlla che ognuno stia dal suo lato sullo schermo e mandi la sua direzione. Erano giusti tutti e quattro. Il guaio era nella [[Chat (app)|chat]], dove OK non premeva sempre quello che si vedeva scelto: da lì le regole 3.12 e 3.13 di [[Le regole per le app|REGOLE.md]], c'è sempre una cosa scelta e OK preme quella, e quello che non si preme non sembra un tasto.
 
 {{Vedi anche|Il clic del mouse|pzk os|Le regole per le app|Il cercapersone zero}}
 [[Categoria:Il cercapersone]]`,
@@ -340,12 +344,20 @@ OK apre il [[Il menu di pzk os|menu principale]], ↓ apre la [[Chat (app)|chat]
   },
 
   'La guida di pzk os': {
-    data: '2026-10-29',
-    fonti: [OS + 'os.js', OS + 'impostazioni.js', README],
-    testo: `[[File:zero-guida.webp|thumb|una pagina della guida, con la cornice smussata dei dialoghi e il tasto per andare avanti]]
-'''La guida di pzk os''' (<code>os.guida</code>) sono quattro pagine di dialogo che spiegano i tasti, la [[La home di pzk os|home]], la [[Chat (app)|chat]] e come si spegne. Compare al primo accesso (localStorage <code>pzkko-zero-guida</code>) e si rivede dalle [[Impostazioni (app)|impostazioni]] («rivedi la guida»).
+    data: '2026-11-04',
+    fonti: [OS + 'os.js', OS + 'impostazioni.js', TEL, README],
+    testo: `[[File:zero-guida.webp|thumb|la prima pagina della guida: la croce con OK in mezzo e INDIETRO tondo, disegnati come sono sul cercapersone, e accanto i tasti del computer]]
+'''La guida di pzk os''' (<code>os.guida</code>) sono tre pagine che spiegano come si usa il [[Il cercapersone zero|cercapersone zero]]. Compare al primo accesso (localStorage <code>pzkko-zero-guida</code>), prima dell'[[Account (app)|account]], e si rivede dalle [[Impostazioni (app)|impostazioni]] («rivedi la guida»).
 
 {{Citazione|rifai la home e al primo accesso spiega come funziona|Alberto, 29 ottobre 2026}}
+
+== Le tre pagine ==
+{{Citazione|uno che non ha mai aperto il sito fa fatica a usare il flipper… fai cose super facili e complete e senza bug|Alberto, 4 novembre 2026}}
+Fino al 4 novembre erano quattro dialoghi di solo testo, e chi arrivava non sapeva quale fosse «la croce» né che le frecce del computer vanno. Ora:
+* '''i tasti''': [[I sei tasti|la croce]] disegnata col tasto OK in mezzo e INDIETRO tondo con la sua freccia, come sono sul modello; accanto cosa fanno, e dal computer le frecce, Invio (OK), Esc (INDIETRO), il [[Il clic del mouse|clic]] sullo schermo; INDIETRO tenuto tre secondi spegne;
+* '''come si usa''': c'è sempre una cosa scelta, quella rovesciata (con un tasto scelto vero accanto a uno no), le frecce la cambiano, OK la preme, in fondo c'è sempre scritto cosa fanno i tasti;
+* '''si comincia''': crea il conto (un nome e un PIN di 4 cifre, 1.000 $pzk), nella [[La home di pzk os|home]] OK apre le app e ↓ la [[Chat (app)|chat]], nella chat «riscuoti il premio».
+OK e → vanno avanti, ← torna, INDIETRO la salta, il clic va avanti; i pallini in alto a destra dicono la pagina. Il collaudo la prova come chi arriva con <code>prova.mjs --guida --senzaconto</code>: la guida, poi il conto.
 
 == Il difetto famoso ==
 Nel terzo giro Alberto ha trovato che «nel tutorial c'è scritto avanti freccia destra ma devo premere ok»: il tasto «avanti ▶» della guida andava solo con OK. Da lì la regola 3.3 di [[Le regole per le app|REGOLE.md]]: ogni scritta che nomina un tasto deve dire il vero, e in un dialogo con un tasto solo OK e dx fanno la stessa cosa.
@@ -355,10 +367,10 @@ Nel terzo giro Alberto ha trovato che «nel tutorial c'è scritto avanti freccia
   },
 
   'Il menu di pzk os': {
-    data: '2026-10-31',
+    data: '2026-11-04',
     fonti: [OS + 'os.js', TEL, README],
-    testo: `[[File:zero-menu.webp|thumb|il menu: l'icona a sinistra, la voce scelta rovesciata, la barra di scorrimento a destra]]
-'''Il menu di pzk os''' è la lista delle app che OK apre dalla [[La home di pzk os|home]], fatta come il menu del Flipper: l'icona a 16 pixel a sinistra, il nome, la voce scelta rovesciata (una fascia scura col testo in negativo), la barra di scorrimento a destra. Le liste girano in tondo: su dalla prima va all'ultima.
+    testo: `[[File:zero-menu.webp|thumb|il menu: l'icona a sinistra, la voce scelta rovesciata, la barra di scorrimento a destra, in fondo cosa fa l'app scelta]]
+'''Il menu di pzk os''' è la lista delle app che OK apre dalla [[La home di pzk os|home]], fatta come il menu del Flipper: l'icona a 16 pixel a sinistra, il nome, la voce scelta rovesciata (una fascia scura col testo in negativo), la barra di scorrimento a destra. Le liste girano in tondo: su dalla prima va all'ultima. In fondo, centrata, una riga dice cosa fa l'app scelta (<code>COSA</code> in os.js, al più 29 caratteri): «parla col bot: lavora, gioca», «il colpo alla cassa di pzk», «binario, esadecimale, basi». È del 4 novembre: «virtual», «bin·hex», «decifra» a chi arrivava non dicevano niente.
 
 == Da dove vengono le voci ==
 Da <code>APP</code> in <code>telefono/telefono.js</code>: id, nome e icona (<code>app-&lt;id&gt;</code>), nell'ordine chat, profilo, account, shop, pzkstore, sfide, quiz, quest, giocatori, zaino, miniera, foto, virtual, banca, rapina, lavatrice, decifra, bin·hex, calcoli, codice C, cucina, e in fondo le impostazioni. La [[La lavatrice|lavatrice]] e il [[Il decifratore|decifratore]] hanno <code>store: true</code> e <code>se</code>: ci sono solo se installati dal [[Il pzkstore|pzkstore]]; aperte senza averle portano alla loro scheda. Il menu si rifà quando lo [[Lo zaino|zaino]] cambia: un'app comprata compare subito. Un'app che non è in <code>PRONTE</code> dice «presto» (oggi nessuna: tutte e 22 sono pronte); fino al 29 ottobre le app non fatte aprivano la vista «in arrivo».
@@ -384,7 +396,7 @@ Dal 29 ottobre (commit <code>7f98ca6</code>): la rete di chi guarda col ping ver
   },
 
   'Le regole per le app': {
-    data: '2026-10-31',
+    data: '2026-11-04',
     fonti: [OS + 'REGOLE.md', OS + 'os.js', PROVA, 'CLAUDE.md', README],
     testo: `{{Infobox
 | titolo = Le regole per le app
@@ -410,7 +422,7 @@ Un file <code>os/&lt;id&gt;.js</code> che esporta <code>vista(os)</code>: un ogg
 
 == 3. I tasti ==
 {{Principale|I sei tasti}}
-Solo i sei tasti del Flipper, più [[Il clic del mouse|il clic del mouse]]. INDIETRO sempre preso (<code>os.togli()</code>); tenuto tre secondi spegne ed è del sistema; ogni scritta che nomina un tasto dice il vero (la guida, «avanti ▶» che andava solo con OK); i tasti si nominano per nome; le liste girano in tondo; un tasto durante un'animazione non si perde; i numeri, i PIN e gli indirizzi con <code>os.cifre</code>, una misura con <code>os.numero</code>, un segreto a lettere con <code>os.tastiera({ nascosto: true })</code>; senza conto non si entra (<code>LIBERE</code>); chi scrive testo usa <code>os.tastiera</code> (con <code>simboli: true</code> per il codice C); il tasto 3D che si abbassa è del modello; quando i tasti di una scelta sono direzioni, le frecce li premono subito (il turno da rider). Il clic: <code>os.zona(x, y, w, h, fn)</code> per ogni cosa che si preme, in pixel dell'lcd, rifatte a ogni disegno; il bip lo fa il sistema; le cose già fatte non si premono.
+Solo i sei tasti del Flipper, più [[Il clic del mouse|il clic del mouse]]. INDIETRO sempre preso (<code>os.togli()</code>); tenuto tre secondi spegne ed è del sistema; ogni scritta che nomina un tasto dice il vero (la guida, «avanti ▶» che andava solo con OK); i tasti si nominano per nome; le liste girano in tondo; un tasto durante un'animazione non si perde; i numeri, i PIN e gli indirizzi con <code>os.cifre</code>, una misura con <code>os.numero</code>, un segreto a lettere con <code>os.tastiera({ nascosto: true })</code>; senza conto non si entra (<code>LIBERE</code>); chi scrive testo usa <code>os.tastiera</code> (con <code>simboli: true</code> per il codice C); il tasto 3D che si abbassa è del modello; quando i tasti di una scelta sono direzioni, le frecce li premono subito (il turno da rider); c'è sempre una cosa scelta e OK preme quella, mai un tasto scelto fuori schermo né due cursori, il cursore si ricorda per chiave e non per posto, e quello che un tasto manda lo dice il suo nome (4 novembre: nella chat «i tasti che premo danno comandi diversi da quel che hanno di nome»); quello che non si preme non sembra un tasto (cornice a puntini), e una scritta che dice «tocca» ha un tasto vero sotto. Il clic: <code>os.zona(x, y, w, h, fn)</code> per ogni cosa che si preme, in pixel dell'lcd, rifatte a ogni disegno; il bip lo fa il sistema; le cose già fatte non si premono.
 
 == 4. Lo schermo ==
 Tutto dentro il margine di 6 pixel e niente negli angoli stondati (un quarto d'ellisse 15 × 13 px per lato); il suggerimento in fondo centrato a <code>H − 9</code>; lettere 5 × 7, passo 6, una riga ogni 9 pixel, 40 caratteri a scala 1 e 20 a scala 2, il testo lungo va a capo con <code>Lcd.acapo</code> e quello che non sta si taglia con «…»; ogni scritta deve stare anche coi dati peggiori (niente, zero, 999.999.999 $pzk con <code>pzk.fmtCorto</code>, un nome di 20 lettere); solo i caratteri di [[Il carattere 5×7|font.js]]; la riga scelta è una fascia scura col testo rovesciato, e tutto il rovesciato sta dentro la fascia (il ▶ delle impostazioni stava fuori: arancione su arancione, invisibile); mai testo sopra altro testo (il «↓ 1» della chat finiva attaccato ai messaggi); un cursore non copre il testo (copriva la «s» di «scrivi»); le liste lunghe con <code>l.ritaglia</code> e la barra di scorrimento; <code>disegna</code> disegna e basta, non cambia lo stato (la barra del tempo della chat leggeva <code>m.tempo.fermo</code> quando <code>m.tempo</code> era già null: «reading 'fermo'» a ogni fotogramma); un bit e basta.
@@ -430,7 +442,7 @@ Si legge e si scrive coi moduli del sito; i dati del server stanno sul server di
 
 == 9. Il collaudo ==
 {{Principale|Il collaudo delle app}}
-<code>node --check</code>, poi <code>prova.mjs --giorno --suoni --app=&lt;id&gt;</code> deve dire «tutto a posto», poi la notte; si guardano tutte le foto; tutte le viste con <code>--tasti</code>; le app col conto con <code>--server-finto</code> e <code>--senzaconto</code>; i dati peggiori con <code>--peggiori</code>; il tasto sul muro con <code>--muro</code>; il clic davvero; i comandi della chat che toccano la pagina si provano anche nello zero; un paragrafo nel README.
+<code>node --check</code>, poi <code>prova.mjs --giorno --suoni --app=&lt;id&gt;</code> deve dire «tutto a posto», poi la notte; si guardano tutte le foto; tutte le viste con <code>--tasti</code>; le app col conto con <code>--server-finto</code> e <code>--senzaconto</code>; la chat senza banca con le scelte finte (<code>finta@…</code>); chi arriva con <code>--guida --senzaconto</code>; la croce 3D con <code>--croce</code>; i dati peggiori con <code>--peggiori</code>; il tasto sul muro con <code>--muro</code>; il clic davvero; i comandi della chat che toccano la pagina si provano anche nello zero; un paragrafo nel README.
 
 == 10. Il modello da copiare ==
 Un'app «esempio» di sessanta righe che passa il collaudo: una lista di sette voci con la riga scelta rovesciata, il ✓ dentro la sua fascia, la barra di scorrimento come il menu, il suggerimento centrato in fondo, il dialogo di conferma, il lampo, la sigla «moneta». Si copia, si rinomina, si cambia. Poi una riga in <code>PRONTE</code>, la sigla, l'icona e il collaudo.
@@ -443,7 +455,7 @@ Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella se
   },
 
   'Il collaudo delle app': {
-    data: '2026-11-02',
+    data: '2026-11-04',
     fonti: [PROVA, OS + 'REGOLE.md', README],
     testo: `{{Infobox
 | titolo = Il collaudo delle app
@@ -467,7 +479,11 @@ Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella se
 |-
 | <code>--suoni</code> || coi suoni accesi: il collaudo vuole anche il bip a ogni tasto; conta solo i suoni di <code>suono/interfaccia.js</code>, non la musica
 |-
-| <code>--tasti=dx,dx,ok,giu,…</code> || una sequenza a scelta; <code>clic@80x121</code> un clic sul pixel 80, 121 attraverso il 3D vero; <code>okvero</code> il tasto OK vero (Ctrl+Invio); <code>aspetta@3000</code> fermo tre secondi senza tasti (il quiz che passa alla domanda dopo); <code>scrivi@mine+50</code> scrive «mine 50»; <code>conta@statistica@n</code> lo zaino conta come dopo un'azione vera; <code>prendi@pezzo@n</code> mette un pezzo nello zaino
+| <code>--tasti=dx,dx,ok,giu,…</code> || una sequenza a scelta; <code>clic@80x121</code> un clic sul pixel 80, 121 attraverso il 3D vero; <code>okvero</code> il tasto OK vero (Ctrl+Invio); <code>aspetta@3000</code> fermo tre secondi senza tasti (il quiz che passa alla domanda dopo); <code>scrivi@mine+50</code> scrive «mine 50»; <code>conta@statistica@n</code> lo zaino conta come dopo un'azione vera; <code>prendi@pezzo@n</code> mette un pezzo nello zaino; <code>finta@direzioni</code>, <code>finta@griglia</code>, <code>finta@parola</code>, <code>finta@azioni</code> mettono nella chat una scelta finta (le frecce del rider, una griglia come le mine, la parola della banconota, dei tasti con uno spento e uno da finire) senza la banca, e alla fine il collaudo scrive cosa hanno risposto
+|-
+| <code>--guida</code> || la guida del primo accesso all'apertura; con <code>--senzaconto</code> è il giro di chi arriva: la guida, poi il conto (l'app non si apre da sola, la porta la guida)
+|-
+| <code>--croce</code> || preme col mouse i quattro bracci della croce 3D e controlla che ognuno stia dal suo lato sullo schermo e mandi a pzk os la sua direzione
 |-
 | <code>--server-finto</code> || un wallet finto dentro il collaudo (entra col PIN 1234, crea, sincronizza, converti, invia, chi è, PIN, indirizzo), la borsa finta, il database dei giocatori finto, i colpi (<code>--rapina=presi</code>, <code>--rapina=galera</code>), il quiz finto (tre domande, la giusta è sempre la prima)
 |-
@@ -479,7 +495,7 @@ Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella se
 |-
 | <code>--muro</code> || solo il tasto sul muro, a 4× (<code>prova-tasto.png</code> e, senza lcd, <code>prova-tasto-nudo.png</code>)
 |-
-| <code>--rider</code> || un turno intero da rider con due frecce e due clic, e il controllo che sia contato
+| <code>--rider</code> || un turno intero da rider con due frecce e due clic, e il controllo che sia contato (dal 31 ottobre il turno lo conta la banca, che nel collaudo non c'è: dice «il turno non è stato contato»; le frecce si provano con <code>finta@direzioni</code>)
 |-
 | <code>--telefono</code>, <code>--larga</code>, <code>--misura=3440x1440</code> || 390 × 844, 1920 × 1080, o una finestra qualsiasi (il cavo lungo)
 |-
@@ -677,12 +693,12 @@ Chi le vuole aprire da fuori: il link della pagina [[Gadget (pagina)|gadget]] (�
   },
 
   'Chat (app)': {
-    data: '2026-11-02',
+    data: '2026-11-04',
     fonti: [OS + 'chat.js', 'albertopecchini.it/pzkko/chat/chat.js', 'albertopecchini.it/pzkko/chat/predittivo.js', 'albertopecchini.it/pzkko/chat/minigiochi.js', 'albertopecchini.it/pzkko/chat/zaino.js', OS + 'os.js', README],
     testo: `{{Infobox
 | titolo = Chat (app)
 | immagine = app-chat.webp
-| didascalia = la prima schermata, dal collaudo: la scheda del bot, la riga da scrivere e i consigliati
+| didascalia = la prima schermata, dal collaudo: il saluto con «riscuoti il premio» già scelto, i consigliati in fondo, e sotto cosa fanno i tasti
 | id = chat
 | file = telefono/zero/os/chat.js
 | logica = chat/chat.js, chat/comandi/*, chat/predittivo.js, chat/minigiochi.js
@@ -697,19 +713,21 @@ Chi le vuole aprire da fuori: il link della pagina [[Gadget (pagina)|gadget]] (�
 <code>os/chat.js</code> usa lo stesso motore di <code>chat/chat.js</code> e gli stessi [[I comandi della chat|comandi]] di <code>chat/comandi/*</code>: attese, eventi casuali, scassato, soldi, morte. Ogni comando riceve un <code>ctx</code> come quello della chat in HTML, ma le schede, i tasti, le griglie dei [[I minigiochi della chat|minigiochi]] (mine, gratta e vinci), i rulli della slot, le barre del tempo e la riga da scrivere si disegnano a pixel. Una '''maniglia finta''' fa da elemento per i comandi che toccano il DOM: <code>querySelector</code> dei rulli, dei tasti, del testo; un selettore <code>[data-…]</code> che la maniglia non conosce scrive nel corpo della scheda. È stato il guasto del [[Il rider|rider]]: <code>[data-fatte]</code> tornava null e alla prima svolta la consegna andava in errore.
 
 == Com'è fatta ==
-Le schede: la barra a sinistra, l'icona di Alberto (il [[Il bot pzk|bot]]) e il titolo, il testo a 40 colonne, i campi, il piè, i tasti di seguito. Si scrive dalla tastiera vera (Invio manda) o, con OK a riga vuota, da quella sullo schermo. Sopra la riga i suggerimenti del [[Il testo predittivo|testo predittivo]] (comandi e argomenti: sinistra/destra scelgono, OK o Tab completano). Il bollino «↓ 1» coi nuovi messaggi, che prima finiva attaccato ai messaggi (ora pulisce il suo posto). La storia resta (sessione o conto).
+Le schede: la barra a sinistra, l'icona di Alberto (il [[Il bot pzk|bot]]) e il titolo, il testo a 40 colonne, i campi, il piè, i tasti di seguito. Dalla tastiera vera si scrive e basta (Invio manda); dai sei tasti c'è il tasto «scrivi…», la tastiera sullo schermo. Mentre si scrive, sopra la riga i suggerimenti del [[Il testo predittivo|testo predittivo]] (comandi e argomenti: ← → scelgono, OK completa; solo quelli che ci stanno, prima ← → arrivavano anche a quelli non disegnati). Il bollino «↓ 3» quando si è scorso in su, che pulisce il suo posto. La storia resta (sessione o conto).
 
-== I consigliati ==
-{{Principale|I consigliati}}
-{{Citazione|fai che la chat mostri subito dei tasti da dove cominciare e con i comandi consigliati|Alberto, 2 novembre 2026}}
-A riga vuota, sopra la riga, i tasti incorniciati coi comandi pronti adesso: giornaliero se il premio c'è, missioni se una quest è pronta, lavora e pesca se non c'è attesa; poi le ultime righe scritte (<code>zaino.rapidi</code>) e saldo, negozio, aiuto, al più otto; ◀ ▶ ai lati quando non ci stanno tutti. ← → li scelgono (la riga li mostra) e OK li manda, il clic li manda subito. Se l'ultima scheda ha le sue azioni di seguito, ← → vanno a quelle e i consigliati spariscono.
+== Un cursore solo ==
+{{Citazione|aggiusta in pzk il flipper: in chat è buggato perché i tasti che premo danno comandi diversi da quel che hanno di nome… fai una cosa più facile in generale, uno che non ha mai aperto il sito fa fatica a usare il flipper; fai cose super facili e complete e senza bug|Alberto, 4 novembre 2026}}
+Prima c'erano tre modi di scegliere: i consigliati che riempivano la riga, le azioni dell'ultima scheda che li facevano sparire, OK a riga vuota che apriva la tastiera; e niente di scelto finché non si toccava una freccia. Il fumetto poi diceva il comando e non il tasto: «comincia La rana che canta» diventava «quest rana». Dal 4 novembre c'è '''sempre un tasto scelto''', rovesciato, e uno solo: ← → lo spostano in fila su tutto quello che si può premere adesso (i tasti dell'ultima scheda, i [[I consigliati|consigliati]] in fondo, «scrivi…»), OK preme quello, il [[Il clic del mouse|clic]] quello sotto il mouse, e il fumetto dice il nome del tasto. Il cursore si ricorda per chiave e non per posto: se la fila cambia resta sullo stesso tasto. Quando arriva una scheda coi tasti il cursore va sul suo primo, e la chat scorre perché si veda. In fondo c'è sempre scritto cosa fanno i tasti: «← → scegli · OK premi», e «· ↑ leggi» quando sopra c'è altro.
 
-== I tasti ==
-Su e giù scorrono; quando un minigioco aspetta una scelta la croce va sui suoi tasti o sulle celle della griglia e OK preme; quando aspetta una parola la riga lo dice. Quando i tasti di una scelta sono direzioni (sinistra, dritto o centro, destra, giù: la consegna del rider, il rigore) le frecce li premono subito (<code>scegli</code>), il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic». Si cliccano i tasti, le azioni, i suggerimenti e il bollino «↓». Da scassato ([[Il cercapersone scassato]]) propone solo <code>lavora</code> e <code>compra cercapersone</code>.
+== I tasti delle schede ==
+I tasti che nella chat grande stavano dentro l'html (<code>data-cmd</code>: «compra» su ogni pezzo della vetrina del [[Lo shop|negozio]], i nomi delle classifiche, «tocca un nome») qui erano testo che non si premeva: ora sono tasti della scheda col nome della cosa e il prezzo, «compra esca viva (42 $pzk)». Le scelte spente delle [[Le side quest|quest]] («— ti manca la canna») e i tasti delle schede vecchie (anche quelle di ieri, dalla storia) hanno la cornice a puntini e non si premono: prima mandavano comandi lo stesso. Un comando da finire («manda pzk… », «slot &lt;puntata&gt;») apre la tastiera già scritta fin lì.
+
+== Le scelte dei giochi ==
+Quando un minigioco aspetta una scelta la croce va sui suoi tasti o sulle celle della griglia e OK preme. Quando i tasti di una scelta sono direzioni (sinistra, dritto o centro, destra, giù: la consegna del rider, il rigore) le frecce li premono subito (<code>scegli</code>), il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic». Quando un evento vuole una parola (la banconota: PRENDILA, la nutria: SCIÒ) la parola è un tasto: coi sei tasti scriverla in cinque secondi non si faceva. Da scassato ([[Il cercapersone scassato]]) propone solo <code>lavora</code> e <code>compra cercapersone</code>.
 
 == Il collaudo ==
 [[File:app-chat-collaudo.webp|thumb|left|il cercapersone zero durante il collaudo della chat (prova.mjs --app=chat)]]
-Al primo giro il [[Il collaudo delle app|collaudo]] ha trovato sei difetti, quattro qui: l'errore «reading 'fermo'» della barra del tempo (la barra leggeva <code>m.tempo.fermo</code> quando <code>m.tempo</code> era già null), la barra delle schede a x 3 fuori dal margine, il «›» del prompt senza glifo, il cursore sopra la «s» di «scrivi», il bollino «↓ 1» attaccato ai messaggi. <code>prova.mjs --rider</code> fa un turno intero da rider. Resta da fare: il nastro dei cestini dello [[Lo spazzino di uffici|spazzino]] costruisce pezzi HTML veri, che nello zero non si vedono.
+Al primo giro il [[Il collaudo delle app|collaudo]] ha trovato sei difetti, quattro qui: l'errore «reading 'fermo'» della barra del tempo (la barra leggeva <code>m.tempo.fermo</code> quando <code>m.tempo</code> era già null), la barra delle schede a x 3 fuori dal margine, il «›» del prompt senza glifo, il cursore sopra la «s» di «scrivi», il bollino «↓ 1» attaccato ai messaggi. <code>prova.mjs --rider</code> fa un turno intero da rider (dal 31 ottobre il turno lo conta la [[La banca sul server|banca]], che nel collaudo non c'è); le scelte senza banca si provano con <code>finta@direzioni</code>, <code>finta@griglia</code>, <code>finta@parola</code> e <code>finta@azioni</code> nella sequenza. Resta da fare: il nastro dei cestini dello [[Lo spazzino di uffici|spazzino]] costruisce pezzi HTML veri, che nello zero non si vedono.
 
 {{Vedi anche|La chat col bot|I comandi della chat|Il testo predittivo|I consigliati|I tasti rapidi|Il bot pzk|I minigiochi della chat|Il rider|pzk os}}
 [[Categoria:Le app di pzk os]]`,

@@ -2827,6 +2827,37 @@ richiesta delle foto vecchie; con `?vecchio` torna il vecchio. Poi (Alberto: «a
 partendo dopo pzk os, svuotava l'lcd del tasto (innerHTML = '') e si portava via la tela di pzk os. Ora chat/tomodachi.js
 toglie tutto tranne .ct-os, e muro.js passa la chiocciolina al desktop appena arriva.
 
+**I tasti dicono il vero, e chi arriva capisce** (4.11, Alberto: «aggiusta in pzk il flipper: in chat è buggato perché i
+tasti che premo danno comandi diversi da quel che hanno di nome… fai una cosa più facile in generale, uno che non ha mai
+aperto il sito fa fatica a usare il flipper; fai cose super facili e complete e senza bug»). Prima la croce 3D: provata col
+mouse su tutti e quattro i bracci (`prova.mjs --croce`), ognuno sta dal suo lato e manda la sua direzione. Il guaio era la
+chat: tre modi diversi di scegliere (i consigliati che riempivano la riga, le azioni dell'ultima scheda che li facevano
+sparire, OK a vuoto che apriva la tastiera), niente di scelto finché non si toccava una freccia, e il fumetto che diceva il
+comando invece del tasto («comincia La rana che canta» diventava «quest rana»). In più i «compra» della vetrina e i nomi
+delle classifiche erano testo che non si premeva («tocca un nome»), le scelte spente delle quest si premevano lo stesso,
+i tasti delle schede vecchie (anche di ieri) mandavano ancora comandi, e «aiuto» diceva «le frecce in su ripetono gli
+ultimi», che nello zero non è vero.
+- `os/chat.js`: **un cursore solo, sempre su un tasto che si vede.** ← → lo spostano su tutto quello che si può premere
+  adesso, in fila: i tasti dell'ultima scheda, poi i consigliati in fondo, poi «scrivi…» (la tastiera sullo schermo). OK
+  preme proprio quello rovesciato, il clic quello sotto il mouse, e il fumetto dice il nome del tasto. Il cursore si ricorda
+  per chiave e non per posto, così se la fila cambia resta sullo stesso tasto; quando arriva una scheda coi tasti va sul
+  suo primo, e la chat scorre perché si veda (la vetrina è più alta dello schermo). I tasti che nella chat grande stavano
+  dentro l'html (`data-cmd`) diventano tasti della scheda col nome della cosa e il prezzo: «compra esca viva (42 $pzk)».
+  Le scelte «spento» e i tasti delle schede vecchie hanno la cornice a puntini e non si premono. Un comando da finire
+  («manda pzk… », «slot <puntata>») apre la tastiera già scritta fin lì. La parola che un evento vuole (PRENDILA, SCIÒ)
+  è un tasto: coi sei tasti non si scriveva in cinque secondi. In fondo c'è sempre scritto cosa fanno i tasti («← → scegli
+  · OK premi», «· ↑ leggi» se sopra c'è altro). I testi: il nome e la riga piccola non sono più attaccati («La campana
+  stonatati manca»), il prezzo in offerta si legge «300 → 180 $pzk».
+- Il saluto dice come si usa e porta già «riscuoti il premio» e «cosa posso fare?»; «aiuto» ha dieci tasti per cominciare
+  (giornaliero, lavora, pesca, caccia, scava, quiz, negozio, zaino, sfide, classifica) e «aiuto pesca» il tasto «prova».
+- `os/os.js`: **la guida nuova**, tre pagine invece di quattro dialoghi di solo testo: i tasti disegnati come sono sul
+  cercapersone (la croce con OK in mezzo, INDIETRO tondo) coi tasti del computer accanto, come si usa (con un tasto
+  scelto vero), da dove si comincia. La **tastiera sullo schermo** spiega i suoi tasti (← → ↑ ↓, OK, ⌫, _, ✓, e che si
+  scrive anche dal computer). Il **menu** dice in fondo cosa fa l'app scelta («il colpo alla cassa di pzk»).
+- `prova.mjs`: `--croce` (i bracci col mouse), `--guida` (il giro di chi arriva: con `--senzaconto` la guida e poi il
+  conto), e nelle sequenze `finta@direzioni|griglia|parola|azioni` (una scelta finta nella chat, senza la banca: il rider,
+  le mine, la banconota, i tasti spenti). Si guarda su http://localhost:5182/?zero.
+
 ## Gli strumenti (tools/)
 
 Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in

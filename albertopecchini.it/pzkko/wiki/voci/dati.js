@@ -1,9 +1,9 @@
-// GENERATO da tools/pzkko/wiki/genera.mjs il 2026-11-03: le voci di pzkkopedia che nascono dai dati del sito (oggetti, pesci,
+// GENERATO da tools/pzkko/wiki/genera.mjs il 2026-11-04: le voci di pzkkopedia che nascono dai dati del sito (oggetti, pesci,
 // bestie, reperti, cose dell'ufficio, mestieri, side quest, squadre di virtual, pezzi e PC pronti della miniera, traguardi,
 // sfide, argomenti dei quiz, foto dei quiz, giornate della lumachina, le app, i commit). NON SI MODIFICA A MANO: si rilancia
 // `node tools/pzkko/wiki/genera.mjs` (lo fa aggiorna.mjs). Il formato è in tools/pzkko/wiki/README.md.
 export const VOCI = {
-  "Canna da pesca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Canna da pesca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = canna da pesca
 | immagine = /art/chat-attrezzi/canna.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -28,7 +28,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Esca viva": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Esca viva": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = esca viva
 | immagine = /art/chat-attrezzi/esca.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -52,7 +52,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Fionda": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Fionda": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = fionda
 | immagine = /art/chat-attrezzi/fionda.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -77,7 +77,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Fucile da caccia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Fucile da caccia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = fucile da caccia
 | immagine = /art/chat-attrezzi/fucile.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -102,7 +102,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Pala": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Pala": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = pala
 | immagine = /art/chat-attrezzi/pala.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -127,7 +127,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Telefono": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Telefono": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = telefono
 | immagine = /art/chat-attrezzi/telefono.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -152,7 +152,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cornetto rosso": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cornetto rosso": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cornetto rosso
 | immagine = /art/chat-attrezzi/cornetto.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -176,7 +176,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Caffè": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Caffè": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = caffè
 | immagine = /art/chat-attrezzi/caffe.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -203,7 +203,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Lattina che mette le ali": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Lattina che mette le ali": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = lattina che mette le ali
 | immagine = /art/chat-attrezzi/lattina.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -230,7 +230,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Mortadella": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Mortadella": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = mortadella
 | immagine = /art/chat-attrezzi/mortadella.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -257,7 +257,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Gratta e vinci": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Gratta e vinci": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = gratta e vinci
 | immagine = /art/chat-attrezzi/gratta.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -281,7 +281,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cassa comune": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cassa comune": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cassa comune
 | immagine = /art/chat-attrezzi/cassa-comune.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -305,7 +305,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cassa rara": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cassa rara": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cassa rara
 | immagine = /art/chat-attrezzi/cassa-rara.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -329,7 +329,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cassa dei Gonzaga": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cassa dei Gonzaga": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cassa dei Gonzaga
 | immagine = /art/chat-attrezzi/cassa-gonzaga.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -353,7 +353,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Pzk-kola": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Pzk-kola": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = pzk-kola
 | immagine = /art/chat-cibo/pzk-kola.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -380,7 +380,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Tè freddo alla pesca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Tè freddo alla pesca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = tè freddo alla pesca
 | immagine = /art/chat-cibo/estathe.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -407,7 +407,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Mirtilli, fragole e lamponi": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Mirtilli, fragole e lamponi": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = mirtilli, fragole e lamponi
 | immagine = /art/chat-cibo/frutti-bosco.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -434,7 +434,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Zucca mantovana": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Zucca mantovana": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = zucca mantovana
 | immagine = /art/chat-cibo/zucca.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -461,7 +461,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Tortelli di zucca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Tortelli di zucca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = tortelli di zucca
 | immagine = /art/chat-cibo/tortelli.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -488,7 +488,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Grissini alla pizza": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Grissini alla pizza": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = grissini alla pizza
 | immagine = /art/chat-cibo/grissini.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -515,7 +515,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Ramen box Pechino": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Ramen box Pechino": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = ramen box Pechino
 | immagine = /art/chat-cibo/ramen.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -542,7 +542,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Sbrisolona": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Sbrisolona": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = sbrisolona
 | immagine = /art/chat-cibo/sbrisolona.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -569,7 +569,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Mostarda mantovana": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Mostarda mantovana": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = mostarda mantovana
 | immagine = /art/chat-cibo/mostarda.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -596,7 +596,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Pomodoro maturo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Pomodoro maturo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = pomodoro maturo
 | immagine = /art/chat-cibo/pomodoro.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -623,7 +623,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Zaino Eastpak": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Zaino Eastpak": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = zaino Eastpak
 | immagine = /art/chat-roba/eastpak.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -651,7 +651,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Piaggio Ciao PX": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Piaggio Ciao PX": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = Piaggio Ciao PX
 | immagine = /art/chat-roba/ciao-px.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -679,7 +679,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Landini L25 testa calda (1957)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Landini L25 testa calda (1957)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = Landini L25 testa calda (1957)
 | immagine = /art/chat-roba/landini.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -707,7 +707,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Stampante Epson ET-2825": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Stampante Epson ET-2825": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = stampante Epson ET-2825
 | immagine = /art/chat-roba/stampante.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -735,7 +735,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "IPhone Duo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "IPhone Duo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = iPhone Duo
 | immagine = /art/chat-roba/iphone-duo.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -763,7 +763,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Stufa a legna": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Stufa a legna": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = stufa a legna
 | immagine = /art/chat-roba/stufa.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -791,7 +791,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Bonsai": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Bonsai": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = bonsai
 | immagine = /art/chat-roba/bonsai.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -819,7 +819,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Penne BIC con corda e scotch": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Penne BIC con corda e scotch": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = penne BIC con corda e scotch
 | immagine = /art/chat-roba/penne-bic.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -844,7 +844,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Hyundai Tucson": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Hyundai Tucson": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = Hyundai Tucson
 | immagine = /art/chat-roba/tucson.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -872,7 +872,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Manuale del Landini L25": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Manuale del Landini L25": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = manuale del Landini L25
 | immagine = /art/chat-roba/manuale-landini.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -900,7 +900,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Pacchetto luckypzkko (vuoto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Pacchetto luckypzkko (vuoto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = pacchetto luckypzkko (vuoto)
 | immagine = /art/chat-pzk/luckypzkko.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -925,7 +925,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Gomma masticata": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Gomma masticata": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = gomma masticata
 | immagine = /art/chat-pzk/gomma.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -950,7 +950,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Tombino con i rilievi": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Tombino con i rilievi": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = tombino con i rilievi
 | immagine = /art/chat-pzk/tombino.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -978,7 +978,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Lucchettone": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Lucchettone": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = lucchettone
 | immagine = /art/chat-pzk/lucchettone.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1006,7 +1006,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Citofono, civico 28": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Citofono, civico 28": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = citofono, civico 28
 | immagine = /art/chat-pzk/citofono.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1031,7 +1031,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Coperchio pzkkonet": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Coperchio pzkkonet": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = coperchio pzkkonet
 | immagine = /art/chat-pzk/pzkkonet.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1059,7 +1059,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Portachiavi col tasto luce": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Portachiavi col tasto luce": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = portachiavi col tasto luce
 | immagine = /art/chat-pzk/portachiavi.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1087,7 +1087,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Petizione «pzkko.it è un bel sito?»": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Petizione «pzkko.it è un bel sito?»": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = petizione «pzkko.it è un bel sito?»
 | immagine = /art/chat-pzk/petizione.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1112,7 +1112,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Neon pzkko": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Neon pzkko": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = neon pzkko
 | immagine = /art/chat-pzk/neon.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1140,7 +1140,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Portafoglio di pelle": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Portafoglio di pelle": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = portafoglio di pelle
 | immagine = /art/chat-pzk/portafoglio.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1168,7 +1168,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cercapersone": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cercapersone": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cercapersone
 | immagine = /art/chat-pzk/pager.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1196,7 +1196,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Peluche della chiocciola": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Peluche della chiocciola": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = peluche della chiocciola
 | immagine = /art/chat-pzk/peluche.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1224,7 +1224,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Cercapersone zero": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
+  "Cercapersone zero": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `{{Infobox
 | titolo = cercapersone zero
 | immagine = /art/chat-pzk/zero.webp
 | didascalia = l’icona a pixel di retro-diffusion
@@ -1252,7 +1252,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Elenco degli oggetti|Lo shop|Lo zaino|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Elenco degli oggetti": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `'''Tutto quello che si compra''' nello [[Lo shop|shop]] di pzkko: 47 cose in 5 reparti (cibo e bevande, attrezzi, fortuna, la roba, cose di pzk). I prezzi sono in [[I $pzk|$pzk]] puliti. Generato dai dati del sito (<code>chat/testi.js</code> e <code>chat/oggetti.js</code>).
+  "Elenco degli oggetti": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `'''Tutto quello che si compra''' nello [[Lo shop|shop]] di pzkko: 47 cose in 5 reparti (cibo e bevande, attrezzi, fortuna, la roba, cose di pzk). I prezzi sono in [[I $pzk|$pzk]] puliti. Generato dai dati del sito (<code>chat/testi.js</code> e <code>chat/oggetti.js</code>).
 
 == Cibo e bevande ==
 {| class="wikitable"
@@ -1643,7 +1643,7 @@ Nello [[Lo shop|shop]] (la [[Shop (app)|app]] del [[Il cercapersone zero|cercape
 
 {{Vedi anche|Lo shop|I reparti dello shop|Le casse|I bonus}}
 [[Categoria:Gli oggetti]]` },
-  "Alborella": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Alborella": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un’alborella
 | immagine = /art/chat-pesci/alborella.webp
 | didascalia = l’icona a pixel
@@ -1663,7 +1663,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi alborella</code> (o d
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Cavedano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Cavedano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un cavedano
 | immagine = /art/chat-pesci/cavedano.webp
 | didascalia = l’icona a pixel
@@ -1683,7 +1683,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cavedano</code> (o da
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Persico": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Persico": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un persico
 | immagine = /art/chat-pesci/persico.webp
 | didascalia = l’icona a pixel
@@ -1703,7 +1703,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi persico</code> (o dal
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Tinca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Tinca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una tinca
 | immagine = /art/chat-pesci/tinca.webp
 | didascalia = l’icona a pixel
@@ -1723,7 +1723,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi tinca</code> (o dalla
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Carpa": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Carpa": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una carpa
 | immagine = /art/chat-pesci/carpa.webp
 | didascalia = l’icona a pixel
@@ -1743,7 +1743,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi carpa</code> (o dalla
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Trota": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Trota": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una trota
 | immagine = /art/chat-pesci/trota.webp
 | didascalia = l’icona a pixel
@@ -1763,7 +1763,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi trota</code> (o dalla
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Pesce gatto": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Pesce gatto": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un pesce gatto
 | immagine = /art/chat-pesci/pescegatto.webp
 | didascalia = l’icona a pixel
@@ -1783,7 +1783,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi pescegatto</code> (o 
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Anguilla": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Anguilla": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un’anguilla
 | immagine = /art/chat-pesci/anguilla.webp
 | didascalia = l’icona a pixel
@@ -1803,7 +1803,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi anguilla</code> (o da
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Gambero killer": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Gambero killer": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un gambero killer
 | immagine = /art/chat-pesci/gambero.webp
 | didascalia = l’icona a pixel
@@ -1823,7 +1823,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi gambero</code> (o dal
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Lucioperca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Lucioperca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un lucioperca
 | immagine = /art/chat-pesci/lucioperca.webp
 | didascalia = l’icona a pixel
@@ -1843,7 +1843,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi lucioperca</code> (o 
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Luccio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Luccio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un luccio
 | immagine = /art/chat-pesci/luccio.webp
 | didascalia = l’icona a pixel
@@ -1863,7 +1863,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi luccio</code> (o dall
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Siluro": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Siluro": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un siluro
 | immagine = /art/chat-pesci/siluro.webp
 | didascalia = l’icona a pixel
@@ -1883,7 +1883,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi siluro</code> (o dall
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Carpa d’oro dei Gonzaga": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Carpa d’oro dei Gonzaga": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = LA CARPA D’ORO DEI GONZAGA
 | immagine = /art/chat-pesci/carpa-oro.webp
 | didascalia = l’icona a pixel
@@ -1903,7 +1903,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi carpa-oro</code> (o d
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Scarpa": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Scarpa": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una scarpa
 | immagine = /art/chat-pesci/scarpa.webp
 | didascalia = l’icona a pixel
@@ -1923,7 +1923,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi scarpa</code> (o dall
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Bottiglia di plastica": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Bottiglia di plastica": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una bottiglia di plastica
 | immagine = /art/chat-pesci/bottiglia.webp
 | didascalia = l’icona a pixel
@@ -1943,7 +1943,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi bottiglia</code> (o d
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Rana": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Rana": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una rana (che ti guarda male)
 | immagine = /art/chat-pesci/rana.webp
 | didascalia = l’icona a pixel
@@ -1963,7 +1963,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi rana</code> (o dalla 
 
 {{Vedi anche|Elenco dei pesci|La pesca|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Elenco dei pesci": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si pesca nel [[Il Mincio|Mincio]]''' col comando <code>pesca</code> della [[La chat col bot|chat]] (serve la [[Canna da pesca|canna]]): 16 pesci e schifezze, con la probabilità di ognuno (il peso sul totale) e quanto si vende. Generato da <code>chat/testi.js</code>.
+  "Elenco dei pesci": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si pesca nel [[Il Mincio|Mincio]]''' col comando <code>pesca</code> della [[La chat col bot|chat]] (serve la [[Canna da pesca|canna]]): 16 pesci e schifezze, con la probabilità di ognuno (il peso sul totale) e quanto si vende. Generato da <code>chat/testi.js</code>.
 
 {| class="wikitable"
 |-
@@ -2092,7 +2092,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi rana</code> (o dalla 
 
 {{Vedi anche|La pesca|La chat col bot|Lo zaino}}
 [[Categoria:I pesci]]` },
-  "Piccione": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Piccione": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un piccione
 | immagine = /art/chat-animali/piccione.webp
 | didascalia = l’icona a pixel
@@ -2112,7 +2112,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi piccione</code> (o da
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Cornacchia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Cornacchia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una cornacchia
 | immagine = /art/chat-animali/cornacchia.webp
 | didascalia = l’icona a pixel
@@ -2132,7 +2132,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cornacchia</code> (o 
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Nutria": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Nutria": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una nutria
 | immagine = /art/chat-animali/nutria.webp
 | didascalia = l’icona a pixel
@@ -2152,7 +2152,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi nutria</code> (o dall
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Anatra": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Anatra": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un’anatra
 | immagine = /art/chat-animali/anatra.webp
 | didascalia = l’icona a pixel
@@ -2172,7 +2172,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi anatra</code> (o dall
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Lepre": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Lepre": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una lepre
 | immagine = /art/chat-animali/lepre.webp
 | didascalia = l’icona a pixel
@@ -2192,7 +2192,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi lepre</code> (o dalla
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Fagiano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Fagiano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un fagiano
 | immagine = /art/chat-animali/fagiano.webp
 | didascalia = l’icona a pixel
@@ -2212,7 +2212,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi fagiano</code> (o dal
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Riccio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Riccio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un riccio (ahi)
 | immagine = /art/chat-animali/riccio.webp
 | didascalia = l’icona a pixel
@@ -2232,7 +2232,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi riccio</code> (o dall
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Volpe": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Volpe": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una volpe
 | immagine = /art/chat-animali/volpe.webp
 | didascalia = l’icona a pixel
@@ -2252,7 +2252,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi volpe</code> (o dalla
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Cervo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Cervo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un cervo
 | immagine = /art/chat-animali/cervo.webp
 | didascalia = l’icona a pixel
@@ -2272,7 +2272,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cervo</code> (o dalla
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Cinghiale": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Cinghiale": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un cinghiale
 | immagine = /art/chat-animali/cinghiale.webp
 | didascalia = l’icona a pixel
@@ -2293,7 +2293,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cinghiale</code> (o d
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Zanzara tigre": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Zanzara tigre": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una zanzara tigre (enorme)
 | immagine = /art/chat-animali/zanzara.webp
 | didascalia = l’icona a pixel
@@ -2313,7 +2313,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi zanzara</code> (o dal
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Drago del Mincio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Drago del Mincio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = IL DRAGO DEL MINCIO
 | immagine = /art/chat-animali/drago.webp
 | didascalia = l’icona a pixel
@@ -2334,7 +2334,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi drago</code> (o dalla
 
 {{Vedi anche|Elenco delle bestie|La caccia|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Elenco delle bestie": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si caccia''' col comando <code>caccia</code> (con la [[Fionda|fionda]] le bestie piccole, col [[Fucile da caccia|fucile]] quelle grosse): 12 bestie, due pericolose. Generato da <code>chat/testi.js</code>.
+  "Elenco delle bestie": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si caccia''' col comando <code>caccia</code> (con la [[Fionda|fionda]] le bestie piccole, col [[Fucile da caccia|fucile]] quelle grosse): 12 bestie, due pericolose. Generato da <code>chat/testi.js</code>.
 
 {| class="wikitable"
 |-
@@ -2435,7 +2435,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi drago</code> (o dalla
 
 {{Vedi anche|La caccia|La chat col bot|Lo zaino}}
 [[Categoria:Le bestie]]` },
-  "Verme": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Verme": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un verme
 | immagine = /art/chat-reperti/verme.webp
 | didascalia = l’icona a pixel
@@ -2455,7 +2455,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi verme</code> (o dalla
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Formicaio intero": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Formicaio intero": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un formicaio intero (addosso)
 | immagine = /art/chat-reperti/formica.webp
 | didascalia = l’icona a pixel
@@ -2475,7 +2475,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi formica</code> (o dal
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Sasso": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Sasso": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un sasso. Un sasso.
 | immagine = /art/chat-reperti/sasso.webp
 | didascalia = l’icona a pixel
@@ -2495,7 +2495,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi sasso</code> (o dalla
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Radice del platano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Radice del platano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una radice del platano
 | immagine = /art/chat-reperti/radice.webp
 | didascalia = l’icona a pixel
@@ -2515,7 +2515,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi radice</code> (o dall
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Tappo di bottiglia del 1987": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Tappo di bottiglia del 1987": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un tappo di bottiglia del 1987
 | immagine = /art/chat-reperti/tappo.webp
 | didascalia = l’icona a pixel
@@ -2535,7 +2535,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi tappo</code> (o dalla
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Bottone di una divisa austriaca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Bottone di una divisa austriaca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un bottone di una divisa austriaca
 | immagine = /art/chat-reperti/bottone.webp
 | didascalia = l’icona a pixel
@@ -2555,7 +2555,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi bottone</code> (o dal
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Osso": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Osso": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un osso (di cosa, meglio non saperlo)
 | immagine = /art/chat-reperti/osso.webp
 | didascalia = l’icona a pixel
@@ -2575,7 +2575,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi osso</code> (o dalla 
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Chiave di ferro vecchia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Chiave di ferro vecchia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una chiave di ferro vecchia
 | immagine = /art/chat-reperti/chiave-vecchia.webp
 | didascalia = l’icona a pixel
@@ -2595,7 +2595,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi chiave-vecchia</code>
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Moneta con la faccia di Virgilio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Moneta con la faccia di Virgilio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = una moneta con la faccia di Virgilio
 | immagine = /art/chat-reperti/moneta-virgilio.webp
 | didascalia = l’icona a pixel
@@ -2615,7 +2615,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi moneta-virgilio</code
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Fossile di ammonite": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Fossile di ammonite": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un fossile di ammonite
 | immagine = /art/chat-reperti/fossile.webp
 | didascalia = l’icona a pixel
@@ -2635,7 +2635,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi fossile</code> (o dal
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Anfora dei Gonzaga": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Anfora dei Gonzaga": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = un’anfora dei Gonzaga
 | immagine = /art/chat-reperti/anfora.webp
 | didascalia = l’icona a pixel
@@ -2655,7 +2655,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi anfora</code> (o dall
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Tesoro dei Gonzaga": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
+  "Tesoro dei Gonzaga": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `{{Infobox
 | titolo = IL TESORO DEI GONZAGA
 | immagine = /art/chat-reperti/tesoro.webp
 | didascalia = l’icona a pixel
@@ -2675,7 +2675,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi tesoro</code> (o dall
 
 {{Vedi anche|Elenco dei reperti|Lo scavo|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Elenco dei reperti": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si scava''' col comando <code>scava</code> (serve la [[Pala|pala]]): 12 reperti, dal verme al tesoro dei Gonzaga. Generato da <code>chat/testi.js</code>.
+  "Elenco dei reperti": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `'''Quello che si scava''' col comando <code>scava</code> (serve la [[Pala|pala]]): 12 reperti, dal verme al tesoro dei Gonzaga. Generato da <code>chat/testi.js</code>.
 
 {| class="wikitable"
 |-
@@ -2776,7 +2776,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi tesoro</code> (o dall
 
 {{Vedi anche|Lo scavo|La chat col bot|Lo zaino}}
 [[Categoria:I reperti]]` },
-  "Cartaccia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Cartaccia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = una cartaccia
 | immagine = /art/chat-ufficio/cartaccia.webp
 | didascalia = l’icona a pixel
@@ -2796,7 +2796,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cartaccia</code> (o d
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Lattina vuota": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Lattina vuota": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = una lattina vuota
 | immagine = /art/chat-ufficio/lattina-vuota.webp
 | didascalia = l’icona a pixel
@@ -2816,7 +2816,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi lattina-vuota</code> 
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Scatola di graffette": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Scatola di graffette": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = una scatola di graffette
 | immagine = /art/chat-ufficio/graffette.webp
 | didascalia = l’icona a pixel
@@ -2836,7 +2836,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi graffette</code> (o d
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Tazza «il capo sono io»": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Tazza «il capo sono io»": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = una tazza «il capo sono io»
 | immagine = /art/chat-ufficio/tazza.webp
 | didascalia = l’icona a pixel
@@ -2856,7 +2856,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi tazza</code> (o dalla
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Mouse senza filo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Mouse senza filo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = un mouse senza filo
 | immagine = /art/chat-ufficio/mouse.webp
 | didascalia = l’icona a pixel
@@ -2876,7 +2876,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi mouse</code> (o dalla
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Cuffie col microfono": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Cuffie col microfono": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = delle cuffie col microfono
 | immagine = /art/chat-ufficio/cuffie.webp
 | didascalia = l’icona a pixel
@@ -2896,7 +2896,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi cuffie</code> (o dall
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Orologio da polso": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Orologio da polso": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = un orologio da polso
 | immagine = /art/chat-ufficio/orologio.webp
 | didascalia = l’icona a pixel
@@ -2916,7 +2916,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi orologio</code> (o da
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Chiavetta usb": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Chiavetta usb": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = una chiavetta usb
 | immagine = /art/chat-ufficio/chiavetta.webp
 | didascalia = l’icona a pixel
@@ -2937,7 +2937,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi chiavetta</code> (o d
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Wallet pzk cifrato": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
+  "Wallet pzk cifrato": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `{{Infobox
 | titolo = un wallet pzk cifrato
 | immagine = /art/chat-ufficio/wallet-pzk.webp
 | didascalia = l’icona a pixel
@@ -2958,7 +2958,7 @@ Finisce nello [[Lo zaino|zaino]]; si vende con <code>vendi wallet-pzk</code> (o 
 
 {{Vedi anche|Elenco delle cose dell’ufficio|Lo spazzino di uffici|Lo zaino}}
 [[Categoria:Gli oggetti]]` },
-  "Elenco delle cose dell’ufficio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `'''Quello che passa sul nastro''' dello [[Lo spazzino di uffici|spazzino di uffici]] (il lavoro rischioso di livello 2): 9 cose, due sospette (la chiavetta e il wallet cifrato, che si aprono col [[Il decifratore|decifratore]]). Generato da <code>chat/testi.js</code>.
+  "Elenco delle cose dell’ufficio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `'''Quello che passa sul nastro''' dello [[Lo spazzino di uffici|spazzino di uffici]] (il lavoro rischioso di livello 2): 9 cose, due sospette (la chiavetta e il wallet cifrato, che si aprono col [[Il decifratore|decifratore]]). Generato da <code>chat/testi.js</code>.
 
 {| class="wikitable"
 |-
@@ -12172,7 +12172,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|La lumachina|La salute della lumachina|Giocatori (app)}}
 [[Categoria:I soldi]]` },
-  "Le app di pzk os (tabella)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/telefono/telefono.js","albertopecchini.it/pzkko/telefono/zero/os/os.js"], testo: `'''Le 21 app''' registrate in <code>APP</code> di <code>telefono/telefono.js</code> (da lì vengono nome e icona del menu di [[pzk os]]) più le impostazioni, che stanno in <code>os/os.js</code>. Il pallino sull’icona lo decide <code>badge</code>; le app con <code>store</code> si comprano nel [[Il pzkstore|pzkstore]] e compaiono solo se installate. Generato dal sorgente.
+  "Le app di pzk os (tabella)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/telefono/telefono.js","albertopecchini.it/pzkko/telefono/zero/os/os.js"], testo: `'''Le 21 app''' registrate in <code>APP</code> di <code>telefono/telefono.js</code> (da lì vengono nome e icona del menu di [[pzk os]]) più le impostazioni, che stanno in <code>os/os.js</code>. Il pallino sull’icona lo decide <code>badge</code>; le app con <code>store</code> si comprano nel [[Il pzkstore|pzkstore]] e compaiono solo se installate. Generato dal sorgente.
 
 {| class="wikitable"
 |-
@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-03", fonti: ["README.md"], testo: `'''I 734 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>6fd58b8</code>, 2026-11-03). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-04", fonti: ["README.md"], testo: `'''I 743 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>98f2d1e</code>, 2026-11-04). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,19 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 33
+| 42
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/98f2d1e 98f2d1e] Merge pull request #15 from ygpzk/arena/1daae774-ap
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/993f5d7 993f5d7] docs(esperimenti): nel README i .woff2 di Allianz Neo come si trovano nella cartella firma
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/0757cc8 0757cc8] fix(esperimenti): il generatore del PDF legge anche gli AllianzNeo .woff2 della cartella firma
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/bd16ee3 bd16ee3] feat(esperimenti): il preventivo dei mirtilli in PDF, con Allianz Neo incorporato
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/81c8c7b 81c8c7b] fix(esperimenti): il preventivo dei mirtilli nello stile Allianz del repo (nero, Allianz Neo, HTML A4)
+* 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/7df23bc 7df23bc] feat(esperimenti): finto preventivo Allianz per i mirtilli da collezione
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/ad4fba1 ad4fba1] chore(tempo): le versioni di oggi di albertopecchini.it e pzkko.it
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/85b7b32 85b7b32] fix(cruscotto): la fine stimata del giro resta «—» finché non c'è una media
+* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/733905a 733905a] feat(cruscotto): la regia vede tutte le sessioni di Claude, ognuna col suo stato
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/6fd58b8 6fd58b8] chore(tempo): le versioni di oggi di albertopecchini.it e pzkko.it
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/7afe6e5 7afe6e5] feat(tempo): l'HTML vero di ogni giorno in un index leggero, e la regia di Claude per ogni lavoro
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/757ad9e 757ad9e] fix(tempo): le foto di Better Call Pekko non fanno più nascere un giorno nuovo di BCP
@@ -12418,372 +12427,363 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/de6b6f3 de6b6f3] fix(tempo): «8.5/10» non diventa più «8.5/tempo/540d403/10»
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/8144e0c 8144e0c] Catture aggiornate: Rivalta sul Mincio, Alberto Pecchini
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4b1e5b2 4b1e5b2] feat(albertopecchini.it): la macchina del tempo, /tempo/, copia della Wayback Machine
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/1a67f1e 1a67f1e] feat(albertopecchini.it): /cv/ e /cv/?print, il curriculum che si stampa da solo
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/33cb3e7 33cb3e7] feat(albertopecchini.it): il blu #007acc al posto del minio, catture nuove di rivaltasulmincio.it, GitHub ygpzk
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/45df816 45df816] feat(albertopecchini.it): il nome gigante torna in home (più piccolo), l'aragosta su una tavola CAD, /stile/ col vestito nuovo
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/40c5862 40c5862] Merge remote-tracking branch 'origin/albertopecchini.it' into albertopecchini.it
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/93a5eaf 93a5eaf] feat(albertopecchini.it): il vestito nuovo, impaginato come reflection.ai con un quinto di anthropic
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/aa35060 aa35060] chore(pzkko): pzkkopedia allineata a d9cf027
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/d9cf027 d9cf027] feat(pzkko): i consigliati nella chat dello zero e il quiz che va avanti da solo
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/247cc84 247cc84] chore(pzkko): pzkkopedia allineata a 2ac0343
-* 2026-11-02 [https://github.com/albertoxpecchini/AP/commit/2ac0343 2ac0343] feat(pzkko): pzkkopedia piena, la wiki di tutto, aggiornata a ogni push
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
 
 {{Vedi anche|La storia del repository|Il repository AP|I messaggi di commit|Speciale:UltimeModifiche}}
 [[Categoria:Il repository]]` },
-  "Canna da pesca (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Canna da pesca]]` },
-  "Esca viva (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Esca viva]]` },
-  "Fionda (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Fionda]]` },
-  "Fucile da caccia (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Fucile da caccia]]` },
-  "Pala (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pala]]` },
-  "Telefono (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Telefono]]` },
-  "Cornetto rosso (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cornetto rosso]]` },
-  "Caffè (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Caffè]]` },
-  "Lattina che mette le ali (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Lattina che mette le ali]]` },
-  "Mortadella (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mortadella]]` },
-  "Gratta e vinci (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Gratta e vinci]]` },
-  "Cassa comune (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa comune]]` },
-  "Cassa rara (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa rara]]` },
-  "Cassa dei Gonzaga (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa dei Gonzaga]]` },
-  "Pzk-kola (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pzk-kola]]` },
-  "Tè freddo alla pesca (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tè freddo alla pesca]]` },
-  "Mirtilli, fragole e lamponi (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mirtilli, fragole e lamponi]]` },
-  "Zucca mantovana (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Zucca mantovana]]` },
-  "Tortelli di zucca (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tortelli di zucca]]` },
-  "Grissini alla pizza (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Grissini alla pizza]]` },
-  "Ramen box Pechino (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Ramen box Pechino]]` },
-  "Sbrisolona (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Sbrisolona]]` },
-  "Mostarda mantovana (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mostarda mantovana]]` },
-  "Pomodoro maturo (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pomodoro maturo]]` },
-  "Zaino Eastpak (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Zaino Eastpak]]` },
-  "Piaggio Ciao PX (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Piaggio Ciao PX]]` },
-  "Landini L25 testa calda (1957) (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Landini L25 testa calda (1957)]]` },
-  "Stampante Epson ET-2825 (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Stampante Epson ET-2825]]` },
-  "IPhone Duo (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[IPhone Duo]]` },
-  "Stufa a legna (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Stufa a legna]]` },
-  "Bonsai (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Bonsai]]` },
-  "Penne BIC con corda e scotch (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Penne BIC con corda e scotch]]` },
-  "Hyundai Tucson (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Hyundai Tucson]]` },
-  "Manuale del Landini L25 (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Manuale del Landini L25]]` },
-  "Pacchetto luckypzkko (vuoto) (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pacchetto luckypzkko (vuoto)]]` },
-  "Gomma masticata (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Gomma masticata]]` },
-  "Tombino con i rilievi (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tombino con i rilievi]]` },
-  "Lucchettone (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Lucchettone]]` },
-  "Citofono, civico 28 (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Citofono, civico 28]]` },
-  "Coperchio pzkkonet (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Coperchio pzkkonet]]` },
-  "Portachiavi col tasto luce (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Portachiavi col tasto luce]]` },
-  "Petizione «pzkko.it è un bel sito?» (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Petizione «pzkko.it è un bel sito?»]]` },
-  "Neon pzkko (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Neon pzkko]]` },
-  "Portafoglio di pelle (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Portafoglio di pelle]]` },
-  "Cercapersone (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cercapersone]]` },
-  "Peluche della chiocciola (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Peluche della chiocciola]]` },
-  "Cercapersone zero (oggetto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cercapersone zero]]` },
-  "Il peluche della chiocciola": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Peluche della chiocciola]]` },
-  "Un’alborella": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Alborella]]` },
-  "Alborella (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Alborella]]` },
-  "Un cavedano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cavedano]]` },
-  "Cavedano (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cavedano]]` },
-  "Un persico": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Persico]]` },
-  "Persico (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Persico]]` },
-  "Una tinca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tinca]]` },
-  "Tinca (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tinca]]` },
-  "Una carpa": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa]]` },
-  "Carpa (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa]]` },
-  "Una trota": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Trota]]` },
-  "Trota (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Trota]]` },
-  "Un pesce gatto": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Pesce gatto]]` },
-  "Pesce gatto (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Pesce gatto]]` },
-  "Un’anguilla": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anguilla]]` },
-  "Anguilla (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anguilla]]` },
-  "Un gambero killer": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Gambero killer]]` },
-  "Gambero killer (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Gambero killer]]` },
-  "Un lucioperca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lucioperca]]` },
-  "Lucioperca (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lucioperca]]` },
-  "Un luccio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Luccio]]` },
-  "Luccio (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Luccio]]` },
-  "Un siluro": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Siluro]]` },
-  "Siluro (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Siluro]]` },
-  "LA CARPA D’ORO DEI GONZAGA": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa d’oro dei Gonzaga]]` },
-  "Carpa d’oro dei Gonzaga (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa d’oro dei Gonzaga]]` },
-  "Una scarpa": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Scarpa]]` },
-  "Scarpa (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Scarpa]]` },
-  "Una bottiglia di plastica": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottiglia di plastica]]` },
-  "Bottiglia di plastica (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottiglia di plastica]]` },
-  "Una rana (che ti guarda male)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Rana]]` },
-  "Rana (pesce)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Rana]]` },
-  "Un piccione": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Piccione]]` },
-  "Piccione (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Piccione]]` },
-  "Una cornacchia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cornacchia]]` },
-  "Cornacchia (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cornacchia]]` },
-  "Una nutria": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Nutria]]` },
-  "Nutria (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Nutria]]` },
-  "Un’anatra": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anatra]]` },
-  "Anatra (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anatra]]` },
-  "Una lepre": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lepre]]` },
-  "Lepre (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lepre]]` },
-  "Un fagiano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fagiano]]` },
-  "Fagiano (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fagiano]]` },
-  "Un riccio (ahi)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Riccio]]` },
-  "Riccio (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Riccio]]` },
-  "Una volpe": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Volpe]]` },
-  "Volpe (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Volpe]]` },
-  "Un cervo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cervo]]` },
-  "Cervo (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cervo]]` },
-  "Un cinghiale": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cinghiale]]` },
-  "Cinghiale (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cinghiale]]` },
-  "Una zanzara tigre (enorme)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Zanzara tigre]]` },
-  "Zanzara tigre (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Zanzara tigre]]` },
-  "IL DRAGO DEL MINCIO": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Drago del Mincio]]` },
-  "Drago del Mincio (bestia)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Drago del Mincio]]` },
-  "Un verme": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Verme]]` },
-  "Verme (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Verme]]` },
-  "Un formicaio intero (addosso)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Formicaio intero]]` },
-  "Formicaio intero (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Formicaio intero]]` },
-  "Un sasso. Un sasso.": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Sasso]]` },
-  "Sasso (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Sasso]]` },
-  "Una radice del platano": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Radice del platano]]` },
-  "Radice del platano (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Radice del platano]]` },
-  "Un tappo di bottiglia del 1987": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tappo di bottiglia del 1987]]` },
-  "Tappo di bottiglia del 1987 (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tappo di bottiglia del 1987]]` },
-  "Un bottone di una divisa austriaca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottone di una divisa austriaca]]` },
-  "Bottone di una divisa austriaca (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottone di una divisa austriaca]]` },
-  "Un osso (di cosa, meglio non saperlo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Osso]]` },
-  "Osso (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Osso]]` },
-  "Una chiave di ferro vecchia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Chiave di ferro vecchia]]` },
-  "Chiave di ferro vecchia (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Chiave di ferro vecchia]]` },
-  "Una moneta con la faccia di Virgilio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Moneta con la faccia di Virgilio]]` },
-  "Moneta con la faccia di Virgilio (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Moneta con la faccia di Virgilio]]` },
-  "Un fossile di ammonite": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fossile di ammonite]]` },
-  "Fossile di ammonite (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fossile di ammonite]]` },
-  "Un’anfora dei Gonzaga": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anfora dei Gonzaga]]` },
-  "Anfora dei Gonzaga (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anfora dei Gonzaga]]` },
-  "IL TESORO DEI GONZAGA": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tesoro dei Gonzaga]]` },
-  "Tesoro dei Gonzaga (reperto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tesoro dei Gonzaga]]` },
-  "Una cartaccia": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cartaccia]]` },
-  "Cartaccia (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cartaccia]]` },
-  "Una lattina vuota": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Lattina vuota]]` },
-  "Lattina vuota (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Lattina vuota]]` },
-  "Una scatola di graffette": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Scatola di graffette]]` },
-  "Scatola di graffette (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Scatola di graffette]]` },
-  "Una tazza «il capo sono io»": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tazza «il capo sono io»]]` },
-  "Tazza «il capo sono io» (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tazza «il capo sono io»]]` },
-  "Un mouse senza filo": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Mouse senza filo]]` },
-  "Mouse senza filo (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Mouse senza filo]]` },
-  "Delle cuffie col microfono": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cuffie col microfono]]` },
-  "Cuffie col microfono (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cuffie col microfono]]` },
-  "Un orologio da polso": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Orologio da polso]]` },
-  "Orologio da polso (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Orologio da polso]]` },
-  "Una chiavetta usb": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Chiavetta usb]]` },
-  "Chiavetta usb (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Chiavetta usb]]` },
-  "Un wallet pzk cifrato": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Wallet pzk cifrato]]` },
-  "Wallet pzk cifrato (ufficio)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Wallet pzk cifrato]]` },
-  "I pesci": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Elenco dei pesci]]` },
-  "I reperti": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Elenco dei reperti]]` },
-  "Le cose dell’ufficio": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Elenco delle cose dell’ufficio]]` },
-  "Rider (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Rider]]` },
-  "Cameriere alla sagra (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cameriere alla sagra]]` },
-  "Barista in piazza Erbe (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Barista in piazza Erbe]]` },
-  "Bidello a unimore (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Bidello a unimore]]` },
-  "Salumiere (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Salumiere]]` },
-  "Tatuatore (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tatuatore]]` },
-  "Streamer (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Streamer]]` },
-  "Sviluppatore web (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Sviluppatore web]]` },
-  "Prof di analisi (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Prof di analisi]]` },
-  "Influencer (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Influencer]]` },
-  "Avvocato (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Avvocato]]` },
-  "Sindaco di Mantova (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Sindaco di Mantova]]` },
-  "Imbianchino (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Imbianchino]]` },
-  "Pizzaiolo (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Pizzaiolo]]` },
-  "Meccanico (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Meccanico]]` },
-  "Bagnino del Mincio (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Bagnino del Mincio]]` },
-  "Spazzino di uffici (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Spazzino di uffici]]` },
-  "Corriere di notte (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Corriere di notte]]` },
-  "Biscazziere (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Biscazziere]]` },
-  "Contrabbandiere di tortelli (mestiere)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Contrabbandiere di tortelli]]` },
-  "Il civico 28 (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il civico 28]]` },
-  "Il pomodoro che scoppia (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il pomodoro che scoppia]]` },
-  "Il Landini non parte (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il Landini non parte]]` },
-  "Il drago del Mincio (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il drago del Mincio]]` },
-  "La nutria sindacalista (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La nutria sindacalista]]` },
-  "Il ponte che non finisce (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il ponte che non finisce]]` },
-  "La sagra dei tortelli (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La sagra dei tortelli]]` },
-  "Il cliente fantasma (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il cliente fantasma]]` },
-  "La rana che canta (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La rana che canta]]` },
-  "La statua che parla (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La statua che parla]]` },
-  "La campana stonata (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La campana stonata]]` },
-  "La consegna impossibile (quest)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La consegna impossibile]]` },
-  "Atalanto (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Atalanto]]` },
-  "Bolognese (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Bolognese]]` },
-  "Cagliaritas (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cagliaritas]]` },
-  "Comodo (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Comodo]]` },
-  "Fiorentoina (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Fiorentoina]]` },
-  "Frosinoni (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Frosinoni]]` },
-  "Genova Grifo (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Genova Grifo]]` },
-  "Inder (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Inder]]` },
-  "Juvenclub (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Juvenclub]]` },
-  "Lazzio (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Lazzio]]` },
-  "Leccese (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Leccese]]` },
-  "Milano Rossonera (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Milano Rossonera]]` },
-  "Monzese (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Monzese]]` },
-  "Napule (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Napule]]` },
-  "Parmigiano (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Parmigiano]]` },
-  "Romma (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Romma]]` },
-  "Sassolino (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sassolino]]` },
-  "Toro Granata (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Toro Granata]]` },
-  "Udinesi (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Udinesi]]` },
-  "Venexia (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Venexia]]` },
-  "Aretini (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Aretini]]` },
-  "Avellinesi (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Avellinesi]]` },
-  "Beneventani (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Beneventani]]` },
-  "Carraresi (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Carraresi]]` },
-  "Catanzarese (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Catanzarese]]` },
-  "Cesenati (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cesenati]]` },
-  "Cremonata (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cremonata]]` },
-  "Empolesi (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Empolesi]]` },
-  "Verona Scaligera (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Verona Scaligera]]` },
-  "Stabia Vespe (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Stabia Vespe]]` },
-  "Mantua (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Mantua]]` },
-  "Modenesi (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Modenesi]]` },
-  "Padovana (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Padovana]]` },
-  "Palermitano (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Palermitano]]` },
-  "Pisa Torre (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Pisa Torre]]` },
-  "Sampdoriana (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sampdoriana]]` },
-  "Sudtirolo (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sudtirolo]]` },
-  "Vicentini (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Vicentini]]` },
-  "Entella Virtuosa (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Entella Virtuosa]]` },
-  "Ascolano (squadra)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Ascolano]]` },
-  "Tavolino pieghevole della sagra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tavolino pieghevole della sagra]]` },
-  "Tavolino del bar dei pensionati (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tavolino del bar dei pensionati]]` },
-  "Scrivania della cameretta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania della cameretta]]` },
-  "Scrivanina gaming (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivanina gaming]]` },
-  "Banco da lavoro dell’officina (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Banco da lavoro dell’officina]]` },
-  "Scrivania gaming della cameretta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania gaming della cameretta]]` },
-  "Bancone della cantina (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Bancone della cantina]]` },
-  "Scrivania del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del geometra]]` },
-  "Scrivania gaming con le luci (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania gaming con le luci]]` },
-  "La scrivania del boss di Mantova": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del boss di Mantova]]` },
-  "Scrivania del boss di Mantova (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del boss di Mantova]]` },
-  "Sgabello del bar (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sgabello del bar]]` },
-  "Sgabello imbottito (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sgabello imbottito]]` },
-  "Sedia da ufficio che cigola (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia da ufficio che cigola]]` },
-  "Sedia del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia del geometra]]` },
-  "Sedia gaming della cameretta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia gaming della cameretta]]` },
-  "Sedia «lumaca racing» (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia «lumaca racing»]]` },
-  "Trono del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Trono del boss]]` },
-  "Scatola da scarpe forata (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scatola da scarpe forata]]` },
-  "Case medio del cugino (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Case medio del cugino]]` },
-  "Mini itx da bar (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mini itx da bar]]` },
-  "Torre col vetro (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Torre col vetro]]` },
-  "Big tower del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Big tower del geometra]]` },
-  "Telaio da mining della cantina (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Telaio da mining della cantina]]` },
-  "Big tower del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Big tower del boss]]` },
-  "Il rig aperto della lumaca": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rig aperto della lumaca]]` },
-  "Rig aperto della lumaca (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rig aperto della lumaca]]` },
-  "Processore del nonno (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Processore del nonno]]` },
-  "Quattro core di Mantova (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Quattro core di Mantova]]` },
-  "Otto core col torrione (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Otto core col torrione]]` },
-  "Core i9 del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Core i9 del geometra]]` },
-  "Sedici core a liquido (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedici core a liquido]]` },
-  "Threadripper del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Threadripper del boss]]` },
-  "Scheda video del bar (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scheda video del bar]]` },
-  "Gtx della cameretta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Gtx della cameretta]]` },
-  "Rx del cugino (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rx del cugino]]` },
-  "Rtx tascabile (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rtx tascabile]]` },
-  "Rtx del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rtx del geometra]]` },
-  "Lumaca rtx 4080 (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Lumaca rtx 4080]]` },
-  "Lumaca rtx 4090 (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Lumaca rtx 4090]]` },
-  "4 GB trovati nel cassetto (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[4 GB trovati nel cassetto]]` },
-  "16 GB del cugino (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[16 GB del cugino]]` },
-  "32 GB coi led (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 GB coi led]]` },
-  "32 GB con le alette (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 GB con le alette]]` },
-  "64 GB rgb (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[64 GB rgb]]` },
-  "128 GB del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[128 GB del boss]]` },
-  "Ventolina da 8 cm (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ventolina da 8 cm]]` },
-  "12 cm silenziosa (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[12 cm silenziosa]]` },
-  "12 cm rgb (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[12 cm rgb]]` },
-  "14 cm della lumaca (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[14 cm della lumaca]]` },
-  "Turbina del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Turbina del boss]]` },
-  "Striscia led rossa del mercato (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Striscia led rossa del mercato]]` },
-  "Led blu pzkko (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led blu pzkko]]` },
-  "Led verde del wallet (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led verde del wallet]]` },
-  "Led viola da discoteca (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led viola da discoteca]]` },
-  "Led arcobaleno (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led arcobaleno]]` },
-  "Hard disk che ticchetta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Hard disk che ticchetta]]` },
-  "2 TB del cugino (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[2 TB del cugino]]` },
-  "Ssd sata (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ssd sata]]` },
-  "Nvme della lumaca (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Nvme della lumaca]]` },
-  "Nvme del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Nvme del boss]]` },
-  "Monitor del ragioniere (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Monitor del ragioniere]]` },
-  "Monitorino curvo (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Monitorino curvo]]` },
-  "24 pollici del cugino (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[24 pollici del cugino]]` },
-  "27 pollici curvo (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[27 pollici curvo]]` },
-  "32 pollici del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 pollici del geometra]]` },
-  "Ultrawide curvo del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ultrawide curvo del boss]]` },
-  "Tastiera del supermercato (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera del supermercato]]` },
-  "Tastiera dell’ufficio postale (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera dell’ufficio postale]]` },
-  "Meccanica coi tasti blu (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Meccanica coi tasti blu]]` },
-  "Meccanica del geometra (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Meccanica del geometra]]` },
-  "Tastiera rgb della lumaca (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera rgb della lumaca]]` },
-  "Mouse col filo attorcigliato (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse col filo attorcigliato]]` },
-  "Mouse senza fili (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse senza fili]]` },
-  "Mouse gaming della cameretta (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse gaming della cameretta]]` },
-  "Mouse da dodici tasti (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse da dodici tasti]]` },
-  "Mouse del boss (miniera)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse del boss]]` },
-  "Il muletto da ufficio (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il muletto da ufficio]]` },
-  "Il gaming della cameretta (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il gaming della cameretta]]` },
-  "Il mini itx da bar (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il mini itx da bar]]` },
-  "La torre col vetro (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La torre col vetro]]` },
-  "La workstation del geometra (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La workstation del geometra]]` },
-  "Il mining rig della cantina (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il mining rig della cantina]]` },
-  "Il trono del boss (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il trono del boss]]` },
-  "La centrale della lumaca (PC pronto)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La centrale della lumaca]]` },
-  "Mettersi in regola (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Mettersi in regola]]` },
-  "Riccone (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Riccone]]` },
-  "Si comincia (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Si comincia]]` },
-  "Veterano (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Veterano]]` },
-  "Leggenda del muro (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Leggenda del muro]]` },
-  "Chiacchierone (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Chiacchierone]]` },
-  "Stakanovista (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Stakanovista]]` },
-  "Pescatore del Mincio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Pescatore del Mincio]]` },
-  "Re del Mincio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Re del Mincio]]` },
-  "Cacciatore di nutrie (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cacciatore di nutrie]]` },
-  "Ammazzadraghi (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ammazzadraghi]]` },
-  "Tombarolo gonzaghesco (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Tombarolo gonzaghesco]]` },
-  "Il tesoro dei Gonzaga (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il tesoro dei Gonzaga]]` },
-  "Anche questo è un traguardo (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Anche questo è un traguardo]]` },
-  "Immortale (a metà) (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Immortale (a metà)]]` },
-  "Giocatore (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Giocatore]]` },
-  "Girandola (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Girandola]]` },
-  "Colpo grosso (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Colpo grosso]]` },
-  "Cervellone (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cervellone]]` },
-  "Costante (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Costante]]` },
-  "Ossessionato (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ossessionato]]` },
-  "Eroe di Mantova (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Eroe di Mantova]]` },
-  "La nonna è fiera (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[La nonna è fiera]]` },
-  "Chef del Mincio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Chef del Mincio]]` },
-  "Collezionista di facce (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Collezionista di facce]]` },
-  "Miliardario in sedicesimi (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Miliardario in sedicesimi]]` },
-  "Ormai di casa (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ormai di casa]]` },
-  "Mito vivente (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Mito vivente]]` },
-  "Amico del bot (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Amico del bot]]` },
-  "Schiavo del sistema (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Schiavo del sistema]]` },
-  "Il Mincio è casa mia (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il Mincio è casa mia]]` },
-  "Incubo delle nutrie (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Incubo delle nutrie]]` },
-  "Talpa umana (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Talpa umana]]` },
-  "Abitué del purgatorio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Abitué del purgatorio]]` },
-  "Habitué del tavolo (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Habitué del tavolo]]` },
-  "Il banco ringrazia (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il banco ringrazia]]` },
-  "Jackpot (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Jackpot]]` },
-  "Enciclopedia ambulante (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Enciclopedia ambulante]]` },
-  "Quark in persona (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Quark in persona]]` },
-  "Curioso (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Curioso]]` },
-  "A raffica (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[A raffica]]` },
-  "Puntuale come le tasse (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Puntuale come le tasse]]` },
-  "Sfida infinita (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Sfida infinita]]` },
-  "Cavaliere del Mincio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cavaliere del Mincio]]` },
-  "Ogni bivio è mio (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ogni bivio è mio]]` },
-  "Camerino dei travestimenti (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Camerino dei travestimenti]]` },
-  "Filosofo (traguardo)": { data: "2026-11-03", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Filosofo]]` },
+  "Canna da pesca (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Canna da pesca]]` },
+  "Esca viva (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Esca viva]]` },
+  "Fionda (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Fionda]]` },
+  "Fucile da caccia (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Fucile da caccia]]` },
+  "Pala (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pala]]` },
+  "Telefono (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Telefono]]` },
+  "Cornetto rosso (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cornetto rosso]]` },
+  "Caffè (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Caffè]]` },
+  "Lattina che mette le ali (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Lattina che mette le ali]]` },
+  "Mortadella (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mortadella]]` },
+  "Gratta e vinci (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Gratta e vinci]]` },
+  "Cassa comune (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa comune]]` },
+  "Cassa rara (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa rara]]` },
+  "Cassa dei Gonzaga (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cassa dei Gonzaga]]` },
+  "Pzk-kola (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pzk-kola]]` },
+  "Tè freddo alla pesca (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tè freddo alla pesca]]` },
+  "Mirtilli, fragole e lamponi (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mirtilli, fragole e lamponi]]` },
+  "Zucca mantovana (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Zucca mantovana]]` },
+  "Tortelli di zucca (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tortelli di zucca]]` },
+  "Grissini alla pizza (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Grissini alla pizza]]` },
+  "Ramen box Pechino (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Ramen box Pechino]]` },
+  "Sbrisolona (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Sbrisolona]]` },
+  "Mostarda mantovana (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Mostarda mantovana]]` },
+  "Pomodoro maturo (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pomodoro maturo]]` },
+  "Zaino Eastpak (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Zaino Eastpak]]` },
+  "Piaggio Ciao PX (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Piaggio Ciao PX]]` },
+  "Landini L25 testa calda (1957) (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Landini L25 testa calda (1957)]]` },
+  "Stampante Epson ET-2825 (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Stampante Epson ET-2825]]` },
+  "IPhone Duo (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[IPhone Duo]]` },
+  "Stufa a legna (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Stufa a legna]]` },
+  "Bonsai (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Bonsai]]` },
+  "Penne BIC con corda e scotch (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Penne BIC con corda e scotch]]` },
+  "Hyundai Tucson (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Hyundai Tucson]]` },
+  "Manuale del Landini L25 (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Manuale del Landini L25]]` },
+  "Pacchetto luckypzkko (vuoto) (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Pacchetto luckypzkko (vuoto)]]` },
+  "Gomma masticata (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Gomma masticata]]` },
+  "Tombino con i rilievi (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Tombino con i rilievi]]` },
+  "Lucchettone (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Lucchettone]]` },
+  "Citofono, civico 28 (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Citofono, civico 28]]` },
+  "Coperchio pzkkonet (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Coperchio pzkkonet]]` },
+  "Portachiavi col tasto luce (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Portachiavi col tasto luce]]` },
+  "Petizione «pzkko.it è un bel sito?» (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Petizione «pzkko.it è un bel sito?»]]` },
+  "Neon pzkko (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Neon pzkko]]` },
+  "Portafoglio di pelle (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Portafoglio di pelle]]` },
+  "Cercapersone (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cercapersone]]` },
+  "Peluche della chiocciola (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Peluche della chiocciola]]` },
+  "Cercapersone zero (oggetto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Cercapersone zero]]` },
+  "Il peluche della chiocciola": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/oggetti.js","albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/mercato.js"], testo: `#RINVIA [[Peluche della chiocciola]]` },
+  "Un’alborella": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Alborella]]` },
+  "Alborella (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Alborella]]` },
+  "Un cavedano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cavedano]]` },
+  "Cavedano (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cavedano]]` },
+  "Un persico": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Persico]]` },
+  "Persico (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Persico]]` },
+  "Una tinca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tinca]]` },
+  "Tinca (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tinca]]` },
+  "Una carpa": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa]]` },
+  "Carpa (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa]]` },
+  "Una trota": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Trota]]` },
+  "Trota (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Trota]]` },
+  "Un pesce gatto": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Pesce gatto]]` },
+  "Pesce gatto (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Pesce gatto]]` },
+  "Un’anguilla": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anguilla]]` },
+  "Anguilla (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anguilla]]` },
+  "Un gambero killer": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Gambero killer]]` },
+  "Gambero killer (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Gambero killer]]` },
+  "Un lucioperca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lucioperca]]` },
+  "Lucioperca (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lucioperca]]` },
+  "Un luccio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Luccio]]` },
+  "Luccio (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Luccio]]` },
+  "Un siluro": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Siluro]]` },
+  "Siluro (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Siluro]]` },
+  "LA CARPA D’ORO DEI GONZAGA": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa d’oro dei Gonzaga]]` },
+  "Carpa d’oro dei Gonzaga (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Carpa d’oro dei Gonzaga]]` },
+  "Una scarpa": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Scarpa]]` },
+  "Scarpa (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Scarpa]]` },
+  "Una bottiglia di plastica": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottiglia di plastica]]` },
+  "Bottiglia di plastica (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottiglia di plastica]]` },
+  "Una rana (che ti guarda male)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Rana]]` },
+  "Rana (pesce)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Rana]]` },
+  "Un piccione": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Piccione]]` },
+  "Piccione (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Piccione]]` },
+  "Una cornacchia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cornacchia]]` },
+  "Cornacchia (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cornacchia]]` },
+  "Una nutria": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Nutria]]` },
+  "Nutria (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Nutria]]` },
+  "Un’anatra": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anatra]]` },
+  "Anatra (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anatra]]` },
+  "Una lepre": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lepre]]` },
+  "Lepre (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Lepre]]` },
+  "Un fagiano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fagiano]]` },
+  "Fagiano (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fagiano]]` },
+  "Un riccio (ahi)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Riccio]]` },
+  "Riccio (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Riccio]]` },
+  "Una volpe": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Volpe]]` },
+  "Volpe (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Volpe]]` },
+  "Un cervo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cervo]]` },
+  "Cervo (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cervo]]` },
+  "Un cinghiale": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cinghiale]]` },
+  "Cinghiale (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Cinghiale]]` },
+  "Una zanzara tigre (enorme)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Zanzara tigre]]` },
+  "Zanzara tigre (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Zanzara tigre]]` },
+  "IL DRAGO DEL MINCIO": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Drago del Mincio]]` },
+  "Drago del Mincio (bestia)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Drago del Mincio]]` },
+  "Un verme": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Verme]]` },
+  "Verme (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Verme]]` },
+  "Un formicaio intero (addosso)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Formicaio intero]]` },
+  "Formicaio intero (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Formicaio intero]]` },
+  "Un sasso. Un sasso.": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Sasso]]` },
+  "Sasso (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Sasso]]` },
+  "Una radice del platano": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Radice del platano]]` },
+  "Radice del platano (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Radice del platano]]` },
+  "Un tappo di bottiglia del 1987": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tappo di bottiglia del 1987]]` },
+  "Tappo di bottiglia del 1987 (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tappo di bottiglia del 1987]]` },
+  "Un bottone di una divisa austriaca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottone di una divisa austriaca]]` },
+  "Bottone di una divisa austriaca (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Bottone di una divisa austriaca]]` },
+  "Un osso (di cosa, meglio non saperlo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Osso]]` },
+  "Osso (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Osso]]` },
+  "Una chiave di ferro vecchia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Chiave di ferro vecchia]]` },
+  "Chiave di ferro vecchia (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Chiave di ferro vecchia]]` },
+  "Una moneta con la faccia di Virgilio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Moneta con la faccia di Virgilio]]` },
+  "Moneta con la faccia di Virgilio (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Moneta con la faccia di Virgilio]]` },
+  "Un fossile di ammonite": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fossile di ammonite]]` },
+  "Fossile di ammonite (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Fossile di ammonite]]` },
+  "Un’anfora dei Gonzaga": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anfora dei Gonzaga]]` },
+  "Anfora dei Gonzaga (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Anfora dei Gonzaga]]` },
+  "IL TESORO DEI GONZAGA": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tesoro dei Gonzaga]]` },
+  "Tesoro dei Gonzaga (reperto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Tesoro dei Gonzaga]]` },
+  "Una cartaccia": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cartaccia]]` },
+  "Cartaccia (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cartaccia]]` },
+  "Una lattina vuota": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Lattina vuota]]` },
+  "Lattina vuota (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Lattina vuota]]` },
+  "Una scatola di graffette": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Scatola di graffette]]` },
+  "Scatola di graffette (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Scatola di graffette]]` },
+  "Una tazza «il capo sono io»": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tazza «il capo sono io»]]` },
+  "Tazza «il capo sono io» (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tazza «il capo sono io»]]` },
+  "Un mouse senza filo": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Mouse senza filo]]` },
+  "Mouse senza filo (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Mouse senza filo]]` },
+  "Delle cuffie col microfono": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cuffie col microfono]]` },
+  "Cuffie col microfono (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cuffie col microfono]]` },
+  "Un orologio da polso": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Orologio da polso]]` },
+  "Orologio da polso (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Orologio da polso]]` },
+  "Una chiavetta usb": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Chiavetta usb]]` },
+  "Chiavetta usb (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Chiavetta usb]]` },
+  "Un wallet pzk cifrato": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Wallet pzk cifrato]]` },
+  "Wallet pzk cifrato (ufficio)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Wallet pzk cifrato]]` },
+  "I pesci": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Elenco dei pesci]]` },
+  "I reperti": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/attivita.js"], testo: `#RINVIA [[Elenco dei reperti]]` },
+  "Le cose dell’ufficio": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Elenco delle cose dell’ufficio]]` },
+  "Rider (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Rider]]` },
+  "Cameriere alla sagra (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Cameriere alla sagra]]` },
+  "Barista in piazza Erbe (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Barista in piazza Erbe]]` },
+  "Bidello a unimore (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Bidello a unimore]]` },
+  "Salumiere (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Salumiere]]` },
+  "Tatuatore (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Tatuatore]]` },
+  "Streamer (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Streamer]]` },
+  "Sviluppatore web (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Sviluppatore web]]` },
+  "Prof di analisi (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Prof di analisi]]` },
+  "Influencer (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Influencer]]` },
+  "Avvocato (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Avvocato]]` },
+  "Sindaco di Mantova (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Sindaco di Mantova]]` },
+  "Imbianchino (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Imbianchino]]` },
+  "Pizzaiolo (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Pizzaiolo]]` },
+  "Meccanico (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Meccanico]]` },
+  "Bagnino del Mincio (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Bagnino del Mincio]]` },
+  "Spazzino di uffici (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Spazzino di uffici]]` },
+  "Corriere di notte (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Corriere di notte]]` },
+  "Biscazziere (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Biscazziere]]` },
+  "Contrabbandiere di tortelli (mestiere)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/testi.js","albertopecchini.it/pzkko/chat/comandi/lavoro.js","albertopecchini.it/pzkko/chat/minigiochi.js"], testo: `#RINVIA [[Contrabbandiere di tortelli]]` },
+  "Il civico 28 (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il civico 28]]` },
+  "Il pomodoro che scoppia (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il pomodoro che scoppia]]` },
+  "Il Landini non parte (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il Landini non parte]]` },
+  "Il drago del Mincio (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il drago del Mincio]]` },
+  "La nutria sindacalista (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La nutria sindacalista]]` },
+  "Il ponte che non finisce (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il ponte che non finisce]]` },
+  "La sagra dei tortelli (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La sagra dei tortelli]]` },
+  "Il cliente fantasma (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[Il cliente fantasma]]` },
+  "La rana che canta (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La rana che canta]]` },
+  "La statua che parla (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La statua che parla]]` },
+  "La campana stonata (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La campana stonata]]` },
+  "La consegna impossibile (quest)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/missioni-dati.js","albertopecchini.it/pzkko/chat/missioni-altre.js","albertopecchini.it/pzkko/chat/missioni.js"], testo: `#RINVIA [[La consegna impossibile]]` },
+  "Atalanto (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Atalanto]]` },
+  "Bolognese (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Bolognese]]` },
+  "Cagliaritas (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cagliaritas]]` },
+  "Comodo (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Comodo]]` },
+  "Fiorentoina (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Fiorentoina]]` },
+  "Frosinoni (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Frosinoni]]` },
+  "Genova Grifo (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Genova Grifo]]` },
+  "Inder (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Inder]]` },
+  "Juvenclub (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Juvenclub]]` },
+  "Lazzio (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Lazzio]]` },
+  "Leccese (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Leccese]]` },
+  "Milano Rossonera (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Milano Rossonera]]` },
+  "Monzese (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Monzese]]` },
+  "Napule (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Napule]]` },
+  "Parmigiano (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Parmigiano]]` },
+  "Romma (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Romma]]` },
+  "Sassolino (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sassolino]]` },
+  "Toro Granata (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Toro Granata]]` },
+  "Udinesi (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Udinesi]]` },
+  "Venexia (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Venexia]]` },
+  "Aretini (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Aretini]]` },
+  "Avellinesi (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Avellinesi]]` },
+  "Beneventani (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Beneventani]]` },
+  "Carraresi (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Carraresi]]` },
+  "Catanzarese (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Catanzarese]]` },
+  "Cesenati (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cesenati]]` },
+  "Cremonata (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Cremonata]]` },
+  "Empolesi (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Empolesi]]` },
+  "Verona Scaligera (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Verona Scaligera]]` },
+  "Stabia Vespe (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Stabia Vespe]]` },
+  "Mantua (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Mantua]]` },
+  "Modenesi (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Modenesi]]` },
+  "Padovana (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Padovana]]` },
+  "Palermitano (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Palermitano]]` },
+  "Pisa Torre (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Pisa Torre]]` },
+  "Sampdoriana (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sampdoriana]]` },
+  "Sudtirolo (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Sudtirolo]]` },
+  "Vicentini (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Vicentini]]` },
+  "Entella Virtuosa (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Entella Virtuosa]]` },
+  "Ascolano (squadra)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/games/virtual/squadre.js","albertopecchini.it/pzkko/games/virtual/partita.js"], testo: `#RINVIA [[Ascolano]]` },
+  "Tavolino pieghevole della sagra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tavolino pieghevole della sagra]]` },
+  "Tavolino del bar dei pensionati (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tavolino del bar dei pensionati]]` },
+  "Scrivania della cameretta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania della cameretta]]` },
+  "Scrivanina gaming (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivanina gaming]]` },
+  "Banco da lavoro dell’officina (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Banco da lavoro dell’officina]]` },
+  "Scrivania gaming della cameretta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania gaming della cameretta]]` },
+  "Bancone della cantina (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Bancone della cantina]]` },
+  "Scrivania del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del geometra]]` },
+  "Scrivania gaming con le luci (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania gaming con le luci]]` },
+  "La scrivania del boss di Mantova": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del boss di Mantova]]` },
+  "Scrivania del boss di Mantova (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scrivania del boss di Mantova]]` },
+  "Sgabello del bar (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sgabello del bar]]` },
+  "Sgabello imbottito (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sgabello imbottito]]` },
+  "Sedia da ufficio che cigola (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia da ufficio che cigola]]` },
+  "Sedia del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia del geometra]]` },
+  "Sedia gaming della cameretta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia gaming della cameretta]]` },
+  "Sedia «lumaca racing» (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedia «lumaca racing»]]` },
+  "Trono del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Trono del boss]]` },
+  "Scatola da scarpe forata (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scatola da scarpe forata]]` },
+  "Case medio del cugino (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Case medio del cugino]]` },
+  "Mini itx da bar (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mini itx da bar]]` },
+  "Torre col vetro (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Torre col vetro]]` },
+  "Big tower del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Big tower del geometra]]` },
+  "Telaio da mining della cantina (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Telaio da mining della cantina]]` },
+  "Big tower del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Big tower del boss]]` },
+  "Il rig aperto della lumaca": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rig aperto della lumaca]]` },
+  "Rig aperto della lumaca (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rig aperto della lumaca]]` },
+  "Processore del nonno (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Processore del nonno]]` },
+  "Quattro core di Mantova (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Quattro core di Mantova]]` },
+  "Otto core col torrione (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Otto core col torrione]]` },
+  "Core i9 del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Core i9 del geometra]]` },
+  "Sedici core a liquido (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Sedici core a liquido]]` },
+  "Threadripper del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Threadripper del boss]]` },
+  "Scheda video del bar (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Scheda video del bar]]` },
+  "Gtx della cameretta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Gtx della cameretta]]` },
+  "Rx del cugino (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rx del cugino]]` },
+  "Rtx tascabile (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rtx tascabile]]` },
+  "Rtx del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Rtx del geometra]]` },
+  "Lumaca rtx 4080 (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Lumaca rtx 4080]]` },
+  "Lumaca rtx 4090 (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Lumaca rtx 4090]]` },
+  "4 GB trovati nel cassetto (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[4 GB trovati nel cassetto]]` },
+  "16 GB del cugino (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[16 GB del cugino]]` },
+  "32 GB coi led (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 GB coi led]]` },
+  "32 GB con le alette (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 GB con le alette]]` },
+  "64 GB rgb (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[64 GB rgb]]` },
+  "128 GB del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[128 GB del boss]]` },
+  "Ventolina da 8 cm (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ventolina da 8 cm]]` },
+  "12 cm silenziosa (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[12 cm silenziosa]]` },
+  "12 cm rgb (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[12 cm rgb]]` },
+  "14 cm della lumaca (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[14 cm della lumaca]]` },
+  "Turbina del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Turbina del boss]]` },
+  "Striscia led rossa del mercato (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Striscia led rossa del mercato]]` },
+  "Led blu pzkko (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led blu pzkko]]` },
+  "Led verde del wallet (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led verde del wallet]]` },
+  "Led viola da discoteca (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led viola da discoteca]]` },
+  "Led arcobaleno (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Led arcobaleno]]` },
+  "Hard disk che ticchetta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Hard disk che ticchetta]]` },
+  "2 TB del cugino (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[2 TB del cugino]]` },
+  "Ssd sata (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ssd sata]]` },
+  "Nvme della lumaca (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Nvme della lumaca]]` },
+  "Nvme del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Nvme del boss]]` },
+  "Monitor del ragioniere (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Monitor del ragioniere]]` },
+  "Monitorino curvo (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Monitorino curvo]]` },
+  "24 pollici del cugino (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[24 pollici del cugino]]` },
+  "27 pollici curvo (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[27 pollici curvo]]` },
+  "32 pollici del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[32 pollici del geometra]]` },
+  "Ultrawide curvo del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Ultrawide curvo del boss]]` },
+  "Tastiera del supermercato (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera del supermercato]]` },
+  "Tastiera dell’ufficio postale (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera dell’ufficio postale]]` },
+  "Meccanica coi tasti blu (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Meccanica coi tasti blu]]` },
+  "Meccanica del geometra (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Meccanica del geometra]]` },
+  "Tastiera rgb della lumaca (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Tastiera rgb della lumaca]]` },
+  "Mouse col filo attorcigliato (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse col filo attorcigliato]]` },
+  "Mouse senza fili (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse senza fili]]` },
+  "Mouse gaming della cameretta (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse gaming della cameretta]]` },
+  "Mouse da dodici tasti (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse da dodici tasti]]` },
+  "Mouse del boss (miniera)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Mouse del boss]]` },
+  "Il muletto da ufficio (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il muletto da ufficio]]` },
+  "Il gaming della cameretta (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il gaming della cameretta]]` },
+  "Il mini itx da bar (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il mini itx da bar]]` },
+  "La torre col vetro (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La torre col vetro]]` },
+  "La workstation del geometra (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La workstation del geometra]]` },
+  "Il mining rig della cantina (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il mining rig della cantina]]` },
+  "Il trono del boss (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[Il trono del boss]]` },
+  "La centrale della lumaca (PC pronto)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/miniera-dati.mjs","albertopecchini.it/pzkko/chat/miniera.js","albertopecchini.it/pzkko/chat/miniera-pixel.js"], testo: `#RINVIA [[La centrale della lumaca]]` },
+  "Mettersi in regola (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Mettersi in regola]]` },
+  "Riccone (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Riccone]]` },
+  "Si comincia (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Si comincia]]` },
+  "Veterano (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Veterano]]` },
+  "Leggenda del muro (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Leggenda del muro]]` },
+  "Chiacchierone (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Chiacchierone]]` },
+  "Stakanovista (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Stakanovista]]` },
+  "Pescatore del Mincio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Pescatore del Mincio]]` },
+  "Re del Mincio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Re del Mincio]]` },
+  "Cacciatore di nutrie (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cacciatore di nutrie]]` },
+  "Ammazzadraghi (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ammazzadraghi]]` },
+  "Tombarolo gonzaghesco (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Tombarolo gonzaghesco]]` },
+  "Il tesoro dei Gonzaga (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il tesoro dei Gonzaga]]` },
+  "Anche questo è un traguardo (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Anche questo è un traguardo]]` },
+  "Immortale (a metà) (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Immortale (a metà)]]` },
+  "Giocatore (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Giocatore]]` },
+  "Girandola (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Girandola]]` },
+  "Colpo grosso (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Colpo grosso]]` },
+  "Cervellone (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cervellone]]` },
+  "Costante (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Costante]]` },
+  "Ossessionato (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ossessionato]]` },
+  "Eroe di Mantova (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Eroe di Mantova]]` },
+  "La nonna è fiera (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[La nonna è fiera]]` },
+  "Chef del Mincio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Chef del Mincio]]` },
+  "Collezionista di facce (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Collezionista di facce]]` },
+  "Miliardario in sedicesimi (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Miliardario in sedicesimi]]` },
+  "Ormai di casa (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ormai di casa]]` },
+  "Mito vivente (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Mito vivente]]` },
+  "Amico del bot (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Amico del bot]]` },
+  "Schiavo del sistema (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Schiavo del sistema]]` },
+  "Il Mincio è casa mia (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il Mincio è casa mia]]` },
+  "Incubo delle nutrie (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Incubo delle nutrie]]` },
+  "Talpa umana (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Talpa umana]]` },
+  "Abitué del purgatorio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Abitué del purgatorio]]` },
+  "Habitué del tavolo (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Habitué del tavolo]]` },
+  "Il banco ringrazia (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Il banco ringrazia]]` },
+  "Jackpot (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Jackpot]]` },
+  "Enciclopedia ambulante (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Enciclopedia ambulante]]` },
+  "Quark in persona (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Quark in persona]]` },
+  "Curioso (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Curioso]]` },
+  "A raffica (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[A raffica]]` },
+  "Puntuale come le tasse (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Puntuale come le tasse]]` },
+  "Sfida infinita (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Sfida infinita]]` },
+  "Cavaliere del Mincio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Cavaliere del Mincio]]` },
+  "Ogni bivio è mio (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Ogni bivio è mio]]` },
+  "Camerino dei travestimenti (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Camerino dei travestimenti]]` },
+  "Filosofo (traguardo)": { data: "2026-11-04", fonti: ["albertopecchini.it/pzkko/chat/traguardi.js","albertopecchini.it/pzkko/traguardi/traguardi.js"], testo: `#RINVIA [[Filosofo]]` },
 }

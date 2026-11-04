@@ -78,6 +78,12 @@ tenuti premuti.
    non vanno per la sequenza».) La chat lo fa da sola in `scegli` per i tasti sinistra, dritto o centro, destra, giù:
    ← ↑ → ↓ premono, il tasto porta la sua freccia, e sotto c'è scritto quali frecce premere. Un'app con un gioco a
    direzioni fa lo stesso: la freccia è l'azione, non uno spostamento del cursore seguito da OK.
+12. **C'è sempre una cosa scelta, e OK preme quella.** (4.11, Alberto: «i tasti che premo danno comandi diversi da quel che
+   hanno di nome».) Mai uno stato «niente di scelto» in cui OK fa altro (la chat apriva la tastiera), mai un tasto scelto
+   fuori schermo, mai due cursori. Il cursore si ricorda per chiave, non per posto: se la lista cambia, resta sullo stesso
+   tasto o torna al primo. Quello che un tasto manda lo dice il suo nome: nella chat il fumetto è il nome del tasto.
+13. **Quello che non si preme non sembra un tasto.** Un tasto spento o vecchio ha la cornice a puntini e ignora OK e il
+   clic; una scritta che dice «tocca» o «premi» deve avere un tasto vero sotto.
 
 ### Il clic del mouse
 
@@ -203,6 +209,10 @@ node tools/pzkko/zero/prova.mjs --app=<id>
    `--rapina=galera`): un wallet finto dentro il collaudo (entra col PIN 1234, crea, sincronizza, converti, invia,
    chi è, PIN, indirizzo) e con `--senzaconto` (il cercapersone chiuso).
    Il collaudo segnala anche i **testi più larghi dello schermo**, pure quando il ritaglio li taglierebbe in silenzio.
+   **Senza la banca** (nel collaudo non c'è) la chat si prova con `finta@direzioni`, `finta@griglia`, `finta@parola`,
+   `finta@azioni` nella sequenza: una scelta finta, e alla fine il collaudo scrive cosa ha risposto. **Chi arriva per la
+   prima volta**: `--guida --senzaconto` (la guida, poi il conto). **La croce 3D**: `--croce` la preme col mouse sui
+   quattro bracci.
 4. **I dati peggiori** (4.2): `--peggiori` dà un nome di 20 lettere, un motto di 60, quasi un miliardo di $pzk, i soldi
    sporchi e un livello sopra 100. (Nel profilo il bollino «liv 129» usciva dal riquadro.)
 5. **Se l'app cambia il tasto sul muro**, anche `prova.mjs --muro`, che lo fotografa a 4×.

@@ -62,9 +62,9 @@ Scrive in minuscolo, come tutto il sito, e con i fatti di Mantova: pesca nel Min
   },
 
   'I comandi della chat': {
-    data: '2026-11-02',
+    data: '2026-11-04',
     fonti: [C('comandi/index.js'), C('comandi/soldi.js'), C('comandi/attivita.js'), C('comandi/lavoro.js'), C('comandi/giochi.js'), C('comandi/negozio.js'), C('comandi/app.js'), C('comandi/giocatori.js'), C('comandi/svago.js'), C('comandi/eventi.js'), R],
-    testo: `'''I comandi della chat''' sono tutto quello che si può dire al [[Il bot pzk|bot]]. Stanno in <code>chat/comandi/</code>, una famiglia per file; ogni comando ha <code>nomi</code> (il primo è quello vero, gli altri alias), la categoria dell'<code>aiuto</code>, l'icona, una riga <code>breve</code>, l'<code>uso</code>, l'<code>attesa</code> in secondi prima di poterlo rifare e <code>fai(ctx)</code>. Scrivere <code>aiuto</code> li elenca per categoria (ogni nome si tocca); <code>aiuto pesca</code> ne spiega uno. Un nome di oggetto scritto da solo (<code>luccio</code>) propone compra, usa, info.
+    testo: `'''I comandi della chat''' sono tutto quello che si può dire al [[Il bot pzk|bot]]. Stanno in <code>chat/comandi/</code>, una famiglia per file; ogni comando ha <code>nomi</code> (il primo è quello vero, gli altri alias), la categoria dell'<code>aiuto</code>, l'icona, una riga <code>breve</code>, l'<code>uso</code>, l'<code>attesa</code> in secondi prima di poterlo rifare e <code>fai(ctx)</code>. Scrivere <code>aiuto</code> li elenca per categoria e porta dieci tasti per cominciare (giornaliero, lavora, pesca, caccia, scava, quiz, negozio, zaino, sfide, classifica); <code>aiuto pesca</code> ne spiega uno, col tasto «prova» (se il comando vuole qualcosa dopo, come <code>slot &lt;puntata&gt;</code>, apre la tastiera già scritta fin lì). Fino al 4.11.2026 «aiuto» diceva anche «le frecce in su ripetono gli ultimi», che nello [[Chat (app)|zero]] non è vero: ↑ scorre i messaggi. Il saluto del bot dice come si usa («← → scelgono un tasto, OK lo preme, oppure scrivi tu») e porta già «riscuoti il premio» e «cosa posso fare?». Un nome di oggetto scritto da solo (<code>luccio</code>) propone compra, usa, info.
 
 == I soldi ==
 {| class="wikitable"
@@ -194,13 +194,17 @@ Dopo lo spazio propone gli argomenti che il comando conosce già, solo da liste 
   },
 
   'I consigliati': {
-    data: '2026-11-02',
+    data: '2026-11-04',
     fonti: [O('chat.js'), C('zaino.js'), R],
-    testo: `'''I consigliati''' (2.11.2026) sono i tasti incorniciati che la [[Chat (app)|chat di pzk os]] mostra sopra la riga quando è vuota: i [[I comandi della chat|comandi]] pronti adesso, da dove cominciare.
+    testo: `'''I consigliati''' (2.11.2026) sono i tasti incorniciati che la [[Chat (app)|chat di pzk os]] mostra in fondo, sopra la riga: i [[I comandi della chat|comandi]] pronti adesso, da dove cominciare.
 
 {{Citazione|fai che la chat mostri subito dei tasti da dove cominciare e con i comandi consigliati|Alberto, 2.11.2026}}
 
-Nell'ordine: <code>giornaliero</code> se il [[Il premio giornaliero|premio]] c'è, <code>missioni</code> se una [[Le side quest|quest]] è pronta, <code>lavora</code> e <code>pesca</code> se non c'è attesa, poi le ultime righe scritte (i [[I tasti rapidi|tasti rapidi]] dello zaino) e <code>saldo</code>, <code>negozio</code>, <code>aiuto</code>, al più otto; ◀ ▶ ai lati quando non ci stanno tutti. ← → li scelgono (la riga li mostra) e OK li manda, il clic li manda subito. Se l'ultima scheda ha le sue azioni di seguito, ← → vanno a quelle e i consigliati spariscono; su e giù scorrono i messaggi. Sono la risposta a un cercapersone che si accendeva su una riga vuota e un cursore: nessuno sapeva cosa scrivere. Da nessuna scelta, → va al primo e ← all'ultimo. Il [[Il collaudo delle app|collaudo]] del 2.11 li ha percorsi tutti con → (la fila scorre e compare ◀ quando i primi escono a sinistra; all'ultimo, «aiuto», ▶ sparisce), ne ha mandato uno con OK («saldo») e uno col clic del mouse («giornaliero»), e la scritta sotto, «scrivi, o ↔ un consiglio e OK», dice il vero.
+Nell'ordine: <code>giornaliero</code> se il [[Il premio giornaliero|premio]] c'è, <code>missioni</code> se una [[Le side quest|quest]] è pronta, <code>lavora</code> e <code>pesca</code> se non c'è attesa, poi le ultime righe scritte (i [[I tasti rapidi|tasti rapidi]] dello zaino) e <code>saldo</code>, <code>negozio</code>, <code>aiuto</code>, al più otto, e in fondo «scrivi…» (la tastiera sullo schermo); ◀ ▶ ai lati quando non ci stanno tutti. Sono la risposta a un cercapersone che si accendeva su una riga vuota e un cursore: nessuno sapeva cosa scrivere.
+
+== Dal 4 novembre: un cursore solo ==
+{{Citazione|in chat è buggato perché i tasti che premo danno comandi diversi da quel che hanno di nome|Alberto, 4.11.2026}}
+Prima ← → li sceglievano scrivendo il comando nella riga, OK a vuoto apriva la tastiera, e se l'ultima scheda aveva i suoi tasti i consigliati sparivano e ← → andavano a quelli. Adesso i consigliati restano sempre, e c'è '''sempre un tasto scelto''': ← → lo portano in fila sui tasti dell'ultima scheda, poi sui consigliati, poi su «scrivi…», e OK preme quello rovesciato; il clic del mouse preme quello sotto. Il cursore si ricorda per chiave, non per posto: se un premio diventa pronto e la fila cambia, resta sullo stesso tasto. Sotto c'è scritto «← → scegli · OK premi». Il [[Il collaudo delle app|collaudo]] del 4.11 li ha scelti con ← (da «riscuoti il premio» si va in tondo a «scrivi…», poi «aiuto», «negozio») e mandati con OK e col clic.
 
 {{Vedi anche|Il testo predittivo|I tasti rapidi|La chat col bot}}
 [[Categoria:La chat]]`,

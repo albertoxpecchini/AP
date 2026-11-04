@@ -7,7 +7,9 @@ import * as zaino from '../zaino.js'
 
 export function salutoIniziale(ctx) {
   const pronto = zaino.manca('giornaliero') === 0
-  ctx.dì({ av: 'bot-occhiolino', t: 'ciao, sono pzk', d: `la chiocciola della banca. Qui si parla a comandi: scrivi <code>aiuto</code> per vederli tutti.${pronto ? `\n:regalo: Hai il premio <code>giornaliero</code> da riscuotere.` : ''}${ctx.pzk.conto() ? '' : '\nSei nella sessione: i $pzk e lo zaino non si salvano. Entra nel wallet per tenerli.'}` })
+  // (4.11, Alberto: «uno che non ha mai aperto il sito fa fatica»: il saluto dice come si usa e porta già i primi tasti)
+  ctx.dì({ av: 'bot-occhiolino', t: 'ciao, sono pzk', d: `la chiocciola della banca. Qui si parla a comandi: ← → scelgono un tasto, OK lo preme, oppure scrivi tu.${pronto ? `\n:regalo: Hai il premio del giorno da riscuotere.` : ''}${ctx.pzk.conto() ? '' : '\nSei nella sessione: i $pzk e lo zaino non si salvano. Entra nel wallet per tenerli.'}`,
+    azioni: [...(pronto ? [['giornaliero', ':regalo: riscuoti il premio', 'oro']] : []), ['aiuto', ':quiz: cosa posso fare?']] })
 }
 
 const EVENTI = {
