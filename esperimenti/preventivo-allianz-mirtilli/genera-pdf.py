@@ -11,12 +11,14 @@ non c’è un browser da cui stampare.
 I caratteri non stanno nel repository (sono del Gruppo Allianz): lo script li
 cerca in `caratteri/` accanto a questo file, poi in
 `C:/Users/Alberto/Documents/firma/caratteri/allianz/`, poi nella cartella
-indicata da ALLIANZ_FONTS.
+indicata da ALLIANZ_FONTS. Vanno bene sia .ttf/.otf sia i .woff2 della cartella
+`firma` (i .woff2 si scompattano al volo con fontTools).
 """
 
 import os
 import re
 import sys
+import tempfile
 
 from reportlab.lib.colors import HexColor
 from reportlab.pdfbase import pdfmetrics
@@ -47,10 +49,11 @@ BIANCO = HexColor("#FFFFFF")
 
 # ── Caratteri ────────────────────────────────────────────────────────────────
 CARATTERI = {
-    "light": "AllianzNeo-Light.ttf",
-    "regular": "AllianzNeo-Regular.ttf",
-    "bold": "AllianzNeo-Bold.ttf",
+    "light": "AllianzNeo-Light",
+    "regular": "AllianzNeo-Regular",
+    "bold": "AllianzNeo-Bold",
 }
+ESTENSIONI = (".ttf", ".otf", ".woff2")
 
 
 def cartella_caratteri():
@@ -61,21 +64,51 @@ def cartella_caratteri():
         os.path.expanduser("~/Documents/firma/caratteri/allianz"),
     ]
     for c in candidate:
-        if c and all(os.path.exists(os.path.join(c, f)) for f in CARATTERI.values()):
+        if c and all(qualsiasi_peso(c, nome) for nome in CARATTERI.values()):
             return c
     return None
+
+
+def qualsiasi_peso(cartella, nome):
+    """Il file di quel peso, con l'estensione che c'è: ttf, otf o woff2."""
+    for est in ESTENSIONI:
+        percorso = os.path.join(cartella, nome + est)
+        if os.path.exists(percorso):
+            return percorso
+    return None
+
+
+def converti_woff2(percorso, cartella_lavoro):
+    """ReportLab legge ttf e otf, non woff2: qui si scompatta in un ttf temporaneo."""
+    try:
+        from fontTools.ttLib import TTFont as FontTools
+    except ImportError:
+        sys.exit("Per leggere i .woff2 serve fontTools: pip install fonttools brotli")
+    uscita = os.path.join(cartella_lavoro, os.path.basename(percorso).replace(".woff2", ".ttf"))
+    if not os.path.exists(uscita):
+        carattere = FontTools(percorso)
+        carattere.flavor = None
+        carattere.save(uscita)
+    return uscita
 
 
 def registra_caratteri():
     cartella = cartella_caratteri()
     if not cartella:
         sys.exit(
-            "Non trovo Allianz Neo. Metti i tre .ttf in "
+            "Non trovo Allianz Neo (Light, Regular, Bold). Metti i file in "
             f"{os.path.join(QUI, 'caratteri')} oppure indica la cartella con ALLIANZ_FONTS."
         )
-    pdfmetrics.registerFont(TTFont("AN", os.path.join(cartella, CARATTERI["regular"])))
-    pdfmetrics.registerFont(TTFont("ANB", os.path.join(cartella, CARATTERI["bold"])))
-    pdfmetrics.registerFont(TTFont("ANL", os.path.join(cartella, CARATTERI["light"])))
+    lavoro = tempfile.mkdtemp(prefix="allianz-neo-")
+    registrati = {}
+    for peso, nome in CARATTERI.items():
+        percorso = qualsiasi_peso(cartella, nome)
+        if percorso.lower().endswith(".woff2"):
+            percorso = converti_woff2(percorso, lavoro)
+        registrati[peso] = percorso
+    pdfmetrics.registerFont(TTFont("AN", registrati["regular"]))
+    pdfmetrics.registerFont(TTFont("ANB", registrati["bold"]))
+    pdfmetrics.registerFont(TTFont("ANL", registrati["light"]))
     return cartella
 
 
