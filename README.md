@@ -6,6 +6,7 @@ Repository di **albertopecchini.it**, il portfolio di Alberto Pecchini: diplomat
 AP/
 ├─ albertopecchini.it/   il sito: sorgenti, contenuti, build (vedi il suo README)
 ├─ package.json          scorciatoie per lanciare i comandi dalla radice, senza `cd`
+├─ esperimenti/          prove grafiche fuori dal sito (il preventivo Allianz per i mirtilli)
 ├─ .github/workflows/    catture.yml: rifà le catture dei siti del portfolio quando cambiano
 └─ .vscode/              F5 in VS Code avvia il server di sviluppo e apre Edge sul sito
 ```
