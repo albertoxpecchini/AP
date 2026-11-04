@@ -2,16 +2,54 @@
 
 Un finto preventivo assicurativo di tre pagine A4 per una collezione privata di
 mirtilli da collezione: **Mirtillo Sassuolo**, **Mirtillo Mantova** e
-**Mirtillo Modena**. Esperimento di stile, fatto per vedere se lo stile Allianz
-si riesce a ricostruire da zero — blu `#003781`, Helvetica, tanto bianco, il
-simbolo delle tre arche ridisegnato in vettoriale — partendo dal modo in cui il
-repository produce già i suoi PDF (`albertopecchini.it/tools/nota/`).
+**Mirtillo Modena**. È un esperimento di stile, rifatto sul modello grafico
+della «Denuncia sinistro abitazione e beni» del Gruppo Allianz: nero su bianco,
+**Allianz Neo**, banda grigia con i dati dell'agenzia, sezioni col filo grigio,
+tabelle, caselle da spuntare, firma in fondo.
 
 ```
-preventivo-mirtilli-allianz.pdf     il documento (3 pagine, A4)
-preventivo-allianz-mirtilli.py      lo script che lo scrive
-anteprima/pagina-1.png … 3.png      le pagine in PNG
+Preventivo Allianz - mirtilli da collezione 04-11-2026.html     il documento
+README.md                                                        questo file
 ```
+
+## Come si guarda e come si stampa
+
+Si apre nel browser e si stampa in PDF da lì (Ctrl+P → A4, margini
+predefiniti), come la denuncia: il foglio è già impostato con `@page { size: A4;
+margin: 12mm 14mm 10mm }` e le tre pagine sono tre `<div class="pagina">`.
+
+I caratteri sono quelli del Gruppo, presi dalla stessa cartella del documento
+vero:
+
+```
+C:/Users/Alberto/Documents/firma/caratteri/allianz/AllianzNeo-Light.woff2
+                                                     AllianzNeo-Regular.woff2
+                                                     AllianzNeo-Italic.woff2
+                                                     AllianzNeo-SemiBold.woff2
+                                                     AllianzNeo-Bold.woff2
+```
+
+Se i file non ci sono, il browser ripiega su Arial e il documento resta
+leggibile ma perde il carattere. In alternativa ai percorsi assoluti, lo stesso
+`@font-face` cerca anche una cartella `caratteri/` accanto all'HTML: basta
+copiarci i cinque `.woff2` perché il preventivo si apra uguale su qualunque
+computer.
+
+## Cosa c'è dentro
+
+| Pagina | Sezioni |
+| --- | --- |
+| 1 | testata, banda dell'agenzia, oggetto, dati del contraente, la collezione assicurata con la stima, la stima del valore, il premio |
+| 2 | garanzie comprese con massimali e franchigie, esclusioni e limiti, schede dei tre esemplari |
+| 3 | cosa fare in caso di sinistro, documenti allegati, recapiti del consulente, dichiarazioni e firma |
+
+I conti tornano apposta: 1,80% di 15.650 € = 281,70 €, meno lo sconto del 12%
+= 247,90 € di netto, più il 21,50% di imposte = **301,20 €**, cioè 4 rate da
+75,30 €.
+
+I disegni dei tre mirtilli nelle schede sono SVG in linea, non fotografie:
+stesso tratto per tutti, altezza della pianta e larghezza del vaso in scala con
+le misure della perizia.
 
 ## Prima di leggerlo
 
@@ -19,45 +57,3 @@ Non è un documento di Allianz e non è un'offerta assicurativa. Dati, importi,
 agenzia, persone e recapiti sono inventati; il marchio e il simbolo sono di
 Allianz SE e qui servono solo a scopo di parodia e studio grafico. La dicitura
 sta in fondo al documento, in piccolo, come sta nei documenti veri.
-
-## Rigenerarlo
-
-Serve Python 3 e ReportLab; PyMuPDF è opzionale e serve solo per le anteprime PNG.
-
-```bash
-pip install reportlab pymupdf
-python3 preventivo-allianz-mirtilli.py
-```
-
-Lo script non ha altre dipendenze: nessuna immagine, nessun font da scaricare.
-Il simbolo delle tre arche è disegnato con tre archi a spessore calante
-(`tre_arche()`), il resto è testo e fili da mezzo punto sul bianco.
-
-## Cosa c'è dentro
-
-| Pagina | Sezioni |
-| --- | --- |
-| 1 | testata, riquadro contraente/validità/consulente, **1** la collezione assicurata con la stima, **2** il premio, tre numeri, allegati |
-| 2 | **3** cosa è compreso (garanzie, massimali, franchigie), **4** gli esemplari uno per uno, **5** parole che tornano (glossario), il parere del perito |
-| 3 | riepilogo dell'offerta, **6** condizioni e avvertenze, **7** in caso di sinistro, **8** domande frequenti, accettazione e nota legale |
-
-I conti tornano apposta: 1,8% di 15.650 € = 281,70 €, meno lo sconto del 12%
-= 247,90 € di netto, più il 21,50% di imposte = **301,20 €**, cioè 4 rate da
-75,30 €.
-
-## Se vuoi cambiare qualcosa
-
-I contenuti stanno in cima allo script, in chiaro: `ESEMPLARI` (nome, cultivar,
-misure, valore, nota), `GARANZIE` (garanzia, cosa comprende, massimale,
-franchigia), `CONDIZIONI`. Il resto sono coordinate: `pagina_uno()`,
-`pagina_due()`, `pagina_tre()`.
-
-## Nota sul metodo
-
-Nel repository non c'era una skill per lo stile Allianz: le skill di
-`.claude/skills/` sono `lezione`, `nota` e `serranda`. Lo stile è stato
-ricostruito a mano, tenendo il metodo di `tools/nota/`: PDF A4 generato da uno
-script, tipografia e colori dichiarati in cima, testo dentro i dati e non
-sparso nel codice di disegno. Se l'esperimento convince, la stessa ricetta si
-può impacchettare come skill (`allianz`) per rifare documenti di questo tipo
-con una riga.
