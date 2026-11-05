@@ -4,6 +4,10 @@
   "trailingSlash": true,
   "headers": [
     {
+      "source": "/.well-known/discord",
+      "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
