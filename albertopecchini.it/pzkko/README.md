@@ -2891,6 +2891,34 @@ apre la banca, e nel collaudo la banca non c'era.
   banca deve aver pagato il turno intero), `--sbaglia` e `--scade` (la risposta sbagliata e il tempo scaduto),
   `--giocate` (le giocate di Bighurra nel profilo). `--rider` adesso è `--turni=strada`.
 
+## La manutenzione (manutenzione/, 6.11)
+
+Alberto, 6.11.2026: «fai un cartello che sarò a monaco di baviera quindi non avrò il PC acceso e di conseguenza non
+potrà funzionare il server … fai che c'è solo quello e non puoi usare il sito in generale … sei su un angolo di un muro
+e vedi 2 pareti perfettamente, scrivi e incolla tutto su quel muro, sarà muro della stazione».
+
+- **La guardia** (`manutenzione/guardia.js`) sta in testa a ogni pagina (`<script src="/manutenzione/guardia.js">`
+  subito dopo `<meta charset>`: home, storia, 404, wiki, gadget, oggetti, traguardi, info, tools/lezioni). Fra `INIZIO`
+  e `FINE` (venerdì 6.11.2026 ore 14 → domenica 8.11 ore 14, ora di Mantova) manda a `/manutenzione/`; fuori da quelle
+  ore non fa niente. Le date stanno solo lì (`window.pzkkoManutenzione`). Passano lo stesso: chi apre una pagina con
+  `?lavori` (resta valido su quel browser fino alla fine: è la porta di Alberto per lavorare da remoto), il sito in
+  locale (localhost, rete di casa, Tailscale), gli strumenti che fotografano e collaudano (`navigator.webdriver`) e i
+  motori di ricerca. Una pagina nuova del sito vuole la stessa riga in testa.
+- **Il cartello** (`manutenzione/index.html`, una pagina sola, CSS e script in linea) è l'angolo di un muro della
+  stazione di Monaco: due pareti (`.parete.sx`, `.parete.dx`) incernierate sullo spigolo e girate con `rotateY` dentro
+  una `perspective`; le piastrelle sono `art/monaco/muro.webp`, specchiata a destra perché sullo spigolo la fascia blu
+  combaci; a sinistra la luce, a destra l'ombra. Tutto quello che si legge è testo vero: il volantino giallo
+  («Achtung!», le due ore, quanto manca, aggiornato ogni 20 s), la targa «München Hbf», la tabella «Abfahrt» delle
+  partenze, le scritte a spray. Intorno gli adesivi (`art/monaco/`) e i volantini tedeschi (`art/monaco-zettel/`),
+  fogli `monaco`, `monaco-zettel`, `monaco-muro` di `tools/pzkko/fogli.js`.
+- Le misure sono in `--u` (un centesimo della finestra, il lato che comanda): ogni pezzo ha `--x` (dallo spigolo),
+  `--y` (dalla mezza altezza), `--w`; col telefono in piedi lo spigolo va all'80% e valgono `--px`, `--py`, `--pw`
+  (`.no-p` / `.no-l`: solo in largo / solo in piedi). Niente animazioni.
+- `/manutenzione/?vedi` lo fa vedere anche fuori dalle ore; passata la fine la pagina riporta alla home da sola.
+- Per un'altra manutenzione: le due date in `guardia.js`, le righe del volantino e della tabella in `index.html`.
+- La prima versione (una finestra sopra la home, con lo sportello di una cassetta elettrica) è stata bocciata la stessa
+  mattina: non rifarla.
+
 ## Gli strumenti (tools/)
 
 Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in

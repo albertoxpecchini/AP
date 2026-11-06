@@ -870,6 +870,50 @@ I pezzi di carta frusciano, e il loro link parte 120 ms dopo perché il fruscio 
 [[Categoria:Le versioni]]`,
   },
 
+  'La manutenzione di Monaco': {
+    data: '2026-11-06',
+    fonti: ['albertopecchini.it/pzkko/manutenzione/index.html', 'albertopecchini.it/pzkko/manutenzione/guardia.js', 'albertopecchini.it/tools/pzkko/fogli.js', README],
+    testo: `{{Infobox
+| titolo = La manutenzione di Monaco
+| immagine = manutenzione.webp
+| didascalia = l'angolo del muro della stazione: a sinistra il volantino, a destra le partenze
+| dove = pzkko.it/manutenzione/
+| quando = da venerdì 6.11.2026 alle 14 a domenica 8.11.2026 alle 14
+| file = manutenzione/index.html, manutenzione/guardia.js
+}}
+'''La manutenzione di Monaco''' (<code>manutenzione/</code>, 6.11.2026) è il cartello che per due giorni prende il posto di tutto [[pzkko.it]]: Alberto è a Monaco di Baviera, il pc di casa è spento e [[Il server dei dati in casa|il server dei dati]] è spento con lui, quindi la banca, i giochi, le classifiche e la petizione non possono rispondere. Da venerdì 6 novembre alle 14 a domenica 8 novembre alle 14 chi apre una pagina qualsiasi del sito vede solo il cartello.
+
+{{Citazione|fai un cartello che sarò a monaco di baviera quindi non avrò il PC acceso e di conseguenza non potrà funzionare il server … fai che c'è solo quello e non puoi usare il sito in generale … sei su un angolo di un muro e vedi 2 pareti perfettamente, scrivi e incolla tutto su quel muro, sarà muro della stazione|Alberto, 6.11.2026}}
+
+== L'angolo del muro ==
+La pagina è l'angolo di un muro della stazione di Monaco visto dallo spigolo: due pareti di piastrelle color crema con una fascia blu cobalto, che si allontanano a sinistra e a destra. Le pareti sono due riquadri girati in prospettiva col CSS (<code>perspective</code> e <code>rotateY</code>, incernierati sullo spigolo); le piastrelle sono una sola immagine, <code>art/monaco/muro.webp</code>, specchiata sulla parete di destra, così sullo spigolo le file e la fascia blu combaciano. La parete di sinistra è in luce, quella di destra in ombra. Col telefono in piedi lo spigolo va a destra e la parete di sinistra prende quasi tutto lo schermo. Niente animazioni.
+
+Quello che c'è scritto è testo vero, non un'immagine:
+* '''il volantino giallo''' sulla parete di sinistra, accanto allo spigolo: «Achtung!», «Wartungsarbeiten · manutenzione», «pzkko.it è chiuso per manutenzione», le due ore in una cornice nera, la riga nera che dice quanto manca (si aggiorna da sola ogni venti secondi), «non si perde niente: conti, $pzk e zaini restano dove sono», la firma e le linguette da strappare «dom · ore 14»;
+* '''la targa''' «München Hbf» di smalto blu e '''la tabella gialla delle partenze''' («Abfahrt»: ven 6.11 14:00 il sito chiude, dom 8.11 14:00 il sito riapre, Gleis 1) sulla parete di destra;
+* '''le scritte a spray''' «chiuso!» e «torno domenica alle 14», che lasciano vedere le piastrelle sotto.
+
+Intorno, incollati, nove adesivi da palo (<code>art/monaco/</code>: l'ovale «M München», il Brezn «Servus!», «Achtung Baustelle», «Minga» coi rombi bavaresi, «Hallo mein Name ist pzkko», il boccale «Prost!», «Kein Bier vor vier», uno strappato, la chiocciola col cappello tirolese «pzkko on tour») e sei volantini tedeschi (<code>art/monaco-zettel/</code>: «Wohnung gesucht!», «Katze entlaufen», «Flohmarkt», la targhetta «Plakate ankleben verboten», il concerto «Die Schnecke», «Wegen Wartungsarbeiten geschlossen»), più quattro graffiti del [[Il muro|muro]] (<code>art/tag/</code>). Li ha disegnati gpt-image-2 su fondo magenta, come [[I fogli di gpt-image-2|gli altri fogli]]: <code>monaco</code>, <code>monaco-zettel</code> e <code>monaco-muro</code> in <code>tools/pzkko/fogli.js</code>.
+
+Le misure sono in «u», un centesimo della finestra (il lato che comanda), contate dallo spigolo e dalla mezza altezza: il cartello è lo stesso sul telefono e sul computer.
+
+== La guardia ==
+<code>manutenzione/guardia.js</code> sta in testa a ogni pagina del sito (la home, la storia, la 404, la wiki, gadget, oggetti, traguardi, info, pzk$meeting) e viene prima di tutto il resto: fra <code>INIZIO</code> e <code>FINE</code> manda a <code>/manutenzione/</code>, fuori da quelle ore non fa niente. Le due date stanno solo lì; il cartello le legge da <code>window.pzkkoManutenzione</code> e, passata la fine, riporta alla home da solo.
+
+Passano lo stesso:
+* chi apre una pagina con <code>?lavori</code> (Alberto che lavora da remoto): vale su quel browser fino alla fine;
+* il sito [[In locale (pzkko)|in locale]] (localhost, la rete di casa, Tailscale);
+* gli strumenti che fotografano e collaudano le pagine (<code>navigator.webdriver</code>) e i motori di ricerca.
+
+<code>/manutenzione/?vedi</code> fa vedere il cartello anche fuori dalle ore della manutenzione. Per un'altra manutenzione si cambiano le due date nella guardia e le righe del volantino.
+
+== La prima versione ==
+La prima versione, la stessa mattina, era una finestra sopra la home con lo sportello di una cassetta elettrica tedesca: bocciata («fa cagare») e rifatta come pagina unica.
+
+{{Vedi anche|Il server dei dati in casa|Lo scontrino delle novità|I fogli di gpt-image-2|La 404}}
+[[Categoria:Il muro]]`,
+  },
+
   'Le versioni di pzkko': {
     data: '2026-11-01',
     fonti: ['albertopecchini.it/pzkko/benvenuto/benvenuto.js', INDEX, README],

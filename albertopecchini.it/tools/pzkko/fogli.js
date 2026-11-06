@@ -592,6 +592,55 @@ It has been customised by a tinkerer in the style of a Fallout Pip-Boy: riveted 
 The display is OFF: plain uniform dark glass, nothing drawn on it, no dots, no text, no icons. A couple of fine scratches on the steel, a small piece of grey duct tape folded over the top right corner of the leather. Soft diffuse studio light from the top left, photorealistic, sharp. The outline of the leather is the edge of the piece: nothing outside it, no table, no shadow falls on the magenta. No text anywhere. ${NIENTE_MAGENTA}`,
   },
 
+  // ── il cartello di Monaco (6.11.2026, pzkko/manutenzione/): Alberto è a Monaco di Baviera, il pc di casa è
+  // spento e il server con lui. All'ingresso del sito c'è lo sportello di una cassetta elettrica tedesca (un
+  // Stromkasten), con gli adesivi dei pali e i volantini di strada intorno al volantino giallo che lo dice (il testo lo
+  // scrive la pagina) ──
+  monaco: {
+    scala: 0.36,
+    titolo: 'nove adesivi da palo di Monaco di Baviera, intorno al cartello della manutenzione',
+    aspetto: '2048x2048',
+    griglia: [3, 3],
+    pezzi: ['ovale', 'brezn', 'baustelle', 'minga', 'hallo', 'prost', 'bier', 'strappato', 'chiocciola'],
+    prompt: `${griglia('Nine separate street stickers,', 3, 3)}
+They are the stickers («slaps») stuck over the years on the lamp posts, traffic-light poles and street cabinets of Munich, Germany: all weathered, faded by the sun, scratched, some corners peeling, each one different:
+1. a white oval sticker like a car country code, a big black «M» and «München» in small black letters under it;
+2. a round sticker with a cartoon Bavarian pretzel (a golden-brown Brezn with salt grains), thick black outlines, and the word «Servus!» around the edge;
+3. a yellow rectangular warning sticker, «ACHTUNG» in heavy black capitals on top, the black pictogram of a worker digging with a shovel in the middle, «Baustelle» in black under it, a thick black border;
+4. a round sticker filled with the blue-and-white Bavarian lozenge pattern (sky blue and white diamonds), with the word «Minga» across it in bold black letters on a white band;
+5. a red «HALLO mein Name ist» label with «pzkko» written by hand in thick black marker in the white field;
+6. a sticker cut in the shape of a big glass beer mug (a Maß) full of golden beer with white foam running over, thick black outlines, and «Prost!» on a small banner;
+7. a black rectangular sticker with «KEIN BIER VOR VIER» in big bold white condensed capitals, scratched;
+8. what is left of a torn-off sticker: a rough rectangle of white paper fibres and yellowed glue, with only a corner of a red print left;
+9. a round sticker with a cheerful cartoon snail wearing a green Bavarian Alpine hat with a feather, thick black outlines, and «pzkko on tour · München» around the edge.
+Seen straight on, flat. No wall, no pole, no shadow: only the stickers on the magenta. ${NIENTE_MAGENTA}`,
+  },
+  'monaco-zettel': {
+    scala: 0.5,
+    titolo: 'sei volantini tedeschi di strada, quelli attaccati alle cassette e ai pali',
+    aspetto: '2048x1152',
+    griglia: [3, 2],
+    pezzi: ['wohnung', 'katze', 'flohmarkt', 'verboten', 'konzert', 'geschlossen'],
+    prompt: `${griglia('Six separate paper notices and signs,', 3, 2)}
+They are the flyers and notices taped to the street cabinets and lamp posts of a German city (Munich), each one seen straight on, a bit weathered by rain and sun, with pieces of yellowed clear tape on the corners:
+1. a white sheet of paper written by hand in thick black marker, «WOHNUNG GESUCHT!» in big capitals, two lines of smaller handwriting under it, and at the bottom a row of vertical tear-off strips with a phone number, three of them already torn away;
+2. a photocopied black-and-white missing-cat notice: «KATZE ENTLAUFEN» in bold capitals, a grainy photocopied photo of a tabby cat, «Belohnung!» under it;
+3. an orange flyer printed in black: «FLOHMARKT» in huge heavy letters, «Samstag · im Hinterhof · ab 9 Uhr», a small drawing of a lamp and a chair;
+4. a small rectangular white enamel sign with a thin black border and two screw holes, «PLAKATE ANKLEBEN VERBOTEN» in black capitals, a little rust at the screws;
+5. a punk gig poster photocopied in black on yellow paper: «LIVE» and «DIE SCHNECKE» in rough cut-out letters, a drawing of a snail with an electric guitar, «Kellerclub · 20 Uhr»;
+6. a small white printed notice with a red border: «WEGEN WARTUNGSARBEITEN GESCHLOSSEN» in bold black capitals and «Wir bitten um Ihr Verständnis.» in small print.
+No wall, no pole, no shadow: only the pieces on the magenta. ${NIENTE_MAGENTA}`,
+  },
+  'monaco-muro': {
+    titolo: 'il muro piastrellato della stazione di Monaco, senza niente sopra (le due pareti dell’angolo)',
+    aspetto: '2048x2048',
+    foto: 'monaco/muro',
+    prompt: `A straight-on, flat, orthographic photograph of a wall inside a Munich railway station (the passage to the S-Bahn platforms of München Hauptbahnhof), filling the whole frame edge to edge with no border, no floor, no ceiling: the wall is entirely covered with glossy off-white (warm cream) glazed ceramic tiles, landscape rectangles about twice as wide as tall, laid in a perfectly regular stacked grid with straight dirty grey grout lines, about fourteen rows of tiles from top to bottom. One horizontal band, two rows of tiles high, is made of deep cobalt-blue glazed tiles: it runs across the whole width about one third of the way down from the top.
+Soft even fluorescent light, perfectly uniform across the whole image (no vignette, no gradient, no bright spot, no reflections of lamps, the brightness is the same in every corner).
+The wall is worn by the city: grime in the grout, dust, a few chipped and cracked tiles, faint drip stains, scuff marks, yellowed glue and torn white paper fibres left by stickers and posters that were scraped away, a couple of half-cleaned grey marker scribbles.
+ABSOLUTELY NO stickers, NO posters, NO signs, NO readable writing, NO letters, NO objects, NO people: only the empty dirty tiled wall. Photorealistic, sharp, fine grain.`,
+  },
+
   // ── la chat col bot (pzkko/chat/): le icone al posto delle emoji e il cercapersone del tasto. I pezzi stanno in
   // pzkko/chat/icone.js, i prompt in fogli-chat.js ──
   ...fogliChat({ griglia, NIENTE_MAGENTA }),

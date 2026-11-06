@@ -119,7 +119,7 @@ Le fa `foto.mjs` (il sito fotografato in Chromium, senza 3D; anche `github`, la 
 quelle di collaudo. I nomi, tutti `.webp`:
 
 - il muro: `home-giorno`, `home-notte`, `home-intera`, `home-telefono`, `storia`, `storia-intera`, `404`,
-  `gadget`, `oggetti`, `traguardi`, `info`, `wiki`, `benvenuto`, `wallet`, `regia`, `petizione`,
+  `gadget`, `oggetti`, `traguardi`, `info`, `wiki`, `benvenuto`, `manutenzione` (il cartello, da `tools/pzkko/lavoro/cartello-computer.png`), `wallet`, `regia`, `petizione`,
   `lezioni`, `barra`
 - i giochi (le finestre aperte): `roulette`, `blackjack`, `mine`, `dado`, `moneta`, `virtual`
 - la scena 3D (da `tools/pzkko/lavoro/`): `scena-cima`, `scena-meta`, `scena-fondo`, `scena-telefono`,
@@ -163,7 +163,7 @@ Gli adesivi degli amici, Il meme degli auguri, La petizione, Le penne della peti
 La sera a Mantova, La strada di notte, Le auto che passano, Le mosche e le formiche del muro, La goccia della condensa,
 Ferma quando è ferma, Come parte la home, La 404, La disposizione, La serranda, Le pile, pzk$meeting,
 Gli strumenti di pzkko, La barra in alto, Gadget (pagina), Oggetti (pagina), Traguardi (pagina), Info (pagina),
-Lo scontrino delle novità, Le versioni di pzkko, Il portafoglio MagSafe, La scrivania di pzkko, Il muro (versione 2.0),
+Lo scontrino delle novità, La manutenzione di Monaco, Le versioni di pzkko, Il portafoglio MagSafe, La scrivania di pzkko, Il muro (versione 2.0),
 Lumaca catodica, Chiocciola zero, Le immagini del muro, I fogli di gpt-image-2, Le foto vere, Vercel (pzkko),
 In locale (pzkko), I crediti di pzkko, La favicon e l'og, Il manuale del Landini, Il meme unimore contro unibo,
 La roba per terra (2D)

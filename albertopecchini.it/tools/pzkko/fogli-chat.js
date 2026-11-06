@@ -120,7 +120,9 @@ export function fogliChat({ griglia, NIENTE_MAGENTA }) {
   const lista = (nomi, testi) => nomi.map((n, i) => `${i + 1}. «${n}»: ${testi[n] ?? n}`).join(';\n') + '.'
   const out = {}
   for (const [nome, [cols, rows, aspetto, titolo, intro, testi]] of Object.entries(TESTI)) {
-    const pezzi = FOGLI_CHAT[nome]
+    // i pezzi oltre la griglia non sono di questo foglio: li ha disegnati dopo pixel.mjs con rd-plus (lo «zero» dello
+    // shop, 29.10), e contarli qui fermava immagini.mjs per tutti i fogli (trovato il 6.11 col cartello di Monaco)
+    const pezzi = FOGLI_CHAT[nome].slice(0, cols * rows)
     if (pezzi.length !== cols * rows) throw new Error(`${nome}: ${pezzi.length} pezzi in una griglia ${cols} × ${rows}`)
     for (const p of pezzi) if (!testi[p]) throw new Error(`${nome}: manca il testo di «${p}»`)
     out[nome] = {

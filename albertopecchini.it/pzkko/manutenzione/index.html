@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16150f">
+<title>pzkko.it è chiuso per manutenzione fino a domenica 8 novembre, ore 14</title>
+<meta name="description" content="Alberto è a Monaco di Baviera: il server di pzkko è spento da venerdì 6 novembre alle 14 a domenica 8 novembre alle 14. Non si perde niente.">
+<link rel="icon" href="/favicon.png">
+<!-- Il cartello della manutenzione (6.11.2026, Alberto: «sei su un angolo di un muro e vedi 2 pareti perfettamente,
+     scrivi e incolla tutto su quel muro, sarà muro della stazione»). Finché la manutenzione dura è l'unica pagina del
+     sito: ce la manda guardia.js, che sta in testa a tutte le altre (e ha le date). L'angolo è fatto di due pareti
+     piastrellate (art/monaco/muro.webp, la stessa immagine specchiata sullo spigolo) girate in prospettiva col CSS; il
+     volantino giallo, la tabella delle partenze, la targa e le scritte a spray sono testo vero, gli adesivi e i
+     volantini tedeschi vengono da art/monaco/ e art/monaco-zettel/ (tools/pzkko/fogli.js). Niente animazioni.
+     Le misure sono in «u» (un centesimo della finestra, il lato che comanda), contate dallo spigolo (--x) e dalla
+     mezza altezza (--y); col telefono in piedi lo spigolo va a destra e valgono --px e --py.
+     ?vedi lo fa vedere anche fuori dalle ore della manutenzione. -->
+<script src="/manutenzione/guardia.js"></script>
+<link rel="preload" as="image" href="/art/monaco/muro.webp">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/anton.woff2" crossorigin>
+<style>
+@font-face{font-family:"Anton";src:url(/fonts/anton.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Archivo Black";src:url(/fonts/archivo-black.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Permanent Marker";src:url(/fonts/permanent-marker.woff2) format("woff2");font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+:root{--u:min(1vw,1.9dvh);--cx:52%;--tl:27deg;--tr:35deg;--p:85vw;--giu:11vmax}
+@media (orientation:portrait){:root{--u:min(2.6vw,1.62dvh);--cx:80%;--tl:14deg;--tr:55deg;--p:250vw;--giu:-5vmax}}
+html,body{height:100%;margin:0;overflow:hidden;background:#16150f;color:#111;font:400 16px/1.35 "Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+img{display:block;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+p,h1,h2,dl,dd{margin:0}
+
+/* l'angolo: due pareti incernierate sullo spigolo, che si allontanano a sinistra e a destra */
+.angolo{position:fixed;inset:0;overflow:hidden;perspective:var(--p);perspective-origin:var(--cx) 47%}
+.parete{position:absolute;top:calc(50% - 75vmax);width:150vmax;height:150vmax}
+.sx{right:calc(100% - var(--cx));transform-origin:100% 50%;transform:rotateY(calc(var(--tl)*-1))}
+.dx{left:var(--cx);transform-origin:0 50%;transform:rotateY(var(--tr))}
+/* le piastrelle: la stessa immagine, specchiata a destra, così sullo spigolo le file e la fascia blu combaciano */
+.parete::before{content:"";position:absolute;inset:0;background:#d8d2c2 url(/art/monaco/muro.webp) 100% 50%/auto 100% no-repeat;translate:0 var(--giu)}
+.dx::before{scale:-1 1}
+/* la luce: la parete di sinistra in piena luce che si spegne lontano, quella di destra in ombra; sopra a tutto, così
+   anche la carta attaccata prende l'ombra della sua parete */
+.parete::after{content:"";position:absolute;inset:0;z-index:9;pointer-events:none}
+.sx::after{background:linear-gradient(to left,rgba(0,0,0,.02),rgba(10,10,14,.42) 85vmax)}
+.dx::after{background:linear-gradient(to right,rgba(12,14,26,.34),rgba(8,9,16,.74) 85vmax)}
+/* lo spigolo: un filo scuro e uno chiaro, il profilo dell'angolo */
+.spigolo{position:absolute;top:0;bottom:0;left:var(--cx);width:calc(.5*var(--u));translate:-50% 0;z-index:3;pointer-events:none;
+  background:linear-gradient(to right,rgba(255,255,255,0),rgba(255,255,255,.38) 42%,rgba(0,0,0,.5) 58%,rgba(0,0,0,0))}
+
+/* un pezzo attaccato a una parete: --x dallo spigolo, --y dalla mezza altezza, --w largo, --r storto (in u) */
+.p{position:absolute;top:calc(50% + var(--y)*var(--u));width:calc(var(--w)*var(--u));rotate:var(--r,0deg);filter:drop-shadow(0 calc(.1*var(--u)) calc(.14*var(--u)) rgba(0,0,0,.4))}
+.sx>.p{right:calc(var(--x)*var(--u))}
+.dx>.p{left:calc(var(--x)*var(--u))}
+.spray{mix-blend-mode:multiply;filter:none;opacity:.9}
+@media (orientation:portrait){
+  .p{top:calc(50% + var(--py,var(--y))*var(--u));width:calc(var(--pw,var(--w))*var(--u))}
+  .sx>.p{right:calc(var(--px,var(--x))*var(--u))}
+  .dx>.p{left:calc(var(--px,var(--x))*var(--u))}
+  .no-p{display:none}
+  /* appeso alla cima della finestra invece che alla mezza altezza: --t dalla cima */
+  .p.alto{top:calc(75vmax - 50dvh + var(--t)*var(--u))}
+  .targa.alto{font-size:calc(3*var(--u))}
+}
+@media (orientation:landscape){.no-l{display:none}}
+
+/* il volantino giallo: accanto allo spigolo sulla parete di sinistra, a mezza altezza. Dentro, le misure sono in cqw
+   (centesimi della sua larghezza) */
+.posto{container-type:inline-size;position:absolute;top:50%;right:calc(var(--x)*var(--u));width:calc(var(--w)*var(--u));translate:0 -50%;z-index:2}
+@media (orientation:portrait){.posto{right:calc(var(--px)*var(--u));width:calc(var(--pw)*var(--u))}}
+.foglio{position:relative;padding:5cqw 5.5cqw 0;background:#f7d417 linear-gradient(105deg,rgba(255,255,255,.16),rgba(255,255,255,0) 40%,rgba(0,0,0,.05));rotate:-.8deg;
+  box-shadow:0 .9cqw 2.6cqw rgba(0,0,0,.42),0 0 0 1px rgba(0,0,0,.12)}
+.nastro{position:absolute;top:-2.6cqw;width:17cqw;height:5.6cqw;background:rgba(238,226,190,.8);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.n1{left:-4cqw;rotate:-38deg}
+.n2{right:-4cqw;rotate:36deg}
+.achtung{font:400 18.6cqw/.86 "Anton","Archivo Black",Impact,sans-serif;letter-spacing:.01em;text-transform:uppercase;text-align:center}
+.fascia{margin:2.2cqw -5.5cqw 0;padding:1.6cqw 2cqw 1.4cqw;background:#111;color:#f7d417;font:400 3.5cqw/1.1 "Archivo Black","Anton",Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;text-align:center;white-space:nowrap}
+.foglio h1{margin:3.6cqw 0 3cqw;font:400 8cqw/1.02 "Archivo Black","Anton",Arial,sans-serif;letter-spacing:-.01em;text-align:center}
+.orario{display:grid;border:.9cqw solid #111}
+.orario div{display:grid;grid-template-columns:2.3em 1fr;align-items:baseline;gap:.5em;padding:.46em .6em .4em}
+.orario div+div{border-top:.9cqw solid #111}
+.orario dt{font:400 3.4cqw/1 "Archivo Black",Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.orario dd{font:700 5cqw/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif}
+.orario b{white-space:nowrap;font-weight:900}
+.quanto{margin-bottom:3.2cqw;padding:.5em .6em .44em;background:#111;color:#fff;font:700 3.7cqw/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.foglio p:not([class]){margin-bottom:.55em;font-size:4.25cqw;line-height:1.3}
+.foglio p b{font-weight:800}
+.firma{margin-top:.1em;font:400 5.6cqw/1.1 "Permanent Marker","Comic Sans MS",cursive;rotate:-1.5deg}
+.firma span{font-size:.72em}
+/* le linguette da strappare in fondo, come sugli annunci «Wohnung gesucht»: una è già andata via */
+.strisce{display:grid;grid-template-columns:repeat(7,1fr);margin:3.2cqw -5.5cqw 0;border-top:.5cqw dashed rgba(17,17,17,.75)}
+.strisce span{writing-mode:vertical-rl;display:grid;place-items:center;padding:1.8cqw 0 2.2cqw;border-left:.3cqw dashed rgba(17,17,17,.6);font:700 2.5cqw/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.04em;white-space:nowrap}
+.strisce span:first-child{border-left:0}
+.strisce span:nth-child(5){visibility:hidden}
+/* gli adesivi sui bordi del volantino (mai sul testo): le misure in centesimi del volantino */
+.posto>img{position:absolute;z-index:1;filter:drop-shadow(0 .3cqw .5cqw rgba(0,0,0,.45))}
+.a-ovale{left:-10%;top:6%;width:19%;rotate:-14deg}
+.a-brezn{right:-14%;top:3.5%;width:20%;rotate:12deg}
+.a-minga{right:-12.5%;top:49%;width:17%;rotate:-9deg}
+.a-prost{left:-11%;top:86%;width:17%;rotate:9deg}
+@media (orientation:portrait){.a-ovale{left:-6%}.a-prost{left:-6.5%}.a-brezn{right:-11%}.a-minga{right:-10.5%}}
+
+/* la targa della stazione: smalto blu, lettere bianche */
+.targa{width:auto;padding:.5em .9em .42em;border-radius:.16em;background:#12307f;color:#fff;font:700 calc(3.6*var(--u))/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.005em;white-space:nowrap;
+  box-shadow:inset 0 0 0 .07em #fff,inset 0 0 0 .12em #12307f,0 .1em .22em rgba(0,0,0,.5);filter:none}
+/* la tabella gialla delle partenze: le due ore che contano, scritte un'altra volta */
+.partenze{padding:1.1em 1.2em 1em;background:#fbe26a;font-size:calc(1.36*var(--u));box-shadow:0 .2em .6em rgba(0,0,0,.4);filter:none}
+.partenze h2{display:flex;justify-content:space-between;align-items:baseline;gap:1em;padding-bottom:.3em;border-bottom:.22em solid #111;font:400 2.1em/1 "Archivo Black",Arial,sans-serif}
+.partenze h2 small{font:700 .42em/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.partenze ul{margin:0;padding:0;list-style:none}
+.partenze li{display:grid;grid-template-columns:4.3em 5em 1fr auto;gap:.6em;align-items:baseline;padding:.52em 0 .44em;border-bottom:.08em solid #111;font-weight:700;line-height:1.1}
+.partenze li b{font:400 1.5em/1 "Archivo Black",Arial,sans-serif}
+.partenze li em{font-style:normal;font-weight:400;white-space:nowrap}
+.partenze li i{font-style:normal;font-size:.8em;white-space:nowrap}
+.partenze .nota{margin-top:.6em;font-size:.82em;line-height:1.25}
+/* le scritte a spray: vernice sul muro, le piastrelle si vedono attraverso */
+.scritta{width:auto;white-space:nowrap;font:400 calc(var(--f)*var(--u))/.9 "Permanent Marker","Comic Sans MS",cursive;color:var(--c,#b3121d);mix-blend-mode:multiply;opacity:.9;filter:blur(calc(.035*var(--u)));text-transform:uppercase}
+@media (orientation:portrait){.scritta{font-size:calc(var(--pf,var(--f))*var(--u))}}
+.cola{position:absolute;top:70%;width:.07em;border-radius:0 0 .04em .04em;background:currentColor;opacity:.85}
+noscript p{position:fixed;inset:auto 0 0;z-index:20;padding:12px;background:#f7d417;font-weight:700;text-align:center}
+</style>
+</head>
+<body>
+<main class="angolo">
+  <!-- la parete di sinistra: il volantino, e più in là quello che la città ci ha attaccato sopra -->
+  <section class="parete sx">
+    <img class="p spray no-p" style="--x:55;--y:-25;--w:26;--r:-4deg" src="/art/tag/tag-nero.webp" alt="">
+    <img class="p spray no-p" style="--x:66;--y:2;--w:17" src="/art/tag/stencil-chiocciola.webp" alt="">
+    <img class="p" style="--x:34;--y:-25;--w:17;--r:-6deg;--px:18;--py:24;--pw:15" src="/art/monaco-zettel/wohnung.webp" alt="">
+    <img class="p no-p" style="--x:36;--y:-8;--w:13;--r:5deg" src="/art/monaco-zettel/konzert.webp" alt="">
+    <img class="p" style="--x:35;--y:9;--w:13;--r:-4deg;--px:3;--py:24.5;--pw:13" src="/art/monaco-zettel/katze.webp" alt="">
+    <img class="p no-p" style="--x:53;--y:11;--w:17;--r:4deg" src="/art/monaco-zettel/flohmarkt.webp" alt="">
+    <img class="p no-p" style="--x:52;--y:-4;--w:9;--r:-8deg" src="/art/monaco/bier.webp" alt="">
+    <img class="p" style="--x:50;--y:-9;--w:8;--r:10deg;--px:1;--py:-34;--pw:8" src="/art/monaco/hallo.webp" alt="">
+    <img class="p no-p" style="--x:72;--y:-12;--w:8;--r:14deg" src="/art/monaco/strappato.webp" alt="">
+
+    <p class="p targa alto no-l" style="--x:0;--y:0;--px:9;--t:1.4" lang="de">München Hbf</p>
+
+    <div class="posto" style="--x:3.6;--w:28;--px:3.2;--pw:30">
+      <article class="foglio">
+        <i class="nastro n1"></i><i class="nastro n2"></i>
+        <p class="achtung" lang="de">Achtung!</p>
+        <p class="fascia"><span lang="de">Wartungsarbeiten</span> · manutenzione</p>
+        <h1>pzkko.it è chiuso<br>per manutenzione</h1>
+        <dl class="orario">
+          <div><dt>da</dt><dd>venerdì 6 novembre <b>ore 14:00</b></dd></div>
+          <div><dt>a</dt><dd>domenica 8 novembre <b>ore 14:00</b></dd></div>
+        </dl>
+        <p class="quanto" id="quanto">si riapre domenica alle 14</p>
+        <p>Sono a <b>Monaco di Baviera</b>: il pc di casa è spento, e il server di pzkko con lui.</p>
+        <p><b>Non si perde niente:</b> conti, $pzk e zaini restano dove sono. Intanto lavoro da remoto per sistemare un po’ di bug.</p>
+        <p class="firma">Alberto <span lang="de">· Servus, bis Sonntag!</span></p>
+        <div class="strisce" aria-hidden="true"><span>dom · ore 14</span><span>dom · ore 14</span><span>dom · ore 14</span><span>dom · ore 14</span><span>dom · ore 14</span><span>dom · ore 14</span><span>dom · ore 14</span></div>
+      </article>
+      <img class="a-ovale" src="/art/monaco/ovale.webp" alt="">
+      <img class="a-brezn" src="/art/monaco/brezn.webp" alt="">
+      <img class="a-minga" src="/art/monaco/minga.webp" alt="">
+      <img class="a-prost" src="/art/monaco/prost.webp" alt="">
+    </div>
+  </section>
+
+  <!-- la parete di destra, in ombra: la targa della stazione, le partenze, la scritta a spray -->
+  <section class="parete dx">
+    <p class="p targa no-p" style="--x:4;--y:-24.5" lang="de">München Hbf</p>
+    <div class="p partenze no-p" style="--x:4;--y:-17;--w:30;--r:.6deg">
+      <h2><span lang="de">Abfahrt</span> <small>partenze · pzkko.it</small></h2>
+      <ul>
+        <li><span>ven 6.11</span><b>14:00</b><em>il sito <strong>chiude</strong></em><i lang="de">Gleis 1</i></li>
+        <li><span>dom 8.11</span><b>14:00</b><em>il sito <strong>riapre</strong></em><i lang="de">Gleis 1</i></li>
+      </ul>
+      <p class="nota">Il server viaggia con Alberto: finché non torna a casa, da qui non parte niente.</p>
+    </div>
+    <p class="p scritta no-p" style="--x:5;--y:1.5;--f:9;--r:-4deg">chiuso!<i class="cola" style="left:17%;height:.5em"></i><i class="cola" style="left:58%;height:.32em"></i><i class="cola" style="left:83%;height:.62em"></i></p>
+    <p class="p scritta no-p" style="--x:6;--y:12.5;--f:3;--r:-3deg;--c:#141414">torno domenica alle 14</p>
+    <img class="p" style="--x:38;--y:-25;--w:17;--r:3deg;--px:1.5;--py:-27;--pw:14" src="/art/monaco-zettel/geschlossen.webp" alt="">
+    <img class="p" style="--x:39;--y:-10;--w:14;--r:-2deg;--px:2;--py:-13;--pw:13" src="/art/monaco-zettel/verboten.webp" alt="">
+    <img class="p" style="--x:50;--y:2;--w:9;--r:7deg;--px:3;--py:0;--pw:9" src="/art/monaco/baustelle.webp" alt="">
+    <img class="p" style="--x:53;--y:14;--w:10;--r:-9deg;--px:4;--py:13;--pw:10" src="/art/monaco/chiocciola.webp" alt="">
+    <img class="p spray" style="--x:64;--y:-14;--w:30;--r:-3deg;--px:1;--py:26;--pw:17" src="/art/tag/throwup-argento.webp" alt="">
+    <img class="p spray no-p" style="--x:68;--y:12;--w:20;--r:5deg" src="/art/tag/tag-arancio.webp" alt="">
+  </section>
+  <i class="spigolo"></i>
+</main>
+<noscript><p>pzkko.it è chiuso per manutenzione da venerdì 6 novembre alle 14 a domenica 8 novembre alle 14.</p></noscript>
+<script>
+// La riga nera del volantino dice quanto manca, e si aggiorna da sola; a manutenzione finita si torna al sito.
+// Fuori dalle ore della manutenzione questa pagina non c'è (si torna alla home), se non con ?vedi.
+(function () {
+  var m = window.pzkkoManutenzione, riga = document.getElementById('quanto')
+  var vedi = /[?&]vedi\b/.test(location.search)
+  function quanto(ms) {
+    var min = Math.max(1, Math.round(ms / 60000)), g = Math.floor(min / 1440), h = Math.floor((min % 1440) / 60), mm = min % 60
+    var n = function (q, uno, tanti) { return q + ' ' + (q === 1 ? uno : tanti) }
+    if (g) return h ? n(g, 'giorno', 'giorni') + ' e ' + n(h, 'ora', 'ore') : n(g, 'giorno', 'giorni')
+    if (h) return mm ? n(h, 'ora', 'ore') + ' e ' + n(mm, 'minuto', 'minuti') : n(h, 'ora', 'ore')
+    return n(mm, 'minuto', 'minuti')
+  }
+  function giro() {
+    var ora = Date.now()
+    if (!m) return
+    if (!vedi && (ora < m.INIZIO || ora >= m.FINE)) { location.replace('/'); return }
+    riga.textContent = ora < m.INIZIO ? 'si chiude fra ' + quanto(m.INIZIO - ora) : ora < m.FINE ? 'si riapre fra ' + quanto(m.FINE - ora) : 'finita: è tutto riaperto'
+  }
+  giro()
+  setInterval(giro, 20000)
+})()
+</script>
+</body>
+</html>
