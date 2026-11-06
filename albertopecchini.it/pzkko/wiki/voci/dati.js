@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 750 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>7032f2e</code>, 2026-11-05). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 751 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>0b2f180</code>, 2026-11-06). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,11 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 49
+| 50
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/0b2f180 0b2f180] fix(pzkko): il turno di lavoro rifatto da capo per lo zero, e il blackjack della chat nel profilo
 * 2026-11-05 [https://github.com/albertoxpecchini/AP/commit/7032f2e 7032f2e] feat(pzkko): il file di verifica del dominio per Discord in /.well-known/discord
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/46a4315 46a4315] chore: il generatore di email tiene i suoi dati con sé, e torna il modello per email:new
 * 2026-11-04 [https://github.com/albertoxpecchini/AP/commit/4e41929 4e41929] chore: riordino del repo — via PRODUCT.md, DESIGN.md e .impeccable, CLAUDE.md più corto
@@ -12426,7 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/7d62c46 7d62c46] feat(mascotte): torna la tartaruga col casco al posto della nutria
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4bd1f81 4bd1f81] fix(tempo): le versioni con la mappa si aprono anche dal tunnel, e la prova di tutte
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/e2a76b0 e2a76b0] fix(tempo): il credito anche nella macchina del tempo, e la Build torna verde
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/c6203a0 c6203a0] fix(tempo): la copia rotta del 3 novembre restava nella cache del browser
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
