@@ -206,7 +206,7 @@ La miniera, I PC pronti della miniera, La cucina, Il compilatore C, La calcolatr
 Il premio giornaliero, L'esperienza e i livelli, Il rider
 
 **dietro.js** — Il repository AP, I rami del repository, I messaggi di commit, Le catture dei siti (workflow),
-Il controllo della build (workflow), Vercel, Il progetto Vercel pzkko, Il server dei dati in casa, La banca sul server,
+Il controllo della build (workflow), Il bot dei bug, Vercel, Il progetto Vercel pzkko, Il server dei dati in casa, La banca sul server,
 Il contratto della banca, La regia del server, Il tunnel Tailscale, Vercel Blob, Il custode del server,
 Lo storico del server, Le API di pzkko, Le firme (API), Il meteo di Mantova (API), Il wallet (API), La borsa (API),
 I giocatori (API), Il canale (API), Il ponte firmato, albertopecchini.it, Better Call Pekko, rivaltasulmincio.it,

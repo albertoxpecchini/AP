@@ -1,0 +1,78 @@
+# Il bot dei bug di pzkko.it (albertopecchini.it/tools/pzkko/bot/, 6.11.2026). Cerca da solo gli errori che di solito
+# trova Alberto guardando il sito:
+#
+# - a ogni push su main che tocca pzkko o i suoi strumenti: i file del commit (sintassi, import, immagini e indirizzi
+#   che non ci sono, maiuscole sbagliate, JSON, la guardia della manutenzione in ogni pagina) e poi ogni pagina e ogni
+#   finestra in un Chrome senza finestra, sul computer e sul telefono (errori di JavaScript, file che non arrivano,
+#   immagini rotte, «undefined» scritto in pagina, finestre che non si aprono, link che non portano da nessuna parte);
+#   in più le prove delle regole dei giochi e di pzkkopedia;
+# - due volte al giorno il giro del browser sul sito vero, https://www.pzkko.it: quello che è online adesso.
+#
+# Se trova qualcosa il commit prende la ❌, i bug sono annotati uno per uno e GitHub manda un'email; il rapporto e le
+# foto di ogni pagina restano una settimana fra gli artefatti dell'esecuzione. Non blocca niente: Vercel pubblica per
+# conto suo, il bot avvisa. Le prove della banca e il collaudo delle app di pzk os girano solo sul pc di Alberto
+# (node tools/pzkko/bot/bot.mjs --tutto): la banca non sta su GitHub e lo zero vuole la scheda video vera.
+
+name: Bot dei bug
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - albertopecchini.it/pzkko/**
+      - albertopecchini.it/tools/pzkko/**
+      - .github/workflows/bot.yml
+  schedule:
+    # (ora di GitHub, UTC: le 7:41 e le 19:41 di Mantova d'inverno)
+    - cron: '41 6,18 * * *'
+  workflow_dispatch:
+    inputs:
+      online:
+        description: 'Il giro del browser sul sito vero (www.pzkko.it) invece che sul commit'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bot-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: albertopecchini.it
+    env:
+      TZ: Europe/Rome
+      CHROME: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      # puppeteer-core sta con lo strumento delle catture (tools/pzkko/browser.mjs lo prende da lì)
+      - name: Dipendenze
+        run: npm ci --prefix tools/catture --no-audit --no-fund
+
+      - name: I file e le pagine del commit
+        if: github.event_name != 'schedule' && !inputs.online
+        run: node tools/pzkko/bot/bot.mjs --collaudi
+
+      - name: Il sito vero
+        if: github.event_name == 'schedule' || inputs.online
+        run: node tools/pzkko/bot/bot.mjs --online
+
+      - name: Il rapporto e le foto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-dei-bug
+          path: albertopecchini.it/tools/pzkko/lavoro/bot
+          retention-days: 7
+          if-no-files-found: ignore

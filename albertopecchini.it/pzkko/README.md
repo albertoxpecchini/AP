@@ -2891,6 +2891,36 @@ apre la banca, e nel collaudo la banca non c'era.
   banca deve aver pagato il turno intero), `--sbaglia` e `--scade` (la risposta sbagliata e il tempo scaduto),
   `--giocate` (le giocate di Bighurra nel profilo). `--rider` adesso è `--turni=strada`.
 
+## Il bot dei bug (../tools/pzkko/bot/, 6.11)
+
+Alberto, 6.11.2026: «ci sono bugs ovunque io guardo, devi creare un bot che verifichi tutti sti errori».
+`npm run bot` (`node tools/pzkko/bot/bot.mjs`) cerca da solo gli errori del sito, in due giri:
+
+- **i file** (senza browser, secondi): sintassi di ogni `.js`/`.mjs` del sito e degli strumenti; ogni `import`,
+  `import()` e `new URL(…, import.meta.url)` porta a un file che c'è; ogni indirizzo scritto per intero in pagine,
+  stili e script (`/art/…`, `href`, `src`, `srcset`, `url()`) esiste **con le maiuscole giuste** (su Windows passa,
+  su Vercel no); JSON validi; i pezzi di `art/pezzi.json` hanno il file; `fogli.js` e `disposizione.js` si caricano;
+  la sitemap porta a pagine vere; ogni pagina ha titolo, lingua, viewport e la guardia della manutenzione per prima;
+- **il browser** (Chromium senza finestra, computer 1366 × 900 e telefono 390 × 844, su un server suo —
+  `bot/sito.mjs`: la cartella con le regole di Vercel e le api «in pausa»): la home, le pagine, la wiki, la 404, il
+  cartello della manutenzione, lo scontrino, i sei giochi, il wallet e la regia. Segna errori di JavaScript, i
+  `console.warn('… non aperta')` del sito, file che non arrivano, immagini rotte, «undefined»/«NaN» in pagina, pagine
+  più larghe dello schermo, id doppi, finestre che non si aprono in 45 s, link interni morti. Una foto per apertura.
+
+In più, a richiesta: `--collaudi` (regole di blackjack e mine, pzkkopedia), `--banca` (le 21 prove di
+`C:\pzkko-server\banca\prove`, in memoria), `--zero[=app,…]` (il collaudo di REGOLE.md per le 22 app di pzk os, ~20 s
+l'una, scheda video vera), `--tutto`; `--online` fa il giro del browser su `https://www.pzkko.it`; `--file`,
+`--browser`, `--solo=roulette,wiki`, `--senza-foto`. Esce con 1 se trova qualcosa; rapporto e foto in
+`tools/pzkko/lavoro/bot/`.
+
+Un falso allarme si toglie in `TOLLERATI` (in cima a `bot.mjs`, col perché); un bug vero che aspetta una decisione sta
+in `DA_DECIDERE`: il bot lo ripete a ogni giro, ma non diventa rosso per quello. Una pagina o una finestra nuova si
+aggiunge a `PAGINE`.
+
+Su GitHub lo lancia `.github/workflows/bot.yml`: a ogni push su `main` che tocca `pzkko/` o `tools/pzkko/` (con
+`--collaudi`) e due volte al giorno sul sito vero (`--online`); ❌, annotazioni ed email se trova qualcosa, rapporto e
+foto fra gli artefatti per una settimana. Non blocca la pubblicazione.
+
 ## La manutenzione (manutenzione/, 6.11)
 
 Alberto, 6.11.2026: «fai un cartello che sarò a monaco di baviera quindi non avrò il PC acceso e di conseguenza non

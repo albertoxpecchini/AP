@@ -23,7 +23,7 @@ export const VOCI = {
 Alla radice ci sono poche cose, tutte spiegate nel suo <code>README.md</code>:
 * <code>albertopecchini.it/</code>: il sito vero e proprio, con i sorgenti, i contenuti, gli strumenti e, dentro, la cartella <code>pzkko/</code> con tutto pzkko.it (file statici, senza build);
 * <code>package.json</code>: solo scorciatoie (<code>npm run dev</code>, <code>dev:pzkko</code>, <code>dev:bcp</code>, <code>build</code>, <code>preview</code>, <code>email</code>…) che inoltrano i comandi alla cartella del sito, «senza dover ricordare il <code>cd</code>»;
-* <code>.github/workflows/</code>: i due workflow di GitHub Actions, [[Le catture dei siti (workflow)|le catture dei siti]] e [[Il controllo della build (workflow)|il controllo della build]];
+* <code>.github/workflows/</code>: i tre workflow di GitHub Actions, [[Le catture dei siti (workflow)|le catture dei siti]], [[Il controllo della build (workflow)|il controllo della build]] e [[Il bot dei bug|il bot dei bug]];
 * <code>.vscode/</code>: con '''F5''' in VS Code parte il server di sviluppo e si apre Edge sul sito (<code>launch.json</code> e il task <code>dev</code> in <code>tasks.json</code>); <code>Ctrl+Alt+O</code> lancia il task <code>online</code>, i tre dev server con gli indirizzi pubblici fissi dei dev tunnel;
 * <code>CLAUDE.md</code>: le regole del progetto per [[Claude Code]] (vedi [[CLAUDE.md]]), e <code>.claude/skills/</code> con le tre skill ([[Le skill di Claude Code]]);
 * fino al 4.11.2026 anche <code>PRODUCT.md</code>, <code>DESIGN.md</code> e <code>.impeccable/</code>, il brief e il sistema visivo di pzkko.it fermi a metà ottobre: cancellati nel riordino ([[PRODUCT.md]], [[DESIGN.md]]).
@@ -231,6 +231,79 @@ Il gruppo di concorrenza <code>build-&lt;ref&gt;</code> cancella il giro in cors
 I commit del bot delle [[Le catture dei siti (workflow)|catture]]: le spinte fatte col <code>GITHUB_TOKEN</code> non fanno partire altri workflow. E pzkko.it non ha build, quindi non è controllato qui: dal 2 novembre 2026 il controllo della wiki (<code>tools/pzkko/wiki/controlla.mjs</code>) si aggiunge a questo workflow, vedi [[Pzkkopedia:Come si aggiorna]].
 
 {{Vedi anche|Il controllo delle pagine|Le catture dei siti (workflow)|Il repository AP}}
+[[Categoria:Il repository]]`,
+  },
+
+  'Il bot dei bug': {
+    data: '2026-11-06',
+    fonti: ['albertopecchini.it/tools/pzkko/bot/bot.mjs', 'albertopecchini.it/tools/pzkko/bot/sito.mjs', '.github/workflows/bot.yml'],
+    testo: `{{Infobox
+| titolo = Il bot dei bug
+| dove = tools/pzkko/bot/bot.mjs, .github/workflows/bot.yml
+| dal = 6 novembre 2026
+| quando = a ogni push su main che tocca pzkko, e due volte al giorno sul sito vero
+| comando = npm run bot
+}}
+'''Il bot dei bug''' (<code>tools/pzkko/bot/</code>, 6.11.2026) è lo strumento che cerca da solo gli errori di [[pzkko.it]], quelli che prima trovava Alberto guardando il sito. È anche il terzo workflow di GitHub Actions del [[Il repository AP|repository AP]], dopo [[Le catture dei siti (workflow)|le catture]] e [[Il controllo della build (workflow)|il controllo della build]].
+
+{{Citazione|ci sono bugs ovunque io guardo, devi creare un bot che verifichi tutti sti errori … ogni cosa che faccio è buggata|Alberto, 6.11.2026}}
+
+== I file ==
+Il primo giro non apre nessun browser e dura pochi secondi. Legge la cartella <code>pzkko/</code> e gli strumenti di <code>tools/pzkko/</code> e controlla che:
+* ogni <code>.js</code> e <code>.mjs</code> si legga senza errori di sintassi (<code>node --check</code>; i pacchetti di altri nelle cartelle <code>lib/</code> no);
+* ogni <code>import</code>, ogni <code>import()</code> e ogni <code>new URL(…, import.meta.url)</code> porti a un file che c'è;
+* ogni indirizzo scritto per intero in una pagina, in un foglio di stile o in uno script (<code>/art/…webp</code>, <code>/fonts/…</code>, <code>href</code>, <code>src</code>, <code>srcset</code>, <code>url()</code>) porti a un file che c'è, '''con le maiuscole giuste''': su Windows «Foto.webp» e «foto.webp» sono lo stesso file, su [[Vercel]] no;
+* i JSON siano JSON, e ogni pezzo di <code>art/pezzi.json</code> abbia il suo file;
+* i moduli di dati degli strumenti si carichino (<code>fogli.js</code>, <code>disposizione.js</code>);
+* la sitemap porti a pagine vere, e ogni pagina abbia titolo, lingua, viewport e [[La manutenzione di Monaco#La guardia|la guardia della manutenzione]] come prima cosa in testa.
+
+Gli indirizzi costruiti mentre la pagina gira (<code>/art/chat-app/app-</code> più il nome) non si possono controllare da fermi: quelli li vede il secondo giro. I testi di [[Pzkkopedia|pzkkopedia]] non contano: parlano anche di file che non ci sono più.
+
+== Il browser ==
+Il secondo giro apre un Chromium senza finestra (lo stesso di <code>tools/pzkko/browser.mjs</code>, con <code>puppeteer-core</code> di <code>tools/catture</code>) su un server suo, <code>sito.mjs</code>, che serve <code>pzkko/</code> con le regole di Vercel e fa rispondere le [[Le API di pzkko|api]] «in pausa», come quando [[Il server dei dati in casa|il server di casa]] è spento: lo stato peggiore in cui il sito deve restare in piedi. Apre 19 cose, ognuna sul computer (1366 × 900) e sul telefono (390 × 844): la home, la storia, gadget, oggetti, traguardi, info, la wiki, pzk$meeting, la [[La 404|404]], [[La manutenzione di Monaco|il cartello della manutenzione]], [[Lo scontrino delle novità|lo scontrino]], i sei giochi (<code>/#roulette</code> … <code>/#virtual</code>), il wallet e la regia. Per ognuna segna:
+* gli errori di JavaScript e gli errori in console;
+* quello che la pagina stessa dice di non essere riuscita a fare (i <code>console.warn('… non aperta', e)</code> con cui il sito va avanti lo stesso);
+* i file che non arrivano (404 e simili), anche quelli chiesti dai fogli di stile;
+* le immagini rotte, dopo aver scorso la pagina fino in fondo per far arrivare quelle pigre;
+* «undefined», «NaN» e «[object Object]» scritti nella pagina;
+* la pagina più larga dello schermo, due cose con lo stesso <code>id</code>, la pagina vuota o senza titolo;
+* le finestre che dopo 45 secondi non si sono aperte;
+* i link interni che non portano da nessuna parte.
+Fa una foto di ogni apertura in <code>tools/pzkko/lavoro/bot/</code>, accanto a <code>rapporto.md</code>. Gli avvisi che non sono bug (three.js importato due volte, le api in pausa) finiscono in «da sapere».
+
+== I comandi ==
+{| class="wikitable"
+! comando !! cosa fa
+|-
+| <code>npm run bot</code> (<code>node tools/pzkko/bot/bot.mjs</code>) || i file e il browser, sulla cartella
+|-
+| <code>--file</code>, <code>--browser</code> || solo uno dei due giri
+|-
+| <code>--online</code> || il browser sul sito vero, <code>https://www.pzkko.it</code>
+|-
+| <code>--collaudi</code> || in più le prove delle regole del blackjack e delle mine e il controllo di pzkkopedia
+|-
+| <code>--banca</code> || in più le 21 prove della [[La banca sul server|banca]] (<code>C:\pzkko-server\banca\prove</code>, in memoria): solo sul pc di Alberto
+|-
+| <code>--zero</code>, <code>--zero=chat,quiz</code> || in più [[Il collaudo delle app|il collaudo]] delle 22 app di pzk os, una ventina di secondi l'una: vuole la scheda video vera
+|-
+| <code>--tutto</code> || tutto quanto
+|-
+| <code>--solo=roulette,wiki</code>, <code>--senza-foto</code> || solo quelle pagine; niente foto
+|}
+Esce con 0 se non trova niente («nessun bug») e con 1 se trova qualcosa. Un falso allarme si toglie nell'elenco <code>TOLLERATI</code> in cima a <code>bot.mjs</code>, col perché accanto; un bug vero che aspetta una decisione di Alberto sta in <code>DA_DECIDERE</code>: il bot lo ripete a ogni giro ma non diventa rosso per quello.
+
+== Su GitHub ==
+<code>.github/workflows/bot.yml</code> lo fa girare da solo: a ogni push su <code>main</code> che tocca <code>pzkko/</code> o <code>tools/pzkko/</code> (i file e le pagine di quel commit, con <code>--collaudi</code>) e due volte al giorno, alle 6:41 e alle 18:41 UTC, sul sito vero (<code>--online</code>). Se trova qualcosa il commit prende la ❌, ogni bug è un'annotazione, GitHub manda un'email, e il rapporto con le foto resta una settimana fra gli artefatti. Non blocca niente: Vercel pubblica per conto suo.
+
+== Cosa ha trovato il primo giorno ==
+* <code>tools/pzkko/immagini.mjs</code> non partiva più dal 29.10: lo «zero» dello shop era il tredicesimo pezzo di <code>chat-pzk</code>, una griglia da dodici, e <code>fogli.js</code> non si caricava. Trovato disegnando gli adesivi del [[La manutenzione di Monaco|cartello di Monaco]], e da lì il controllo «i moduli di dati si caricano»;
+* <code>tools/pzkko/prova-lotti.mjs</code> importa <code>api/_giocatori.mjs</code>, che non c'è più dal 31.10 (la banca è andata sul server) e non parte: sta fra i «da decidere» del bot (<code>DA_DECIDERE</code>), finché Alberto non dice se toglierlo o rifarlo sulle prove della banca;
+* sul sito vero, a ogni visita nuova senza conto, <code>/api/wallet/</code> rispondeva 401 «entra di nuovo»: <code>chat/sfide.js</code> chiedeva alla banca le sfide del giorno (<code>sfide.oggi</code>) prima che l'ospite avesse il biglietto. Adesso aspetta la prima risposta della banca;
+* le 22 app di pzk os e le 21 prove della banca: tutte a posto.
+
+{{Vedi anche|Il controllo della build (workflow)|Il controllo delle pagine|Il collaudo delle app|La manutenzione di Monaco}}
+[[Categoria:Gli strumenti]]
 [[Categoria:Il repository]]`,
   },
 
