@@ -6,7 +6,7 @@
 // del veloce stanno sulla banca finché non tocca vederle.
 import { punti } from '../../games/blackjack/regole.js'
 import { scriviMolt, nomeCasella, MINE, LIMITI as LIMITI_MINE } from '../../games/mine/regole.js'
-import { suTela } from '../minigiochi.js'
+import { aspetta } from '../minigiochi.js'
 
 const DADO_ICONE = Array.from({ length: 7 }, (_, i) => `<span class="c-carta">${i}</span>`) // le facce come cartellini
 const faccia = (n) => `<b class="pzk">${n}</b>`
@@ -51,20 +51,21 @@ function suDado(cosa) {
 
 export const GIOCHI = [
   {
-    nomi: ['veloce', 'fast', 'riflessi'], cat: 'giochi', icona: 'fulmine', breve: 'una parola compare all’improvviso: riscrivila, paga in base al tempo', uso: 'veloce', attesa: 30,
+    nomi: ['veloce', 'fast', 'riflessi'], cat: 'giochi', icona: 'fulmine', breve: 'una parola compare all’improvviso: premila o riscrivila, paga in base al tempo', uso: 'veloce', attesa: 30,
     async fai(ctx) {
-      const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, riscrivila.' })
+      const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, premila (o riscrivila).' })
       await ctx.inVista(s)
       // (31.10) la banca dice fra quanto compare, e la parola la dà solo passato quel tempo: il tempo lo conta lei
       const a = await ctx.fai('chat.veloce', {})
       if (!a.ok) return ctx.aggiorna(s, { colore: a.manca ? 'ambra' : 'grigio', av: 'bot-triste', t: a.manca ? ':clessidra: calma' : '', d: a.manca ? `«veloce» lo puoi rifare fra <b>${ctx.durata(a.manca)}</b>.` : a.errore ?? 'non è andata.' })
-      await ctx.dormi(a.esito.ritardo)
+      // (6.11) l'attesa è un tempo vero (ctx.dormi con «riduci animazioni» dura 150 ms, e la banca diceva «non ancora»), e la
+      // parola è testo della scheda e un tasto in fondo (era disegnata su una tela che nello zero non compare): si preme, o si riscrive
+      await aspetta(a.esito.ritardo)
       const v = await ctx.fai('chat.veloce', { via: true })
       if (!v.ok) return ctx.aggiorna(s, { colore: 'grigio', av: 'bot-triste', d: v.errore ?? 'non è andata.' })
-      ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: '' })
-      suTela(s, v.esito.parola)
+      ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: `<b>${v.esito.parola}</b>` })
       const ferma = ctx.tempo(s, 10000)
-      const scritto = await ctx.scrivi(10000)
+      const scritto = await ctx.scrivi(10000, { segnaposto: v.esito.parola })
       ferma()
       const r = await ctx.fai('chat.veloce', { risposta: scritto })
       if (!r.ok) return ctx.no(r, 'veloce')

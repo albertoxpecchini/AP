@@ -54,6 +54,7 @@ let coda = Promise.resolve()
 let salutato = false, ultimoGiorno = ''
 const inCorso = new Set()
 let cambiato = () => {}
+let nSchede = 0 // quante schede ha scritto il bot da quando la pagina è aperta (per il collaudo: adesso)
 
 const esc = (t) => String(t)
 /** L'html di una scheda, a testo: via i tag, le entità sciolte, le :icone: tolte, <code> fra parentesi quadre. */
@@ -87,7 +88,7 @@ export function sistema(testo) { return aggiungi({ tipo: 'sistema', testo: pulis
 
 /** Una scheda del bot: nasce subito (i comandi la usano appena creata), compare dopo i puntini (500 ms), una alla volta. */
 export function scheda(e) {
-  const m = { tipo: 'bot', e: { ...e }, av: e.av ?? 'bot', fatto: false, righe: null, rulli: rulliDa(e.html) }
+  const m = { tipo: 'bot', e: { ...e }, av: e.av ?? 'bot', fatto: false, righe: null, rulli: rulliDa(e.html), n: ++nSchede }
   aggiungi(m)
   if (RIDOTTO.matches) { m.fatto = true; m.pronta = Promise.resolve() }
   else {
@@ -116,6 +117,7 @@ export function aggiorna(s, e) {
   if (e.av) m.av = e.av
   m.e = { ...e }
   m.azioniObj = null // (le azioni nuove della scheda: prima restavano quelle di prima)
+  if (e.senzaTasti) m.scelte = (m.scelte ?? []).filter((x) => scelte.includes(x)) // (6.11, il nastro: i tasti delle scelte già finite se ne vanno, la scheda è quella del pezzo nuovo)
   m.rulli = rulliDa(e.html) ?? m.rulli
   invalida(m)
   return s
@@ -180,8 +182,11 @@ function annulla() { for (const sc of [...scelte]) sc.fine(null, null) }
 const manda = (cmd) => { annulla(); return esegui(cmd) }
 /** Un tasto di una scheda: fa anche da finto elemento per i comandi che lo toccano (innerHTML, classList, disabled). */
 function bottone(m, b) {
+  // (6.11) l'icona di un tasto: il nome nudo («gemma») o fra due punti («:canna:»). Un tasto di sola icona, in fila, prende
+  // per scritta il nome dell'icona: prima restava vuoto e si disegnava «?» (i cinque tasti del turno da meccanico)
+  const grezza = String(b.eti ?? b.id), ic = iconaIn(icona(grezza)) || iconaIn(conIcone(grezza)) || null
   const o = {
-    dataset: { id: String(b.id) }, eti: pulisci(conIcone(b.eti ?? b.id)), icona: iconaIn(icona(b.eti ?? '')) || null, stile: b.stile ?? '', disabled: false, premuto: false, style: {},
+    dataset: { id: String(b.id) }, eti: pulisci(conIcone(grezza)) || (ic ? ic.replaceAll('-', ' ') : ''), icona: ic, stile: b.stile ?? '', disabled: false, premuto: false, style: {},
     get innerHTML() { return o.eti },
     set innerHTML(v) { const i = iconaIn(v); if (i) { o.icona = i; o.eti = '' } else o.eti = pulisci(v); invalida(m) },
     classList: { add: (c) => { o[c] = true; invalida(m) }, remove: (c) => { o[c] = false; invalida(m) }, contains: (c) => !!o[c], toggle: (c, v) => { o[c] = v ?? !o[c]; invalida(m) } },
@@ -189,11 +194,17 @@ function bottone(m, b) {
   }
   return o
 }
+/** Sposta la croce di una scelta in fila al prossimo tasto che si preme (verso: 1 o -1; in tondo). I tasti spenti si
+ *  saltano (6.11: i pezzi già premuti dei minigiochi): c'è sempre un tasto scelto, e OK preme quello (REGOLE.md 3.12). */
+function vivo(sc, verso) {
+  const N = sc.lista.length
+  for (let k = 0; k < N; k++) { sc.sel = (sc.sel + verso + N) % N; if (!sc.lista[sc.sel].disabled) return }
+}
 /** Preme il tasto scelto (la croce ci è sopra e OK, o il mouse). */
 function premi(sc, b) {
   if (!b || b.disabled) return
   const riga = { querySelector: (sel) => { const id = /data-id="([^"]+)"/.exec(sel)?.[1]; return sc.lista.find((x) => x.dataset.id === id) ?? null }, querySelectorAll: () => sc.lista }
-  if (sc.onPremuto) { const r = sc.onPremuto(b.dataset.id, b, riga); if (r === 'continua') { invalida(sc.m); return } if (r !== undefined) return sc.fine(r, b) }
+  if (sc.onPremuto) { const r = sc.onPremuto(b.dataset.id, b, riga); if (r === 'continua') { if (!sc.griglia && sc.lista[sc.sel]?.disabled) vivo(sc, 1); invalida(sc.m); return } if (r !== undefined) return sc.fine(r, b) }
   sc.fine(b.dataset.id, b)
 }
 /** Aspetta che si scriva qualcosa nella riga: → Promise del testo (null allo scadere). */
@@ -201,10 +212,23 @@ export function scrivi(ms = 0, { segnaposto = 'scrivi qui…' } = {}) {
   return new Promise((risolvi) => {
     let timer = 0
     aspettaTesto = { segnaposto, risolvi: (t) => { clearTimeout(timer); aspettaTesto = null; os.ridisegna(); risolvi(t) } }
+    // (6.11) la parola da premere (PRENDILA, la parola del veloce) prende la croce quando compare: prima OK premeva il tasto
+    // su cui la croce era rimasta, anche «scrivi…», e la parola restava lì
+    const p = parola(segnaposto)
+    if (p) { cur = 'p:' + p; curScheda = schedaAttiva() }
     if (ms > 0) timer = setTimeout(() => aspettaTesto?.risolvi(null), ms)
     os.ridisegna()
   })
 }
+/** Chiude quello che una scheda aspetta ancora, le sue scelte e la riga da scrivere, come allo scadere (6.11, i minigiochi
+ *  del turno: la risposta si dà coi tasti o scrivendo, e chi arriva prima spegne l'altro). */
+export function smetti(s) {
+  const m = s?.__msg
+  for (const sc of [...scelte]) if (!m || sc.m === m) sc.fine(null, null)
+  aspettaTesto?.risolvi(null)
+}
+/** Chiede le icone prima che servano (le webp di riserva arrivano dopo: icone.js). Non aspetta niente. */
+export const caricaIcone = (nomi, lato = 16) => { for (const n of nomi) icone.bitmap(n, lato) }
 export async function inVista(s, ms = 0) { await s.__msg.pronta; if (ms) await dormi(ms) }
 export async function pensa(ms = 700) {
   led.colpo(ms)
@@ -252,7 +276,7 @@ function ctxDi(args, testo) {
   const mie = [] // (le schede di questo comando: se si rompe, i suoi rulli si fermano)
   const sua = (e) => { const s = scheda(e); mie.push(s.__msg); return s }
   const ctx = {
-    __mie: mie, args, testo, zaino, pzk, dì: sua, scheda: sua, aggiorna, scegli, scrivi, tempo, dormi, inVista, pensa, sistema, utente,
+    __mie: mie, args, testo, zaino, pzk, dì: sua, scheda: sua, aggiorna, scegli, scrivi, smetti, caricaIcone, tempo, dormi, inVista, pensa, sistema, utente,
     nome, importo, caso, rnd, tra, durata, fmt, pzkHtml, eurHtml, icona, conIcone,
     esegui, apriWallet: (sez) => pzk.apriWallet(sez), apriApp: (app) => os.apri(app), comandi: COMANDI, perNome: PER_NOME, categorie: CATEGORIE,
     // (31.10) la banca, come nella chat grande (chat.js): fai chiede, no dice il suo no, morte racconta la morte che ha deciso lei
@@ -351,8 +375,8 @@ function salva() {
   if (!storiaDove) return
   const piatti = msgs.filter((m) => m.tipo !== 'pensa' && (m.tipo !== 'bot' || m.fatto)).slice(-80).map((m) => {
     if (m.tipo !== 'bot') return { tipo: m.tipo, testo: m.testo }
-    const { t, d, html, campi, pie, colore, azioni } = m.e
-    return { tipo: 'bot', av: m.av, e: { t, d, html: m.rulli ? '' : html, campi, pie, colore, azioni }, rulli: m.rulli?.map((r) => ({ icona: r.icona })) ?? null,
+    const { t, d, html, campi, pie, colore, azioni, icone: ic, lato } = m.e
+    return { tipo: 'bot', av: m.av, e: { t, d, html: m.rulli ? '' : html, campi, pie, colore, azioni, icone: ic, lato }, rulli: m.rulli?.map((r) => ({ icona: r.icona })) ?? null,
       scelte: m.scelte?.length ? m.scelte.map((sc) => ({ griglia: sc.griglia, lista: sc.lista.map((b) => ({ dataset: b.dataset, eti: b.eti, icona: b.icona, stile: b.stile, premuto: b.premuto, aperta: b.aperta, bum: b.bum, disabled: true })) })) : null }
   })
   try { storiaDove.dep.setItem(storiaDove.k, JSON.stringify({ giorno: ultimoGiorno, msgs: piatti })) } catch {}
@@ -453,7 +477,7 @@ let selOra = null, attivaOra = null // (solo per il disegno: il tasto scelto e l
 /** La riga in fondo quando non si scrive: cosa fanno i tasti adesso, coi tasti per nome (REGOLE.md 3.3 e 3.4). */
 function aiuto() {
   if (scelta?.dir) return `premi ${Object.keys(scelta.dir).map((k) => FRECCIA[k]).join(' ')} o fai clic`
-  if (scelta) return scelta.griglia ? '← → ↑ ↓ scegli · OK premi' : '← → scegli · OK premi'
+  if (scelta) return scelta.griglia ? '← → ↑ ↓ scegli · OK premi' : aspettaTesto ? '← → scegli · OK premi · o scrivila' : '← → scegli · OK premi'
   if (aspettaTesto && !parola(aspettaTesto.segnaposto)) return 'scrivi e Invio, o OK tastiera'
   return scorri < maxScorri() ? '← → scegli · OK premi · ↑ leggi' : '← → scegli · OK premi' // (4.11: chi arriva non sapeva che ↑ fa leggere i messaggi di prima)
 }
@@ -493,6 +517,9 @@ function impagina(m) {
   const corpo = [pulisci(conIcone(e.d ?? '')), m.rulli ? '' : pulisci(conIcone(String(e.html ?? '').replace(/<button\b[^>]*\bdata-cmd[^>]*>[\s\S]*?<\/button>/gi, '')))].filter(Boolean).join('\n') // (i tasti data-cmd sono diventati tasti della scheda, azioniHtml: nel testo restava un «compra» che non si premeva)
   for (const r of Lcd.acapo(corpo, COL)) if (r) R.push(rigaTesto(r, X0)); else R.push({ h: 4, d() {} })
   if (m.rulli) R.push({ h: 24, d: (l, y, t) => m.rulli.forEach((r, i) => { const x = X0 + i * 24; l.cornice(x, y, 22, 22); const nome = r.gira ? RULLI[(t + i * 2) % RULLI.length] : r.icona; l.bitmap(icone.bitmap(nome, 16), x + 3, y + 3) }) })
+  // (6.11) le icone della scheda (`icone`: i nomi; `lato`: 16 o 32): una fila di riquadri, come i rulli. È il modo di far
+  // VEDERE un'icona nella chat: quelle dentro il testo (:canna:, <img>) pulisci le toglie
+  if (e.icone?.length) { const nomi = [...e.icone], lato = e.lato === 32 ? 32 : 16, c = lato + 6; R.push({ h: c + 3, d: (l, y) => nomi.forEach((n, i) => { const x = X0 + i * (c + 2); l.cornice(x, y, c, c); l.bitmap(icone.bitmap(n, lato), x + 3, y + 3) }) }) }
   for (const [n, v] of e.campi ?? []) { const s = `${pulisci(conIcone(n))}: ${pulisci(conIcone(v))}`; for (const r of Lcd.acapo(s, COL)) R.push(rigaTesto(r, X0)) }
   if (e.pie) for (const r of Lcd.acapo('· ' + pulisci(conIcone(e.pie)), COL)) R.push(rigaTesto(r, X0))
   if (m.tempo) { const tm = m.tempo; R.push({ h: 6, d: (l, y) => { const k = tm.fermo ? 0 : Math.max(0, 1 - (Date.now() - tm.da) / tm.ms); l.riempi(X0, y + 1, Math.round(230 * k), 2) } }) } // (tm preso qui: m.tempo diventa null a tempo scaduto e queste righe restano in memoria, rileggerlo dava «reading 'fermo'»; la fine la decide il tic, anche fuori schermo)
@@ -518,7 +545,7 @@ function impagina(m) {
       for (const b of fr) {
         const bw = Lcd.larghezza(b.eti || '?') + 8, on = sc ? scelta === sc && sc.lista[sc.sel] === b : viva && selOra?.b === b
         const morta = !sc && (!viva || b.disabled)
-        if (on || b.premuto) l.riempi(x, y, bw, 11); else if (morta) puntini(l, x, y, bw, 11); else l.cornice(x, y, bw, 11)
+        if (on || b.premuto) l.riempi(x, y, bw, 11); else if (morta || b.usato) puntini(l, x, y, bw, 11); else l.cornice(x, y, bw, 11) // (usato: un pezzo già premuto, minigiochi.js)
         l.testo(x + 4, y + 2, b.eti || '?', { inv: on || b.premuto })
         const bb = b
         if (sc) zonaChat(x, y, bw, 11, () => clicca(sc, bb))
@@ -550,6 +577,18 @@ function mostra(m, cerca) {
   for (let i = k + 1; i < msgs.length; i++) sotto += altezza(msgs[i])
   const alta = fondo() - (BARRA + 1) - 12 // (12: in cima, da scorsi, c'è il bollino «↓ 3»; il tasto scelto ci finiva sotto)
   scorri = Math.max(0, Math.min(sotto, Math.max(scorri, sotto + riga.h - alta)))
+}
+
+/** Per il collaudo (tools/pzkko/zero/prova.mjs --turni): cosa aspetta la chat adesso e cosa dice l'ultima scheda. */
+export const adesso = () => {
+  const u = msgs.findLast((m) => m.tipo === 'bot')
+  return {
+    scelta: scelta && { sel: scelta.sel, griglia: scelta.griglia ?? null, dir: scelta.dir ? Object.fromEntries(Object.entries(scelta.dir).map(([k, b]) => [b.dataset.id, k])) : null, tasti: scelta.lista.map((b) => ({ id: b.dataset.id, eti: b.eti, spento: !!b.disabled })) },
+    scrivi: aspettaTesto?.segnaposto ?? null,
+    scheda: u ? { t: pulisci(conIcone(u.e.t ?? '')), d: pulisci(conIcone(u.e.d ?? '')), pie: pulisci(conIcone(u.e.pie ?? '')), icone: u.e.icone ?? [], fatta: !!u.fatto } : null,
+    schede: nSchede, occupata: inCorso.size > 0,
+    ultime: msgs.filter((m) => m.tipo === 'bot' && m.n).slice(-4).map((m) => ({ n: m.n, t: pulisci(conIcone(m.e.t ?? '')) })),
+  }
 }
 
 // ── la vista ──
@@ -635,12 +674,14 @@ export function vista() {
     tasto(n) {
       riordina()
       if (scelta?.dir?.[n]) { const sc = scelta, b = sc.dir[n]; sc.sel = sc.lista.indexOf(b); premi(sc, b); invalida(sc.m); return true } // (la freccia preme la sua direzione)
+      // (6.11) una risposta che si dà coi tasti O scrivendo (minigiochi.js, componi): se c'è una riga scritta, Invio manda quella
+      if (n === 'ok' && riga && aspettaTesto && scelta) { invia(); return true }
       if (scelta) {
         const sc = scelta, cols = sc.griglia === 'g5' ? 5 : sc.griglia === 'g3' ? 3 : sc.lista.length, N = sc.lista.length
         // (più scelte insieme, le mine: ↑ dalla prima riga e ↓ dall'ultima passano alla scelta di prima o di dopo)
         const i = scelte.indexOf(sc), prima = scelte[i - 1], dopo = scelte[i + 1], r = Math.floor(sc.sel / cols), ultima = r >= Math.ceil(N / cols) - 1, selPrima = sc.sel
-        if (n === 'sx') sc.sel = (sc.sel - 1 + N) % N
-        else if (n === 'dx') sc.sel = (sc.sel + 1) % N
+        if (n === 'sx') { if (sc.griglia) sc.sel = (sc.sel - 1 + N) % N; else vivo(sc, -1) } // (in fila i tasti spenti si saltano)
+        else if (n === 'dx') { if (sc.griglia) sc.sel = (sc.sel + 1) % N; else vivo(sc, 1) }
         else if (n === 'su') { if (sc.griglia && r > 0) sc.sel -= cols; else if (prima) scelta = prima; else if (sc.griglia) sc.sel = (sc.sel - cols + N) % N; else scorri = Math.min(scorri + 16, maxScorri()) }
         else if (n === 'giu') { if (sc.griglia && !ultima) sc.sel = Math.min(N - 1, sc.sel + cols); else if (dopo) scelta = dopo; else if (sc.griglia) sc.sel = (sc.sel + cols) % N; else scorri = Math.max(0, scorri - 16) }
         else if (n === 'ok') premi(sc, sc.lista[sc.sel])

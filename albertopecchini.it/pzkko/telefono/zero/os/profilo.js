@@ -112,18 +112,28 @@ function pSoldi(l) {
   })
 }
 const GIOCHI = [['roulette', 'roulette'], ['blackjack', 'blackjack'], ['mine', 'mine'], ['dado', 'dadi'], ['moneta', 'testa/croce'], ['virtual', 'virtual']]
+/** I giochi giocati col bot nella chat («blackjack 400», «slot 20»: nel libro sono chat-<gioco>), tutti insieme in una riga. */
+function nellaChat(g) {
+  const r = [0, 0, 0, 0, 0]
+  for (const [id, v] of Object.entries(g)) if (id.startsWith('chat-')) { const x = (Array.isArray(v) ? v : []).map((n) => Number(n) || 0); for (let i = 0; i < 4; i++) r[i] += x[i] ?? 0; r[4] = Math.max(r[4], x[4] ?? 0) }
+  return r
+}
+// (6.11, Bighurra: «non mi ha tenuto conto dei miei 400 guadagnati con il blackjack») i 400 nel saldo c'erano, ma li aveva
+// vinti al blackjack DELLA CHAT, e qui c'erano solo i sei giochi grandi: la riga «blackjack» restava a trattini e la vincita
+// non compariva da nessuna parte. Adesso sette righe (una ogni 9 pixel): i sei giochi grandi e «nella chat», tutti i giochi
+// del bot insieme. La riga in fondo li contava già tutti (games/libro.mjs)
 function pGiochi(l) {
   const k = conti(pzk.conto()?.libro), g = k.perGioco
   l.testo(10, 34, 'gioco'); destra(l, 112, 34, 'mani'); destra(l, 150, 34, 'vinte'); destra(l, 200, 34, 'netto'); destra(l, 245, 34, 'colpo')
   l.orizz(8, 42, 240)
-  GIOCHI.forEach(([id, nome], i) => {
-    const [ma, vi, pu, to, mi] = (g[id] ?? [0, 0, 0, 0, 0]).map((x) => Number(x) || 0), y = 45 + i * 10
+  ;[...GIOCHI.map(([id, nome]) => [nome, g[id] ?? [0, 0, 0, 0, 0]]), ['nella chat', nellaChat(g)]].forEach(([nome, v], i) => {
+    const [ma, vi, pu, to, mi] = v.map((x) => Number(x) || 0), y = 44 + i * 9
     l.testo(10, y, nome)
     if (!ma) { for (const xc of [112, 150, 200, 245]) destra(l, xc, y, '—'); return } // (mai giocato: un trattino per colonna)
     destra(l, 112, y, f(ma)); destra(l, 150, y, pct(vi, ma)); destra(l, 200, y, segno(to - pu)); destra(l, 245, y, mi > 0 ? f(mi) : '—')
   })
-  l.orizz(8, 105, 240)
-  l.testo(10, 108, `${f(k.mani)} mani · ${pct(k.vinte, k.mani)} vinte`)
+  l.orizz(8, 107, 240)
+  l.testo(10, 109, `${f(k.mani)} mani · ${pct(k.vinte, k.mani)} vinte`)
 }
 /** Una cella di numeri: il valore allineato a destra in 42 pixel, poi l'etichetta (12 lettere al massimo). */
 function cella(l, x, y, v, eti) { if (v) destra(l, x + 42, y, v); l.testo(v ? x + 48 : x, y, corto(eti, v ? 12 : 20)) }
@@ -162,7 +172,7 @@ function pClassifiche(l, k, t) {
 const PAGINE = [
   { nome: 'cartellino', icona: 'app-profilo', disegna: pCartellino },
   { nome: 'i soldi', icona: 'pzk', disegna: pSoldi },
-  { nome: 'i giochi grandi', icona: 'dado', disegna: pGiochi },
+  { nome: 'i giochi', icona: 'dado', disegna: pGiochi }, // (6.11: «i giochi grandi» fino a ieri; adesso c'è anche la riga della chat)
   { nome: 'la vita col bot', icona: 'bot', disegna: pBot },
   { nome: 'i progressi', icona: 'stella', disegna: pProgressi },
   { nome: 'le classifiche', icona: 'trofeo', disegna: pClassifiche },

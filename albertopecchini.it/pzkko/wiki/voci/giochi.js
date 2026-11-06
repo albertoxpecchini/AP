@@ -896,7 +896,7 @@ Il primo invio della storia è un'[[Le operazioni della banca|operazione della b
   },
 
   'Le operazioni della banca': {
-    data: '2026-10-23',
+    data: '2026-11-06',
     fonti: ['albertopecchini.it/pzkko/api/wallet.mjs', README],
     testo: `'''Le operazioni della banca''' sono i passaggi di [[I $pzk|$pzk]] che [[Alberto Pecchini|Alberto]] chiede e che il server di [[pzkko.it]] fa da solo, una volta sola: la lista <code>OPERAZIONI</code> in <code>api/wallet.mjs</code>, eseguita alla prima richiesta di ogni istanza della funzione e segnata in <code>db.operazioni</code>; quelle non andate si ritentano, e <code>GET /api/wallet/?operazioni=1</code> dice com'è andata.
 
@@ -904,7 +904,13 @@ Il primo invio della storia è un'[[Le operazioni della banca|operazione della b
 5.000 $pzk da pzk398893 ([[il conto di Alberto|Il conto di Alberto]]) a pzk113089, il 23.10.2026 (commit f4ca651: «le operazioni della banca e i soldi da fuori che un browser vecchio non cancella»). Lo stesso giorno la correzione dei 5.000 di Alberto (2138696: «un browser col saldo di prima non rimette più i soldi già mandati»): da lì i soldi che arrivano da fuori hanno un numero (<code>c.es</code>) e un browser aperto col saldo vecchio non li cancella.
 
 == E le altre ==
-Dal 31.10 ([[La banca sul server]]) i movimenti della cassa passano dal server in casa, con la [[La regia del server|regia del server]] che li vede in diretta; un'operazione nuova si scrive lì. I colpi riusciti e le retate delle [[La rapina|rapine]] e le catastrofi della [[La lumachina|lumachina]] fanno le [[Le notizie della banca|notizie della banca]], che sono un'altra cosa: notizie, non passaggi.
+Dal 31.10 ([[La banca sul server]]) i movimenti della cassa passano dal server in casa, con la [[La regia del server|regia del server]] che li vede in diretta; un'operazione nuova si scrive lì (<code>C:\pzkko-server\banca\wallet.mjs</code>), e ha una scadenza (<code>entro</code>): dopo, se non è andata, non si ritenta più.
+
+== Il regalo del 6 novembre ==
+{{Citazione|per scusarmi dona 1999pzk a tutti i giocatori che hanno giocato nelle ultime 48 ore|Alberto, 6.11.2026}}
+Il turno di [[Il lavoro|lavoro]] nello zero non si vedeva ([[I minigiochi della chat]]). L'operazione <code>2026-11-06-scuse-1999</code> è la prima di un tipo nuovo, il '''regalo''' (<code>regalo</code>, <code>per</code>: gli id dei conti): soldi nuovi, coniati (crescono l'offerta: [[L'economia]]), a tutti i conti insieme o a nessuno, con la mossa «regalo di pzkko» sul conto e nel [[Il libro dei conti|libro]] fra i premi. Sono andati 1.999 $pzk a pzk398893 ([[Il conto di Alberto|pzkko]]) e a pzk380801 (Bighurra), gli unici due conti che avevano giocato dal 4.11: lo dicono le copie dello [[Lo storico del server|storico]] del [[Il server dei dati in casa|server in casa]], una ogni dieci minuti. Prima di farla sui conti veri è stata provata in memoria su una loro copia, due volte: la seconda non cambia niente.
+
+I colpi riusciti e le retate delle [[La rapina|rapine]] e le catastrofi della [[La lumachina|lumachina]] fanno le [[Le notizie della banca|notizie della banca]], che sono un'altra cosa: notizie, non passaggi.
 
 {{Vedi anche|I conti|Gli invii|Il conto di Alberto|La cassa di pzk|Le notizie della banca}}
 [[Categoria:I soldi]]`,

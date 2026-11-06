@@ -312,7 +312,7 @@ Prima si è provata la croce 3D: <code>prova.mjs --croce</code> la preme col mou
 I tasti, le azioni, i suggerimenti e il bollino «↓» della [[Chat (app)|chat]], le righe del [[Il menu di pzk os|menu]], le righe e le frecce delle [[Impostazioni (app)|impostazioni]], i tasti dei dialoghi e della tastiera, «OK menu» e «chat» della home, le miniature delle [[Foto (app)|foto]], i lati di una foto, il grafico della [[Banca (app)|borsa]], i quarti del mestolo in [[Cucina (app)|cucina]], ▲ ▼ della [[Lavatrice (app)|lavatrice]], le risposte del [[Decifratore (app)|decifratore]].
 
 == La prova ==
-<code>prova.mjs --rider</code> fa un turno intero da rider con due frecce dalla tastiera e due clic del mouse sullo schermo, e controlla che il turno sia contato. Nelle sequenze del collaudo <code>clic@80x121</code> è un clic sul pixel 80, 121 dell'lcd, attraverso il 3D vero.
+<code>prova.mjs --rider</code> (dal 6.11 <code>--turni=strada</code>) fa un turno intero da rider con due frecce dalla tastiera e due clic del mouse sullo schermo, e controlla che il turno sia contato. Nelle sequenze del collaudo <code>clic@80x121</code> è un clic sul pixel 80, 121 dell'lcd, attraverso il 3D vero.
 
 {{Vedi anche|I sei tasti|Il rider|Il collaudo delle app|Le regole per le app}}
 [[Categoria:Il cercapersone]]`,
@@ -396,7 +396,7 @@ Dal 29 ottobre (commit <code>7f98ca6</code>): la rete di chi guarda col ping ver
   },
 
   'Le regole per le app': {
-    data: '2026-11-04',
+    data: '2026-11-06',
     fonti: [OS + 'REGOLE.md', OS + 'os.js', PROVA, 'CLAUDE.md', README],
     testo: `{{Infobox
 | titolo = Le regole per le app
@@ -447,6 +447,9 @@ Si legge e si scrive coi moduli del sito; i dati del server stanno sul server di
 == 10. Il modello da copiare ==
 Un'app «esempio» di sessanta righe che passa il collaudo: una lista di sette voci con la riga scelta rovesciata, il ✓ dentro la sua fascia, la barra di scorrimento come il menu, il suggerimento centrato in fondo, il dialogo di conferma, il lampo, la sigla «moneta». Si copia, si rinomina, si cambia. Poi una riga in <code>PRONTE</code>, la sigla, l'icona e il collaudo.
 
+== Le regole del 6 novembre ==
+Vengono dal turno di lavoro che nello zero non si vedeva ([[I minigiochi della chat]]; Bighurra: «non vedo cosa devo replicare»). Nella chat un'icona si vede solo col campo <code>icone</code> della scheda, col nome accanto (5.5); lo schermo è a un bit e i colori si scrivono (5.6); un tempo di gioco non è un'animazione, e si aspetta con <code>aspetta</code>, non con <code>ctx.dormi</code> che «riduci animazioni» taglia a 150 ms (6.5); i comandi della chat non toccano la pagina, niente <code>appendChild</code> né <code>querySelector</code> (9.7); ogni risposta si dà coi sei tasti, i testi a pezzi da premere (9.8); quello che apre la banca si collauda con la banca, <code>prova.mjs --banca</code> e <code>--turni</code> (9.9).
+
 == Se una regola è sbagliata ==
 Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella sessione in cui sono nate, Alberto aveva trovato a occhio, uno dopo l'altro, i bug che ora vietano; il collaudo scritto insieme ne ha trovati altri sei nella chat e nelle impostazioni prima che li vedesse lui.
 
@@ -455,7 +458,7 @@ Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella se
   },
 
   'Il collaudo delle app': {
-    data: '2026-11-04',
+    data: '2026-11-06',
     fonti: [PROVA, OS + 'REGOLE.md', README],
     testo: `{{Infobox
 | titolo = Il collaudo delle app
@@ -495,7 +498,11 @@ Si corregge REGOLE.md, non si aggira ([[Regole app pzk os (memoria)]]). Nella se
 |-
 | <code>--muro</code> || solo il tasto sul muro, a 4× (<code>prova-tasto.png</code> e, senza lcd, <code>prova-tasto-nudo.png</code>)
 |-
-| <code>--rider</code> || un turno intero da rider con due frecce e due clic, e il controllo che sia contato (dal 31 ottobre il turno lo conta la banca, che nel collaudo non c'è: dice «il turno non è stato contato»; le frecce si provano con <code>finta@direzioni</code>)
+| <code>--banca</code> || (6.11) <code>/api/wallet</code>, <code>/api/borsa</code>, <code>/api/giocatori</code> li serve la [[La banca sul server|banca vera]] (<code>C:\pzkko-server\banca</code>) coi file in memoria, come [[In locale (pzkko)|tools/dev.mjs]]: i dati veri non si toccano, e la pagina entra da sola col conto pzkko. Con <code>--app=profilo --giocate</code> il conto ha nel libro le giocate di Bighurra
+|-
+| <code>--turni</code> || (6.11) i tredici [[I minigiochi della chat|minigiochi del turno]], uno per mestiere, giocati coi sei tasti contro la banca vera in memoria: il mestiere messo a mano nel conto, «lavora» scritto nella chat, la risposta giusta letta dal tavolo della banca e data con le frecce e Invio (l'anagramma scritto dalla tastiera vera, due svolte del rider col clic del mouse). Foto <code>prova-turno-&lt;gioco&gt;-*.png</code>; la banca deve aver pagato il turno intero. <code>--turni=icona,ordine</code> solo quelli; <code>--sbaglia</code> la risposta sbagliata, <code>--scade</code> il tempo scaduto (devono finire in «turno storto»)
+|-
+| <code>--rider</code> || è <code>--turni=strada</code>. Dal 31 ottobre al 6 novembre non andava: il turno lo conta la banca, che nel collaudo non c'era («il turno non è stato contato»), e così nessuno giocava più un turno nel collaudo
 |-
 | <code>--telefono</code>, <code>--larga</code>, <code>--misura=3440x1440</code> || 390 × 844, 1920 × 1080, o una finestra qualsiasi (il cavo lungo)
 |-
@@ -693,7 +700,7 @@ Chi le vuole aprire da fuori: il link della pagina [[Gadget (pagina)|gadget]] (�
   },
 
   'Chat (app)': {
-    data: '2026-11-04',
+    data: '2026-11-06',
     fonti: [OS + 'chat.js', 'albertopecchini.it/pzkko/chat/chat.js', 'albertopecchini.it/pzkko/chat/predittivo.js', 'albertopecchini.it/pzkko/chat/minigiochi.js', 'albertopecchini.it/pzkko/chat/zaino.js', OS + 'os.js', README],
     testo: `{{Infobox
 | titolo = Chat (app)
@@ -725,6 +732,9 @@ I tasti che nella chat grande stavano dentro l'html (<code>data-cmd</code>: «co
 == Le scelte dei giochi ==
 Quando un minigioco aspetta una scelta la croce va sui suoi tasti o sulle celle della griglia e OK preme. Quando i tasti di una scelta sono direzioni (sinistra, dritto o centro, destra, giù: la consegna del rider, il rigore) le frecce li premono subito (<code>scegli</code>), il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic». Quando un evento vuole una parola (la banconota: PRENDILA, la nutria: SCIÒ) la parola è un tasto: coi sei tasti scriverla in cinque secondi non si faceva. Da scassato ([[Il cercapersone scassato]]) propone solo <code>lavora</code> e <code>compra cercapersone</code>.
 
+== Le icone delle schede ==
+Dal 6.11.2026 una scheda può avere il campo <code>icone</code> (i nomi) e <code>lato</code> (16 o 32): una fila di riquadri con l'icona a un bit, come i rulli della slot. È il solo modo di far vedere un'icona nella chat: quelle dentro il testo (<code>:canna:</code>) <code>pulisci</code> le toglie. Lo usano [[I minigiochi della chat|i minigiochi del turno]] (la cosa da ricordare, l'ordinazione, i pezzi del nastro) e la scheda della paga dello spazzino. Insieme sono arrivati <code>smetti</code> (una risposta che si dà coi tasti o scrivendo: chi arriva prima spegne l'altro), i tasti spenti che ← → saltano, e la parola da premere che prende la croce quando compare.
+
 == Il collaudo ==
 [[File:app-chat-collaudo.webp|thumb|left|il cercapersone zero durante il collaudo della chat (prova.mjs --app=chat)]]
 Al primo giro il [[Il collaudo delle app|collaudo]] ha trovato sei difetti, quattro qui: l'errore «reading 'fermo'» della barra del tempo (la barra leggeva <code>m.tempo.fermo</code> quando <code>m.tempo</code> era già null), la barra delle schede a x 3 fuori dal margine, il «›» del prompt senza glifo, il cursore sopra la «s» di «scrivi», il bollino «↓ 1» attaccato ai messaggi. <code>prova.mjs --rider</code> fa un turno intero da rider (dal 31 ottobre il turno lo conta la [[La banca sul server|banca]], che nel collaudo non c'è); le scelte senza banca si provano con <code>finta@direzioni</code>, <code>finta@griglia</code>, <code>finta@parola</code> e <code>finta@azioni</code> nella sequenza. Resta da fare: il nastro dei cestini dello [[Lo spazzino di uffici|spazzino]] costruisce pezzi HTML veri, che nello zero non si vedono.
@@ -734,7 +744,7 @@ Al primo giro il [[Il collaudo delle app|collaudo]] ha trovato sei difetti, quat
   },
 
   'Profilo (app)': {
-    data: '2026-10-29',
+    data: '2026-11-06',
     fonti: [OS + 'profilo.js', 'albertopecchini.it/pzkko/telefono/app/profilo.js', OS + 'pezzi.js', README],
     testo: `{{Infobox
 | titolo = Profilo (app)
@@ -756,7 +766,7 @@ Al primo giro il [[Il collaudo delle app|collaudo]] ha trovato sei difetti, quat
 Si sfogliano con ← → (e ↑ ↓) coi pallini in alto e lo scorrimento di lato (<code>pagine</code> di pezzi.js):
 # il '''cartellino''': la faccia, il bollino del livello, il nome, l'indirizzo e la data, il titolo, i [[I soldi sporchi|soldi sporchi]] o la [[La galera|galera]], il motto, la barra degli xp che si riempie entrando, tutto dentro la cornice scelta disegnata davvero (nastro, oro doppia, neon a puntini, pixel a gradini);
 # i '''soldi''' (coi puntini fra nome e numero);
-# i '''giochi grandi''' (la tabella mani, vinte, netto, colpo);
+# i '''giochi''' (la tabella mani, vinte, netto, colpo: i sei giochi grandi e, dal 6.11, la riga '''«nella chat»''', tutti i giochi giocati col bot insieme. Bighurra aveva vinto 400 $pzk al blackjack della chat, nel saldo c'erano, ma qui la riga «blackjack» restava a trattini: «non mi ha tenuto conto dei miei 400 guadagnati con il blackjack»);
 # la '''vita col bot''';
 # i '''progressi''';
 # le '''classifiche''' (col conto, da <code>chat/db.js</code>; senza, o col server che non risponde, lo dice).
@@ -795,7 +805,7 @@ Crea (il nome, la chiave nascosta per i nomi riservati di Alberto, il PIN due vo
 
 == Col conto, cinque pagine ==
 # il '''conto''' (OK: sincronizza o esci; l'uscita si conferma);
-# le '''mosse''' (le ultime, descritte da <code>descriviMossa</code>: le stesse parole dell'app vecchia e del wallet);
+# le '''mosse''' (le ultime, descritte da <code>descriviMossa</code>: le stesse parole dell'app vecchia e del wallet; dal 6.11 anche «regalo di pzkko», la mossa delle [[Le operazioni della banca|operazioni della banca]]);
 # il '''cambio''' (il verso, il cursore 0–100 %, la conferma: [[Gli EUR€]]);
 # '''invia''' (l'indirizzo a cifre e il nome di chi è, quanti, la conferma: [[Gli invii]] si aprono 48 ore dopo la nascita del conto);
 # '''altro''' (l'indirizzo, che si cambia una volta sola, il PIN vecchio-nuovo-ripetuto, il [[Il regalo di Instagram|regalo di instagram]]).

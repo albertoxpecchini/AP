@@ -287,7 +287,7 @@ I traguardi: «cacciatore di nutrie» (50), «incubo delle nutrie» (200), «amm
   },
 
   'Il lavoro': {
-    data: '2026-10-31',
+    data: '2026-11-06',
     fonti: [C('comandi/lavoro.js'), C('minigiochi.js'), C('testi.js'), C('zaino.js'), R],
     testo: `'''Il lavoro''' è il comando <code>lavora</code> (work, lavoro) della [[La chat col bot|chat]]: un turno è un [[I minigiochi della chat|minigioco]] di pochi secondi, riuscito = la paga del [[I mestieri|mestiere]] per il moltiplicatore, più punti esperienza. Un turno ogni 20 minuti (<code>ATTESA_TURNO = 20 * 60</code>; i bonus «attese» lo accorciano).
 
@@ -298,6 +298,10 @@ I traguardi: «cacciatore di nutrie» (50), «incubo delle nutrie» (200), «amm
 # <code>lavora licenziati</code>: si lascia il mestiere.
 
 La paga è quella di <code>MESTIERI</code> (da 120 $pzk del rider a 1.000 del sindaco; i [[I lavori rischiosi|lavori rischiosi]] fino a 2.200) moltiplicata per <code>zaino.moltiplicatore()</code>: 1 + 2 % per ogni livello sopra il primo + i [[I bonus|bonus]] «paga» (la [[Pzk-kola]] +15 %, la [[Hyundai Tucson]] +12 %, il [[Neon pzkko|neon]] +6 %…). Dal 31.10 il turno è l'azione <code>chat.lavora</code> della [[La banca sul server|banca]] (<code>chat-lavoro.mjs</code>): è lei che prepara il minigioco (la parola, la sequenza), tiene la risposta in <code>x.tavolo</code>, verifica risposta e tempo con un minimo umano, e per i lavori rischiosi tira il dado della [[La galera|galera]]. Nello [[Il cercapersone zero|zero]] i tasti di una scelta a direzioni (la consegna del rider, il rigore del calcio) si premono con le frecce (29.10: «le freccie non vanno per la sequenza, fammele andare»).
+
+== Il 6 novembre ==
+{{Citazione|Il lavoro è un po buggato (non vedo cosa devo replicare) e non mi ha tenuto conto dei miei 400 guadagnati con il blackjack|Bighurra, 6.11.2026}}
+I minigiochi erano nati per la chat in HTML, e nella chat a 8 bit dello zero metà delle prove non si vedeva: sono stati [[I minigiochi della chat|riscritti da capo]]. <code>lavoro.js</code> adesso chiede le icone prima che la banca apra il turno (<code>prepara</code>), chiude il turno anche se un minigioco si rompe (vale «non ho risposto»: la briciola), e dice per nome le cose che la banca nominava con un'icona («no: era «anguria»», prima «no: era .»). I 400 del blackjack nel saldo c'erano: mancavano nel [[Profilo (app)|profilo]]. Per scusarsi Alberto ha fatto dare 1.999 $pzk a chi aveva giocato nelle ultime 48 ore: una delle [[Le operazioni della banca|operazioni della banca]].
 
 I turni contano per le [[Le sfide giornaliere|sfide]] (1, 2, 4 turni) e i [[I traguardi|traguardi]] «stakanovista» (50) e «schiavo del sistema» (200); «guadagnati in tutto» del [[Il libro dei conti|libro dei conti]] somma il lavoro ai premi.
 
@@ -374,14 +378,15 @@ Il [[Il testo predittivo|testo predittivo]] dopo <code>lavora come</code> propon
   },
 
   'Lo spazzino di uffici': {
-    data: '2026-10-29',
+    data: '2026-11-06',
     fonti: [C('minigiochi.js'), C('testi.js'), C('comandi/lavoro.js'), R],
-    testo: `'''Lo spazzino di uffici''' è il [[I lavori rischiosi|lavoro rischioso]] di livello 2 (paga 260 $pzk, rischio 4 % a turno, 2 ore di [[La galera|galera]], multa 500): «svuoti i cestini di un ufficio di notte: sul nastro passa di tutto». Il suo turno non è un quiz ma un videogioco, '''il nastro''' (<code>chat/minigiochi.js</code>, <code>nastro</code>): 12 cose passano una al secondo, si tiene o si butta trascinando o con le frecce, al più tre in tasca, e poi il resto lo si guarda passare.
+    testo: `'''Lo spazzino di uffici''' è il [[I lavori rischiosi|lavoro rischioso]] di livello 2 (paga 260 $pzk, rischio 4 % a turno, 2 ore di [[La galera|galera]], multa 500): «svuoti i cestini di un ufficio di notte: sul nastro passa di tutto». Il suo turno non è un quiz ma un videogioco, '''il nastro''' (<code>chat/minigiochi.js</code>, <code>nastro</code>): 12 cose passano una al secondo, si tiene (→) o si butta (←), al più tre in tasca, e poi il resto lo si guarda passare. I pezzi li dà la [[La banca sul server|banca]] uno alla volta (<code>chat.nastro</code>): quello che viene dopo nel browser non si sa mai prima.
 
 == Cosa passa sul nastro ==
 Le cose di <code>UFFICIO</code> in <code>chat/testi.js</code>: una cartaccia (peso 30, vale 1), una lattina vuota (22, 2), una scatola di graffette (16, 6), una tazza «il capo sono io» (12, 18), un mouse senza filo (9, 45), delle cuffie col microfono (6, 90), un orologio da polso (3, 260, raro) e due cose '''sospette''' che valgono 0 a venderle: una [[Chiavetta usb|chiavetta usb]] (5) e un [[Wallet pzk cifrato|wallet pzk cifrato]] (4), «qualcuno l'ha perso: si apre con l'app [[Il decifratore|decifratore]], che si compra nel [[Il pzkstore|pzkstore]]». Ogni chiavetta o wallet tenuto alza il rischio di essere presi del 15 %: tre pezzi sospetti in tasca fanno 49 %.
 
-Nello [[Il cercapersone zero|zero]] il nastro resta da fare: costruisce pezzi HTML veri (i cestini), che nella scheda finta di pzk os non si vedono (README, «Il rider e il clic»: «Resta da fare»).
+== Nello zero ==
+Fino al 6.11.2026 nello [[Il cercapersone zero|zero]] il nastro non si vedeva: costruiva pezzi HTML veri (una scatola coi cestini), che nella scheda finta di pzk os non compaiono, e il turno passava a guardare una scheda ferma. Dal 6.11 è una scheda sola che cambia a ogni pezzo: il titolo col numero («il nastro dei cestini · 3/12»), il nome e quanto vale (o «⚠ roba che scotta»), il disegno nel campo <code>icone</code>, le tasche («in tasca 2/3: cuffie, lattina vuota»), la barra del secondo che passa e due tasti, «← butta» e «→ tieni», che le frecce premono subito. A tasche piene i tasti non ci sono. La scheda della paga ha i disegni e i nomi della roba tenuta. Il collaudo (<code>prova.mjs --turni=nastro</code>) fa passare tutti e dodici i pezzi contro la banca vera in memoria e ne tiene tre.
 
 {{Vedi anche|I lavori rischiosi|Il decifratore|I portafogli smarriti|I mestieri}}
 [[Categoria:I mestieri]]`,
@@ -412,43 +417,56 @@ L'arresto lo decide la [[La banca sul server|banca]] (dal 31.10: un'azione che m
   },
 
   'I minigiochi della chat': {
-    data: '2026-10-31',
+    data: '2026-11-06',
     fonti: [C('minigiochi.js'), C('comandi/lavoro.js'), O('chat.js'), R],
-    testo: `'''I minigiochi della chat''' (<code>chat/minigiochi.js</code>, <code>MINIGIOCHI</code>) sono i tredici turni di [[Il lavoro|lavoro]], uno per [[I mestieri|mestiere]]:
+    testo: `'''I minigiochi della chat''' (<code>chat/minigiochi.js</code>, <code>MINIGIOCHI</code>) sono i tredici turni di [[Il lavoro|lavoro]], uno per [[I mestieri|mestiere]]. Il 6.11.2026 sono stati '''riscritti da capo''' per lo schermo del [[Il cercapersone zero|cercapersone zero]]: ogni prova si vede, e ogni risposta si dà coi [[I sei tasti|sei tasti]].
 
 {| class="wikitable"
 ! minigioco !! cosa si fa !! chi lo fa
 |-
-| riscrivi || riscrivi la frase che compare, senza errori || salumiere
+| riscrivi || la frase è scritta nella scheda; le sue parole, mescolate, sono tasti da premere in fila (o la si scrive tutta) || salumiere
 |-
-| anagramma || rimetti in ordine le lettere di una parola di <code>PAROLE</code> (chiocciola, sbrisolona, Rigoletto, euroshit…) || influencer
+| anagramma || le lettere mescolate di una parola di <code>PAROLE</code> (chiocciola, sbrisolona, Rigoletto, euroshit…) sono tasti: si premono nell'ordine giusto || influencer
 |-
-| memoria || i piatti da ricordare, nell'ordine || cameriere, contrabbandiere
+| memoria || cinque parole per quattro secondi, poi si premono nell'ordine di prima (almeno quattro al posto giusto) || cameriere, contrabbandiere
 |-
-| colori || il colore giusto, in fretta || bidello, imbianchino
+| colori || quattro parole, ognuna col suo colore scritto accanto («nutria → rosso»: lo schermo è a un bit), poi «di che colore era?» || bidello, imbianchino
 |-
-| icona || trova l'icona chiesta fra quelle mostrate || tatuatore, meccanico
+| icona || una cosa da guardare due secondi (il disegno a 32 pixel e il nome), poi quale era fra cinque || tatuatore, meccanico
 |-
 | calcio || il rigore: sinistra, centro o destra || sindaco
 |-
-| contrario || scrivi il contrario || sviluppatore web
+| contrario || una parola scritta al contrario: le lettere si premono dall'ultima alla prima || sviluppatore web
 |-
-| veloce || la parola che compare all'improvviso, riscritta col tempo || streamer, bagnino
+| veloce || la parola compare all'improvviso ed è un tasto: si preme (o si riscrive) subito || streamer, bagnino
 |-
-| conti || un conto a mente || prof di analisi, biscazziere
+| conti || un conto a mente: le cifre sono tasti (col meno), poi ✓ || prof di analisi, biscazziere
 |-
-| ordine || metti in ordine le ordinazioni || barista, pizzaiolo
+| ordine || l'ordinazione: tre cose da ricordare (i disegni e i nomi), poi nello stesso ordine || barista, pizzaiolo
 |-
 | strada || la consegna: a ogni svolta sinistra, dritto, destra || rider, corriere
 |-
 | quiz || una domanda dei [[I quiz|quiz]] || avvocato
 |-
-| nastro || il videogioco dello [[Lo spazzino di uffici|spazzino]]: tieni o butta || spazzino
+| nastro || il videogioco dello [[Lo spazzino di uffici|spazzino]]: dodici cose, una al secondo, → tieni o ← butta || spazzino
 |}
 
-Le risposte si scrivono con <code>normalizza</code> (accenti e maiuscole non contano); le parole si disegnano su una tela (<code>suTela</code>) perché non si copino. Dal 31.10 la banca prepara la prova e verifica la risposta e il tempo. Le scelte a direzioni (strada, calcio) si premono con le frecce anche nello [[Il cercapersone zero|zero]], e il tasto porta la sua freccia («premi ← ↑ → o fai clic»).
+Dal 31.10 la [[La banca sul server|banca]] prepara la prova (<code>chat.turno</code>: la frase, le parole, la sequenza) e verifica la risposta e il tempo, con <code>normalizza</code> (accenti e maiuscole non contano); il browser mostra e raccoglie. Le scelte a direzioni (strada, calcio, nastro) si premono con le frecce, e il tasto porta la sua freccia («premi ← ↑ → o fai clic»).
 
-{{Vedi anche|Il lavoro|I mestieri|I comandi della chat}}
+== Rifatti da capo, il 6 novembre ==
+{{Citazione|Il lavoro è un po buggato (non vedo cosa devo replicare)|Bighurra, 6.11.2026}}
+{{Citazione|per sicurezza io rifarei da zero il sistema tutti i servizi danneggiati senza far perdere i dati… fai un super lavoro, aggiusta benissimo tutto ricreando|Alberto, 6.11.2026}}
+I minigiochi erano nati per la chat in HTML del cercapersone vecchio: un'immagine da ricordare, la frase disegnata su una tela (<code>suTela</code>, perché non si copiasse), le parole colorate, una scatola col nastro dentro. Dal 31.10 la chat è solo quella a 8 bit di [[pzk os]], che di una scheda disegna il testo e i tasti. Così al meccanico l'icona da ricordare non compariva e i cinque tasti per rispondere erano cinque «?»; l'ordinazione del barista era vuota; i colori, su uno schermo a un bit, erano tutti uguali; la frase del salumiere, la parola dello streamer e il nastro non si vedevano. Con «riduci animazioni» le cose da guardare duravano 150 ms. E nessun collaudo giocava più un turno: li apre la banca, che nel [[Il collaudo delle app|collaudo]] non c'era.
+
+Le regole di adesso (in testa a <code>chat/minigiochi.js</code> e in [[Le regole per le app|REGOLE.md]]):
+* quello che c'è da guardare è '''testo''', o le '''icone della scheda''' (il campo <code>icone</code>: pzk os le disegna a un bit, in un riquadro), sempre col nome accanto;
+* ogni risposta si dà '''coi sei tasti''' o col clic. Una risposta che è un testo è fatta di pezzi (<code>componi</code>): le parole, le lettere, le cifre sono tasti da premere in ordine, sotto la domanda si legge quello che si è composto («› la nutria non…»), il pezzo premuto si spegne (cornice a puntini) e la croce passa al prossimo, ⌫ rimette l'ultimo. Chi ha la tastiera vera può anche scrivere la risposta e Invio: vale quella che arriva prima;
+* i tempi da guardare sono tempi veri (<code>aspetta</code>), non <code>ctx.dormi</code>;
+* le prove e i giudizi restano della banca: <code>chat-lavoro.mjs</code> non è cambiato.
+
+Il collaudo è <code>prova.mjs --turni</code>: tutti e tredici, uno per mestiere, giocati coi sei tasti contro la banca vera in memoria; la banca deve aver pagato il turno intero.
+
+{{Vedi anche|Il lavoro|I mestieri|I comandi della chat|Lo spazzino di uffici|Il collaudo delle app}}
 [[Categoria:La chat]]`,
   },
 
@@ -1232,10 +1250,10 @@ Nello zero ([[Codice C (app)|l'app]]) l'editor è una vista sola coi numeri di r
   },
 
   'Il rider': {
-    data: '2026-10-29',
+    data: '2026-11-06',
     fonti: [C('testi.js'), C('minigiochi.js'), O('chat.js'), 'albertopecchini.it/tools/pzkko/zero/prova.mjs', R],
     testo: `[[File:/art/chat-mestieri/rider.webp|thumb|upright|il rider]]
-'''Il rider''' è il primo [[I mestieri|mestiere]], livello 1, 120 $pzk a turno: «consegni pizze in bici col freddo». Il turno è il minigioco '''strada''': la consegna, a ogni svolta sinistra, dritto o destra, coi tre tasti in fila (lo fa anche il [[Corriere di notte|corriere di notte]]). È il mestiere che ha fatto scrivere due regole di [[Le regole per le app|pzk os]]: il 29.10 notte ({{Citazione|come faccio a premere quando faccio lavoro rider? le freccie non vanno per la sequenza, fammele andare, e metti per sicurezza anche il click del mous|Alberto, 29.10.2026}}) la scheda finta dello zero tornava null per <code>[data-fatte]</code> e la consegna andava in errore alla prima svolta, e i tre tasti volevano la croce per spostarsi e OK per premere. Da allora quando i tasti di una scelta sono direzioni le frecce li premono subito, il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic»; il collaudo <code>prova.mjs --rider</code> fa un turno intero con due frecce e due clic e controlla che sia contato. La voce generata [[Rider]] è la sua scheda.
+'''Il rider''' è il primo [[I mestieri|mestiere]], livello 1, 120 $pzk a turno: «consegni pizze in bici col freddo». Il turno è il minigioco '''strada''': la consegna, a ogni svolta sinistra, dritto o destra, coi tre tasti in fila (lo fa anche il [[Corriere di notte|corriere di notte]]). È il mestiere che ha fatto scrivere due regole di [[Le regole per le app|pzk os]]: il 29.10 notte ({{Citazione|come faccio a premere quando faccio lavoro rider? le freccie non vanno per la sequenza, fammele andare, e metti per sicurezza anche il click del mous|Alberto, 29.10.2026}}) la scheda finta dello zero tornava null per <code>[data-fatte]</code> e la consegna andava in errore alla prima svolta, e i tre tasti volevano la croce per spostarsi e OK per premere. Da allora quando i tasti di una scelta sono direzioni le frecce li premono subito, il tasto porta la sua freccia e sotto c'è scritto «premi ← ↑ → o fai clic»; il collaudo <code>prova.mjs --rider</code> fa un turno intero con due frecce e due clic e controlla che sia contato (dal 6.11 è <code>--turni=strada</code>, contro la banca vera in memoria: dal 31.10 il turno lo conta la banca, e senza di lei il collaudo diceva «il turno non è stato contato»). La voce generata [[Rider]] è la sua scheda.
 
 {{Vedi anche|I mestieri|Il lavoro|Il clic del mouse|Il collaudo delle app}}
 [[Categoria:I mestieri]]`,

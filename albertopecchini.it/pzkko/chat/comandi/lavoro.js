@@ -9,14 +9,28 @@
 // (31.10) TUTTO SULLA BANCA (giochi/chat-lavoro.mjs): 'chat.assumi', 'chat.licenzia', 'chat.turno' (apre il turno col suo
 // minigioco, e poi lo chiude con la risposta), 'chat.nastro' (lo spazzino: i pezzi uno alla volta, tieni o butta). L'attesa, la paga, il dado della galera e
 // la roba che resta in tasca li decide lei; qui si mostra il minigioco e si racconta com'è andata.
+// (6.11, Bighurra: «non vedo cosa devo replicare») I MINIGIOCHI SONO RIFATTI per lo schermo dello zero (minigiochi.js): ogni
+// prova si vede e ogni risposta si dà coi sei tasti. Qui: le icone si chiedono prima che la banca apra il turno (prepara), e
+// un minigioco che si rompe non lascia più il turno aperto sulla banca (si chiude come «tempo scaduto»: la briciola).
 import * as zaino from '../zaino.js'
-import { MESTIERI } from '../testi.js'
-import { MINIGIOCHI } from '../minigiochi.js'
+import { MESTIERI, UFFICIO } from '../testi.js'
+import { MINIGIOCHI, prepara } from '../minigiochi.js'
 import * as pzk from '../../games/pzk.js'
 
 // l'articolo giusto davanti al mestiere: lo spazzino, l'imbianchino, il rider
 const il = (n) => (/^(s[^aeiou]|z|gn|ps|x|y)/i.test(n) ? 'lo' : /^[aeiou]/i.test(n) ? 'l’' : 'il')
 const pc = (x) => `${Math.round(x * 100)} %`
+/** Il nome di una cosa dal suo id («lattina-vuota» → «lattina vuota»). */
+const nomeDi = (id) => String(id).replaceAll('-', ' ')
+/** (6.11) La nota della banca a turno finito. La banca nomina le cose con le icone («no: era :canna:.», «in tasca: :cuffie:
+ *  :orologio:»), che nella chat a 8 bit dentro il testo non si disegnano: restava «no: era .». Qui le icone diventano il
+ *  nome, e la roba tenuta dal nastro si scrive per nome (le icone vanno nella scheda, col campo icone). */
+function notaDi(e) {
+  if (!e.tenuti) return String(e.nota ?? '').replace(/:([a-z0-9-]+):/g, (_, n) => `«${nomeDi(n)}»`)
+  if (!e.tenuti.length) return 'tasche vuote: hai buttato tutto.'
+  const valore = e.tenuti.reduce((a, id) => a + (UFFICIO.find((y) => y.id === id)?.vale ?? 0), 0)
+  return `in tasca: <b>${e.tenuti.map(nomeDi).join(', ')}</b> (${valore} $pzk di roba${e.scottano ? ', più quella che scotta' : ''}).`
+}
 const ora = (t) => new Date(t).toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' })
 
 export const ATTESA_TURNO = 20 * 60
@@ -64,14 +78,24 @@ export const LAVORO = [
         if (v !== 'si') return ctx.dì({ colore: 'grigio', d: 'saggio. il turno resta lì.' }) && false
       } else {
         const pronto = ctx.dì({ av: 'bot-occhiolino', t: `:${m.id}: turno da ${m.nome}`, d: `${m.frase}. Pronto?` })
+        prepara(ctx)
         await ctx.inVista(pronto, 900)
       }
+      prepara(ctx) // (le icone del turno, chieste adesso: quando la banca apre il turno il tempo corre già)
       // la banca apre il turno e sceglie il minigioco (il turno si conta adesso: chi non risponde aspetta lo stesso)
       const a = await ctx.fai('chat.turno', {})
       if (!a.ok) return ctx.no(a, 'lavora')
       const { gioco, prova } = a.esito
       // (il nastro chiede i pezzi alla banca uno alla volta e chiude il turno da sé; gli altri rispondono una volta)
-      const r = gioco === 'nastro' ? await MINIGIOCHI.nastro(ctx, prova) : await ctx.fai('chat.turno', { risposta: await MINIGIOCHI[gioco](ctx, prova) })
+      let r
+      if (gioco === 'nastro') r = await MINIGIOCHI.nastro(ctx, prova)
+      else {
+        // (6.11) un minigioco che si rompe, o che qui non c'è, vale «non ho risposto»: il turno si chiude lo stesso sulla banca
+        // (prima restava aperto, e l'errore copriva la paga)
+        let risposta = null
+        try { risposta = MINIGIOCHI[gioco] ? await MINIGIOCHI[gioco](ctx, prova) : null } catch (e) { console.error('minigioco', gioco, e) }
+        r = await ctx.fai('chat.turno', { risposta: risposta ?? null })
+      }
       if (!r.ok) return ctx.no(r, 'lavora')
       const e = r.esito
       if (e.preso) {
@@ -80,7 +104,7 @@ export const LAVORO = [
         return false
       }
       if (e.scottano) ctx.dì({ colore: 'ambra', av: 'bot-occhiolino', t: ':chiavetta: roba che scotta', d: `hai ${e.scottano === 1 ? 'una cosa cifrata' : `${e.scottano} cose cifrate`} nello zaino. Si aprono con l’app <b>decifratore</b>: ${zaino.installata('decifratore') ? 'ce l’hai, è nella home del cercapersone (pagina dei soldi).' : 'si compra nel <b>pzkstore</b> del cercapersone, una volta sola, 1.500 $pzk puliti (o scrivi <code>installa decifratore</code>), poi lo apri dalla home, pagina dei soldi.'}` })
-      ctx.scheda({ colore: e.ok ? 'oro' : 'grigio', av: e.ok ? 'bot-ricco' : 'bot-triste', t: e.ok ? ':pzk: paga' : 'turno storto', d: `${e.nota} ${e.ok ? `Turno ${e.turni}${e.bonus ? ` (+${e.bonus} %)` : ''}: ${ctx.pzkHtml(e.n)}.` : `Il capo ti dà ${ctx.pzkHtml(e.n)} e uno sguardo.`}`, pie: `il prossimo turno fra ${ctx.durata(e.prossimo)}` })
+      ctx.scheda({ colore: e.ok ? 'oro' : 'grigio', av: e.ok ? 'bot-ricco' : 'bot-triste', t: e.ok ? ':pzk: paga' : 'turno storto', icone: e.tenuti?.length ? e.tenuti : undefined, d: `${notaDi(e)} ${e.ok ? `Turno ${e.turni}${e.bonus ? ` (+${e.bonus} %)` : ''}: ${ctx.pzkHtml(e.n)}.` : `Il capo ti dà ${ctx.pzkHtml(e.n)} e uno sguardo.`}`, pie: `il prossimo turno fra ${ctx.durata(e.prossimo)}` })
       ctx.saleDiLivello(e.livello)
       return false
     },

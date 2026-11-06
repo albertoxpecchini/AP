@@ -8,7 +8,7 @@ import * as pzk from '../../games/pzk.js'
 export const RISERVATI = /^\s*(pzkko|alberto|albertopecchini|pecchini|admin|banca|bancapzk|root)\s*$/i // come NOMI_PROTETTI in api/wallet.mjs (anche lo zero, os/account.js)
 const fmt = pzk.fmt, fmtEur = pzk.fmtEur
 
-const NOMI_MOSSE = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato' }
+const NOMI_MOSSE = { nato: 'conto aperto', 'in-eur': 'in EUR€', 'in-pzk': 'in $pzk', inviato: 'inviati a', ricevuto: 'ricevuti da', indirizzo: 'indirizzo cambiato', instagram: 'regalo di instagram', trovato: 'trovati per terra', sussidio: 'sussidio', lumaca: 'la lumachina', rapina: 'rapina alla cassa (sporchi)', arresto: 'arresto: multa', cauzione: 'cauzione', lavatrice: 'lavatrice (commissione)', lavati: 'lavati: ora puliti', puliti: 'puliti dal tempo', decifrato: 'wallet decifrato', regalo: 'regalo di pzkko' }
 /** Una mossa del conto in parole: { quando, cosa, n, segno }. L'account del cercapersone zero (telefono/zero/os/account.js)
  *  passa da qui. */
 export function descriviMossa(m) {

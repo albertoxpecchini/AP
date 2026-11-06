@@ -26,7 +26,38 @@ const telefono = process.argv.includes('--telefono'), larga = process.argv.inclu
 const app = (process.argv.find((a) => a.startsWith('--app=')) ?? '').slice(6)
 const misura = (process.argv.find((a) => a.startsWith('--misura=')) ?? '').slice(9).split('x').map(Number) // --misura=3440x1440: una finestra qualsiasi
 const peggiori = process.argv.includes('--peggiori') // i dati peggiori (REGOLE.md 4.2): nome di 20 lettere, motto di 60, quasi un miliardo
-const rider = process.argv.includes('--rider')
+// --turni (6.11, Bighurra: «il lavoro è un po' buggato, non vedo cosa devo replicare»): i tredici minigiochi del turno di
+// lavoro (chat/minigiochi.js), uno per mestiere, giocati COI SEI TASTI contro LA BANCA VERA in memoria (--banca). A ogni
+// passo la foto dell'lcd (prova-turno-<gioco>-<n>-<cosa>.png) e i controlli del collaudo; alla fine la banca deve aver
+// pagato il turno intero. --turni=icona,ordine: solo quelli. --rider è il turno del rider (--turni=strada): due svolte con
+// le frecce e due col clic del mouse. --sbaglia: nei giochi a una scelta (icona, colori, quiz) si preme una risposta sbagliata,
+// e deve finire in «turno storto» con la risposta giusta detta per nome. --scade: non si risponde, e allo scadere il turno
+// si chiude lo stesso (la briciola)
+const GIOCHI_TURNO = { strada: 'rider', memoria: 'cameriere', ordine: 'barista', colori: 'bidello', riscrivi: 'salumiere', icona: 'meccanico', veloce: 'streamer', contrario: 'sviluppatore', conti: 'prof', anagramma: 'influencer', quiz: 'avvocato', calcio: 'sindaco', nastro: 'spazzino' }
+const turniArg = process.argv.find((a) => a === '--turni' || a.startsWith('--turni='))
+const turni = process.argv.includes('--rider') ? ['strada'] : turniArg ? (turniArg.split('=')[1]?.split(',').filter((g) => GIOCHI_TURNO[g]) ?? Object.keys(GIOCHI_TURNO)) : []
+// --banca: /api/wallet, /api/borsa, /api/giocatori e /__dev/accesso li serve la banca vera (C:\pzkko-server\banca, o
+// PZKKO_BANCA) coi file IN MEMORIA, come tools/dev.mjs: i dati veri non si toccano. La pagina entra da sola col conto pzkko
+// (games/pzk.js, in locale). `metti` cambia il conto a mano, per preparare una prova; `rnd` è il caso della banca.
+// --giocate (con --banca --app=profilo): nel libro del conto le giocate di Bighurra del 4.11 (un blackjack vinto nella chat,
+// tre slot perse) e qualche mano ai giochi grandi, per vedere la riga «nella chat» della pagina dei giochi
+const conBanca = process.argv.includes('--banca') || turni.length > 0
+let bancaVera = null
+if (conBanca) {
+  const dir = process.env.PZKKO_BANCA || 'C:\\pzkko-server\\banca'
+  const u = (f) => new URL(`file:///${join(dir, f).replace(/\\/g, '/')}`).href
+  process.env.PZKKO_BANCA_SEGRETO ||= 'pzkko-banca-nel-collaudo-' + 'x'.repeat(24)
+  const b = await import(u('index.mjs'))
+  await b.collega(null, {})
+  const [w, arch, conti, motore] = await Promise.all([import(u('wallet.mjs')), import(u('archivio.mjs')), import(u('conti.mjs')), import(u('motore.mjs'))])
+  if (!arch.inMemoria()) throw new Error('la banca non è in memoria: mi fermo, i dati veri non si toccano')
+  const store = () => arch.archivio(conti.PATH, conti.vuoto)
+  bancaVera = {
+    gestisci: b.gestisci, accesso: () => w.accessoLocale('pzkko'), rnd: motore.rnd,
+    conto: async () => (await (await store()).read()).db.conti.find((c) => c.nome === 'pzkko') ?? null,
+    metti: async (fn) => arch.aggiorna(await store(), (db) => { const c = db.conti.find((x) => x.nome === 'pzkko'); c.zaino ??= { v: 1, t: 0, xp: 0, mestiere: null, turni: 0, oggetti: {}, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] }; fn(c, db); c.agg = (c.agg ?? 0) + 1 }),
+  }
+}
 const senzaConto = process.argv.includes('--senzaconto') // nessun conto: il cercapersone chiuso, l'account
 const finto = process.argv.includes('--server-finto') // un server del wallet finto (qui sotto): entra (PIN 1234), crea, converti, invia… // un turno da rider: la consegna con le frecce e coi clic del mouse
 const guidaPrima = process.argv.includes('--guida') // la guida del primo accesso all'apertura (con --senzaconto: il giro di chi arriva)
@@ -154,6 +185,18 @@ function giocatoriFinto(u, metodo) {
   return { ok: false, errore: 'richiesta sbagliata' }
 }
 const server = createServer(async (req, res) => {
+  // (6.11) la banca vera in memoria (--banca, --turni): come tools/dev.mjs
+  if (bancaVera) {
+    const pathname = new URL(req.url, 'http://x').pathname
+    if (pathname === '/__dev/accesso') { const d = await bancaVera.accesso(); res.writeHead(d.ok ? 200 : 404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); return res.end(JSON.stringify(d)) }
+    const daBanca = /^\/api\/(wallet|borsa|giocatori)\/?$/.exec(pathname)?.[1]
+    if (daBanca) {
+      let corpo = ''
+      if (req.method === 'POST') { const parti = []; for await (const p of req) parti.push(p); corpo = Buffer.concat(parti).toString('utf8') }
+      const r = await bancaVera.gestisci(daBanca, { m: req.method === 'HEAD' ? 'GET' : req.method, q: new URL(req.url, 'http://x').search, ip: '127.0.0.1', ua: req.headers['user-agent'] ?? '', corpo })
+      res.writeHead(r.status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(r.corpo)
+    }
+  }
   if (finto && req.url.startsWith('/api/borsa')) { // la borsa finta: un'onda lenta con un po' di rumore
     res.setHeader('Content-Type', 'application/json')
     const da = new URL(req.url, 'http://x').searchParams.get('da') ?? '24h', ore = { '24h': 24, '7g': 168, '30g': 720, tutto: 1500 }[da] ?? 24, n = 80, ora = Date.now()
@@ -194,18 +237,18 @@ try {
   console.log('webgl:', await page.evaluate(() => { const gl = document.createElement('canvas').getContext('webgl2'); if (!gl) return 'niente'; const d = gl.getExtension('WEBGL_debug_renderer_info'); return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) }))
   // lo zaino (senza «zero»: dal 31.10 lo zero c'è per tutti) e il conto finto, prima che la pagina parta
   // (1.11) le app del pzkstore (la lavatrice, il decifratore) si collaudano installate: se no non sono nel menu e non si aprono
-  await page.evaluateOnNewDocument((suoniAccesi, peggiori, senzaConto, daStore) => {
+  await page.evaluateOnNewDocument((suoniAccesi, peggiori, senzaConto, daStore, conBanca) => {
     const zaino = { v: 1, t: 0, xp: peggiori ? 987654 : 300, ...(peggiori && { profilo: { av: 'av-gonzaga', avs: ['av-gonzaga'], col: 'blu', cor: 'pixel', mot: 'chi va piano va sano e va lontano, ma chi va forte arriva prima' } }), mestiere: null, turni: 0, oggetti: { canna: 1 }, attese: {}, effetti: {}, serie: {}, stat: {}, rapidi: [] }
     sessionStorage.setItem('pzkko-chat-sessione', JSON.stringify(zaino))
     localStorage.setItem('pzkko-chat', JSON.stringify({ ind: 'pzk000001', zaino, visto: 0 }))
-    if (!senzaConto) localStorage.setItem('pzkko-wallet', JSON.stringify({ token: 'prova.prova', conto: { ind: 'pzk000001', nome: peggiori ? 'Bartolomeo Pecchinix' : 'prova', pzk: peggiori ? 987654321 : 52340, ...(peggiori && { creato: Date.UTC(2026, 9, 1), sporchi: 123456 }), ...(daStore && { zaino: { v: 1, t: 0, xp: 300, mestiere: null, turni: 0, oggetti: {}, app: { lavatrice: 1, decifratore: 1 }, attese: {}, effetti: {}, serie: {}, stat: {} } }), eur: 0, mosse: [], t: Date.now() }, tasso: 1, t: Date.now() }))
+    if (!senzaConto && !conBanca) localStorage.setItem('pzkko-wallet', JSON.stringify({ token: 'prova.prova', conto: { ind: 'pzk000001', nome: peggiori ? 'Bartolomeo Pecchinix' : 'prova', pzk: peggiori ? 987654321 : 52340, ...(peggiori && { creato: Date.UTC(2026, 9, 1), sporchi: 123456 }), ...(daStore && { zaino: { v: 1, t: 0, xp: 300, mestiere: null, turni: 0, oggetti: {}, app: { lavatrice: 1, decifratore: 1 }, attese: {}, effetti: {}, serie: {}, stat: {} } }), eur: 0, mosse: [], t: Date.now() }, tasso: 1, t: Date.now() }))
     localStorage.setItem('pzkko-benvenuto', JSON.stringify({ versione: 99 }))
     if (!location.search.includes('guida')) localStorage.setItem('pzkko-zero-guida', 'si')
     // i suoni: si contano gli oscillatori che nascono (ogni suono di suono/interfaccia.js ne fa almeno uno)
     localStorage.setItem('pzkko-suono', suoniAccesi ? 'si' : 'no')
     const AC = window.AudioContext
     if (AC) { const crea = AC.prototype.createOscillator; AC.prototype.createOscillator = function () { if (/interfaccia.js/.test(new Error().stack ?? '')) window.__oscillatori = (window.__oscillatori ?? 0) + 1; return crea.call(this) } } // (solo i suoni di suono/interfaccia.js: la musica e la strada ne fanno di continuo)
-  }, suoni, peggiori, senzaConto, ['lavatrice', 'decifratore'].includes(app))
+  }, suoni, peggiori, senzaConto, ['lavatrice', 'decifratore'].includes(app), conBanca)
 
   // (--guida: come chi arriva per la prima volta, la guida all'apertura; con --app l'app non si apre da sola, la guida porta lì)
   await page.goto(`${base}/?muro=1&chat&ora=${ora}${guidaPrima ? '&guida' : ''}`, { waitUntil: 'networkidle2', timeout: 60000 })
@@ -263,7 +306,7 @@ try {
   await page.screenshot({ path: join(LAVORO, 'prova-aperto.png') })
   await dorm(1400)
   await page.screenshot({ path: join(LAVORO, 'prova-cavo.png') })
-  if (!app && !rider) { // (collaudando un'app sola, il giro di sempre no: senza conto finirebbe a scrivere nell'account)
+  if (!app && !turni.length) { // (collaudando un'app sola, il giro di sempre no: senza conto finirebbe a scrivere nell'account)
   // pzk os: OK apre il menu, OK apre la chat (la prima), poi i comandi veri dalla tastiera
   await page.keyboard.press('Enter'); await dorm(500)
   await page.screenshot({ path: join(LAVORO, 'prova-menu.png') })
@@ -299,44 +342,156 @@ try {
   for (let i = 0; i < 3; i++) { await page.keyboard.press('Enter'); await dorm(200) } // (le tre pagine della guida)
   await page.keyboard.press('Escape'); await dorm(200); await page.keyboard.press('Escape'); await dorm(400)
   }
-  if (rider) {
-    // IL TURNO DA RIDER (29.10, Alberto: «come faccio a premere quando faccio lavoro rider? le freccie non vanno per la
-    // sequenza… metti per sicurezza anche il click del mouse»): assunto, «lavora», e la consegna rifatta con DUE FRECCE dalla
-    // tastiera e DUE CLIC del mouse sul tasto disegnato nello schermo 3D. Il caso è fissato (Math.random 0,1) finché il gioco
-    // non parte: il minigioco è quello del rider («strada») e le quattro svolte sono tutte «sinistra»
+  // ── gli attrezzi del collaudo (li usano --app e --turni): strumenta aggancia l'lcd (i caratteri senza glifo, le icone che non
+  // ci sono, i testi larghi), controlla guarda lo schermo di adesso (angoli, margine) e lo fotografa ──
+  const strumenta = () => page.evaluate(async () => {
+    const [os, font] = await Promise.all([import('/telefono/zero/os/os.js'), import('/telefono/zero/os/font.js')])
+    window.__collaudo = { glifi: new Set(), nulle: 0, larghi: new Set() }
+    // un'icona che non c'è: icone.bitmap torna null e al suo posto resta un buco
+    const bm = os.lcd.bitmap.bind(os.lcd)
+    os.lcd.bitmap = (b, ...r) => { if (!b) window.__collaudo.nulle++; return bm(b, ...r) }
+    const testo = os.lcd.testo.bind(os.lcd)
+    // un testo più largo del suo spazio (anche se poi il ritaglio lo taglia in silenzio): fuori dal margine di 6 pixel
+    const { Lcd } = await import('/telefono/zero/os/lcd.js')
+    os.lcd.testo = (x, y, s, o) => { for (const ch of String(s)) if (!font.esiste(ch)) window.__collaudo.glifi.add(ch); const w = Lcd.larghezza(s, o?.scala ?? 1); if (window.__collaudo.misura && y >= os.BARRA && (x < os.MARGINE - 2 || x + w > os.W - os.MARGINE + 2)) window.__collaudo.larghi.add(String(s).slice(0, 40)); return testo(x, y, s, o) }
+  })
+  const controlla = () => page.evaluate(async () => {
+    const os = await import('/telefono/zero/os/os.js'), { W, H, BARRA, MARGINE } = os, fb = os.lcd.fb
+    await new Promise((r) => setTimeout(r, 250)) // (le webp di riserva fanno in tempo ad arrivare)
+    window.__collaudo.nulle = 0
+    window.__collaudo.misura = true // (i testi larghi si contano solo qui, a pagina ferma: mentre scorre di lato sono spostati apposta)
+    os.ridisegna(); await new Promise((r) => setTimeout(r, 250))
+    window.__collaudo.misura = false
+    const fuori = { angoli: 0, margine: 0, dove: [] }
+    // gli angoli dello schermo sono stondati (2,2 mm: un quarto d'ellisse di 15 × 13 pixel): lì l'inchiostro non si vede
+    const RX = 15, RY = 13
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!fb[y * W + x]) continue
+      const cx = x < RX ? RX : x >= W - RX ? W - 1 - RX : null, cy = y < RY ? RY : y >= H - RY ? H - 1 - RY : null
+      if (cx !== null && cy !== null && ((x - cx) / RX) ** 2 + ((y - cy) / RY) ** 2 > 1) { fuori.angoli++; if (fuori.dove.length < 6) fuori.dove.push(x + ',' + y) }
+      else if (y >= BARRA && (x < MARGINE - 2 || x >= W - MARGINE + 2)) { fuori.margine++; if (fuori.dove.length < 6) fuori.dove.push(x + ',' + y) } // (2 px di tolleranza: le cornici dei dialoghi)
+    }
+    const v = os.corrente()
+    return { vista: v?.nome ?? '?', app: v?.app ?? '', fuori, nulle: window.__collaudo.nulle, glifi: [...window.__collaudo.glifi], png: os.lcd.canvas.toDataURL('image/png') }
+  })
+  if (turni.length) {
+    // IL GIRO DEI TURNI (6.11; prima c'era solo il turno del rider, del 29.10, che dal 31.10 non poteva più andare: i turni
+    // li apre la banca, e nel collaudo la banca non c'era). Per ogni minigioco: il mestiere giusto messo a mano nel conto
+    // (livello alto, nessuna attesa), «lavora» scritto nella chat, e la prova giocata come la gioca uno coi sei tasti (le
+    // frecce e Invio, che sono la croce e OK). La risposta giusta la si legge dal tavolo della banca, che qui è in memoria.
+    // L'anagramma si scrive dalla tastiera vera (l'altra strada), la consegna del rider fa due svolte con le frecce e due
+    // col clic del mouse sul tasto disegnato nello schermo 3D. La banca tira sempre il gioco del mestiere e non arresta
+    // nessuno (rnd.si), se no ogni giro sarebbe una prova diversa.
     const errori = []
     page.on('pageerror', (e) => errori.push('errore nella pagina: ' + e.message))
-    const lcdPng = async (nome) => { const png = await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => { os.ridisegna(); return new Promise((r) => setTimeout(() => r(os.lcd.canvas.toDataURL('image/png')), 250)) })); await writeFile(join(LAVORO, `prova-rider-${nome}.png`), Buffer.from(png.split(',')[1], 'base64')) }
-    await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.apri('chat'))); await dorm(1200)
-    await page.keyboard.type('lavora come rider', { delay: 25 }); await page.keyboard.press('Enter'); await dorm(2500)
-    const turni0 = await page.evaluate(() => import('/chat/zaino.js').then((z) => z.stato().turni ?? 0))
-    await page.evaluate(() => { window.__random = Math.random; Math.random = () => 0.1 })
-    await page.keyboard.type('lavora', { delay: 25 }); await page.keyboard.press('Enter')
-    // si aspetta che compaiano i tre tasti della consegna (tre zone cliccabili larghe nella chat)
-    let tasti = []
-    for (let i = 0; i < 40 && tasti.length < 3; i++) { await dorm(250); tasti = await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.elencoZone().filter((z) => z.h >= 8 && z.w > 30 && z.y > 12))) }
-    await page.evaluate(() => { Math.random = window.__random })
-    if (tasti.length < 3) errori.push('i tasti della consegna non sono comparsi')
-    await lcdPng('0-tasti')
-    // due frecce dalla tastiera
-    await page.keyboard.press('ArrowLeft'); await dorm(300); await lcdPng('1-freccia')
-    await page.keyboard.press('ArrowLeft'); await dorm(300); await lcdPng('2-freccia')
-    // due clic del mouse sul tasto «← sinistra»: il più a sinistra dell'ultima fila
-    for (const n of [3, 4]) {
-      const zz = await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.elencoZone().filter((z) => z.h >= 8 && z.w > 30 && z.y > 12)))
-      const yMax = Math.max(...zz.map((z) => z.y)), z = zz.filter((q) => q.y === yMax).sort((a, b) => a.x - b.x)[0]
-      if (!z) { errori.push('tasto da cliccare non trovato'); break }
-      const p = await page.evaluate((x, y) => window.pzkkoZero.puntoLcd(x, y), z.x + z.w / 2, z.y + z.h / 2)
-      await page.mouse.move(p.x, p.y); await dorm(150)
-      const cursore = await page.evaluate(() => document.querySelector('.z-tela')?.style.cursor)
-      if (cursore !== 'pointer') errori.push(`clic ${n}: sopra il tasto il puntatore non è la manina (${cursore || 'niente'})`)
-      await page.mouse.click(p.x, p.y); await dorm(300); await lcdPng(`${n}-clic`)
+    bancaVera.rnd.si = (p) => p === 0.6
+    const sbaglia = process.argv.includes('--sbaglia'), scade = process.argv.includes('--scade')
+    await strumenta()
+    const adesso = () => page.evaluate(() => import('/telefono/zero/os/chat.js').then((c) => c.adesso()))
+    const FRECCE = { sx: 'ArrowLeft', dx: 'ArrowRight', su: 'ArrowUp', giu: 'ArrowDown' }
+    const nomeDi = (id) => id.replaceAll('-', ' ')
+    await page.waitForFunction(() => import('/games/pzk.js').then((p) => p.conto()?.nome === 'pzkko'), { timeout: 20000 }).catch(() => errori.push('il conto pzkko della banca in memoria non è entrato'))
+    await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.apri('chat'))); await dorm(1500)
+    for (const gioco of turni) {
+      const mest = GIOCHI_TURNO[gioco], male = (cosa) => errori.push(`${gioco} (${mest}): ${cosa}`)
+      let n = 0
+      // la foto dell'lcd coi controlli (mezzo secondo), o svelta (il nastro: un secondo a pezzo)
+      const foto = async (cosa, svelta = false) => {
+        const nome = `prova-turno-${gioco}-${n++}-${cosa}.png`
+        if (svelta) { await dorm(160); const png = await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.lcd.canvas.toDataURL('image/png'))); await writeFile(join(LAVORO, nome), Buffer.from(png.split(',')[1], 'base64')); return }
+        const r = await controlla()
+        await writeFile(join(LAVORO, nome), Buffer.from(r.png.split(',')[1], 'base64'))
+        if (r.nulle) male(`${cosa}: ${r.nulle} icone che non ci sono`)
+        if (r.fuori.angoli) male(`${cosa}: ${r.fuori.angoli} pixel negli angoli stondati (${r.fuori.dove.join(' ')})`)
+        if (r.fuori.margine) male(`${cosa}: ${r.fuori.margine} pixel fuori dal margine (${r.fuori.dove.join(' ')})`)
+      }
+      await bancaVera.metti((c) => { const z = c.zaino; z.xp = 30000; z.mestiere = mest; z.turni = 0; z.attese = { ...z.attese, turno: 0 }; delete c.galera; delete c.tavoli?.['chat-turno']; c.pzk = Math.max(c.pzk, 5000) })
+      await page.evaluate(() => import('/games/pzk.js').then((p) => p.sincronizza()))
+      await page.waitForFunction((m) => import('/chat/zaino.js').then((z) => z.mestiere() === m && z.manca('turno') === 0), { timeout: 10000 }, mest).catch(() => male('il mestiere non è arrivato nello zaino del browser'))
+      const prima = (await adesso()).schede
+      await page.keyboard.type('lavora', { delay: 25 }); await page.keyboard.press('Enter')
+      // quello che c'è da fare, nell'ordine: i tasti da premere ({ id } o { eti }), letti dal segreto della banca
+      let piano = null, scritto = false, visto = '', fatte = 0, tenuti = 0, pezzo = '', fine = null, clic = 0
+      const scadenza = Date.now() + 70000 // (il più lungo: la memoria, 4 + 20 secondi, più i margini)
+      while (Date.now() < scadenza) {
+        await dorm(90)
+        const st = await adesso()
+        const esito = st.ultime.find((u) => u.n > prima && /^(paga|turno storto|presi)$/.test(u.t))?.t // (solo le schede di questo turno)
+        if (esito && !st.scelta && !st.scrivi && !st.occupata) { fine = esito; break }
+        const t = (await bancaVera.conto())?.tavoli?.['chat-turno']
+        if (!piano && t?.gioco) {
+          if (t.gioco !== gioco) { male(`la banca ha aperto «${t.gioco}»`); break }
+          piano = { riscrivi: () => t.atteso.split(' ').map((eti) => ({ eti })), contrario: () => [...t.atteso].map((eti) => ({ eti })), memoria: () => t.cinque.map((eti) => ({ eti })),
+            conti: () => [...[...t.atteso].map((eti) => ({ eti })), { id: 'fatto' }], colori: () => [{ id: t.atteso }], icona: () => [{ id: t.atteso }], quiz: () => [{ id: t.atteso }],
+            ordine: () => t.seq.map((v) => ({ eti: nomeDi(v) })), strada: () => t.seq.map((id) => ({ id })), calcio: () => [{ id: 'sinistra' }], anagramma: () => [{ scrivi: t.atteso }], veloce: () => [{ parola: t.atteso }], nastro: () => [] }[gioco]()
+          if (scade && gioco !== 'nastro') piano = []
+          else if (sbaglia && ['icona', 'colori', 'quiz'].includes(gioco)) piano = [{ altro: t.atteso }]
+        }
+        // la scheda è cambiata: una foto (la prova da guardare, i tasti, la paga)
+        const ora = st.scheda ? `${st.scheda.t}|${st.scheda.d.split('\n')[0]}|${st.scelta ? 'tasti' : st.scrivi ? 'scrivi' : ''}` : ''
+        if (st.scheda?.fatta && st.schede > prima && ora !== visto && gioco !== 'nastro') { visto = ora; await foto(st.scelta ? 'tasti' : st.scrivi ? 'scrivi' : 'guarda'); continue }
+        // un lavoro rischioso chiede prima se si vuole lavorare lo stesso
+        if (st.scelta?.tasti.some((b) => b.id === 'si') && st.scelta.tasti.some((b) => b.id === 'no')) { await foto('rischio'); const i = st.scelta.tasti.findIndex((b) => b.id === 'si'); for (let k = 0; k < 6 && (await adesso()).scelta?.sel !== i; k++) { await page.keyboard.press('ArrowRight'); await dorm(60) } await page.keyboard.press('Enter'); await dorm(300); continue }
+        if (!piano) continue
+        // il nastro: i primi tre pezzi si tengono (→), gli altri si guardano passare
+        if (gioco === 'nastro') {
+          if (st.scheda && st.scheda.t !== pezzo && /\d+\/\d+$/.test(st.scheda.t)) { pezzo = st.scheda.t; fatte++; if (fatte <= 5 || fatte === 12) await foto(`pezzo${fatte}`, true); if (!st.scheda.icone.length) male(`${pezzo}: il pezzo non ha l'icona`); if (st.scelta && tenuti < 3) { await dorm(250); await page.keyboard.press('ArrowRight'); tenuti++ } }
+          continue
+        }
+        const b = piano[0]
+        if (!b) continue
+        if (b.scrivi) { if (st.scelta && st.scrivi && !scritto) { scritto = true; await page.keyboard.type(b.scrivi, { delay: 35 }); await foto('scritta'); await page.keyboard.press('Enter'); piano.shift() } continue }
+        if (b.parola) { if (st.scrivi === b.parola) { await page.keyboard.press('Enter'); piano.shift() } else if (st.scrivi && st.scrivi !== 'scrivi qui…') male(`la parola da premere è «${st.scrivi}», la banca aspetta «${b.parola}»`); continue }
+        if (!st.scelta) continue
+        const i = st.scelta.tasti.findIndex((x) => !x.spento && (b.altro ? x.id !== b.altro : b.id ? x.id === b.id : x.eti === b.eti))
+        if (i < 0) { male(`il tasto ${JSON.stringify(b)} non c'è fra ${st.scelta.tasti.map((x) => x.eti).join(' | ')}`); break }
+        const verso = st.scelta.dir?.[st.scelta.tasti[i].id]
+        if (verso && gioco === 'strada' && fatte >= 2) {
+          // le ultime due svolte col clic del mouse sul tasto nello schermo 3D: i tre tasti stanno nell'ultima fila, da sinistra
+          const zz = await page.evaluate(() => import('/telefono/zero/os/os.js').then((os) => os.elencoZone().filter((z) => z.h >= 8 && z.w > 30 && z.y > 12)))
+          const yMax = Math.max(...zz.map((z) => z.y)), z = zz.filter((q) => q.y === yMax).sort((a, b) => a.x - b.x)[i]
+          if (!z) { male('il tasto da cliccare non è fra le zone'); break }
+          const pt = await page.evaluate((x, y) => window.pzkkoZero.puntoLcd(x, y), z.x + z.w / 2, z.y + z.h / 2)
+          await page.mouse.move(pt.x, pt.y); await dorm(150)
+          const cursore = await page.evaluate(() => document.querySelector('.z-tela')?.style.cursor)
+          if (cursore !== 'pointer') male(`clic ${++clic}: sopra il tasto il puntatore non è la manina (${cursore || 'niente'})`)
+          await page.mouse.click(pt.x, pt.y)
+        } else if (verso) await page.keyboard.press(FRECCE[verso]) // (una direzione: la freccia preme subito)
+        else { for (let k = 0; k < 40 && (await adesso()).scelta?.sel !== i; k++) { await page.keyboard.press('ArrowRight'); await dorm(35) } await page.keyboard.press('Enter') }
+        piano.shift(); fatte++
+        await dorm(120)
+        if (fatte === 1 || !piano.length) await foto(piano.length ? 'primo' : 'ultimo', true)
+      }
+      for (let k = 0; k < 40 && (await adesso()).occupata; k++) await dorm(250) // (il comando finisce prima del turno dopo)
+      await dorm(700)
+      await foto('fine')
+      const c = await bancaVera.conto()
+      if (!fine) male('il turno non è finito in 70 secondi')
+      else if (scade || (sbaglia && ['icona', 'colori', 'quiz'].includes(gioco))) {
+        const ultima = (await adesso()).scheda
+        if (fine !== 'turno storto') male(`doveva finire in «turno storto», è finito con «${fine}»`)
+        else if (!scade && !/era («[^»]+»|[a-zà-ù]+)/.test(ultima?.d ?? '')) male(`la scheda non dice qual era la risposta giusta: «${ultima?.d}»`)
+        else if (scade && !/scaduto|non hai tirato/.test(ultima?.d ?? '')) male(`la scheda non dice che il tempo è scaduto: «${ultima?.d}»`)
+      } else if (fine !== 'paga' && gioco !== 'calcio') male(`finito con «${fine}» invece della paga intera`) // (il rigore lo para il portiere, una volta su tre)
+      if (c?.tavoli?.['chat-turno']) male('il turno è rimasto aperto sulla banca')
+      if ((c?.zaino?.turni ?? 0) !== 1) male(`il turno non è stato contato (turni ${c?.zaino?.turni})`)
+      if (gioco === 'nastro' && fatte !== 12) male(`sul nastro sono passati ${fatte} pezzi, non 12`)
+      console.log(`  ${gioco.padEnd(10)} ${mest.padEnd(13)} → ${fine ?? 'non finito'}${gioco === 'nastro' ? ` (${fatte} pezzi, ${tenuti} tenuti)` : ''}  foto ${n}`)
+      await dorm(600)
     }
-    await dorm(2500); await lcdPng('5-paga')
-    const turni1 = await page.evaluate(() => import('/chat/zaino.js').then((z) => z.stato().turni ?? 0))
-    if (turni1 !== turni0 + 1) errori.push(`il turno non è stato contato (turni ${turni0} → ${turni1})`)
-    console.log(errori.length ? `RIDER: ${errori.length} problemi\n  - ` + errori.join('\n  - ') : `RIDER: tutto a posto (turni ${turni0} → ${turni1}); guarda prova-rider-*.png`)
+    const glifi = await page.evaluate(() => [...window.__collaudo.glifi])
+    if (glifi.length) errori.push('caratteri senza glifo in font.js: ' + glifi.map((c) => JSON.stringify(c)).join(' '))
+    const larghi = await page.evaluate(() => [...window.__collaudo.larghi])
+    if (larghi.length) errori.push('testi più larghi dello schermo: ' + larghi.map((t) => JSON.stringify(t)).join(' '))
+    console.log(errori.length ? `TURNI: ${errori.length} problemi\n  - ` + errori.join('\n  - ') : `TURNI: tutto a posto (${turni.length} minigiochi, coi sei tasti, con la banca vera in memoria); guarda prova-turno-*.png`)
     await page.keyboard.press('Escape'); await dorm(400)
+  }
+  if (app && bancaVera) {
+    await page.waitForFunction(() => import('/games/pzk.js').then((p) => p.conto()?.nome === 'pzkko'), { timeout: 20000 }).catch(() => console.log('  (il conto pzkko della banca in memoria non è entrato)'))
+    if (process.argv.includes('--giocate')) {
+      await bancaVera.metti((c) => { c.libro = { ...c.libro, lav: 10292.5, pre: 1160, spe: 10580, g: { 'chat-slot': [3, 0, 60, 0, 0], 'chat-blackjack': [1, 1, 400, 800, 400], blackjack: [5, 2, 865, 130, 50], roulette: [2, 2, 5000, 6000, 500] } } })
+      await page.evaluate(() => import('/games/pzk.js').then((p) => p.sincronizza())); await dorm(600)
+    }
   }
   if (app) {
     // IL COLLAUDO DI UN'APP (le regole: pzkko/telefono/zero/os/REGOLE.md): la si apre, si premono tutti e sei i tasti, e a
@@ -354,36 +509,7 @@ try {
     const passi = scelti.length ? [['apri', null], ...scelti.map(passo)] : [['apri', null], ['giu', 'ArrowDown'], ['giu', 'ArrowDown'], ['su', 'ArrowUp'], ['dx', 'ArrowRight'], ['sx', 'ArrowLeft'], ['ok', 'Enter'], ['ok', 'Enter'], ['indietro', 'Escape'], ['indietro', 'Escape'], ['indietro', 'Escape']]
     const errori = []
     page.on('pageerror', (e) => errori.push('errore nella pagina: ' + e.message))
-    await page.evaluate(async () => {
-      const [os, font] = await Promise.all([import('/telefono/zero/os/os.js'), import('/telefono/zero/os/font.js')])
-      window.__collaudo = { glifi: new Set(), nulle: 0, larghi: new Set() }
-      // un'icona che non c'è: icone.bitmap torna null e al suo posto resta un buco
-      const bm = os.lcd.bitmap.bind(os.lcd)
-      os.lcd.bitmap = (b, ...r) => { if (!b) window.__collaudo.nulle++; return bm(b, ...r) }
-      const testo = os.lcd.testo.bind(os.lcd)
-      // un testo più largo del suo spazio (anche se poi il ritaglio lo taglia in silenzio): fuori dal margine di 6 pixel
-      const { Lcd } = await import('/telefono/zero/os/lcd.js')
-      os.lcd.testo = (x, y, s, o) => { for (const ch of String(s)) if (!font.esiste(ch)) window.__collaudo.glifi.add(ch); const w = Lcd.larghezza(s, o?.scala ?? 1); if (window.__collaudo.misura && y >= os.BARRA && (x < os.MARGINE - 2 || x + w > os.W - os.MARGINE + 2)) window.__collaudo.larghi.add(String(s).slice(0, 40)); return testo(x, y, s, o) }
-    })
-    const controlla = () => page.evaluate(async () => {
-      const os = await import('/telefono/zero/os/os.js'), { W, H, BARRA, MARGINE } = os, fb = os.lcd.fb
-      await new Promise((r) => setTimeout(r, 250)) // (le webp di riserva fanno in tempo ad arrivare)
-      window.__collaudo.nulle = 0
-      window.__collaudo.misura = true // (i testi larghi si contano solo qui, a pagina ferma: mentre scorre di lato sono spostati apposta)
-      os.ridisegna(); await new Promise((r) => setTimeout(r, 250))
-      window.__collaudo.misura = false
-      const fuori = { angoli: 0, margine: 0, dove: [] }
-      // gli angoli dello schermo sono stondati (2,2 mm: un quarto d'ellisse di 15 × 13 pixel): lì l'inchiostro non si vede
-      const RX = 15, RY = 13
-      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-        if (!fb[y * W + x]) continue
-        const cx = x < RX ? RX : x >= W - RX ? W - 1 - RX : null, cy = y < RY ? RY : y >= H - RY ? H - 1 - RY : null
-        if (cx !== null && cy !== null && ((x - cx) / RX) ** 2 + ((y - cy) / RY) ** 2 > 1) { fuori.angoli++; if (fuori.dove.length < 6) fuori.dove.push(x + ',' + y) }
-        else if (y >= BARRA && (x < MARGINE - 2 || x >= W - MARGINE + 2)) { fuori.margine++; if (fuori.dove.length < 6) fuori.dove.push(x + ',' + y) } // (2 px di tolleranza: le cornici dei dialoghi)
-      }
-      const v = os.corrente()
-      return { vista: v?.nome ?? '?', app: v?.app ?? '', fuori, nulle: window.__collaudo.nulle, glifi: [...window.__collaudo.glifi], png: os.lcd.canvas.toDataURL('image/png') }
-    })
+    await strumenta()
     await page.evaluate(() => { window.__oscillatori = 0 })
     let ultimaVista = ''
     for (const [i, [nome, k]] of passi.entries()) {

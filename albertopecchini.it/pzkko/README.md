@@ -2858,6 +2858,39 @@ ultimi», che nello zero non è vero.
   conto), e nelle sequenze `finta@direzioni|griglia|parola|azioni` (una scelta finta nella chat, senza la banca: il rider,
   le mine, la banconota, i tasti spenti). Si guarda su http://localhost:5182/?zero.
 
+**Il turno di lavoro rifatto da capo** (6.11, Bighurra: «il lavoro è un po' buggato (non vedo cosa devo replicare) e non
+mi ha tenuto conto dei miei 400 guadagnati con il blackjack»; Alberto: «per sicurezza io rifarei da zero il sistema, tutti i
+servizi danneggiati, senza far perdere i dati… fai un super lavoro, aggiusta benissimo tutto ricreando»). I minigiochi del
+turno erano nati per la chat in HTML e dal 31.10 giravano solo nella chat a 8 bit, che di una scheda disegna il testo e i
+tasti: al meccanico (e al tatuatore) l'icona da ricordare non compariva e i cinque tasti per rispondere erano cinque «?»;
+l'ordinazione del barista era vuota; le parole colorate del bidello su uno schermo a un bit erano tutte uguali; la frase del
+salumiere e la parola dello streamer stavano su una tela che nello zero non esiste; il nastro dello spazzino non si vedeva
+affatto. Con «riduci animazioni» le cose da guardare duravano 150 ms. E dal 31.10 nessun collaudo giocava più un turno: li
+apre la banca, e nel collaudo la banca non c'era.
+- `chat/minigiochi.js` **riscritto**: quello che c'è da guardare è testo o le **icone della scheda** (il campo `icone`,
+  col nome scritto accanto); ogni risposta si dà **coi sei tasti**: le parole, le lettere e le cifre sono tasti da premere
+  in ordine (`componi`: sotto la domanda si legge quello che si è composto, il pezzo premuto si spegne, ⌫ lo rimette), e
+  chi ha la tastiera vera può anche scrivere la risposta e Invio. I colori sono scritti («nutria → rosso»), la parola del
+  veloce è un tasto, il nastro è una scheda che cambia a ogni pezzo (il disegno, il nome, quanto vale, le tasche; → tiene,
+  ← butta). I tempi da guardare sono tempi veri (`aspetta`). Le prove e i giudizi restano della banca, uguali a prima.
+- `chat/comandi/lavoro.js`: le icone si chiedono prima che la banca apra il turno; un minigioco che si rompe chiude il
+  turno lo stesso; le note della banca con le icone dentro («no: era :canna:») dicono il nome; la roba del nastro è nella
+  scheda della paga, coi disegni. `chat/comandi/giochi.js`: anche il comando «veloce» aveva la parola sulla tela.
+- `os/chat.js`: il campo `icone` delle schede (una fila di riquadri, a 16 o 32 pixel), `smetti` (chi ha risposto coi
+  tasti spegne la riga da scrivere, e viceversa), i tasti spenti che ← → saltano, un tasto di sola icona che prende il
+  nome dell'icona, la parola da premere che prende la croce quando compare.
+- **Il blackjack di Bighurra.** I 400 nel saldo c'erano: il conto torna al mezzo $pzk con tutte le voci del libro. Li aveva
+  vinti al blackjack **della chat**, e nel profilo la pagina dei giochi aveva solo i sei giochi grandi: la riga «blackjack»
+  restava a trattini. `os/profilo.js`: la pagina si chiama «i giochi» e ha la riga **«nella chat»** (tutti i giochi del bot
+  insieme: mani, vinte, netto, il colpo migliore).
+- **Il regalo.** «Per scusarmi dona 1999pzk a tutti i giocatori che hanno giocato nelle ultime 48 ore»: un'operazione della
+  banca (`C:\pzkko-server\banca\wallet.mjs`, `OPERAZIONI`, `2026-11-06-scuse-1999`), una volta sola, coniati, con la
+  mossa «regalo di pzkko» sul conto. Sono andati a pzkko e a Bighurra, gli unici due che avevano giocato dal 4.11.
+- `prova.mjs`: `--banca` (la banca vera di `C:\pzkko-server\banca` coi file in memoria, come `tools/dev.mjs`) e
+  `--turni` (i tredici minigiochi, uno per mestiere, giocati coi sei tasti, con le foto `prova-turno-<gioco>-*.png`; la
+  banca deve aver pagato il turno intero), `--sbaglia` e `--scade` (la risposta sbagliata e il tempo scaduto),
+  `--giocate` (le giocate di Bighurra nel profilo). `--rider` adesso è `--turni=strada`.
+
 ## Gli strumenti (tools/)
 
 Uno strumento è una pagina statica in `tools/<nome>/`, fuori dalla scena 3D: in

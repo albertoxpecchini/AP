@@ -1,92 +1,124 @@
-// I minigiochi del turno di lavoro (comandi/lavoro.js). Le parole da riscrivere stanno su una tela (canvas), così non si
-// copiano.
-// (31.10) DAL 31.10 LI PREPARA E LI GIUDICA LA BANCA (giochi/chat-lavoro.mjs): la frase, le parole, i colori, la sequenza
-// arrivano dalla banca quando apre il turno ('chat.turno'); qui si mostrano coi loro tempi e si raccoglie la risposta,
-// che torna alla banca. Le risposte giuste non passano mai di qui prima della risposta. Ognuno: async (ctx, prova) →
-// la risposta (testo, id, sequenza; null allo scadere). Il nastro parla da sé con la banca, un pezzo alla volta, e torna
-// la sua ultima risposta.
+// I minigiochi del turno di lavoro (comandi/lavoro.js), RIFATTI DA CAPO il 6.11 per lo schermo del cercapersone zero.
+// (6.11, Bighurra: «il lavoro è un po' buggato, non vedo cosa devo replicare»; Alberto: «rifarei da zero… aggiusta
+// benissimo tutto ricreando».) Erano nati per la chat in HTML: un'immagine da ricordare, la frase disegnata su una tela, le
+// parole colorate, una scatola col nastro dentro. Dal 31.10 la chat è solo quella a 8 bit di pzk os
+// (telefono/zero/os/chat.js), che di una scheda disegna il testo e i tasti: l'icona da ricordare non c'era e i cinque tasti
+// per rispondere erano cinque «?», l'ordinazione del barista era vuota, i colori su uno schermo a un bit non esistono, la
+// frase su tela e il nastro non comparivano mai. E con «riduci animazioni» le cose da guardare duravano 150 ms.
+//
+// Le regole di adesso (valgono per ogni minigioco nuovo):
+// - quello che c'è da guardare è TESTO, o le ICONE DELLA SCHEDA (il campo `icone`: pzk os le disegna a un bit, in un
+//   riquadro), sempre col nome scritto accanto: se l'immagine tarda, il gioco si fa lo stesso;
+// - ogni risposta si dà COI SEI TASTI o col clic: i pezzi (le parole, le lettere, le cifre) sono tasti da premere in ordine,
+//   e sotto la domanda si legge quello che si è composto. Chi ha la tastiera vera può anche scrivere la risposta e Invio:
+//   vale quella che arriva prima (componi, qui sotto);
+// - i tempi da guardare sono tempi veri (aspetta): ctx.dormi è per le animazioni, e «riduci animazioni» lo taglia a 150 ms;
+// - le prove le prepara e le giudica la banca (giochi/chat-lavoro.mjs, 'chat.turno'): la frase, le parole, la sequenza
+//   arrivano da lei quando apre il turno, qui si mostrano e si raccoglie la risposta. Le risposte giuste non passano mai di
+//   qui prima della risposta. Ognuno: async (ctx, prova) → la risposta (testo, id, lista; null allo scadere). Il nastro
+//   parla da sé con la banca, un pezzo alla volta, e torna la sua ultima risposta.
+// Il collaudo: node tools/pzkko/zero/prova.mjs --turni (tutti e tredici, con la banca vera in memoria, coi sei tasti).
 import { COLORI, UFFICIO } from './testi.js'
-import { icona } from './icone.js'
+import { FOGLI_CHAT } from './icone.js'
 
 export const normalizza = (s) => String(s ?? '').normalize('NFC').toLowerCase().replace(/[’']/g, '\'').replace(/\s+/g, ' ').trim()
-const mescola = (a) => [...a].sort(() => Math.random() - 0.5) // (solo l'ordine dei tasti sullo schermo)
+/** Mescola una copia (solo l'ordine dei tasti sullo schermo: il caso che conta è della banca). */
+function mescola(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] } return a }
+/** Un tempo vero, da guardare o da rispettare con la banca (mai accorciato da «riduci animazioni»). */
+export const aspetta = (ms) => new Promise((r) => setTimeout(r, ms))
+/** Il nome di un'icona come si legge: «cassa-comune» → «cassa comune». */
+const nomeDi = (id) => String(id).replaceAll('-', ' ')
+const secondi = (ms) => Math.round(ms / 1000)
 
-/** Scrive un testo su una tela dentro la scheda (così non si seleziona né si incolla). */
-export function suTela(s, testo) {
-  const c = document.createElement('canvas')
-  c.className = 'c-parola'
-  const dpr = Math.min(2, devicePixelRatio || 1)
-  c.width = 440 * dpr; c.height = 44 * dpr
-  c.style.width = '440px'
-  const g = c.getContext('2d')
-  g.scale(dpr, dpr)
-  g.fillStyle = '#0a0d0a'; g.fillRect(0, 0, 440, 44)
-  g.font = `400 ${testo.length > 28 ? 17 : 22}px "Permanent Marker", cursive`
-  g.fillStyle = '#ffd400'
-  g.textBaseline = 'middle'
-  // leggermente storto e con un filo di rumore: le lettere si leggono, il copia e incolla no
-  g.save(); g.translate(10, 22); g.rotate(-0.012); g.fillText(testo, 0, 0); g.restore()
-  g.strokeStyle = 'rgba(70,255,125,.35)'
-  for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(Math.random() * 440, Math.random() * 44); g.lineTo(Math.random() * 440, Math.random() * 44); g.stroke() }
-  s.appendChild(c)
-  return c
+/** Le icone che un turno può mostrare (quelle da ricordare, la slot, la roba degli uffici): si chiedono prima che la banca
+ *  apra il turno, così quando serve l'immagine c'è già. Non aspetta niente. */
+export function prepara(ctx) {
+  ctx.caricaIcone?.(['chat-attrezzi', 'chat-pesci', 'chat-animali', 'chat-slot'].flatMap((f) => FOGLI_CHAT[f]), 32)
+  ctx.caricaIcone?.([...FOGLI_CHAT['chat-slot'], ...FOGLI_CHAT['chat-ufficio']], 16)
 }
-/** Aspetta che si scriva la risposta entro ms (la barra del tempo parte quando la domanda si legge tutta). → testo o null */
-async function chiedi(ctx, s, ms, { segnaposto = 'scrivi qui…' } = {}) {
+
+/**
+ * LA RISPOSTA FATTA DI PEZZI. I tasti si premono in ordine e sotto la domanda si legge quello che si è composto («› la
+ * nutria non…»). Un pezzo premuto si spegne (cornice a puntini) e la croce passa al prossimo; ⌫ rimette l'ultimo.
+ *   pezzi: [{ v: il valore, eti: sul tasto, id: l'id del tasto (per le direzioni: sinistra, dritto, destra) }]
+ *   fino: quanti ne servono (poi finisce da sé) · conferma: finisce col tasto ✓ · riusa: i tasti non si spengono (le
+ *   cifre, le svolte) · cancella: c'è ⌫ · scritta: la tastiera vera può scrivere la risposta intera · come: i valori → il testo
+ * → i valori premuti (una lista), il testo scritto (una stringa), o null allo scadere.
+ */
+async function componi(ctx, s, e, pezzi, ms, { fino = pezzi.length, conferma = false, riusa = false, cancella = true, scritta = false, come = (v) => v.join(' ') } = {}) {
+  const messi = [] // i pezzi premuti (i loro posti), in ordine
+  const valori = () => messi.map((i) => pezzi[i].v)
+  const vista = () => ({ ...e, d: `${e.d}\n› <b>${come(valori()) || '…'}</b>` })
+  const idDi = (i) => pezzi[i].id ?? `p${i}`
+  ctx.aggiorna(s, vista())
   const ferma = ctx.tempo(s, ms)
-  await ctx.inVista(s)
-  const r = await ctx.scrivi(ms, { segnaposto })
+  const tasti = [...pezzi.map((p, i) => ({ id: idDi(i), eti: p.eti ?? String(p.v), stile: 'nero' })), ...(cancella ? [{ id: 'via', eti: '⌫' }] : []), ...(conferma ? [{ id: 'fatto', eti: '✓' }] : [])]
+  const premuti = ctx.scegli(s, tasti, ms, { onPremuto(id, b, riga) {
+    if (id === 'fatto') return messi.length ? { v: valori() } : 'continua'
+    if (id === 'via') {
+      const i = messi.pop()
+      const t = i !== undefined && !riusa ? riga.querySelector(`[data-id="${idDi(i)}"]`) : null
+      if (t) { t.disabled = false; t.classList.remove('usato') }
+    } else {
+      messi.push(pezzi.findIndex((_, i) => idDi(i) === id))
+      if (!riusa) { b.disabled = true; b.classList.add('usato') }
+    }
+    ctx.aggiorna(s, vista())
+    return !conferma && messi.length >= fino ? { v: valori() } : 'continua'
+  } })
+  const scritto = scritta ? ctx.scrivi(ms, { segnaposto: 'o scrivila' }).then((t) => (t == null ? null : { t })) : new Promise(() => {})
+  const r = await Promise.race([premuti, scritto])
   ferma()
-  return r
+  ctx.smetti(s) // (chi ha risposto in un modo spegne l'altro: i tasti, o la riga che aspettava)
+  return r == null ? null : r.t ?? r.v
 }
-/** I tasti in fila, premuti uno dopo l'altro fino a `quanti`: → la sequenza, o null allo scadere. */
-async function sequenza(ctx, s, voci, quanti, ms, ogni = () => {}) {
-  const premute = []
-  const ferma = ctx.tempo(s, ms)
-  const r = await ctx.scegli(s, voci, ms, { onPremuto: (id, b) => { premute.push(id); b.classList?.add('premuto'); ogni(premute); return premute.length >= quanti ? 'fine' : 'continua' } })
-  ferma()
-  return r === null ? null : premute
+/** Una risposta che è un testo: i pezzi premuti, uniti (o la risposta scritta). → il testo o null */
+async function testo(ctx, s, e, pezzi, ms, unisci, opz = {}) {
+  const r = await componi(ctx, s, e, pezzi.map((v) => ({ v })), ms, { scritta: true, come: (v) => v.join(unisci), ...opz })
+  return Array.isArray(r) ? r.join(unisci) : r
 }
 
 export const MINIGIOCHI = {
-  /** riscrivi la frase (sta su tela) */
+  /** riscrivi la frase: le sue parole, mescolate, da rimettere in fila */
   async riscrivi(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'riscrivi la frase', d: 'esatta, in 15 secondi (niente copia e incolla: è un disegno).' })
-    suTela(s, p.frase)
-    return chiedi(ctx, s, p.ms)
+    const e = { colore: 'blu', t: 'riscrivi la frase', d: `rimetti in fila le parole, in ${secondi(p.ms)} secondi:\n<b>${p.frase}</b>` }
+    const s = ctx.dì(e)
+    await ctx.inVista(s)
+    return testo(ctx, s, e, mescola(p.frase.split(' ')), p.ms, ' ')
   },
-  /** l'anagramma */
+  /** l'anagramma: le lettere nell'ordine giusto */
   async anagramma(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'anagramma', d: `rimetti in ordine le lettere, in 15 secondi: <b>${p.lettere}</b>` })
-    return chiedi(ctx, s, p.ms)
+    const e = { colore: 'blu', t: 'anagramma', d: `che parola è <b>${p.lettere}</b>? premi le lettere nell’ordine giusto. ${secondi(p.ms)} secondi.` }
+    const s = ctx.dì(e)
+    await ctx.inVista(s)
+    return testo(ctx, s, e, [...p.lettere], p.ms, '')
   },
   /** memoria: cinque parole per 4 secondi, poi in ordine */
   async memoria(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'memoria', d: `ricorda queste cinque, nell’ordine: <b>${p.parole.join(' · ')}</b>` })
-    await ctx.inVista(s, p.mostra)
-    ctx.aggiorna(s, { colore: 'blu', t: 'memoria', d: 'adesso scrivile tu, nell’ordine, separate da uno spazio. 20 secondi.' })
-    const ferma = ctx.tempo(s, p.ms)
-    const r = await ctx.scrivi(p.ms, { segnaposto: 'parola parola parola…' })
-    ferma()
-    return r
+    const s = ctx.dì({ colore: 'blu', t: 'memoria', d: `ricorda queste cinque, nell’ordine (${secondi(p.mostra)} secondi):\n<b>${p.parole.join(' · ')}</b>` })
+    await ctx.inVista(s)
+    await aspetta(p.mostra)
+    return testo(ctx, s, { colore: 'blu', t: 'memoria', d: `adesso premile nell’ordine di prima. ${secondi(p.ms)} secondi.` }, mescola(p.parole), p.ms, ' ')
   },
-  /** colori: quattro parole colorate, poi «di che colore era X?» */
+  /** colori: quattro parole, ognuna col suo colore (scritto: lo schermo è a un bit), poi «di che colore era X?» */
   async colori(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'i colori', html: `<p>guarda bene, 4 secondi: ${p.parole.map((w, i) => `<b style="color:${p.colori[i][1]}">${w}</b>`).join(' · ')}</p>` })
-    await ctx.inVista(s, p.mostra)
+    const s = ctx.dì({ colore: 'blu', t: 'i colori', d: `ricorda il colore di ogni parola (${secondi(p.mostra)} secondi):\n${p.parole.map((w, i) => `<b>${w}</b> → ${p.colori[i][0]}`).join('\n')}` })
+    await ctx.inVista(s)
+    await aspetta(p.mostra)
     ctx.aggiorna(s, { colore: 'blu', t: 'i colori', d: `di che colore era <b>${p.parole[p.k]}</b>?` })
     const ferma = ctx.tempo(s, p.ms)
     const r = await ctx.scegli(s, mescola(COLORI).map(([n]) => ({ id: n, eti: n, stile: 'nero' })), p.ms)
     ferma()
     return r
   },
-  /** icona: una vista 2 secondi, poi scegli fra cinque */
+  /** icona: una cosa vista 2 secondi (il disegno e il nome), poi quale era fra cinque */
   async icona(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'occhio', html: `<p>guarda, 2 secondi: ${ctx.icona(p.giusta, 'emo grande')}</p>` })
-    await ctx.inVista(s, p.mostra)
+    const s = ctx.dì({ colore: 'blu', t: 'occhio', d: `guarda bene, ${secondi(p.mostra)} secondi: <b>${nomeDi(p.giusta)}</b>`, icone: [p.giusta], lato: 32 })
+    await ctx.inVista(s)
+    await aspetta(p.mostra)
     ctx.aggiorna(s, { colore: 'blu', t: 'occhio', d: 'qual era?' })
     const ferma = ctx.tempo(s, p.ms)
-    const r = await ctx.scegli(s, p.scelte.map((i) => ({ id: i, eti: `:${i}:`, stile: 'nero quadro' })), p.ms)
+    const r = await ctx.scegli(s, p.scelte.map((i) => ({ id: i, eti: nomeDi(i), stile: 'nero' })), p.ms)
     ferma()
     return r
   },
@@ -98,38 +130,44 @@ export const MINIGIOCHI = {
     ferma()
     return r
   },
-  /** al contrario: la parola rovesciata */
+  /** al contrario: la parola rovesciata, le lettere si premono dall'ultima alla prima */
   async contrario(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'al contrario', d: `scrivi la parola giusta, questa è rovesciata: <b>${p.rovescia}</b>. 12 secondi.` })
-    return chiedi(ctx, s, p.ms)
+    const e = { colore: 'blu', t: 'al contrario', d: `questa parola è scritta al contrario: <b>${p.rovescia}</b>. Premi le lettere dall’ultima alla prima. ${secondi(p.ms)} secondi.` }
+    const s = ctx.dì(e)
+    await ctx.inVista(s)
+    return testo(ctx, s, e, [...p.rovescia], p.ms, '')
   },
-  /** veloce: la parola compare dopo un'attesa a caso, riscrivila subito */
+  /** veloce: la parola compare dopo un'attesa a caso, e diventa un tasto: si preme (o si riscrive) subito */
   async veloce(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, riscrivila.' })
-    await ctx.inVista(s, p.ritardo)
-    ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: '' })
-    suTela(s, p.parola)
-    return chiedi(ctx, s, p.ms)
+    const s = ctx.dì({ colore: 'blu', av: 'bot-pensa', t: 'pronti…', d: 'appena compare la parola, premila (o riscrivila).' })
+    await ctx.inVista(s)
+    await aspetta(p.ritardo)
+    ctx.aggiorna(s, { colore: 'ambra', av: 'bot-arrabbiato', t: 'VIA!', d: `<b>${p.parola}</b>` })
+    const ferma = ctx.tempo(s, p.ms)
+    const r = await ctx.scrivi(p.ms, { segnaposto: p.parola })
+    ferma()
+    return r
   },
-  /** conti: due numeri */
+  /** conti: due numeri, il risultato a cifre (col meno davanti, se serve) e ✓ */
   async conti(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'conti', d: `quanto fa <b>${p.testo}</b>? 12 secondi.` })
-    return chiedi(ctx, s, p.ms, { segnaposto: 'il risultato' })
+    const e = { colore: 'blu', t: 'conti', d: `quanto fa <b>${p.testo}</b>? premi le cifre, poi ✓. ${secondi(p.ms)} secondi.` }
+    const s = ctx.dì(e)
+    await ctx.inVista(s)
+    return testo(ctx, s, e, [...'0123456789-'], p.ms, '', { riusa: true, conferma: true })
   },
-  /** ordine: l'ordinazione del cliente, premi i pulsanti nello stesso ordine */
+  /** ordine: l'ordinazione del cliente, le tre cose nello stesso ordine */
   async ordine(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'l’ordinazione', html: `<p>il cliente vuole, in quest’ordine (3 secondi): ${p.seq.map((i) => ctx.icona(i, 'emo grande')).join(' ')}</p>` })
-    await ctx.inVista(s, p.mostra)
-    ctx.aggiorna(s, { colore: 'blu', t: 'l’ordinazione', d: 'premi le tre cose nello stesso ordine.' })
-    return sequenza(ctx, s, p.voci.map((i) => ({ id: i, eti: `:${i}:`, stile: 'nero quadro' })), p.seq.length, p.ms)
+    const s = ctx.dì({ colore: 'blu', t: 'l’ordinazione', d: `il cliente vuole, in quest’ordine (${secondi(p.mostra)} secondi):\n<b>${p.seq.map(nomeDi).join(' → ')}</b>`, icone: p.seq })
+    await ctx.inVista(s)
+    await aspetta(p.mostra)
+    return componi(ctx, s, { colore: 'blu', t: 'l’ordinazione', d: `premi le ${p.seq.length} cose nello stesso ordine.` }, p.voci.map((v) => ({ v, eti: nomeDi(v) })), p.ms, { fino: p.seq.length, come: (v) => v.map(nomeDi).join(' → ') })
   },
-  /** strada: le svolte per arrivare alla consegna. Mentre le rifai, sotto compaiono quelle già fatte (1/4, 2/4…). */
+  /** strada: le svolte per arrivare alla consegna; le frecce premono subito la loro direzione (pzk os, scegli) */
   async strada(ctx, p) {
-    const s = ctx.dì({ colore: 'blu', t: 'la consegna', d: `la strada, 3 secondi: <b>${p.seq.join(' → ')}</b>` })
-    await ctx.inVista(s, p.mostra)
-    ctx.aggiorna(s, { colore: 'blu', t: 'la consegna', d: 'rifai le quattro svolte, in ordine.', html: '<p class="c-testo" data-fatte>fatte 0/4</p>' })
-    const fatte = s.querySelector('[data-fatte]')
-    return sequenza(ctx, s, ['sinistra', 'dritto', 'destra'].map((d) => ({ id: d, eti: d, stile: 'nero' })), p.seq.length, p.ms, (premute) => { fatte.innerHTML = `fatte ${premute.length}/4: <b>${premute.join(' → ')}</b>` })
+    const s = ctx.dì({ colore: 'blu', t: 'la consegna', d: `la strada, ${secondi(p.mostra)} secondi:\n<b>${p.seq.join(' → ')}</b>` })
+    await ctx.inVista(s)
+    await aspetta(p.mostra)
+    return componi(ctx, s, { colore: 'blu', t: 'la consegna', d: `rifai le ${p.seq.length} svolte, in ordine.` }, ['sinistra', 'dritto', 'destra'].map((v) => ({ v, id: v })), p.ms, { fino: p.seq.length, riusa: true, cancella: false, come: (v) => v.join(' → ') })
   },
   /** quiz: una domanda, quattro risposte (la giusta la sa la banca) */
   async quiz(ctx, p) {
@@ -139,65 +177,41 @@ export const MINIGIOCHI = {
     ferma()
     return r
   },
-  /** nastro (26.10, lo spazzino di uffici): sul nastro passano 12 cose, una alla volta, un secondo ciascuna. Si tiene (→,
-   *  trascinando a destra o in su, il tasto «tieni») o si butta (←, a sinistra o in giù, «butta»); chi non decide la butta.
-   *  Si tengono al più TRE cose: dopo, le altre si guardano passare, anche se valgono di più.
+  /** nastro (26.10, lo spazzino di uffici): sul nastro passano 12 cose, una alla volta, un secondo ciascuna. → la tiene,
+   *  ← la butta (le frecce premono subito; chi non decide la butta). In tasca ne stanno TRE: dopo, le altre si guardano
+   *  passare, anche se valgono di più.
    *  (31.10, Alberto: «decifra un wallet devi farlo se hai un wallet») I PEZZI LI DÀ LA BANCA, UNO ALLA VOLTA ('chat.nastro'):
-   *  a fine finestra la decisione sul pezzo che passa va alla banca, e la risposta porta il pezzo dopo (mentre questo esce,
-   *  260 ms: il ritmo è quello di prima). Quello che viene dopo qui non si sa mai prima. In tasca va quello che la banca dice
-   *  tenuto; all'ultimo pezzo la banca chiude il turno. → la sua ultima risposta (il turno: paga, o presi) */
+   *  la decisione sul pezzo che passa va alla banca, e la risposta porta il pezzo dopo; quello che viene dopo qui non si sa
+   *  mai prima. In tasca va quello che la banca dice tenuto; all'ultimo pezzo la banca chiude il turno.
+   *  (6.11) La scheda è una sola e cambia a ogni pezzo: il disegno, il nome, quanto vale, le tasche.
+   *  → la sua ultima risposta (il turno: paga, o presi) */
   async nastro(ctx, p) {
     const MAX = p.max, N = p.n, FINESTRA = p.finestra
-    const s = ctx.dì({ colore: 'blu', t: ':sacco: il nastro dei cestini', d: 'tieni o butta, un secondo a pezzo. tre posti in tasca: una volta pieni, il resto lo guardi passare.' })
-    const box = document.createElement('div')
-    box.className = 'c-nastro'
-    box.tabIndex = 0
-    box.innerHTML = `<div class="c-nastro-tasche">${'<i></i>'.repeat(MAX)}</div><div class="c-nastro-nastro"><div class="c-nastro-pezzo"></div><i class="c-nastro-tempo"></i></div>
-      <div class="c-nastro-tasti"><button type="button" class="c-b nero" data-v="butta">← butta</button><span class="c-nastro-conta">0/${N}</span><button type="button" class="c-b" data-v="tieni">tieni →</button></div>`
-    s.appendChild(box)
-    await ctx.inVista(s, 600)
-    const pezzo = box.querySelector('.c-nastro-pezzo'), tempo = box.querySelector('.c-nastro-tempo'), tasche = [...box.querySelectorAll('.c-nastro-tasche i')], conta = box.querySelector('.c-nastro-conta')
-    let tenuti = 0, scelta = null, sveglia = null
-    const decidi = (v) => { if (scelta || !sveglia) return; if (v === 'tieni' && tenuti >= MAX) return; scelta = v; sveglia() }
-    box.addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (b) decidi(b.dataset.v) })
-    const tasto = (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); decidi('tieni') } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); decidi('butta') } }
-    document.addEventListener('keydown', tasto)
-    let x0 = null, y0 = null
-    box.addEventListener('pointerdown', (e) => { if (e.target.closest('button')) return; x0 = e.clientX; y0 = e.clientY })
-    box.addEventListener('pointerup', (e) => {
-      if (x0 === null) return
-      const dx = e.clientX - x0, dy = e.clientY - y0
-      x0 = null
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 28) return
-      decidi(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'tieni' : 'butta') : dy < 0 ? 'tieni' : 'butta')
-    })
-    box.focus({ preventScroll: true })
-    const aspetta = (ms) => new Promise((ok) => { const t = setTimeout(ok, ms); sveglia = () => { clearTimeout(t); ok() } })
-    const dormi = (ms) => new Promise((ok) => setTimeout(ok, ms))
+    const PASSO = 900 // (la banca dà il pezzo dopo solo quando questo è passato: 860 ms dal suo arrivo, giochi/chat-lavoro.mjs)
+    const tasche = []
+    const titolo = ':sacco: il nastro dei cestini'
+    const inTasca = () => `in tasca ${tasche.length}/${MAX}${tasche.length ? ': ' + tasche.map((x) => nomeDi(x.id)).join(', ') : ''}`
+    const s = ctx.dì({ colore: 'blu', t: titolo, d: `passano ${N} cose, un secondo l’una: → la tieni, ← la butti. In tasca ne stanno ${MAX}.` })
+    await ctx.inVista(s)
+    await aspetta(1500)
     // la decisione alla banca (se il pezzo dopo non è ancora arrivato, un attimo e si riprova: la rete può essere svelta)
-    const manda = async (i, tieni) => { for (let k = 0; ; k++) { const r = await ctx.fai('chat.nastro', { i, tieni }); if (r.ok || !r.presto || k >= 5) return r; await dormi(150) } }
+    const manda = async (i, tieni) => { for (let k = 0; ; k++) { const r = await ctx.fai('chat.nastro', { i, tieni }); if (r.ok || !r.presto || k >= 5) return r; await aspetta(150) } }
     let r = await ctx.fai('chat.nastro', {}) // il primo pezzo
     while (r.ok && !r.esito.fine) {
-      const { i, id } = r.esito
+      const { i, id } = r.esito, da = Date.now()
       const x = UFFICIO.find((y) => y.id === id) ?? { id, nome: id, vale: 0 }
-      const pieno = tenuti >= MAX
-      box.classList.toggle('pieno', pieno)
-      conta.textContent = `${i + 1}/${N}`
-      pezzo.className = 'c-nastro-pezzo entra' + (x.sospetto ? ' sospetto' : '')
-      pezzo.innerHTML = `${icona(x.id, 'emo')}<b>${x.nome.replace(/^(un’|un |una |uno |delle |degli |dei )/i, '')}</b>${x.sospetto ? '<small>⚠ roba che scotta</small>' : x.vale ? `<small>vale ${x.vale}</small>` : ''}`
-      tempo.style.animation = 'none'; void tempo.offsetWidth; tempo.style.animation = `c-nastro-tempo ${FINESTRA}ms linear forwards`
-      scelta = null
-      await aspetta(FINESTRA)
-      sveglia = null
-      const tieni = !pieno && scelta === 'tieni'
-      pezzo.className = 'c-nastro-pezzo ' + (tieni ? 'preso' : pieno ? 'passa' : 'via')
-      ;[r] = await Promise.all([manda(i, tieni), dormi(260)])
-      if (r.ok && r.esito.tenuto) { tasche[tenuti].innerHTML = icona(x.id, 'emo'); tasche[tenuti].classList.add('piena'); tenuti++ }
+      const pieno = tasche.length >= MAX
+      const nome = x.nome.replace(/^(un’|un |una |uno |delle |degli |dei )/i, '')
+      ctx.aggiorna(s, { colore: x.sospetto ? 'ambra' : 'blu', t: `${titolo} · ${i + 1}/${N}`, d: `<b>${nome}</b> · ${x.sospetto ? '⚠ roba che scotta' : `vale ${x.vale}`}${pieno ? ' · tasche piene' : ''}`, icone: [x.id], pie: inTasca(), senzaTasti: true })
+      const ferma = ctx.tempo(s, FINESTRA)
+      const v = pieno ? (await aspetta(FINESTRA), null) : await ctx.scegli(s, [{ id: 'sinistra', eti: 'butta', stile: 'nero' }, { id: 'destra', eti: 'tieni' }], FINESTRA)
+      ferma()
+      const manca = PASSO - (Date.now() - da)
+      if (manca > 0) await aspetta(manca)
+      r = await manda(i, v === 'destra')
+      if (r.ok && r.esito.tenuto) tasche.push(x)
     }
-    document.removeEventListener('keydown', tasto)
-    box.classList.add('finito')
-    pezzo.innerHTML = ''
+    ctx.aggiorna(s, { colore: 'blu', t: titolo, d: r.ok ? 'il nastro è finito.' : 'il nastro si è fermato.', icone: tasche.map((x) => x.id), pie: inTasca(), senzaTasti: true })
     return r
   },
-
 }

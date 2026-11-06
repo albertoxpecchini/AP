@@ -143,6 +143,11 @@ si clicca si fa anche coi tasti.
 3. **Un nome che non c'è lascia un buco** (il collaudo lo segnala: «icone che non ci sono»).
 4. **Le webp di Alberto** (`chat/icone.js`) restano solo come riserva per i nomi che non hanno ancora un SVG. Un'icona
    nuova non si fa mai così: la prima volta `icone.bitmap` torna null finché l'immagine non arriva, e lo schermo salta.
+5. **Nella chat un'icona si VEDE solo col campo `icone` della scheda** (`icone: ['canna']`, `lato: 32`): una fila di
+   riquadri. Quelle dentro il testo (`:canna:`, `<img>`) la chat le toglie, e un tasto con la sola icona in fila non ha
+   disegno. (6.11, Bighurra: «non vedo cosa devo replicare»: al meccanico l'icona da ricordare non compariva, e i cinque
+   tasti per rispondere erano cinque «?».) Accanto all'icona va sempre il nome: una webp di riserva può arrivare tardi.
+6. **Lo schermo è a un bit: i colori si scrivono.** («i colori» del bidello: quattro parole colorate, tutte uguali.)
 
 ## 6. Le animazioni
 
@@ -153,6 +158,9 @@ si clicca si fa anche coi tasti.
 3. **Si ridisegna solo mentre si anima.** Quando l'animazione finisce, `tic` smette di chiamare `ridisegna`: ogni
    disegno rifà la tela 768 × 384, la trama del 3D e il tasto sul muro.
 4. **Corte**, al massimo un secondo e mezzo, e mai di traverso ai tasti (3.6).
+5. **Un tempo di gioco non è un'animazione.** Quello che il giocatore deve guardare o aspettare (quattro secondi per
+   ricordare, il ritardo del «veloce») si aspetta con `aspetta` di `chat/minigiochi.js`, mai con `ctx.dormi` o
+   `ctx.inVista(s, ms)`: con «riduci animazioni» quelli durano 150 ms, e le cinque parole da ricordare sparivano subito.
 5. **La retroilluminazione** (`lcd.accendi`) è del sistema: accensione, spegnimento, saluto.
 
 ## 7. I suoni
@@ -218,9 +226,18 @@ node tools/pzkko/zero/prova.mjs --app=<id>
 5. **Se l'app cambia il tasto sul muro**, anche `prova.mjs --muro`, che lo fotografa a 4×.
 6. **Il clic si prova davvero:** col mouse sul 3D, su ogni cosa che si preme. `prova.mjs --rider` è l'esempio: un turno
    intero, con due frecce dalla tastiera e due clic del mouse sullo schermo, e il controllo che il turno sia contato.
-7. **I comandi della chat che toccano la pagina** (`querySelector` sulla scheda, `appendChild`, tasti ascoltati sul
-   documento) si provano anche nello zero: lì la scheda è finta (`maniglia` in os/chat.js) e un selettore che non conosce
-   torna null. («[data-fatte]» della consegna del rider rompeva il gioco alla prima svolta.)
+7. **I comandi della chat non toccano la pagina:** niente `querySelector` sulla scheda, niente `appendChild`, niente
+   `document.createElement`, niente tasti ascoltati sul documento. Nello zero la scheda è finta (`maniglia` in
+   os/chat.js): `appendChild` non fa niente e un selettore che non conosce torna null. («[data-fatte]» della consegna del
+   rider rompeva il gioco alla prima svolta; il 6.11 la tela con la frase da riscrivere e la scatola del nastro non
+   comparivano mai.) Si usa quello che la scheda sa disegnare: `t`, `d`, `campi`, `pie`, `icone`, i tasti di `scegli`.
+8. **Ogni risposta si dà coi sei tasti.** Una risposta che è un testo (una parola, una frase, un numero) è fatta di pezzi
+   da premere in ordine (`componi` in `chat/minigiochi.js`), e la tastiera vera può scriverla intera; la parola che
+   compare all'improvviso è un tasto (`scrivi` col `segnaposto`). Mai solo «scrivi»: con la croce in quindici secondi non
+   si scrive una frase.
+9. **Quello che apre la banca si collauda con la banca:** `prova.mjs --banca` la carica coi file in memoria, e
+   `--turni` gioca i tredici minigiochi del turno coi sei tasti (`--sbaglia`, `--scade`: la risposta sbagliata e il tempo
+   scaduto). Dal 31.10 al 6.11 nessun collaudo giocava un turno, e nessuno si è accorto che non si vedeva.
 6. **Si scrive un paragrafo nel README** (`pzkko/README.md`, «Il cercapersone zero»), con le parole di Alberto. Si dice ad
    Alberto dove guardarla: http://localhost:5182/?zero.
 
