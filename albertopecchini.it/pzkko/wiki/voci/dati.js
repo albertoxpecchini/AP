@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 756 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>541f48c</code>, 2026-11-06). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 758 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>d6ff9ab</code>, 2026-11-06). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,12 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 55
+| 57
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/d6ff9ab d6ff9ab] fix(pzkko): l'ospite appena arrivato aspetta il biglietto della banca prima di ogni azione (niente più 401 a ogni visita nuova)
+* 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/65f5524 65f5524] docs(wiki): pzkkopedia allineata al bot dei bug (541f48c)
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/541f48c 541f48c] feat(tools): il bot dei bug di pzkko, che gira da solo a ogni push e due volte al giorno sul sito vero
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/d358119 d358119] Catture aggiornate: pzkko
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/7d8bf1c 7d8bf1c] docs(wiki): pzkkopedia allineata al cartello della manutenzione di Monaco (7d95b08)
@@ -12425,8 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/4e7bf20 4e7bf20] chore(tempo): le versioni di oggi di albertopecchini.it e pzkko.it
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/a1574d7 a1574d7] feat(tempo): una pagina leggera per ogni cattura, con l'indirizzo suo
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/312bf5c 312bf5c] chore(tempo): le versioni di oggi di albertopecchini.it e pzkko.it
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/a1f781e a1f781e] chore(pzkko): pzkkopedia allineata a f185289
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/f185289 f185289] Merge remote-tracking branch 'origin/main' into albertopecchini.it
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
