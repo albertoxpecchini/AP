@@ -12366,7 +12366,7 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 
 {{Vedi anche|Le app di pzk os|pzk os|Il cercapersone zero}}
 [[Categoria:Le app di pzk os]]` },
-  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 753 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>7d95b08</code>, 2026-11-06). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
+  "Elenco dei commit": { data: "2026-11-06", fonti: ["README.md"], testo: `'''I 755 commit''' del [[Il repository AP|repository AP]] dal 2026-05-24 a oggi (l’ultimo: <code>99f4342</code>, 2026-11-06). La lista completa, con filtri, sta in [[Speciale:UltimeModifiche|Ultime modifiche]]; la cronologia di ogni voce (la linguetta «Cronologia») elenca i commit che hanno toccato i suoi file. Generato da <code>git log</code> ogni volta che la wiki si aggiorna.
 
 == Per mese ==
 {| class="wikitable"
@@ -12393,10 +12393,12 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 | 190
 |-
 | 2026-11
-| 52
+| 54
 |}
 
 == Gli ultimi trenta ==
+* 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/99f4342 99f4342] feat(tools): il bot dei bug di pzkko, che gira da solo a ogni push e due volte al giorno sul sito vero
+* 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/7d8bf1c 7d8bf1c] docs(wiki): pzkkopedia allineata al cartello della manutenzione di Monaco (7d95b08)
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/7d95b08 7d95b08] feat(pzkko): il cartello della manutenzione sul muro della stazione di Monaco, e il sito chiuso fino a domenica alle 14
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/a0ab410 a0ab410] docs(wiki): pzkkopedia allineata al turno di lavoro rifatto (0b2f180)
 * 2026-11-06 [https://github.com/albertoxpecchini/AP/commit/0b2f180 0b2f180] fix(pzkko): il turno di lavoro rifatto da capo per lo zero, e il blackjack della chat nel profilo
@@ -12425,8 +12427,6 @@ Ogni partita: 8 domande, 15 secondi l’una; ogni risposta giusta paga 20/40/80 
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/a1f781e a1f781e] chore(pzkko): pzkkopedia allineata a f185289
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/f185289 f185289] Merge remote-tracking branch 'origin/main' into albertopecchini.it
 * 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/13ff3ec 13ff3ec] feat(tempo): la macchina del tempo di cinque siti, col selettore, le statistiche e i momenti
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/5e7c98b 5e7c98b] Catture aggiornate: Alberto Pecchini
-* 2026-11-03 [https://github.com/albertoxpecchini/AP/commit/7d62c46 7d62c46] feat(mascotte): torna la tartaruga col casco al posto della nutria
 
 == Dove si vede ==
 [[File:github.webp|thumb|none|380px|il repository AP su GitHub, con il numero dei commit]]
