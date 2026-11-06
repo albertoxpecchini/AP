@@ -153,7 +153,20 @@ export const sincronizzato = () => W?.t ?? 0
 export const scaduto = () => !!W && Date.now() - W.t > VALE_CAMBIO
 export const serverOnline = () => online
 
-async function chiama(body, { keepalive = false } = {}) {
+// L'ospite appena arrivato non ha ancora il biglietto: finché la banca non glielo dà, un'azione (fai) partirebbe con
+// «ospite: null» e tornerebbe 401 «entra di nuovo» (virtual.palinsesto, sfide.oggi… a ogni visita nuova: trovato dal
+// bot dei bug sul sito vero, 6.11). Il biglietto si chiede una volta sola, e le azioni lo aspettano; se la banca è in
+// pausa non arriva, e l'azione parte lo stesso e si prende il suo «in pausa».
+let inVolo = null
+const primoBiglietto = () => (inVolo ??= manda({ a: 'ospite' }).finally(() => { inVolo = null }))
+async function chiama(body, opz = {}) {
+  if (!W && !O) {
+    if (body.a === 'ospite') return primoBiglietto()
+    if (body.a === 'fai') await primoBiglietto()
+  }
+  return manda(body, opz)
+}
+async function manda(body, { keepalive = false } = {}) {
   const dati = W ? { token: W.token, ...body } : { ospite: O?.biglietto ?? null, ...body }
   const chi = W?.token ?? 'ospite' // (chi ha chiesto: se intanto si è entrati o usciti, la risposta è dell'altro e non si prende)
   try {

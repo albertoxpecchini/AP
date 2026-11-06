@@ -294,7 +294,12 @@ async function giraBrowser() {
             const u = new URL(r.url())
             if (r.status() < 400) return
             if (u.origin !== origine) return nota(dove, `da fuori: ${u.host}${u.pathname} → ${r.status()}`)
-            if (u.pathname.startsWith('/api/')) return r.status() === 503 ? nota('la banca', 'le api rispondono «in pausa» (503): il server di casa è spento, o è la prova in locale') : segna(G, dove, `${u.pathname} risponde ${r.status()}`)
+            if (u.pathname.startsWith('/api/')) {
+              if (r.status() === 503) return nota('la banca', 'le api rispondono «in pausa» (503): il server di casa è spento, o è la prova in locale')
+              // (38 aperture di fila dallo stesso indirizzo: è il bot che si prende il limite della banca, non un visitatore)
+              if (r.status() === 429) return nota('la banca', 'ha risposto «troppe richieste» (429) al bot, che apre tante pagine di fila')
+              return segna(G, dove, `${u.pathname} risponde ${r.status()}`)
+            }
             if (opz.stato === r.status() && r.request().isNavigationRequest()) return
             segna(G, dove, `non arriva ${u.pathname} (${r.status()})`)
           })

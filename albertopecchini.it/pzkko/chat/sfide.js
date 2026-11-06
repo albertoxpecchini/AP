@@ -41,9 +41,6 @@ const ieri = (giorno) => giornoDi(new Date(`${giorno}T12:00:00+01:00`).getTime()
 let chiesto = ''
 function prepara(oggi) {
   if (chiesto === oggi) return
-  // prima della prima risposta della banca l'ospite non ha ancora il biglietto: chiedere adesso torna 401 («entra di
-  // nuovo») a ogni visita nuova (trovato dal bot dei bug, 6.11). Si chiede al disegno dopo, quando lo zaino è arrivato
-  if (pzk.ospite() && pzk.zainoBanca() === null) return
   chiesto = oggi
   pzk.fai('sfide.oggi').then((d) => { if (!d?.ok) chiesto = '' }).catch(() => { chiesto = '' }) // (riprova al prossimo disegno; quando arriva, zaino.ascolta ridisegna)
 }

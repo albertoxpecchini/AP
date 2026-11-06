@@ -299,7 +299,7 @@ Esce con 0 se non trova niente («nessun bug») e con 1 se trova qualcosa. Un fa
 == Cosa ha trovato il primo giorno ==
 * <code>tools/pzkko/immagini.mjs</code> non partiva più dal 29.10: lo «zero» dello shop era il tredicesimo pezzo di <code>chat-pzk</code>, una griglia da dodici, e <code>fogli.js</code> non si caricava. Trovato disegnando gli adesivi del [[La manutenzione di Monaco|cartello di Monaco]], e da lì il controllo «i moduli di dati si caricano»;
 * <code>tools/pzkko/prova-lotti.mjs</code> importa <code>api/_giocatori.mjs</code>, che non c'è più dal 31.10 (la banca è andata sul server) e non parte: sta fra i «da decidere» del bot (<code>DA_DECIDERE</code>), finché Alberto non dice se toglierlo o rifarlo sulle prove della banca;
-* sul sito vero, a ogni visita nuova senza conto, <code>/api/wallet/</code> rispondeva 401 «entra di nuovo»: <code>chat/sfide.js</code> chiedeva alla banca le sfide del giorno (<code>sfide.oggi</code>) prima che l'ospite avesse il biglietto. Adesso aspetta la prima risposta della banca;
+* sul sito vero, a ogni visita nuova senza conto, <code>/api/wallet/</code> rispondeva 401 «entra di nuovo»: chi arriva da ospite non ha ancora il biglietto, e le azioni (<code>sfide.oggi</code>, <code>virtual.palinsesto</code>) partivano lo stesso con «ospite: null». Adesso in <code>games/pzk.js</code> il biglietto si chiede una volta sola e ogni <code>fai</code> lo aspetta (provato da ospite contro la banca vera in memoria);
 * le 22 app di pzk os e le 21 prove della banca: tutte a posto.
 
 {{Vedi anche|Il controllo della build (workflow)|Il controllo delle pagine|Il collaudo delle app|La manutenzione di Monaco}}
